@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>OpenFIDO</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/convert.css') }}">
+        <script src="{{ url_for('static',filename='js/convert.js') }}"></script>
+    </head>
+    <body>
+        {% include 'includes/_navbar.html' %}
+        <div class="container">
+            {% block body %}{% endblock %}
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    </body>
+</html>

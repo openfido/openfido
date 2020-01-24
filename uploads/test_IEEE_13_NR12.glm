@@ -1,0 +1,3799 @@
+// JSON to GLM Converter Output
+ // CLOCK
+clock {
+	timezone EST5EDT;
+	starttime "2000-01-01 00:00:00 EST";
+	stoptime "2000-01-01 00:00:01 EST";
+}
+ // MODULES
+module powerflow{
+	message_flags DEBUG|VERBOSE;
+	show_matrix_values FALSE;
+	primary_voltage_ratio +60;
+	nominal_frequency +60;
+	require_voltage_control FALSE;
+	geographic_degree +3.21944;
+	fault_impedance +1e-06+0j;
+	ground_impedance +1e-06+0j;
+	warning_underfrequency +55;
+	warning_overfrequency +65;
+	warning_undervoltage +0.8;
+	warning_overvoltage +1.2;
+	warning_voltageangle +2;
+	maximum_voltage_error +1e-06;
+	solver_method NR;
+	NR_matrix_output_interval NEVER;
+	NR_matrix_output_references FALSE;
+	line_capacitance TRUE;
+	line_limits TRUE;
+	NR_iteration_limit 500;
+	NR_deltamode_iteration_limit 10;
+	NR_superLU_procs 1;
+	default_maximum_voltage_error +1e-06;
+	default_maximum_power_error +0.0001;
+	NR_admit_change FALSE;
+	enable_subsecond_models FALSE;
+	all_powerflow_delta FALSE;
+	deltamode_timestep +1e+07 ns;
+	current_frequency +60 Hz;
+	master_frequency_update FALSE;
+	enable_frequency_dependence FALSE;
+	default_resistance +0.0001;
+	enable_inrush FALSE;
+	low_voltage_impedance_level +0.7;
+	enable_mesh_fault_current FALSE;
+	convergence_error_handling FATAL;
+	solver_profile_enable FALSE;
+	solver_profile_filename solver_nr_profile.csv;
+	solver_profile_headers_included TRUE;
+	solver_headers timestamp,duration[microsec],iteration,bus_count,branch_count,error;
+	solver_ml_config /usr/local/share/gridlabd/solver_ml.conf;
+	market_price_name current_market.clearing_price;
+}
+module assert{
+	message_flags DEBUG|VERBOSE;
+}
+ // GLOBALS
+// version.major is set to 4
+// version.minor is set to 2
+// version.patch is set to 1
+// version.build is set to 191231
+// version.branch is set to develop-change-license
+// command_line is set to /usr/local/opt/gridlabd/4.2.1-200104-develop/bin/gridlabd.bin test_IEEE_13_NR.glm -o test_IEEE_13_NR.json
+#ifndef environment
+global char1024 environment "batch";
+#else
+#set environment="batch"
+#endif //environment
+#ifndef quiet
+global bool quiet FALSE;
+#else
+#set quiet=FALSE
+#endif //quiet
+#ifndef warn
+global bool warn TRUE;
+#else
+#set warn=TRUE
+#endif //warn
+#ifndef debugger
+global bool debugger FALSE;
+#else
+#set debugger=FALSE
+#endif //debugger
+#ifndef gdb
+global bool gdb FALSE;
+#else
+#set gdb=FALSE
+#endif //gdb
+#ifndef debug
+global bool debug FALSE;
+#else
+#set debug=FALSE
+#endif //debug
+#ifndef test
+global bool test FALSE;
+#else
+#set test=FALSE
+#endif //test
+#ifndef verbose
+global bool verbose FALSE;
+#else
+#set verbose=FALSE
+#endif //verbose
+#ifndef iteration_limit
+global int32 iteration_limit 100000;
+#else
+#set iteration_limit=100000
+#endif //iteration_limit
+// workdir is set to /Users/alyona_slac/gridlabd/slacgismo_gridlabd/powerflow/autotest/test_IEEE_13_NR
+#ifndef dumpfile
+global char1024 dumpfile "gridlabd.json";
+#else
+#set dumpfile="gridlabd.json"
+#endif //dumpfile
+#ifndef savefile
+global char1024 savefile "test_IEEE_13_NR.json";
+#else
+#set savefile="test_IEEE_13_NR.json"
+#endif //savefile
+#ifndef dumpall
+global bool dumpall FALSE;
+#else
+#set dumpall=FALSE
+#endif //dumpall
+#ifndef runchecks
+global bool runchecks FALSE;
+#else
+#set runchecks=FALSE
+#endif //runchecks
+#ifndef threadcount
+global int32 threadcount 1;
+#else
+#set threadcount=1
+#endif //threadcount
+#ifndef profiler
+global bool profiler FALSE;
+#else
+#set profiler=FALSE
+#endif //profiler
+#ifndef pauseatexit
+global bool pauseatexit FALSE;
+#else
+#set pauseatexit=FALSE
+#endif //pauseatexit
+#ifndef testoutputfile
+global char1024 testoutputfile "test.txt";
+#else
+#set testoutputfile="test.txt"
+#endif //testoutputfile
+#ifndef xml_encoding
+global int32 xml_encoding 8;
+#else
+#set xml_encoding=8
+#endif //xml_encoding
+#ifndef clock
+global timestamp clock "2000-01-01 00:00:00 EST";
+#else
+#set clock="2000-01-01 00:00:00 EST"
+#endif //clock
+#ifndef starttime
+global timestamp starttime "2000-01-01 00:00:00 EST";
+#else
+#set starttime="2000-01-01 00:00:00 EST"
+#endif //starttime
+#ifndef stoptime
+global timestamp stoptime "2000-01-01 00:00:01 EST";
+#else
+#set stoptime="2000-01-01 00:00:01 EST"
+#endif //stoptime
+#ifndef double_format
+global char32 double_format "%+lg";
+#else
+#set double_format="%+lg"
+#endif //double_format
+#ifndef complex_format
+global char256 complex_format "%+lg%+lg%c";
+#else
+#set complex_format="%+lg%+lg%c"
+#endif //complex_format
+#ifndef object_format
+global char32 object_format "%s:%d";
+#else
+#set object_format="%s:%d"
+#endif //object_format
+#ifndef object_scan
+global char32 object_scan "%[^:]:%d";
+#else
+#set object_scan="%[^:]:%d"
+#endif //object_scan
+#ifndef object_tree_balance
+global bool object_tree_balance FALSE;
+#else
+#set object_tree_balance=FALSE
+#endif //object_tree_balance
+// kmlfile is set to 
+#ifndef kmlhost
+global char1024 kmlhost "https://raw.githubusercontent.com/dchassin/gridlabd/master/gldcore/rt";
+#else
+#set kmlhost="https://raw.githubusercontent.com/dchassin/gridlabd/master/gldcore/rt"
+#endif //kmlhost
+// modelname is set to test_IEEE_13_NR.glm
+// execdir is set to /usr/local/opt/gridlabd/4.2.1-200104-develop/bin
+#ifndef strictnames
+global bool strictnames TRUE;
+#else
+#set strictnames=TRUE
+#endif //strictnames
+#ifndef website
+global char1024 website "http://www.gridlabd.org/";
+#else
+#set website="http://www.gridlabd.org/"
+#endif //website
+#ifndef urlbase
+global char1024 urlbase "http://www.gridlabd.org/";
+#else
+#set urlbase="http://www.gridlabd.org/"
+#endif //urlbase
+#ifndef randomseed
+global int32 randomseed 1897958302;
+#else
+#set randomseed=1897958302
+#endif //randomseed
+#ifndef randomstate
+global int32 randomstate 1897958302;
+#else
+#set randomstate=1897958302
+#endif //randomstate
+// include is set to 
+// trace is set to 
+#ifndef gdb_window
+global bool gdb_window FALSE;
+#else
+#set gdb_window=FALSE
+#endif //gdb_window
+#ifndef tmp
+global char1024 tmp "/Users/alyona_slac/.gridlabd/tmp";
+#else
+#set tmp="/Users/alyona_slac/.gridlabd/tmp"
+#endif //tmp
+#ifndef force_compile
+global int32 force_compile 0;
+#else
+#set force_compile=0
+#endif //force_compile
+#ifndef nolocks
+global bool nolocks FALSE;
+#else
+#set nolocks=FALSE
+#endif //nolocks
+#ifndef skipsafe
+global bool skipsafe FALSE;
+#else
+#set skipsafe=FALSE
+#endif //skipsafe
+#ifndef dateformat
+global enumeration dateformat ISO;
+#else
+#set dateformat=ISO
+#endif //dateformat
+#ifndef init_sequence
+global enumeration init_sequence DEFERRED;
+#else
+#set init_sequence=DEFERRED
+#endif //init_sequence
+#ifndef minimum_timestep
+global int32 minimum_timestep 1;
+#else
+#set minimum_timestep=1
+#endif //minimum_timestep
+// platform is set to MACOSX
+#ifndef suppress_repeat_messages
+global bool suppress_repeat_messages TRUE;
+#else
+#set suppress_repeat_messages=TRUE
+#endif //suppress_repeat_messages
+#ifndef maximum_synctime
+global int32 maximum_synctime 60;
+#else
+#set maximum_synctime=60
+#endif //maximum_synctime
+#ifndef run_realtime
+global bool run_realtime FALSE;
+#else
+#set run_realtime=FALSE
+#endif //run_realtime
+#ifndef enter_realtime
+global timestamp enter_realtime "NEVER";
+#else
+#set enter_realtime="NEVER"
+#endif //enter_realtime
+// realtime_metric is set to +0
+#ifndef no_deprecate
+global bool no_deprecate FALSE;
+#else
+#set no_deprecate=FALSE
+#endif //no_deprecate
+// streaming_io is set to FALSE
+// compileonly is set to FALSE
+#ifndef relax_naming_rules
+global bool relax_naming_rules FALSE;
+#else
+#set relax_naming_rules=FALSE
+#endif //relax_naming_rules
+#ifndef browser
+global char1024 browser "safari";
+#else
+#set browser="safari"
+#endif //browser
+#ifndef server_portnum
+global int32 server_portnum 0;
+#else
+#set server_portnum=0
+#endif //server_portnum
+#ifndef server_quit_on_close
+global bool server_quit_on_close FALSE;
+#else
+#set server_quit_on_close=FALSE
+#endif //server_quit_on_close
+// client_allowed is set to 
+#ifndef autoclean
+global bool autoclean TRUE;
+#else
+#set autoclean=TRUE
+#endif //autoclean
+#ifndef technology_readiness_level
+global enumeration technology_readiness_level UNKNOWN;
+#else
+#set technology_readiness_level=UNKNOWN
+#endif //technology_readiness_level
+#ifndef show_progress
+global bool show_progress TRUE;
+#else
+#set show_progress=TRUE
+#endif //show_progress
+#ifndef checkpoint_type
+global enumeration checkpoint_type NONE;
+#else
+#set checkpoint_type=NONE
+#endif //checkpoint_type
+// checkpoint_file is set to 
+#ifndef checkpoint_seqnum
+global int32 checkpoint_seqnum 0;
+#else
+#set checkpoint_seqnum=0
+#endif //checkpoint_seqnum
+#ifndef checkpoint_interval
+global int32 checkpoint_interval 0;
+#else
+#set checkpoint_interval=0
+#endif //checkpoint_interval
+#ifndef checkpoint_keepall
+global bool checkpoint_keepall FALSE;
+#else
+#set checkpoint_keepall=FALSE
+#endif //checkpoint_keepall
+#ifndef check_version
+global bool check_version FALSE;
+#else
+#set check_version=FALSE
+#endif //check_version
+#ifndef random_number_generator
+global enumeration random_number_generator RNG3;
+#else
+#set random_number_generator=RNG3
+#endif //random_number_generator
+#ifndef mainloop_state
+global enumeration mainloop_state DONE;
+#else
+#set mainloop_state=DONE
+#endif //mainloop_state
+#ifndef pauseat
+global timestamp pauseat "NEVER";
+#else
+#set pauseat="NEVER"
+#endif //pauseat
+// infourl is set to http://gridlab-d.shoutwiki.com/w/index.php?title=Special%3ASearch&fulltext=Search&search=
+#ifndef hostname
+global char1024 hostname "localhost";
+#else
+#set hostname="localhost"
+#endif //hostname
+#ifndef hostaddr
+global char32 hostaddr "127.0.0.1";
+#else
+#set hostaddr="127.0.0.1"
+#endif //hostaddr
+#ifndef autostart_gui
+global bool autostart_gui TRUE;
+#else
+#set autostart_gui=TRUE
+#endif //autostart_gui
+// master is set to 
+#ifndef master_port
+global int64 master_port 0;
+#else
+#set master_port=0
+#endif //master_port
+#ifndef multirun_mode
+global enumeration multirun_mode STANDALONE;
+#else
+#set multirun_mode=STANDALONE
+#endif //multirun_mode
+#ifndef multirun_conn
+global enumeration multirun_conn NONE;
+#else
+#set multirun_conn=NONE
+#endif //multirun_conn
+#ifndef signal_timeout
+global int32 signal_timeout 5000;
+#else
+#set signal_timeout=5000
+#endif //signal_timeout
+#ifndef slave_port
+global int16 slave_port 6267;
+#else
+#set slave_port=6267
+#endif //slave_port
+#ifndef slave_id
+global int64 slave_id 0;
+#else
+#set slave_id=0
+#endif //slave_id
+// return_code is set to 0
+// exit_code is set to 0
+#ifndef module_compiler_flags
+global set module_compiler_flags NONE;
+#else
+#set module_compiler_flags=NONE
+#endif //module_compiler_flags
+// init_max_defer is set to 64
+#ifndef mt_analysis
+global bool mt_analysis FALSE;
+#else
+#set mt_analysis=FALSE
+#endif //mt_analysis
+#ifndef inline_block_size
+global int32 inline_block_size 1048576;
+#else
+#set inline_block_size=1048576
+#endif //inline_block_size
+#ifndef validate
+global set validate TSTD|RALL;
+#else
+#set validate=TSTD|RALL
+#endif //validate
+#ifndef sanitize
+global set sanitize NAMES|POSITIONS;
+#else
+#set sanitize=NAMES|POSITIONS
+#endif //sanitize
+#ifndef sanitize_prefix
+global char8 sanitize_prefix "GLD_";
+#else
+#set sanitize_prefix="GLD_"
+#endif //sanitize_prefix
+#ifndef sanitize_index
+global char1024 sanitize_index ".txt";
+#else
+#set sanitize_index=".txt"
+#endif //sanitize_index
+// sanitize_offset is set to 
+#ifndef simulation_mode
+global enumeration simulation_mode EVENT;
+#else
+#set simulation_mode=EVENT
+#endif //simulation_mode
+#ifndef deltamode_allowed
+global bool deltamode_allowed FALSE;
+#else
+#set deltamode_allowed=FALSE
+#endif //deltamode_allowed
+#ifndef deltamode_timestep
+global int32 deltamode_timestep 10000000;
+#else
+#set deltamode_timestep=10000000
+#endif //deltamode_timestep
+#ifndef deltamode_maximumtime
+global int64 deltamode_maximumtime 3600000000000;
+#else
+#set deltamode_maximumtime=3600000000000
+#endif //deltamode_maximumtime
+#ifndef deltaclock
+global int64 deltaclock 0;
+#else
+#set deltaclock=0
+#endif //deltaclock
+#ifndef delta_current_clock
+global double delta_current_clock +0;
+#else
+#set delta_current_clock=+0
+#endif //delta_current_clock
+// deltamode_updateorder is set to powerflow
+#ifndef deltamode_iteration_limit
+global int32 deltamode_iteration_limit 10;
+#else
+#set deltamode_iteration_limit=10
+#endif //deltamode_iteration_limit
+#ifndef deltamode_forced_extra_timesteps
+global int32 deltamode_forced_extra_timesteps 0;
+#else
+#set deltamode_forced_extra_timesteps=0
+#endif //deltamode_forced_extra_timesteps
+#ifndef deltamode_forced_always
+global bool deltamode_forced_always FALSE;
+#else
+#set deltamode_forced_always=FALSE
+#endif //deltamode_forced_always
+#ifndef run_powerworld
+global bool run_powerworld FALSE;
+#else
+#set run_powerworld=FALSE
+#endif //run_powerworld
+#ifndef bigranks
+global bool bigranks TRUE;
+#else
+#set bigranks=TRUE
+#endif //bigranks
+// exename is set to /usr/local/opt/gridlabd/4.2.1-200104-develop/bin/gridlabd.bin
+#ifndef wget_options
+global char1024 wget_options "maxsize:100MB;update:newer";
+#else
+#set wget_options="maxsize:100MB;update:newer"
+#endif //wget_options
+#ifndef curl_options
+global char1024 curl_options "maxsize:100MB;update:newer";
+#else
+#set curl_options="maxsize:100MB;update:newer"
+#endif //curl_options
+#ifndef svnroot
+global char1024 svnroot "http://gridlab-d.svn.sourceforge.net/svnroot/gridlab-d";
+#else
+#set svnroot="http://gridlab-d.svn.sourceforge.net/svnroot/gridlab-d"
+#endif //svnroot
+#ifndef github
+global char1024 github "https://github.com/gridlab-d";
+#else
+#set github="https://github.com/gridlab-d"
+#endif //github
+#ifndef gitraw
+global char1024 gitraw "https://raw.githubusercontent.com/gridlab-d";
+#else
+#set gitraw="https://raw.githubusercontent.com/gridlab-d"
+#endif //gitraw
+#ifndef allow_reinclude
+global bool allow_reinclude FALSE;
+#else
+#set allow_reinclude=FALSE
+#endif //allow_reinclude
+#ifndef output_message_context
+global set output_message_context ALL;
+#else
+#set output_message_context=ALL
+#endif //output_message_context
+#ifndef permissive_access
+global int32 permissive_access 0;
+#else
+#set permissive_access=0
+#endif //permissive_access
+#ifndef relax_undefined_if
+global bool relax_undefined_if FALSE;
+#else
+#set relax_undefined_if=FALSE
+#endif //relax_undefined_if
+#ifndef literal_if
+global bool literal_if TRUE;
+#else
+#set literal_if=TRUE
+#endif //literal_if
+#ifndef validto_context
+global enumeration validto_context 1414743296;
+#else
+#set validto_context=1414743296
+#endif //validto_context
+#ifndef daemon_configfile
+global char1024 daemon_configfile "gridlabd.cnf";
+#else
+#set daemon_configfile="gridlabd.cnf"
+#endif //daemon_configfile
+// timezone_locale is set to EST5EDT
+#ifndef glm_save_options
+global set glm_save_options LEGACY;
+#else
+#set glm_save_options=LEGACY
+#endif //glm_save_options
+#ifndef filesave_options
+global set filesave_options ALL;
+#else
+#set filesave_options=ALL
+#endif //filesave_options
+#ifndef ignore_errors
+global bool ignore_errors FALSE;
+#else
+#set ignore_errors=FALSE
+#endif //ignore_errors
+// powerflow::message_flags is set to DEBUG|VERBOSE
+// powerflow::show_matrix_values is set to FALSE
+// powerflow::primary_voltage_ratio is set to +60
+// powerflow::nominal_frequency is set to +60
+// powerflow::require_voltage_control is set to FALSE
+// powerflow::geographic_degree is set to +3.21944
+// powerflow::fault_impedance is set to +1e-06+0j
+// powerflow::ground_impedance is set to +1e-06+0j
+// powerflow::warning_underfrequency is set to +55
+// powerflow::warning_overfrequency is set to +65
+// powerflow::warning_undervoltage is set to +0.8
+// powerflow::warning_overvoltage is set to +1.2
+// powerflow::warning_voltageangle is set to +2
+// powerflow::maximum_voltage_error is set to +1e-06
+// powerflow::solver_method is set to NR
+// powerflow::NR_matrix_file is set to 
+// powerflow::NR_matrix_output_interval is set to NEVER
+// powerflow::NR_matrix_output_references is set to FALSE
+// powerflow::line_capacitance is set to TRUE
+// powerflow::line_limits is set to TRUE
+// powerflow::lu_solver is set to 
+// powerflow::NR_iteration_limit is set to 500
+// powerflow::NR_deltamode_iteration_limit is set to 10
+// powerflow::NR_superLU_procs is set to 1
+// powerflow::default_maximum_voltage_error is set to +1e-06
+// powerflow::default_maximum_power_error is set to +0.0001
+// powerflow::NR_admit_change is set to FALSE
+// powerflow::enable_subsecond_models is set to FALSE
+// powerflow::all_powerflow_delta is set to FALSE
+// powerflow::deltamode_timestep is set to +1e+07 ns
+// powerflow::current_frequency is set to +60 Hz
+// powerflow::master_frequency_update is set to FALSE
+// powerflow::enable_frequency_dependence is set to FALSE
+// powerflow::default_resistance is set to +0.0001
+// powerflow::enable_inrush is set to FALSE
+// powerflow::low_voltage_impedance_level is set to +0.7
+// powerflow::enable_mesh_fault_current is set to FALSE
+// powerflow::convergence_error_handling is set to FATAL
+// powerflow::solver_profile_enable is set to FALSE
+// powerflow::solver_profile_filename is set to solver_nr_profile.csv
+// powerflow::solver_profile_headers_included is set to TRUE
+// powerflow::solver_headers is set to timestamp,duration[microsec],iteration,bus_count,branch_count,error
+// powerflow::solver_ml_config is set to /usr/local/share/gridlabd/solver_ml.conf
+// powerflow::market_price_name is set to current_market.clearing_price
+// pole::repair_time is set to +24 h
+#ifndef climate_impact_zone
+global enumeration climate_impact_zone NONE;
+#else
+#set climate_impact_zone=NONE
+#endif //climate_impact_zone
+// assert::message_flags is set to DEBUG|VERBOSE
+ // CLASSES
+ // SCHEDULES
+ // OBJECTS
+object overhead_line_conductor{
+	name "olc6010";
+	geometric_mean_radius "0.0313 ft";
+	resistance "0.1859 Ohm/mile";
+	diameter "0.927 in";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object overhead_line_conductor{
+	name "olc6020";
+	geometric_mean_radius "0.00814 ft";
+	resistance "0.592 Ohm/mile";
+	diameter "0.56 in";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object overhead_line_conductor{
+	name "olc6030";
+	geometric_mean_radius "0.00446 ft";
+	resistance "1.12 Ohm/mile";
+	diameter "0.4 in";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object underground_line_conductor{
+	name "ulc6060";
+	outer_diameter "1.29 in";
+	conductor_gmr "0.0171 ft";
+	conductor_diameter "0.567 in";
+	conductor_resistance "0.41 Ohm/mile";
+	neutral_gmr "0.00208 ft";
+	neutral_diameter "0.0640837 in";
+	neutral_resistance "14.872 Ohm/mile";
+	neutral_strands "13";
+	shield_thickness "0 in";
+	shield_diameter "0 in";
+	insulation_relative_permitivitty "2.3 unit";
+	shield_gmr "0 ft";
+	shield_resistance "0 Ohm/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object underground_line_conductor{
+	name "ulc6070";
+	outer_diameter "1.06 in";
+	conductor_gmr "0.0111 ft";
+	conductor_diameter "0.368 in";
+	conductor_resistance "0.97 Ohm/mile";
+	neutral_gmr "0.0111 ft";
+	neutral_diameter "0.0640837 in";
+	neutral_resistance "0.97 Ohm/mile";
+	neutral_strands "6";
+	shield_thickness "0 in";
+	shield_diameter "0 in";
+	insulation_relative_permitivitty "2.3 unit";
+	shield_gmr "0 ft";
+	shield_resistance "0 Ohm/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_spacing{
+	name "ls500601";
+	distance_AB "2.5 ft";
+	distance_BC "7 ft";
+	distance_AC "4.5 ft";
+	distance_AN "4.272 ft";
+	distance_BN "5.65685 ft";
+	distance_CN "5 ft";
+	distance_AE "28 ft";
+	distance_BE "28 ft";
+	distance_CE "28 ft";
+	distance_NE "24 ft";
+}
+object line_spacing{
+	name "ls500602";
+	distance_AB "4.5 ft";
+	distance_BC "7 ft";
+	distance_AC "2.5 ft";
+	distance_AN "4.272 ft";
+	distance_BN "5 ft";
+	distance_CN "5.65685 ft";
+	distance_AE "28 ft";
+	distance_BE "28 ft";
+	distance_CE "28 ft";
+	distance_NE "24 ft";
+}
+object line_spacing{
+	name "ls505603";
+	distance_AB "0 ft";
+	distance_BC "7 ft";
+	distance_AC "0 ft";
+	distance_AN "0 ft";
+	distance_BN "5 ft";
+	distance_CN "5.65685 ft";
+	distance_AE "0 ft";
+	distance_BE "28 ft";
+	distance_CE "28 ft";
+	distance_NE "24 ft";
+}
+object line_spacing{
+	name "ls505604";
+	distance_AB "0 ft";
+	distance_BC "0 ft";
+	distance_AC "7 ft";
+	distance_AN "5.65685 ft";
+	distance_BN "0 ft";
+	distance_CN "5 ft";
+	distance_AE "28 ft";
+	distance_BE "0 ft";
+	distance_CE "28 ft";
+	distance_NE "24 ft";
+}
+object line_spacing{
+	name "ls510";
+	distance_AB "0 ft";
+	distance_BC "0 ft";
+	distance_AC "0 ft";
+	distance_AN "0 ft";
+	distance_BN "0 ft";
+	distance_CN "5 ft";
+	distance_AE "0 ft";
+	distance_BE "0 ft";
+	distance_CE "28 ft";
+	distance_NE "24 ft";
+}
+object line_configuration{
+	name "lc601";
+	conductor_A "olc6010";
+	conductor_B "olc6010";
+	conductor_C "olc6010";
+	conductor_N "olc6020";
+	spacing "ls500601";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_configuration{
+	name "lc602";
+	conductor_A "olc6020";
+	conductor_B "olc6020";
+	conductor_C "olc6020";
+	conductor_N "olc6020";
+	spacing "ls500602";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_configuration{
+	name "lc603";
+	conductor_B "olc6030";
+	conductor_C "olc6030";
+	conductor_N "olc6030";
+	spacing "ls505603";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_configuration{
+	name "lc604";
+	conductor_A "olc6030";
+	conductor_C "olc6030";
+	conductor_N "olc6030";
+	spacing "ls505604";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_configuration{
+	name "lc605";
+	conductor_C "olc6030";
+	conductor_N "olc6030";
+	spacing "ls510";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_spacing{
+	name "ls515";
+	distance_AB "0.5 ft";
+	distance_BC "0.5 ft";
+	distance_AC "1 ft";
+	distance_AN "0 ft";
+	distance_BN "0 ft";
+	distance_CN "0 ft";
+	distance_AE "0 ft";
+	distance_BE "0 ft";
+	distance_CE "0 ft";
+	distance_NE "0 ft";
+}
+object line_spacing{
+	name "ls520";
+	distance_AB "0 ft";
+	distance_BC "0 ft";
+	distance_AC "0 ft";
+	distance_AN "0.083333 ft";
+	distance_BN "0 ft";
+	distance_CN "0 ft";
+	distance_AE "0 ft";
+	distance_BE "0 ft";
+	distance_CE "0 ft";
+	distance_NE "0 ft";
+}
+object line_configuration{
+	name "lc606";
+	conductor_A "ulc6060";
+	conductor_B "ulc6060";
+	conductor_C "ulc6060";
+	spacing "ls515";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object line_configuration{
+	name "lc607";
+	conductor_A "ulc6070";
+	conductor_N "ulc6070";
+	spacing "ls520";
+	z11 "0+0j Ohm/mile";
+	z12 "0+0j Ohm/mile";
+	z13 "0+0j Ohm/mile";
+	z21 "0+0j Ohm/mile";
+	z22 "0+0j Ohm/mile";
+	z23 "0+0j Ohm/mile";
+	z31 "0+0j Ohm/mile";
+	z32 "0+0j Ohm/mile";
+	z33 "0+0j Ohm/mile";
+	c11 "0 nF/mile";
+	c12 "0 nF/mile";
+	c13 "0 nF/mile";
+	c21 "0 nF/mile";
+	c22 "0 nF/mile";
+	c23 "0 nF/mile";
+	c31 "0 nF/mile";
+	c32 "0 nF/mile";
+	c33 "0 nF/mile";
+	rating.summer.continuous "1000 A";
+	rating.summer.emergency "2000 A";
+	rating.winter.continuous "1000 A";
+	rating.winter.emergency "2000 A";
+}
+object overhead_line{
+	name "line_632-645";
+	configuration "lc603";
+	length "500 ft";
+	status "CLOSED";
+	from "n632";
+	to "l645";
+	power_in "414269+266110j VA";
+	power_out "411499+263717j VA";
+	power_out_real "411499 W";
+	power_losses "2769.09+2392.41j VA";
+	power_in_A "0-0j VA";
+	power_in_B "334347+127928j VA";
+	power_in_C "79921.5+138182j VA";
+	power_out_A "0+0j VA";
+	power_out_B "331799+125763j VA";
+	power_out_C "79700.5+137954j VA";
+	power_losses_A "0-0j VA";
+	power_losses_B "2548.13+2164.62j VA";
+	power_losses_C "220.96+227.788j VA";
+	current_out_A "0+0j A";
+	current_out_B "-113.765-86.7884j A";
+	current_out_C "34.7425+55.2281j A";
+	current_in_A "0+0j A";
+	current_in_B "-113.764-86.7889j A";
+	current_in_C "34.7414+55.2277j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AN";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "BCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_645-646";
+	configuration "lc603";
+	length "300 ft";
+	status "CLOSED";
+	from "l645";
+	to "l646";
+	power_in "241499+138717j VA";
+	power_out "240958+138289j VA";
+	power_out_real "240958 W";
+	power_losses "541.846+428.407j VA";
+	power_in_A "0+0j VA";
+	power_in_B "161799+763.083j VA";
+	power_in_C "79700.5+137954j VA";
+	power_out_A "0+0j VA";
+	power_out_B "161528+550.101j VA";
+	power_out_C "79430+137739j VA";
+	power_losses_A "0+0j VA";
+	power_losses_B "271.336+212.982j VA";
+	power_losses_C "270.51+215.425j VA";
+	current_out_A "0+0j A";
+	current_out_B "-34.7432-55.2283j A";
+	current_out_C "34.7432+55.2283j A";
+	current_in_A "0+0j A";
+	current_in_B "-34.7425-55.2286j A";
+	current_in_C "34.7425+55.2281j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AN";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "BCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_630-632";
+	configuration "lc601";
+	length "2000 ft";
+	status "CLOSED";
+	from "n630";
+	to "n632";
+	power_in "3.59512e+06+1.69721e+06j VA";
+	power_out "3.5354e+06+1.5046e+06j VA";
+	power_out_real "3.5354e+06 W";
+	power_losses "65643+192608j VA";
+	power_in_A "1.26154e+06+678443j VA";
+	power_in_B "977189+373720j VA";
+	power_in_C "1.3564e+06+645046j VA";
+	power_out_A "1.23959e+06+598776j VA";
+	power_out_B "980149+341459j VA";
+	power_out_C "1.31566e+06+564366j VA";
+	power_losses_A "21947.9+79667.4j VA";
+	power_losses_B "2959.64+32260.5j VA";
+	power_losses_C "40735.4+80680.1j VA";
+	current_out_A "494.367-265.867j A";
+	current_out_B "-322.09-261.479j A";
+	current_out_C "-46.5842+583.287j A";
+	current_in_A "494.366-265.859j A";
+	current_in_B "-322.085-261.483j A";
+	current_in_C "-46.5895+583.283j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_632-6321";
+	configuration "lc601";
+	length "500 ft";
+	status "CLOSED";
+	from "n632";
+	to "l6321";
+	power_in "2.71489e+06+937586j VA";
+	power_out "2.70532e+06+907024j VA";
+	power_out_real "2.70532e+06 W";
+	power_losses "12416.3+30562.3j VA";
+	power_in_A "1.07672e+06+483677j VA";
+	power_in_B "524231+120682j VA";
+	power_in_C "1.11394e+06+333227j VA";
+	power_out_A "1.07426e+06+467246j VA";
+	power_out_B "525654+119487j VA";
+	power_out_C "1.10541e+06+320291j VA";
+	power_losses_A "2456.19+16430.9j VA";
+	power_losses_B "1423.09+1195.27j VA";
+	power_losses_C "8537.03+12936.1j VA";
+	current_out_A "430.056-216.098j A";
+	current_out_B "-151.209-152.87j A";
+	current_out_C "-91.7334+466.305j A";
+	current_in_A "430.055-216.096j A";
+	current_in_B "-151.208-152.871j A";
+	current_in_C "-91.7347+466.305j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BR|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_6321-671";
+	configuration "lc601";
+	length "1500 ft";
+	status "CLOSED";
+	from "l6321";
+	to "l671";
+	power_in "2.57199e+06+829690j VA";
+	power_out "2.54569e+06+745897j VA";
+	power_out_real "2.54569e+06 W";
+	power_losses "35577+83793.6j VA";
+	power_in_A "1.06293e+06+460580j VA";
+	power_in_B "481654+94153.3j VA";
+	power_in_C "1.02741e+06+274957j VA";
+	power_out_A "1.05452e+06+411282j VA";
+	power_out_B "486294+90973.7j VA";
+	power_out_C "1.00488e+06+243641j VA";
+	power_losses_A "8408.86+49298.1j VA";
+	power_losses_B "4639.91+3179.62j VA";
+	power_losses_C "22528.2+31315.9j VA";
+	current_out_A "425.558-213.111j A";
+	current_out_B "-133.363-143.3j A";
+	current_out_C "-93.5992+429.1j A";
+	current_in_A "425.558-213.105j A";
+	current_in_B "-133.359-143.303j A";
+	current_in_C "-93.6032+429.098j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BR|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_671-680";
+	configuration "lc601";
+	length "1000 ft";
+	status "CLOSED";
+	from "l671";
+	to "n680";
+	power_in "2.91964e-07-24.2078j VA";
+	power_out "-6.66507e-09+1.84733e-09j VA";
+	power_out_real "-6.66507e-09 W";
+	power_losses "2.62465-24.2078j VA";
+	power_in_A "-0.881216-8.47422j VA";
+	power_in_B "1.31232-8.68227j VA";
+	power_in_C "-0.431107-7.05135j VA";
+	power_out_A "-1.08439e-09-4.47181e-09j VA";
+	power_out_B "-4.77003e-09-1.86752e-09j VA";
+	power_out_C "-8.10649e-10+8.18667e-09j VA";
+	power_losses_A "0.881216-8.47422j VA";
+	power_losses_B "1.31232-8.68227j VA";
+	power_losses_C "0.431107-7.05135j VA";
+	current_out_A "-2.80532e-13+1.91437e-12j A";
+	current_out_B "1.63413e-12+1.19917e-12j A";
+	current_out_C "3.27771e-12+1.21109e-12j A";
+	current_in_A "-4.01835e-05+0.00358225j A";
+	current_in_B "0.00262451-0.00227679j A";
+	current_in_C "-0.00261338-0.00147452j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_671-684";
+	configuration "lc604";
+	length "300 ft";
+	status "CLOSED";
+	from "l671";
+	to "n684";
+	power_in "297115+54233.5j VA";
+	power_out "296505+53743.5j VA";
+	power_out_real "296505 W";
+	power_losses "610.047+490.038j VA";
+	power_in_A "124873+83543.5j VA";
+	power_in_B "-0+0j VA";
+	power_in_C "172242-29309.9j VA";
+	power_out_A "124658+83340.8j VA";
+	power_out_B "0+0j VA";
+	power_out_C "171847-29597.3j VA";
+	power_losses_A "215.025+202.646j VA";
+	power_losses_B "-0+0j VA";
+	power_losses_C "395.022+287.393j VA";
+	current_out_A "49.0415-39.824j A";
+	current_out_B "0+0j A";
+	current_out_C "-43.1905+60.3484j A";
+	current_in_A "49.0417-39.8234j A";
+	current_in_B "0+0j A";
+	current_in_C "-43.1911+60.348j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BN|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ACN";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_684-611";
+	configuration "lc605";
+	length "300 ft";
+	status "CLOSED";
+	from "n684";
+	to "l611";
+	power_in "171847-29597.3j VA";
+	power_out "171431-30017.4j VA";
+	power_out_real "171431 W";
+	power_losses "415.996+420.103j VA";
+	power_in_A "0-0j VA";
+	power_in_B "0+0j VA";
+	power_in_C "171847-29597.3j VA";
+	power_out_A "0+0j VA";
+	power_out_B "0+0j VA";
+	power_out_C "171431-30017.4j VA";
+	power_losses_A "0-0j VA";
+	power_losses_B "0+0j VA";
+	power_losses_C "415.996+420.103j VA";
+	current_out_A "0+0j A";
+	current_out_B "0+0j A";
+	current_out_C "-43.19+60.3487j A";
+	current_in_A "0+0j A";
+	current_in_B "0+0j A";
+	current_in_C "-43.1905+60.3484j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BN|AN";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "CN";
+	nominal_voltage "2401.78 V";
+}
+object underground_line{
+	name "line_684-652";
+	configuration "lc607";
+	length "800 ft";
+	status "CLOSED";
+	from "n684";
+	to "l652";
+	power_in "124658+83340.8j VA";
+	power_out "123974+83295.2j VA";
+	power_out_real "123974 W";
+	power_losses "683.635+45.6164j VA";
+	power_in_A "124658+83340.8j VA";
+	power_in_B "0+0j VA";
+	power_in_C "0+0j VA";
+	power_out_A "123974+83295.2j VA";
+	power_out_B "0+0j VA";
+	power_out_C "0+0j VA";
+	power_losses_A "683.635+45.6164j VA";
+	power_losses_B "0+0j VA";
+	power_losses_C "0+0j VA";
+	current_out_A "49.0393-39.848j A";
+	current_out_B "0+0j A";
+	current_out_C "0+0j A";
+	current_in_A "49.0415-39.824j A";
+	current_in_B "0+0j A";
+	current_in_C "0+0j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CN|BN|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "AN";
+	nominal_voltage "2401.78 V";
+}
+object underground_line{
+	name "line_692-675";
+	configuration "lc606";
+	length "500 ft";
+	status "CLOSED";
+	from "l692";
+	to "l675";
+	power_in "847127-142919j VA";
+	power_out "843000-145407j VA";
+	power_out_real "843000 W";
+	power_losses "4127.42+2488.58j VA";
+	power_in_A "488215-1475.35j VA";
+	power_in_B "68344.5-161931j VA";
+	power_in_C "290568+20487.9j VA";
+	power_out_A "485000-3528.59j VA";
+	power_out_B "68000-162449j VA";
+	power_out_C "290000+20570.4j VA";
+	power_losses_A "3215.34+2053.24j VA";
+	power_losses_B "344.522+517.832j VA";
+	power_losses_C "567.567-82.4923j VA";
+	current_out_A "204.466-18.3439j A";
+	current_out_B "39.6424-57.1162j A";
+	current_out_C "-46.1307+114.806j A";
+	current_in_A "204.468-18.3223j A";
+	current_in_B "39.6619-57.1287j A";
+	current_in_C "-46.1501+114.796j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BR|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABC";
+	nominal_voltage "2401.78 V";
+}
+object overhead_line{
+	name "line_632-633";
+	configuration "lc602";
+	length "500 ft";
+	status "CLOSED";
+	from "n632";
+	to "n633";
+	power_in "406242+300906j VA";
+	power_out "405434+299881j VA";
+	power_out_real "405434 W";
+	power_losses "807.228+1025j VA";
+	power_in_A "162872+115098j VA";
+	power_in_B "121571+92849.7j VA";
+	power_in_C "121798+92957.8j VA";
+	power_out_A "162518+114578j VA";
+	power_out_B "121423+92588j VA";
+	power_out_C "121493+92715j VA";
+	power_losses_A "354.442+520.562j VA";
+	power_losses_B "147.867+261.649j VA";
+	power_losses_C "304.919+242.786j VA";
+	current_out_A "64.3109-49.7724j A";
+	current_out_B "-57.1198-21.8184j A";
+	current_out_C "10.4105+61.7554j A";
+	current_in_A "64.3111-49.7707j A";
+	current_in_B "-57.1186-21.8192j A";
+	current_in_C "10.4092+61.7545j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object node{
+	name "n633";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2442.77-108.917j V";
+	voltage_B "-1314.77-2123.16j V";
+	voltage_C "-1137.36+2159.06j V";
+	voltage_AB "3757.54+2014.24j V";
+	voltage_BC "-177.413-4282.22j V";
+	voltage_CA "-3580.13+2267.98j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_31";
+	parent "n633";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2442.57-109.208j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_32";
+	parent "n633";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1315.27-2123.8j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_33";
+	parent "n633";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1137.49+2155.61j";
+	within "5";
+	target "voltage_C";
+}
+object node{
+	name "n630";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2551.84+0.0265859j V";
+	voltage_B "-1260.9-2183.97j V";
+	voltage_C "-1283.45+2222.94j V";
+	voltage_AB "3812.74+2184j V";
+	voltage_BC "22.5442-4406.92j V";
+	voltage_CA "-3835.28+2222.92j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object node{
+	name "n632";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2450.16-106.481j V";
+	voltage_B "-1315.48-2128.07j V";
+	voltage_C "-1140.43+2164.52j V";
+	voltage_AB "3765.64+2021.59j V";
+	voltage_BC "-175.05-4292.59j V";
+	voltage_CA "-3590.59+2271.01j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_36";
+	parent "n632";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2449.89-106.536j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_37";
+	parent "n632";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1315.77-2128.75j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_38";
+	parent "n632";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1140.78+2160.93j";
+	within "5";
+	target "voltage_C";
+}
+object node{
+	name "n650";
+	bustype "SWING";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2401.78+0j V";
+	voltage_B "-1200.89-2080j V";
+	voltage_C "-1200.89+2080j V";
+	voltage_AB "3602.67+2080j V";
+	voltage_BC "0-4160j V";
+	voltage_CA "-3602.67+2080j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_40";
+	parent "n650";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2401.78+0j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_41";
+	parent "n650";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1200.89-2080j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_42";
+	parent "n650";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1200.89+2080j";
+	within "5";
+	target "voltage_C";
+}
+object node{
+	name "n680";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2368.08-219.432j V";
+	voltage_B "-1352.2-2135.1j V";
+	voltage_C "-1029.63+2117.24j V";
+	voltage_AB "3720.27+1915.67j V";
+	voltage_BC "-322.572-4252.34j V";
+	voltage_CA "-3397.7+2336.67j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_44";
+	parent "n680";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2367.58-219.634j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_45";
+	parent "n680";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1352.77-2136.57j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_46";
+	parent "n680";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1030.23+2110.42j";
+	within "10";
+	target "voltage_C";
+}
+object node{
+	name "n684";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2363.4-219.799j V";
+	voltage_B "0+0j V";
+	voltage_C "-1023.36+2115.17j V";
+	voltage_AB "2363.4-219.799j V";
+	voltage_BC "1023.36-2115.17j V";
+	voltage_CA "-3386.76+2334.97j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ACN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_48";
+	parent "n684";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2363.43-220.08j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_49";
+	parent "n684";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1019.29+2110.39j";
+	within "5";
+	target "voltage_C";
+}
+object load{
+	name "l634";
+	load_class "U";
+	constant_power_A "160000+110000j VA";
+	constant_power_B "120000+90000j VA";
+	constant_power_C "120000+90000j VA";
+	constant_power_A_real "160000 W";
+	constant_power_B_real "120000 W";
+	constant_power_C_real "120000 W";
+	constant_power_A_reac "110000 VAr";
+	constant_power_B_reac "90000 VAr";
+	constant_power_C_reac "90000 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "275.057-15.5175j";
+	measured_voltage_B "-150.938-239.459j";
+	measured_voltage_C "-126.759+245.578j";
+	measured_voltage_AB "425.996+223.941j";
+	measured_voltage_BC "-24.1794-485.037j";
+	measured_voltage_CA "-401.816+261.096j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00048 V";
+	voltage_A "275.057-15.5175j V";
+	voltage_B "-150.938-239.459j V";
+	voltage_C "-126.759+245.578j V";
+	voltage_AB "425.996+223.941j V";
+	voltage_BC "-24.1794-485.037j V";
+	voltage_CA "-401.816+261.096j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "480 V";
+}
+object complex_assert{
+	name "complex_assert_51";
+	parent "l634";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "274.563-15.4947j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_52";
+	parent "l634";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-150.973-239.555j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_53";
+	parent "l634";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-126.768+245.188j";
+	within "5";
+	target "voltage_C";
+}
+object load{
+	name "l645";
+	load_class "U";
+	constant_power_A "0+0j VA";
+	constant_power_B "170000+125000j VA";
+	constant_power_C "0+0j VA";
+	constant_power_A_real "0 W";
+	constant_power_B_real "170000 W";
+	constant_power_C_real "0 W";
+	constant_power_A_reac "0 VAr";
+	constant_power_B_reac "125000 VAr";
+	constant_power_C_reac "0 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "0+0j";
+	measured_voltage_B "-1310.51-2105.22j";
+	measured_voltage_C "-1139.24+2159.78j";
+	measured_voltage_AB "1310.51+2105.22j";
+	measured_voltage_BC "-171.271-4265j";
+	measured_voltage_CA "-1139.24+2159.78j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "0+0j V";
+	voltage_B "-1310.51-2105.22j V";
+	voltage_C "-1139.24+2159.78j V";
+	voltage_AB "1310.51+2105.22j V";
+	voltage_BC "-171.271-4265j V";
+	voltage_CA "-1139.24+2159.78j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "BCN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_55";
+	parent "l645";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1310.95-2106.13j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_56";
+	parent "l645";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1139.78+2156.3j";
+	within "5";
+	target "voltage_C";
+}
+object load{
+	name "l646";
+	load_class "U";
+	constant_power_A "0+0j VA";
+	constant_power_B "0+0j VA";
+	constant_power_C "0+0j VA";
+	constant_power_A_real "0 W";
+	constant_power_B_real "0 W";
+	constant_power_C_real "0 W";
+	constant_power_A_reac "0 VAr";
+	constant_power_B_reac "0 VAr";
+	constant_power_C_reac "0 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "56.5993+32.4831j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "56.5993 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "32.4831 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "0+0j";
+	measured_voltage_B "-1311.08-2099.95j";
+	measured_voltage_C "-1138.63+2154.5j";
+	measured_voltage_AB "1311.08+2099.95j";
+	measured_voltage_BC "-172.453-4254.45j";
+	measured_voltage_CA "-1138.63+2154.5j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "0+0j V";
+	voltage_B "-1311.08-2099.95j V";
+	voltage_C "-1138.63+2154.5j V";
+	voltage_AB "1311.08+2099.95j V";
+	voltage_BC "-172.453-4254.45j V";
+	voltage_CA "-1138.63+2154.5j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "BCD";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_58";
+	parent "l646";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1311.6-2100.62j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_59";
+	parent "l646";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1138.92+2151.05j";
+	within "5";
+	target "voltage_C";
+}
+object load{
+	name "l652";
+	load_class "U";
+	constant_power_A "0+0j VA";
+	constant_power_B "0+0j VA";
+	constant_power_C "0+0j VA";
+	constant_power_A_real "0 W";
+	constant_power_B_real "0 W";
+	constant_power_C_real "0 W";
+	constant_power_A_reac "0 VAr";
+	constant_power_B_reac "0 VAr";
+	constant_power_C_reac "0 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "31.0501+20.8618j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "31.0501 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "20.8618 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2353.98-214.237j";
+	measured_voltage_B "0+0j";
+	measured_voltage_C "0+0j";
+	measured_voltage_AB "2353.98-214.237j";
+	measured_voltage_BC "0+0j";
+	measured_voltage_CA "-2353.98+214.237j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2353.98-214.237j V";
+	voltage_B "0+0j V";
+	voltage_C "0+0j V";
+	voltage_AB "2353.98-214.237j V";
+	voltage_BC "0+0j V";
+	voltage_CA "-2353.98+214.237j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "AN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_61";
+	parent "l652";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2349.84-215.92j";
+	within "5";
+	target "voltage_A";
+}
+object load{
+	name "l671";
+	load_class "U";
+	constant_power_A "385000+220000j VA";
+	constant_power_B "385000+220000j VA";
+	constant_power_C "385000+220000j VA";
+	constant_power_A_real "385000 W";
+	constant_power_B_real "385000 W";
+	constant_power_C_real "385000 W";
+	constant_power_A_reac "220000 VAr";
+	constant_power_B_reac "220000 VAr";
+	constant_power_C_reac "220000 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2368.08-219.432j";
+	measured_voltage_B "-1352.2-2135.1j";
+	measured_voltage_C "-1029.63+2117.24j";
+	measured_voltage_AB "3720.27+1915.67j";
+	measured_voltage_BC "-322.572-4252.34j";
+	measured_voltage_CA "-3397.7+2336.67j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2368.08-219.432j V";
+	voltage_B "-1352.2-2135.1j V";
+	voltage_C "-1029.63+2117.24j V";
+	voltage_AB "3720.27+1915.67j V";
+	voltage_BC "-322.572-4252.34j V";
+	voltage_CA "-3397.7+2336.67j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCD";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_63";
+	parent "l671";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2367.59-219.635j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_64";
+	parent "l671";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1351.62-2134.75j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_65";
+	parent "l671";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1030.23+2110.42j";
+	within "8";
+	target "voltage_C";
+}
+object load{
+	name "l675";
+	load_class "U";
+	constant_power_A "485000+190000j VA";
+	constant_power_B "68000+60000j VA";
+	constant_power_C "290000+212000j VA";
+	constant_power_A_real "485000 W";
+	constant_power_B_real "68000 W";
+	constant_power_C_real "290000 W";
+	constant_power_A_reac "190000 VAr";
+	constant_power_B_reac "60000 VAr";
+	constant_power_C_reac "212000 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0-28.8427j Ohm";
+	constant_impedance_B "0-28.8427j Ohm";
+	constant_impedance_C "0-28.8427j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "-28.8427 Ohm";
+	constant_impedance_B_reac "-28.8427 Ohm";
+	constant_impedance_C_reac "-28.8427 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2351.55-228.229j";
+	measured_voltage_B "-1361.83-2135.75j";
+	measured_voltage_C "-1028.16+2112.87j";
+	measured_voltage_AB "3713.38+1907.52j";
+	measured_voltage_BC "-333.672-4248.63j";
+	measured_voltage_CA "-3379.71+2341.1j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2351.55-228.229j V";
+	voltage_B "-1361.83-2135.75j V";
+	voltage_C "-1028.16+2112.87j V";
+	voltage_AB "3713.38+1907.52j V";
+	voltage_BC "-333.672-4248.63j V";
+	voltage_CA "-3379.71+2341.1j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABC";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_67";
+	parent "l675";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2351.04-228.864j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_68";
+	parent "l675";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1362.58-2137.18j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_69";
+	parent "l675";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1028.49+2105.92j";
+	within "8";
+	target "voltage_C";
+}
+object load{
+	name "l692";
+	load_class "U";
+	constant_power_A "0+0j VA";
+	constant_power_B "0+0j VA";
+	constant_power_C "0+0j VA";
+	constant_power_A_real "0 W";
+	constant_power_B_real "0 W";
+	constant_power_C_real "0 W";
+	constant_power_A_reac "0 VAr";
+	constant_power_B_reac "0 VAr";
+	constant_power_C_reac "0 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "-17.2414+51.8677j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "-17.2414 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "51.8677 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2368.07-219.417j";
+	measured_voltage_B "-1352.2-2135.1j";
+	measured_voltage_C "-1029.63+2117.23j";
+	measured_voltage_AB "3720.27+1915.68j";
+	measured_voltage_BC "-322.566-4252.32j";
+	measured_voltage_CA "-3397.7+2336.64j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2368.07-219.417j V";
+	voltage_B "-1352.2-2135.1j V";
+	voltage_C "-1029.63+2117.23j V";
+	voltage_AB "3720.27+1915.68j V";
+	voltage_BC "-322.566-4252.32j V";
+	voltage_CA "-3397.7+2336.64j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCD";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_71";
+	parent "l692";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "2367.56-220.048j";
+	within "5";
+	target "voltage_A";
+}
+object complex_assert{
+	name "complex_assert_72";
+	parent "l692";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1351.62-2134.75j";
+	within "5";
+	target "voltage_B";
+}
+object complex_assert{
+	name "complex_assert_73";
+	parent "l692";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1030.13+2110.21j";
+	within "8";
+	target "voltage_C";
+}
+object load{
+	name "l611";
+	load_class "U";
+	constant_power_A "0+0j VA";
+	constant_power_B "0+0j VA";
+	constant_power_C "0+0j VA";
+	constant_power_A_real "0 W";
+	constant_power_B_real "0 W";
+	constant_power_C_real "0 W";
+	constant_power_A_reac "0 VAr";
+	constant_power_B_reac "0 VAr";
+	constant_power_C_reac "0 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "-6.5443+77.9524j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "-6.5443 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "77.9524 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0-57.6854j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "-57.6854 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "0+0j";
+	measured_voltage_B "0+0j";
+	measured_voltage_C "-1015.48+2113.92j";
+	measured_voltage_AB "0+0j";
+	measured_voltage_BC "1015.48-2113.92j";
+	measured_voltage_CA "-1015.48+2113.92j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "0+0j V";
+	voltage_B "0+0j V";
+	voltage_C "-1015.48+2113.92j V";
+	voltage_AB "0+0j V";
+	voltage_BC "1015.48-2113.92j V";
+	voltage_CA "-1015.48+2113.92j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "CN";
+	nominal_voltage "2401.78 V";
+}
+object complex_assert{
+	name "complex_assert_75";
+	parent "l611";
+	status "ASSERT_TRUE";
+	once "ONCE_FALSE";
+	operation "FULL";
+	value "-1017.21+2106.07j";
+	within "8";
+	target "voltage_C";
+}
+object load{
+	name "l6711";
+	parent "l671";
+	load_class "U";
+	constant_power_A "5666.67+3333.33j VA";
+	constant_power_B "22000+12666.7j VA";
+	constant_power_C "39000+22666.7j VA";
+	constant_power_A_real "5666.67 W";
+	constant_power_B_real "22000 W";
+	constant_power_C_real "39000 W";
+	constant_power_A_reac "3333.33 VAr";
+	constant_power_B_reac "12666.7 VAr";
+	constant_power_C_reac "22666.7 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2368.08-219.432j";
+	measured_voltage_B "-1352.2-2135.1j";
+	measured_voltage_C "-1029.63+2117.24j";
+	measured_voltage_AB "3720.27+1915.67j";
+	measured_voltage_BC "-322.572-4252.34j";
+	measured_voltage_CA "-3397.7+2336.67j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2368.08-219.432j V";
+	voltage_B "-1352.2-2135.1j V";
+	voltage_C "-1029.63+2117.24j V";
+	voltage_AB "3720.27+1915.67j V";
+	voltage_BC "-322.572-4252.34j V";
+	voltage_CA "-3397.7+2336.67j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	topological_parent "l671";
+	phases "ABC";
+	nominal_voltage "2401.78 V";
+}
+object load{
+	name "l6321";
+	load_class "U";
+	constant_power_A "11333.3+6666.67j VA";
+	constant_power_B "44000+25333.3j VA";
+	constant_power_C "78000+45333.3j VA";
+	constant_power_A_real "11333.3 W";
+	constant_power_B_real "44000 W";
+	constant_power_C_real "78000 W";
+	constant_power_A_reac "6666.67 VAr";
+	constant_power_B_reac "25333.3 VAr";
+	constant_power_C_reac "45333.3 VAr";
+	constant_current_A "0+0j A";
+	constant_current_B "0+0j A";
+	constant_current_C "0+0j A";
+	constant_current_A_real "0 A";
+	constant_current_B_real "0 A";
+	constant_current_C_real "0 A";
+	constant_current_A_reac "0 A";
+	constant_current_B_reac "0 A";
+	constant_current_C_reac "0 A";
+	constant_impedance_A "0+0j Ohm";
+	constant_impedance_B "0+0j Ohm";
+	constant_impedance_C "0+0j Ohm";
+	constant_impedance_A_real "0 Ohm";
+	constant_impedance_B_real "0 Ohm";
+	constant_impedance_C_real "0 Ohm";
+	constant_impedance_A_reac "0 Ohm";
+	constant_impedance_B_reac "0 Ohm";
+	constant_impedance_C_reac "0 Ohm";
+	constant_power_AN "0+0j VA";
+	constant_power_BN "0+0j VA";
+	constant_power_CN "0+0j VA";
+	constant_power_AN_real "0 W";
+	constant_power_BN_real "0 W";
+	constant_power_CN_real "0 W";
+	constant_power_AN_reac "0 VAr";
+	constant_power_BN_reac "0 VAr";
+	constant_power_CN_reac "0 VAr";
+	constant_current_AN "0+0j A";
+	constant_current_BN "0+0j A";
+	constant_current_CN "0+0j A";
+	constant_current_AN_real "0 A";
+	constant_current_BN_real "0 A";
+	constant_current_CN_real "0 A";
+	constant_current_AN_reac "0 A";
+	constant_current_BN_reac "0 A";
+	constant_current_CN_reac "0 A";
+	constant_impedance_AN "0+0j Ohm";
+	constant_impedance_BN "0+0j Ohm";
+	constant_impedance_CN "0+0j Ohm";
+	constant_impedance_AN_real "0 Ohm";
+	constant_impedance_BN_real "0 Ohm";
+	constant_impedance_CN_real "0 Ohm";
+	constant_impedance_AN_reac "0 Ohm";
+	constant_impedance_BN_reac "0 Ohm";
+	constant_impedance_CN_reac "0 Ohm";
+	constant_power_AB "0+0j VA";
+	constant_power_BC "0+0j VA";
+	constant_power_CA "0+0j VA";
+	constant_power_AB_real "0 W";
+	constant_power_BC_real "0 W";
+	constant_power_CA_real "0 W";
+	constant_power_AB_reac "0 VAr";
+	constant_power_BC_reac "0 VAr";
+	constant_power_CA_reac "0 VAr";
+	constant_current_AB "0+0j A";
+	constant_current_BC "0+0j A";
+	constant_current_CA "0+0j A";
+	constant_current_AB_real "0 A";
+	constant_current_BC_real "0 A";
+	constant_current_CA_real "0 A";
+	constant_current_AB_reac "0 A";
+	constant_current_BC_reac "0 A";
+	constant_current_CA_reac "0 A";
+	constant_impedance_AB "0+0j Ohm";
+	constant_impedance_BC "0+0j Ohm";
+	constant_impedance_CA "0+0j Ohm";
+	constant_impedance_AB_real "0 Ohm";
+	constant_impedance_BC_real "0 Ohm";
+	constant_impedance_CA_real "0 Ohm";
+	constant_impedance_AB_reac "0 Ohm";
+	constant_impedance_BC_reac "0 Ohm";
+	constant_impedance_CA_reac "0 Ohm";
+	measured_voltage_A "2430.27-134.702j";
+	measured_voltage_B "-1324.11-2128.85j";
+	measured_voltage_C "-1110.25+2152.15j";
+	measured_voltage_AB "3754.37+1994.15j";
+	measured_voltage_BC "-213.857-4281.01j";
+	measured_voltage_CA "-3540.52+2286.86j";
+	phase_loss_protection "FALSE";
+	base_power_A "0 VA";
+	base_power_B "0 VA";
+	base_power_C "0 VA";
+	power_pf_A "1 pu";
+	current_pf_A "1 pu";
+	impedance_pf_A "1 pu";
+	power_pf_B "1 pu";
+	current_pf_B "1 pu";
+	impedance_pf_B "1 pu";
+	power_pf_C "1 pu";
+	current_pf_C "1 pu";
+	impedance_pf_C "1 pu";
+	power_fraction_A "0 pu";
+	current_fraction_A "0 pu";
+	impedance_fraction_A "0 pu";
+	power_fraction_B "0 pu";
+	current_fraction_B "0 pu";
+	impedance_fraction_B "0 pu";
+	power_fraction_C "0 pu";
+	current_fraction_C "0 pu";
+	impedance_fraction_C "0 pu";
+	bustype "PQ";
+	busflags "HASSOURCE";
+	maximum_voltage_error "0.00240178 V";
+	voltage_A "2430.27-134.702j V";
+	voltage_B "-1324.11-2128.85j V";
+	voltage_C "-1110.25+2152.15j V";
+	voltage_AB "3754.37+1994.15j V";
+	voltage_BC "-213.857-4281.01j V";
+	voltage_CA "-3540.52+2286.86j V";
+	mean_repair_time "0 s";
+	frequency_measure_type "NONE";
+	sfm_Tf "0.01 s";
+	pll_Kp "10 pu";
+	pll_Ki "100 pu";
+	measured_angle_A "0 rad";
+	measured_frequency_A "60 Hz";
+	measured_angle_B "0 rad";
+	measured_frequency_B "60 Hz";
+	measured_angle_C "0 rad";
+	measured_frequency_C "60 Hz";
+	measured_frequency "60 Hz";
+	service_status "IN_SERVICE";
+	service_status_double "-1";
+	previous_uptime "-1 min";
+	current_uptime "0 min";
+	Norton_dynamic "FALSE";
+	generator_dynamic "FALSE";
+	GFA_enable "FALSE";
+	GFA_freq_low_trip "59.5 Hz";
+	GFA_freq_high_trip "60.5 Hz";
+	GFA_volt_low_trip "0.8 pu";
+	GFA_volt_high_trip "1.2 pu";
+	GFA_reconnect_time "300 s";
+	GFA_freq_disconnect_time "0.2 s";
+	GFA_volt_disconnect_time "0.2 s";
+	GFA_status "TRUE";
+	GFA_trip_method "NONE";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object switch{
+	name "switch_671-692";
+	phase_A_state "CLOSED";
+	phase_B_state "CLOSED";
+	phase_C_state "CLOSED";
+	operating_mode "BANKED";
+	switch_resistance "0.0001 Ohm";
+	status "CLOSED";
+	from "l671";
+	to "l692";
+	power_in "1.02691e+06-6979.41j VA";
+	power_out "1.0269e+06-6974.88j VA";
+	power_out_real "1.0269e+06 W";
+	power_losses "4.5357-4.5357j VA";
+	power_in_A "540427+117565j VA";
+	power_in_B "68344.8-161931j VA";
+	power_in_C "418137+37387j VA";
+	power_out_A "540425+117568j VA";
+	power_out_B "68344.5-161931j VA";
+	power_out_C "418135+37388.5j VA";
+	power_losses_A "2.70409-2.70409j VA";
+	power_losses_B "0.241837-0.241837j VA";
+	power_losses_C "1.58977-1.58977j VA";
+	current_out_A "221.71-70.19j A";
+	current_out_B "39.6619-57.1287j A";
+	current_out_C "-63.3915+166.664j A";
+	current_in_A "221.71-70.19j A";
+	current_in_B "39.6619-57.1287j A";
+	current_in_C "-63.3915+166.664j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object transformer_configuration{
+	name "tc400";
+	connect_type "WYE_WYE";
+	install_type "PADMOUNT";
+	coolant_type "UNKNOWN";
+	cooling_type "UNKNOWN";
+	primary_voltage "4160 V";
+	secondary_voltage "480 V";
+	power_rating "500 kVA";
+	powerA_rating "166.667 kVA";
+	powerB_rating "166.667 kVA";
+	powerC_rating "166.667 kVA";
+	resistance "0.011 pu*Ohm";
+	reactance "0.02 pu*Ohm";
+	impedance "0.011+0.02j pu*Ohm";
+	resistance1 "0 pu*Ohm";
+	reactance1 "0 pu*Ohm";
+	impedance1 "0+0j pu*Ohm";
+	resistance2 "0 pu*Ohm";
+	reactance2 "0 pu*Ohm";
+	impedance2 "0+0j pu*Ohm";
+	shunt_resistance "1e+09 pu*Ohm";
+	shunt_reactance "1e+09 pu*Ohm";
+	shunt_impedance "1e+09+1e+09j pu*Ohm";
+	core_coil_weight "0 lb";
+	tank_fittings_weight "0 lb";
+	oil_volume "0 gal";
+	rated_winding_time_constant "0 h";
+	rated_winding_hot_spot_rise "0 degC";
+	rated_top_oil_rise "0 degC";
+	no_load_loss "0 pu";
+	full_load_loss "0 pu";
+	reactance_resistance_ratio "4.5";
+	installed_insulation_life "0 h";
+	magnetization_location "NONE";
+	inrush_saturation_enabled "FALSE";
+	L_A "0.2 pu";
+	phi_K "1.17 pu";
+	phi_M "1 pu";
+	I_M "0.01 pu";
+	T_D "0.5";
+}
+object transformer{
+	name "transformer_633-634";
+	configuration "tc400";
+	ambient_temperature "0 degC";
+	top_oil_hot_spot_temperature "0 degC";
+	winding_hot_spot_temperature "0 degC";
+	percent_loss_of_life "0";
+	aging_constant "0";
+	use_thermal_model "FALSE";
+	transformer_replacement_count "0";
+	aging_granularity "0 s";
+	phase_A_primary_flux_value "0 Wb";
+	phase_B_primary_flux_value "0 Wb";
+	phase_C_primary_flux_value "0 Wb";
+	phase_A_secondary_flux_value "0 Wb";
+	phase_B_secondary_flux_value "0 Wb";
+	phase_C_secondary_flux_value "0 Wb";
+	status "CLOSED";
+	from "n633";
+	to "l634";
+	power_in "405434+299881j VA";
+	power_out "400000+290000j VA";
+	power_out_real "400000 W";
+	power_losses "5434.44+9880.81j VA";
+	power_in_A "162518+114578j VA";
+	power_in_B "121423+92588j VA";
+	power_in_C "121493+92715j VA";
+	power_out_A "160000+110000j VA";
+	power_out_B "120000+90000j VA";
+	power_out_C "120000+90000j VA";
+	power_losses_A "2517.79+4577.8j VA";
+	power_losses_B "1423.41+2588.03j VA";
+	power_losses_C "1493.24+2714.98j VA";
+	current_out_A "557.361-431.36j A";
+	current_out_B "-495.038-189.092j A";
+	current_out_C "90.2239+535.213j A";
+	current_in_A "64.3109-49.7724j A";
+	current_in_B "-57.1198-21.8184j A";
+	current_in_C "10.4105+61.7554j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "500 A";
+	emergency_rating "500 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABCN";
+	nominal_voltage "2401.78 V";
+}
+object regulator_configuration{
+	name "regconfig6506321";
+	connect_type "WYE_WYE";
+	band_center "122 V";
+	band_width "2 V";
+	time_delay "30 s";
+	dwell_time "0 s";
+	raise_taps "16";
+	lower_taps "16";
+	current_transducer_ratio "700 pu";
+	power_transducer_ratio "20 pu";
+	compensator_r_setting_A "3 V";
+	compensator_r_setting_B "3 V";
+	compensator_r_setting_C "3 V";
+	compensator_x_setting_A "9 V";
+	compensator_x_setting_B "9 V";
+	compensator_x_setting_C "9 V";
+	CT_phase "CBA";
+	PT_phase "CBA";
+	regulation "0.1";
+	control_level "INDIVIDUAL";
+	Control "MANUAL";
+	reverse_flow_control "LOCK_NONE";
+	Type "A";
+	tap_pos_A "10";
+	tap_pos_B "8";
+	tap_pos_C "11";
+}
+object regulator{
+	name "fregn650n630";
+	configuration "regconfig6506321";
+	tap_A "10";
+	tap_B "8";
+	tap_C "11";
+	tap_A_change_count "0";
+	tap_B_change_count "0";
+	tap_C_change_count "0";
+	regulator_resistance "0.0001 Ohm";
+	status "CLOSED";
+	from "n650";
+	to "n630";
+	power_in "3.59521e+06+1.69721e+06j VA";
+	power_out "3.59512e+06+1.69721e+06j VA";
+	power_out_real "3.59512e+06 W";
+	power_losses "82.9581+5.82077e-11j VA";
+	power_in_A "1.26157e+06+678443j VA";
+	power_in_B "977207+373720j VA";
+	power_in_C "1.35643e+06+645046j VA";
+	power_out_A "1.26154e+06+678443j VA";
+	power_out_B "977189+373720j VA";
+	power_out_C "1.3564e+06+645046j VA";
+	power_losses_A "31.5079+0j VA";
+	power_losses_B "17.2112+5.82077e-11j VA";
+	power_losses_C "34.239+0j VA";
+	current_out_A "494.366-265.859j A";
+	current_out_B "-322.085-261.483j A";
+	current_out_C "-46.5895+583.283j A";
+	current_in_A "525.264-282.475j A";
+	current_in_B "-338.189-274.557j A";
+	current_in_C "-49.7925+623.384j A";
+	fault_current_in_A "0+0j A";
+	fault_current_in_B "0+0j A";
+	fault_current_in_C "0+0j A";
+	fault_current_out_A "0+0j A";
+	fault_current_out_B "0+0j A";
+	fault_current_out_C "0+0j A";
+	fault_voltage_A "0+0j A";
+	fault_voltage_B "0+0j A";
+	fault_voltage_C "0+0j A";
+	flow_direction "CF|BF|AF";
+	mean_repair_time "0 s";
+	continuous_rating "1000 A";
+	emergency_rating "2000 A";
+	inrush_convergence_value "0.0001 V";
+	phases "ABC";
+	nominal_voltage "2401.78 V";
+}
