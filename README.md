@@ -1,4 +1,5 @@
-# Open Framework for Integrated Data Operations (OpenFIDO)
+# OpenFIDO
+*The Open Framework for Integrated Data Operations*
 
 This project is funded by the California Energy Commission under EPIC grant EPC-17-047.
 
