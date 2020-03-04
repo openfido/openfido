@@ -10,8 +10,8 @@ jobs:
       - checkout
       - run: pip install -r platform/requirements.txt
       - run: 
-          command: ./openfido/manage.py test
           name: Test
+          command: ./platform/openfido/manage.py test
 
 workflows:
   main:
