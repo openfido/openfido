@@ -5,6 +5,7 @@ orbs:
 
 jobs:
   build-and-test:
+    working_directory: ~/platform
     executor: python/default
     steps:
       - checkout
@@ -12,7 +13,7 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: ./platform/openfido/manage.py test
+          command: ./openfido/manage.py test
           name: Test
 
 workflows:
