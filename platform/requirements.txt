@@ -1,0 +1,4 @@
+requests
+Django==3.0.3
+djangorestframework
+psycopg2
