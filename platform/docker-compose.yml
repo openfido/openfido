@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  openfido:
+    image: openfido
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: gunicorn --bind localhost:8100 wsgi
+    ports:
+      - "8100:8100"

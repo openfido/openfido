@@ -1,31 +1,18 @@
 # Getting Setup to run the OpenFIDO web platform
 
-## Creating the env - ensure you are running the anaconda `4.5.x +`
+## The Conda Way:
 ```bash
 conda env create -f openfido-environment.yml
-```
-
-## Updating the env after adding new packages
-```bash
+# if you need to update
 conda env update -f openfido-environment.yml
-```
-
-## Starting the env
-```bash
+# then
 conda activate venv_openfido
-```
-
-## Install pip packages after starting the env:
-```bash
-pip install -r requirements.txt
-```
-
-## Stopping the env
-```bash
+# to stop
 conda deactivate
 ```
 
-## Running the platform - TBD
-
-
-## Executing tests locally - TBD
+## The Docker Way
+```bash
+docker build -t openfido-platform .
+docker run openfido-platform
+```

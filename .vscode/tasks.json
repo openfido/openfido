@@ -1,0 +1,30 @@
+{
+    "tasks": [
+        {
+            "type": "docker-build",
+            "label": "docker-build",
+            "platform": "python",
+            "dockerBuild": {
+                "tag": "openfido:latest",
+                "dockerfile": "${workspaceFolder}/platform/Dockerfile",
+                "context": "${workspaceFolder}/platform"
+            }
+        },
+        {
+            "type": "docker-run",
+            "label": "docker-run: debug",
+            "dependsOn": [
+                "docker-build"
+            ],
+            "python": {
+                "args": [
+                    "runserver",
+                    "0.0.0.0:8100",
+                    "--nothreading",
+                    "--noreload"
+                ],
+                "file": "manage.py"
+            }
+        }
+    ]
+}
