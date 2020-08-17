@@ -2,13 +2,17 @@ import os
 
 from flask import Flask
 from flask_migrate import Migrate
-from tasks import make_celery
+from celery import make_celery
 
 from .models import db
 
 # Allow a specific set of environmental variables to be configurable:
-CONFIG_VARS = ("SECRET_KEY", "SQLALCHEMY_DATABASE_URI", "CELERY_RESULT_BACKEND",
-               "CELERY_BROKER_URL")
+CONFIG_VARS = (
+    "SECRET_KEY",
+    "SQLALCHEMY_DATABASE_URI",
+    "CELERY_RESULT_BACKEND",
+    "CELERY_BROKER_URL",
+)
 
 
 def create_app(config=None):
@@ -29,6 +33,7 @@ def create_app(config=None):
     migrate = Migrate(app, db)
 
     celery = make_celery(app)
+
     @celery.task()
     def add_numbers(a, b):
         return a + b

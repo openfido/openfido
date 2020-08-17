@@ -7,6 +7,7 @@ db = SQLAlchemy()
 
 class Pipeline(db.Model):
     """ Represents a 'pipeline' job. """
+
     __tablename__ = "pipeline"
 
     id = db.Column(db.Integer, primary_key=True)
