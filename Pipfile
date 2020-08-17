@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+black = "*"
+flasgger = "*"
+pylint-flask-sqlalchemy = "*"
+invoke = "*"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+psycopg2 = "*"
+pytest = "*"
+pytest-cov = "*"
+celery = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

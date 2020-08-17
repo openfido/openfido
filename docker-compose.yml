@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: workflowservice
+      POSTGRES_PASSWORD: dev-password
+  api:
+    build: .
+    command: flask run -h 0.0.0.0
+    environment:
+      PGDATABASE: workflowservice
+      PGUSER: postgres
+      PGHOST: db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
+    volumes:
+      - .:/opt/app:delegated
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
