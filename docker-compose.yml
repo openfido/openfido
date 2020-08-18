@@ -1,10 +1,34 @@
 version: '3'
 services:
+  queue:
+    image: rabbitmq:3
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit-user
+      RABBITMQ_DEFAULT_PASS: rabbit-password
+      RABBITMQ_DEFAULT_VHOST: api-queue
   db:
     image: postgres:11
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
+  worker:
+    build: .
+    command: celery -A app.worker worker
+    environment:
+      PGDATABASE: workflowservice
+      PGUSER: postgres
+      PGHOST: db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
+      CELERY_RESULT_BACKEND: "amqp://rabbit-user:rabbit-password@queue/api-queue"
+      CELERY_BROKER_URL: "amqp://rabbit-user:rabbit-password@queue/api-queue"
+    volumes:
+      - .:/opt/app:delegated
+    depends_on:
+      - db
+      - queue
   api:
     build: .
     command: flask run -h 0.0.0.0
@@ -16,9 +40,12 @@ services:
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
+      CELERY_RESULT_BACKEND: "amqp://rabbit-user:rabbit-password@queue/api-queue"
+      CELERY_BROKER_URL: "amqp://rabbit-user:rabbit-password@queue/api-queue"
     volumes:
       - .:/opt/app:delegated
     ports:
       - "5000:5000"
     depends_on:
       - db
+      - queue

@@ -6,12 +6,13 @@ from app import create_app
 @pytest.fixture
 def app():
     # create a temporary file to isolate the database for each test
-    (app, db, _) = create_app(
+    (app, db, _, _) = create_app(
         {
             "SQLALCHEMY_DATABASE_URI": "sqlite://",
             "TESTING": True,
             "DEBUG": True,
             "SECRET_KEY": "PYTEST",
+            "CELERY_TASK_ALWAYS_EAGER": True,
         }
     )
 
