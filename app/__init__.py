@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 from flask_migrate import Migrate
-from celery import make_celery
+from .tasks import make_celery
 
 from .models import db
 
