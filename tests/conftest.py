@@ -12,6 +12,7 @@ def app():
             "TESTING": True,
             "DEBUG": True,
             "SECRET_KEY": "PYTEST",
+            "CELERY_TASK_ALWAYS_EAGER": True,
         }
     )
 

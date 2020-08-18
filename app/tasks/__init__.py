@@ -3,11 +3,7 @@ from celery import Celery
 
 def make_celery(app):
     """ Create a celery client. """
-    celery = Celery(
-        app.import_name,
-        backend=app.config['CELERY_RESULT_BACKEND'],
-        broker=app.config['CELERY_BROKER_URL']
-    )
+    celery = Celery(app.import_name)
     celery.conf.update(app.config)
 
     class ContextTask(celery.Task):
