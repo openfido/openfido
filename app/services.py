@@ -1,15 +1,19 @@
-from .models import Pipeline, PipelineVersion, db
+from .models import Pipeline, db
 
 
-def create_pipeline_version(
-        name, description, version, docker_image_url, repository_ssh_url, repository_branch
+def create_pipeline(
+    name, description, docker_image_url, repository_ssh_url, repository_branch
 ):
     """ Create a Pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
-    if len(docker_image_url) == 0 and len(repository_ssh_url) == 0 and len(repository_branch) == 0:
-        raise ValueError('A configuration URL must be supplied.')
+    if len(name) == 0 or len(description) == 0:
+        raise ValueError("name and description must be supplied.")
+    if len(docker_image_url) == 0:
+        raise ValueError("A docker image URL must be supplied.")
+    if len(repository_ssh_url) == 0 or len(repository_branch) == 0:
+        raise ValueError("A ssh URL must be supplied.")
 
     pipeline = Pipeline(
         name=name,
@@ -18,8 +22,6 @@ def create_pipeline_version(
         repository_ssh_url=repository_ssh_url,
         repository_branch=repository_branch,
     )
-    pipeline_version = PipelineVersion(version=version)
-    pipeline.versions.append(pipeline_version)
     db.session.add(pipeline)
 
-    return pipeline_version
+    return pipeline

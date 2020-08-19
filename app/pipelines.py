@@ -4,7 +4,7 @@ from functools import wraps
 from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
-from .services import create_pipeline_version
+from .services import create_pipeline
 
 logger = logging.getLogger("pipelines")
 
@@ -40,15 +40,17 @@ def verify_content_type_and_params(required_keys, optional_keys):
     return decorator
 
 
-
 @pipeline_bp.route("", methods=["POST"])
 @verify_content_type_and_params(
-    ['name',
-     'description',
-     'version',
-     'docker_image_url',
-     'repository_ssh_url',
-     'repository_branch'], [])
+    [
+        "name",
+        "description",
+        "docker_image_url",
+        "repository_ssh_url",
+        "repository_branch",
+    ],
+    [],
+)
 def create():
     """ Create a pipeline.
     ---
@@ -67,8 +69,6 @@ def create():
               name:
                 type: string
               description:
-                type: string
-              version:
                 type: string
               docker_image_url:
                 type: string
@@ -90,8 +90,6 @@ def create():
                   type: string
                 description:
                   type: string
-                version:
-                  type: string
                 docker_image_url:
                   type: string
                 repository_ssh_url:
@@ -102,45 +100,29 @@ def create():
                   type: string
                 updated_at:
                   type: string
-                inputs:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      description:
-                        type: string
-                      parameter_name:
-                        type: string
-                      mime_type:
-                        type: string
       "400":
         description: "Bad request"
     """
     name = request.json["name"]
     description = request.json["description"]
-    version = request.json["version"]
     docker_image_url = request.json["docker_image_url"]
     repository_ssh_url = request.json["repository_ssh_url"]
     repository_branch = request.json["repository_branch"]
     try:
-        pipeline_version = create_pipeline_version(
-            name, description, version, docker_image_url, repository_ssh_url, repository_branch)
+        pipeline = create_pipeline(
+            name, description, docker_image_url, repository_ssh_url, repository_branch
+        )
         db.session.commit()
 
-        pipeline = pipeline_version.pipeline
         return jsonify(
             uuid=pipeline.uuid,
             name=pipeline.name,
             description=pipeline.description,
-            version=pipeline_version.version,
             docker_image_url=pipeline.docker_image_url,
             repository_ssh_url=pipeline.repository_ssh_url,
             repository_branch=pipeline.repository_branch,
             created_at=pipeline.created_at,
             updated_at=pipeline.updated_at,
-            inputs=[],
         )
     except ValueError:
         return {}, 400
