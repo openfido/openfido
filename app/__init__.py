@@ -2,9 +2,10 @@ import os
 
 from flask import Flask
 from flask_migrate import Migrate
-from .tasks import make_celery
 
 from .models import db
+from .pipelines import pipeline_bp
+from .tasks import make_celery
 
 # Allow a specific set of environmental variables to be configurable:
 CONFIG_VARS = (
@@ -12,7 +13,7 @@ CONFIG_VARS = (
     "SQLALCHEMY_DATABASE_URI",
     "CELERY_RESULT_BACKEND",
     "CELERY_BROKER_URL",
-    "CELERY_TASK_ALWAYS_EAGER",
+    "CELERY_ALWAYS_EAGER",
 )
 
 
@@ -35,14 +36,6 @@ def create_app(config=None):
 
     celery = make_celery(app)
 
-    @celery.task()
-    def add_numbers(a, b):
-        return a + b
-
-    @app.route("/example")
-    def example():
-        result = add_numbers.delay(10, 12)
-        result.wait()
-        return f"Example: {result.result}"
+    app.register_blueprint(pipeline_bp, url_prefix="/v1/pipelines")
 
     return (app, db, celery, migrate)

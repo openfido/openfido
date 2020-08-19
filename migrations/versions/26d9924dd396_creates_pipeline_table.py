@@ -1,8 +1,8 @@
-"""create pipeline table
+"""creates pipeline table
 
-Revision ID: ac95b63983ef
+Revision ID: 26d9924dd396
 Revises: 
-Create Date: 2020-08-17 18:27:31.288774
+Create Date: 2020-08-19 18:50:10.982290
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ac95b63983ef'
+revision = '26d9924dd396'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,13 +21,13 @@ def upgrade():
     op.create_table('pipeline',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uuid', sa.String(length=32), server_default='', nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('description', sa.String(length=300), nullable=False),
     sa.Column('docker_image_url', sa.String(length=2000), nullable=True),
     sa.Column('repository_ssh_url', sa.String(length=2000), nullable=True),
     sa.Column('repository_branch', sa.String(length=100), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
