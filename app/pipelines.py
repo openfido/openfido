@@ -124,9 +124,23 @@ def create():
     docker_image_url = request.json["docker_image_url"]
     repository_ssh_url = request.json["repository_ssh_url"]
     repository_branch = request.json["repository_branch"]
-    pipeline_version = create_pipeline_version(
-        name, description, version, docker_image_url, repository_ssh_url, repository_branch)
-    db.session.commit()
-    return jsonify(
-        uuid=pipeline_version.pipeline.uuid,
-    )
+    try:
+        pipeline_version = create_pipeline_version(
+            name, description, version, docker_image_url, repository_ssh_url, repository_branch)
+        db.session.commit()
+
+        pipeline = pipeline_version.pipeline
+        return jsonify(
+            uuid=pipeline.uuid,
+            name=pipeline.name,
+            description=pipeline.description,
+            version=pipeline_version.version,
+            docker_image_url=pipeline.docker_image_url,
+            repository_ssh_url=pipeline.repository_ssh_url,
+            repository_branch=pipeline.repository_branch,
+            created_at=pipeline.created_at,
+            updated_at=pipeline.updated_at,
+            inputs=[],
+        )
+    except ValueError:
+        return {}, 400

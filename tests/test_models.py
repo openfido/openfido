@@ -8,6 +8,7 @@ def test_create_pipeline(app):
     db.session.commit()
 
     assert set(Pipeline.query.all()) == set([pipeline])
+    assert len(pipeline.uuid) > 0
 
 
 def test_create_pipeline_version(app):
@@ -19,3 +20,4 @@ def test_create_pipeline_version(app):
     db.session.commit()
 
     assert set(PipelineVersion.query.all()) == set([pipeline_version])
+    assert len(pipeline.uuid) > 0

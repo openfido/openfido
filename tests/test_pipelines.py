@@ -1,7 +1,61 @@
 from app.models import db, Pipeline
 
 
-# TODO at least one of the url params must be non-empty
+def test_create_pipeline_wrong_content_type(client):
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/badtype",
+    )
+    assert result.status_code == 400
+
+
+def test_create_pipeline_no_params(client):
+    # An error is returned if no configuration information is supplied.
+    params = {}
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+    )
+    assert result.status_code == 400
+
+
+def test_create_pipeline_wrong_params(client):
+    # An error is returned if no configuration information is supplied.
+    params = {
+        'wrong': 'wrong',
+        'name': 'a pipeline',
+        'description': 'a description',
+        'version': 'version',
+        'docker_image_url': '',
+        'repository_ssh_url': '',
+        'repository_branch': '',
+    }
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+    )
+    assert result.status_code == 400
+
+
+def test_create_pipeline_non_empty_params(client):
+    # An error is returned if no configuration information is supplied.
+    params = {
+        'name': 'a pipeline',
+        'description': 'a description',
+        'version': 'version',
+        'docker_image_url': '',
+        'repository_ssh_url': '',
+        'repository_branch': '',
+    }
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+    )
+    assert result.status_code == 400
+
 
 def test_create_pipeline(client):
     params = {

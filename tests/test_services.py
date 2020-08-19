@@ -1,3 +1,4 @@
+import pytest
 from app import services
 
 A_NAME = 'a pipeline'
@@ -6,6 +7,13 @@ A_DOCKER_IMAGE = 'example/image'
 A_SSH_URL = 'git@github.com:an_org/a_repo.git'
 A_BRANCH = 'master'
 A_VERSION = '1.0'
+
+
+def test_create_pipeline_version_no_urls(app):
+    # Can't create a pipeline without some kind of URL configuration.
+    with pytest.raises(ValueError):
+        services.create_pipeline_version(
+            A_NAME, A_DESCRIPTION, A_VERSION, '', '', '')
 
 
 def test_create_pipeline_version(app):

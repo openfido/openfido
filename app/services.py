@@ -8,6 +8,9 @@ def create_pipeline_version(
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
+    if len(docker_image_url) == 0 and len(repository_ssh_url) == 0 and len(repository_branch) == 0:
+        raise ValueError('A configuration URL must be supplied.')
+
     pipeline = Pipeline(
         name=name,
         description=description,
