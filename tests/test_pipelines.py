@@ -82,3 +82,27 @@ def test_list_pipelines(client):
     assert len(result.json) == 2
     assert result.json[0]["name"] == p1.name
     assert result.json[1]["name"] == p2.name
+
+
+def test_get_pipeline_no_match(client):
+    result = client.get(
+        "/v1/pipelines/1111ddddeeee2222", content_type="application/json"
+    )
+    assert result.status_code == 404
+
+
+def test_get_pipeline(client):
+    pipeline = Pipeline(
+        name="pipeline 2",
+        description="a description",
+        docker_image_url="",
+        repository_ssh_url="",
+        repository_branch="",
+    )
+    db.session.add(pipeline)
+    db.session.commit()
+
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}", content_type="application/json"
+    )
+    assert result.status_code == 200

@@ -1,7 +1,6 @@
 import pytest
 
 from app import create_app
-from app.models import Pipeline
 
 
 @pytest.fixture
@@ -29,14 +28,3 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
-
-
-@pytest.fixture
-def pipeline(app):
-    return Pipeline(
-        name="a pipeline",
-        description="a description",
-        docker_image_url="",
-        repository_ssh_url="",
-        repository_branch="",
-    )
