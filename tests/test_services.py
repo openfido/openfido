@@ -43,7 +43,7 @@ def test_create_pipeline_version(app):
 
 def test_delete_pipeline_no_record(app):
     with pytest.raises(ValueError):
-        services.delete_pipeline('fake-id')
+        services.delete_pipeline("fake-id")
 
 
 def test_delete_pipeline(app):
