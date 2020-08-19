@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
 from .queries import find_pipeline, find_pipelines
-from .services import create_pipeline
+from .services import create_pipeline, delete_pipeline
 
 logger = logging.getLogger("pipelines")
 
@@ -178,6 +178,29 @@ def get(uuid):
         return {}, 404
 
     return jsonify(pipeline_to_json(pipeline))
+
+
+@pipeline_bp.route("/<uuid>", methods=["DELETE"])
+@verify_content_type_and_params([], [])
+def remove(uuid):
+    """ Delete a pipeline.
+    ---
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        description: UUID of a pipeline.
+    responses:
+      "200":
+        description: "Deleted"
+      "400":
+        description: "Bad request"
+    """
+    try:
+        delete_pipeline(uuid)
+        return {}, 200
+    except ValueError:
+        return {}, 400
 
 
 @pipeline_bp.route("", methods=["GET"])

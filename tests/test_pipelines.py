@@ -106,3 +106,27 @@ def test_get_pipeline(client):
         f"/v1/pipelines/{pipeline.uuid}", content_type="application/json"
     )
     assert result.status_code == 200
+
+
+def test_remove_pipeline_no_match(client):
+    result = client.delete(
+        "/v1/pipelines/1111ddddeeee2222", content_type="application/json"
+    )
+    assert result.status_code == 400
+
+
+def test_remove_pipeline(client):
+    pipeline = Pipeline(
+        name="pipeline 2",
+        description="a description",
+        docker_image_url="",
+        repository_ssh_url="",
+        repository_branch="",
+    )
+    db.session.add(pipeline)
+    db.session.commit()
+
+    result = client.delete(
+        f"/v1/pipelines/{pipeline.uuid}", content_type="application/json"
+    )
+    assert result.status_code == 200

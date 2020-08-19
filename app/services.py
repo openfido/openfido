@@ -1,4 +1,14 @@
 from .models import Pipeline, db
+from .queries import find_pipeline
+
+
+def delete_pipeline(uuid):
+    """ Delete a pipeline. """
+    pipeline = find_pipeline(uuid)
+    if pipeline is None:
+        raise ValueError('no pipeline found')
+
+    db.session.delete(pipeline)
 
 
 def create_pipeline(
