@@ -4,7 +4,7 @@ from functools import wraps
 from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
-from .queries import find_pipelines
+from .queries import find_pipeline, find_pipelines
 from .services import create_pipeline
 
 logger = logging.getLogger("pipelines")
@@ -136,8 +136,83 @@ def create():
         return {}, 400
 
 
+@pipeline_bp.route("/<uuid>", methods=["GET"])
+@verify_content_type_and_params([], [])
+def get(uuid):
+    """ Get a pipeline.
+    ---
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        description: UUID of a pipeline.
+    responses:
+      "200":
+        description: "Fetched"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                docker_image_url:
+                  type: string
+                repository_ssh_url:
+                  type: string
+                repository_branch:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+    """
+    pipeline = find_pipeline(uuid)
+    if pipeline is None:
+        return {}, 404
+
+    return jsonify(pipeline_to_json(pipeline))
+
+
 @pipeline_bp.route("", methods=["GET"])
 @verify_content_type_and_params([], [])
 def list_pipelines():
+    """ List all pipelines.
+    ---
+    responses:
+      "200":
+        description: "Listed"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  docker_image_url:
+                    type: string
+                  repository_ssh_url:
+                    type: string
+                  repository_branch:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+      "400":
+        description: "Bad request"
+    """
     pipelines = find_pipelines()
     return jsonify(list(map(pipeline_to_json, pipelines)))
