@@ -4,11 +4,25 @@ from functools import wraps
 from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
+from .queries import find_pipelines
 from .services import create_pipeline
 
 logger = logging.getLogger("pipelines")
 
 pipeline_bp = Blueprint("pipelines", __name__)
+
+
+def pipeline_to_json(pipeline):
+    return {
+        "uuid": pipeline.uuid,
+        "name": pipeline.name,
+        "description": pipeline.description,
+        "docker_image_url": pipeline.docker_image_url,
+        "repository_ssh_url": pipeline.repository_ssh_url,
+        "repository_branch": pipeline.repository_branch,
+        "created_at": pipeline.created_at,
+        "updated_at": pipeline.updated_at,
+    }
 
 
 def verify_content_type_and_params(required_keys, optional_keys):
@@ -21,9 +35,12 @@ def verify_content_type_and_params(required_keys, optional_keys):
                 logger.warn("invalid content type")
                 return {}, 400
 
-            request_keys = set(request.json.keys())
             required_set = set(required_keys)
             optional_set = set(optional_keys)
+            if len(required_set) == len(optional_set) == 0:
+                return view(*args, **kwargs)
+
+            request_keys = set(request.json.keys())
             if not required_set <= request_keys:
                 logger.warn(
                     f"create: invalid payload keys {list(request.json.keys())}, requires {required_keys}",
@@ -114,15 +131,13 @@ def create():
         )
         db.session.commit()
 
-        return jsonify(
-            uuid=pipeline.uuid,
-            name=pipeline.name,
-            description=pipeline.description,
-            docker_image_url=pipeline.docker_image_url,
-            repository_ssh_url=pipeline.repository_ssh_url,
-            repository_branch=pipeline.repository_branch,
-            created_at=pipeline.created_at,
-            updated_at=pipeline.updated_at,
-        )
+        return jsonify(pipeline_to_json(pipeline))
     except ValueError:
         return {}, 400
+
+
+@pipeline_bp.route("", methods=["GET"])
+@verify_content_type_and_params([], [])
+def list_pipelines():
+    pipelines = find_pipelines()
+    return jsonify(list(map(pipeline_to_json, pipelines)))
