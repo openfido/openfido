@@ -56,3 +56,31 @@ def test_delete_pipeline(app):
     services.delete_pipeline(pipeline.uuid)
 
     assert pipeline.is_deleted
+
+
+def test_create_pipeline_run_no_pipeline(app):
+    with pytest.raises(ValueError):
+        pipeline_run = services.create_pipeline_run("no-id", [])
+
+
+def test_create_pipeline_run(app):
+    pipeline = services.create_pipeline(
+        A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
+    )
+    db.session.add(pipeline)
+    db.session.commit()
+
+    input1 = {
+        "name": "name1.pdf",
+        "url": "https://example.com/name1.pdf",
+    }
+    input2 = {
+        "name": "name2.pdf",
+        "url": "https://example.com/name2.pdf",
+    }
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, [input1, input2])
+    assert pipeline_run.pipeline == pipeline
+    assert pipeline_run.sequence == 1
+    assert len(pipeline_run.pipeline_run_inputs) == 2
+    assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
+    assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]

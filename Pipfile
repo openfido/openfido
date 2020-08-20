@@ -9,6 +9,7 @@ black = "*"
 flasgger = "*"
 pylint-flask-sqlalchemy = "*"
 invoke = "*"
+simplejson = "*"
 
 [packages]
 flask = "*"

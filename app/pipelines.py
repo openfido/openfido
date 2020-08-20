@@ -32,7 +32,7 @@ def verify_content_type_and_params(required_keys, optional_keys):
         @wraps(view)
         def wrapper(*args, **kwargs):
             if request.headers.get("Content-Type", None) != "application/json":
-                logger.warn("invalid content type")
+                logger.warning("invalid content type")
                 return {}, 400
 
             required_set = set(required_keys)
@@ -42,12 +42,12 @@ def verify_content_type_and_params(required_keys, optional_keys):
 
             request_keys = set(request.json.keys())
             if not required_set <= request_keys:
-                logger.warn(
+                logger.warning(
                     f"create: invalid payload keys {list(request.json.keys())}, requires {required_keys}",
                 )
                 return {}, 400
             if len(request_keys - required_set.union(optional_set)) > 0:
-                logger.warn("unknown key passed to request")
+                logger.warning("unknown key passed to request")
                 return {}, 400
 
             return view(*args, **kwargs)

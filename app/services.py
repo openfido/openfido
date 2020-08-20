@@ -1,4 +1,4 @@
-from .models import Pipeline, db
+from .models import Pipeline, PipelineRun, PipelineRunInput, db
 from .queries import find_pipeline
 
 
@@ -38,3 +38,22 @@ def create_pipeline(
     db.session.add(pipeline)
 
     return pipeline
+
+
+def create_pipeline_run(uuid, inputs):
+    """ Create a new PipelineRun for a Pipeline's uuid """
+    pipeline = find_pipeline(uuid)
+    if pipeline is None:
+        raise ValueError("no pipeline found")
+
+    sequence = len(pipeline.pipeline_runs) + 1
+    pipeline_run = PipelineRun(sequence=sequence)
+
+    for i in inputs:
+        pipeline_run.pipeline_run_inputs.append(
+            PipelineRunInput(filename=i["name"], url=i["url"])
+        )
+
+    pipeline.pipeline_runs.append(pipeline_run)
+
+    return pipeline_run
