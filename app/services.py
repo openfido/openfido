@@ -3,12 +3,15 @@ from .queries import find_pipeline
 
 
 def delete_pipeline(uuid):
-    """ Delete a pipeline. """
+    """ Delete a pipeline.
+
+    Note: The db.session is not committed. Be sure to commit the session.
+    """
     pipeline = find_pipeline(uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
-    db.session.delete(pipeline)
+    pipeline.is_deleted = True
 
 
 def create_pipeline(

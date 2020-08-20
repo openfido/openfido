@@ -55,4 +55,4 @@ def test_delete_pipeline(app):
 
     services.delete_pipeline(pipeline.uuid)
 
-    assert find_pipeline(pipeline.uuid) is None
+    assert pipeline.is_deleted
