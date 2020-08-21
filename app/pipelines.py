@@ -267,8 +267,10 @@ def create_run(uuid):
                   properties:
                     name:
                       type: string
+                      example: name.pdf
                     url:
                       type: string
+                      example: https://example.com/name.pdf
     responses:
       "200":
         description: "Created"
@@ -279,7 +281,38 @@ def create_run(uuid):
               properties:
                 uuid:
                   type: string
-                TODO - the remaining fields
+                  example: "5ea9102b2abd498f9830389debb21fb8"
+                sequence:
+                  type: integer
+                  example: 1
+                created_at:
+                  type: string
+                  example: "2020-08-05T08:15:30-05:00"
+                inputs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                        example: "5ea9102b2abd498f9830389debb21fb8"
+                      name:
+                        type: string
+                        example: name.pdf
+                      url:
+                        type: string
+                        example: https://example.com/name.pdf
+                states:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        example: NOT_STARTED
+                      created_at:
+                        type: string
+                        example: "2020-08-05T08:15:30-05:00"
       "400":
         description: "Bad request"
     """
