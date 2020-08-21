@@ -258,3 +258,33 @@ def test_get_pipeline_run_output(client, pipeline):
         "std_out": "stdout",
         "std_err": "",
     }
+
+
+def test_update_pipeline_run_output(client, pipeline):
+    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    db.session.commit()
+
+    result = client.put(
+        "/v1/pipelines/no-id/runs/no-id/console",
+        content_type="application/json",
+        json={"std_out": "stdout", "std_err": "stderr",},
+    )
+    assert result.status_code == 404
+
+    # no such pipeline_run_id
+    result = client.put(
+        f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console",
+        content_type="application/json",
+        json={"std_out": "stdout", "std_err": "stderr",},
+    )
+    assert result.status_code == 404
+
+    # successfully fetch a pipeline_run
+    result = client.put(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json={"std_out": "stdout", "std_err": "stderr",},
+    )
+    assert result.status_code == 200
+    assert pipeline_run.std_out == "stdout"
+    assert pipeline_run.std_err == "stderr"

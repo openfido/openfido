@@ -74,3 +74,15 @@ def test_create_pipeline_run(app, pipeline):
     assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
     assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]
     assert len(pipeline_run.pipeline_run_states) == 1
+
+
+def test_update_pipeline_run_output(app, pipeline):
+    with pytest.raises(ValueError):
+        services.update_pipeline_run_output(None, "stdout", "stderr")
+
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, [])
+    db.session.commit()
+
+    services.update_pipeline_run_output(pipeline_run.uuid, "stdout", "stderr")
+    assert pipeline_run.std_out == "stdout"
+    assert pipeline_run.std_err == "stderr"

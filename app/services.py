@@ -6,7 +6,7 @@ from .models import (
     RunState,
     db,
 )
-from .queries import find_pipeline, find_run_state_type
+from .queries import find_pipeline, find_run_state_type, find_pipeline_run
 
 
 def delete_pipeline(uuid):
@@ -80,3 +80,12 @@ def create_pipeline_run(uuid, inputs):
     db.session.add(pipeline)
 
     return pipeline_run
+
+
+def update_pipeline_run_output(uuid, std_out, std_err):
+    pipeline_run = find_pipeline_run(uuid)
+    if pipeline_run is None:
+        raise ValueError("pipeline run not found")
+
+    pipeline_run.std_out = std_out
+    pipeline_run.std_err = std_err

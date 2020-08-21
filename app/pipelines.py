@@ -4,8 +4,13 @@ from functools import wraps
 from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
-from .queries import find_pipeline, find_pipelines, find_pipeline_run
-from .services import create_pipeline, create_pipeline_run, delete_pipeline
+from .queries import find_pipeline, find_pipeline_run, find_pipelines
+from .services import (
+    create_pipeline,
+    create_pipeline_run,
+    delete_pipeline,
+    update_pipeline_run_output,
+)
 
 logger = logging.getLogger("pipelines")
 
@@ -499,3 +504,41 @@ def get_run_output(pipeline_uuid, pipeline_run_uuid):
     return jsonify(
         std_out=pipeline_run.std_out or "", std_err=pipeline_run.std_err or "",
     )
+
+
+@pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["PUT"])
+@verify_content_type_and_params(["std_out", "std_err"], [])
+def upload_run_output(pipeline_uuid, pipeline_run_uuid):
+    """ Update the console output.
+    ---
+    requestBody:
+      description: "standard output and error"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              std_out:
+                type: string
+              std_err:
+                type: string
+    responses:
+      "200":
+        description: "Updated"
+      "400":
+        description: "Bad request"
+    """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        return {}, 404
+
+    pipeline_run = find_pipeline_run(pipeline_run_uuid)
+    if pipeline_run is None:
+        return {}, 404
+
+    update_pipeline_run_output(
+        pipeline_run.uuid, request.json["std_out"], request.json["std_err"]
+    )
+
+    return {}, 200
