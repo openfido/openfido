@@ -205,3 +205,34 @@ def test_get_pipeline_run(client, pipeline):
     db.session.commit()
     result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}")
     assert result.status_code == 404
+
+
+def test_list_pipeline_runs(client, pipeline):
+    result = client.get(f"/v1/pipelines/no-id/runs")
+    assert result.status_code == 404
+
+    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs")
+    assert result.status_code == 200
+    assert result.json == []
+
+    # successfully fetch a pipeline_run
+    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    db.session.commit()
+    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs")
+    assert result.status_code == 200
+    assert result.json == [
+        {
+            "uuid": pipeline_run.uuid,
+            "sequence": pipeline_run.sequence,
+            "created_at": toISO8601(pipeline_run.created_at),
+            "inputs": [],
+            "states": [
+                {
+                    "state": pipeline_run.pipeline_run_states[0].name,
+                    "created_at": toISO8601(
+                        pipeline_run.pipeline_run_states[0].created_at
+                    ),
+                }
+            ],
+        }
+    ]

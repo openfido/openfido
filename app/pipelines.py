@@ -31,19 +31,19 @@ def pipeline_to_json(pipeline):
 
 
 def pipeline_run_to_json(pipeline_run):
-    return jsonify(
-        uuid=pipeline_run.uuid,
-        sequence=pipeline_run.sequence,
-        created_at=toISO8601(pipeline_run.created_at),
-        inputs=[
+    return {
+        "uuid": pipeline_run.uuid,
+        "sequence": pipeline_run.sequence,
+        "created_at": toISO8601(pipeline_run.created_at),
+        "inputs": [
             {"name": i.filename, "url": i.url,}
             for i in pipeline_run.pipeline_run_inputs
         ],
-        states=[
+        "states": [
             {"state": s.run_state_type.name, "created_at": toISO8601(s.created_at),}
             for s in pipeline_run.pipeline_run_states
         ],
-    )
+    }
 
 
 def verify_content_type_and_params(required_keys, optional_keys):
@@ -346,7 +346,7 @@ def create_run(pipeline_uuid):
         pipeline_run = create_pipeline_run(pipeline_uuid, inputs)
         db.session.commit()
 
-        return pipeline_run_to_json(pipeline_run)
+        return jsonify(pipeline_run_to_json(pipeline_run))
     except ValueError:
         return {}, 400
 
@@ -408,4 +408,62 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
     if pipeline_run is None:
         return {}, 404
 
-    return pipeline_run_to_json(pipeline_run)
+    return jsonify(pipeline_run_to_json(pipeline_run))
+
+
+@pipeline_bp.route("/<pipeline_uuid>/runs", methods=["GET"])
+def get_runs(pipeline_uuid):
+    """ Get a all pipeline runs for a pipeline.
+    ---
+    responses:
+      "200":
+        description: "Created"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    example: "5ea9102b2abd498f9830389debb21fb8"
+                  sequence:
+                    type: integer
+                    example: 1
+                  created_at:
+                    type: string
+                    example: "2020-08-05T08:15:30-05:00"
+                  inputs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uuid:
+                          type: string
+                          example: "5ea9102b2abd498f9830389debb21fb8"
+                        name:
+                          type: string
+                          example: name.pdf
+                        url:
+                          type: string
+                          example: https://example.com/name.pdf
+                  states:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                          example: NOT_STARTED
+                        created_at:
+                          type: string
+                          example: "2020-08-05T08:15:30-05:00"
+      "400":
+        description: "Bad request"
+    """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        return {}, 404
+
+    return jsonify(list(map(pipeline_run_to_json, pipeline.pipeline_runs)))
