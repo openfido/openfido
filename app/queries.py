@@ -1,4 +1,4 @@
-from .models import Pipeline, RunStateType, db
+from .models import Pipeline, PipelineRun, RunStateType, db
 from sqlalchemy import and_
 
 
@@ -29,3 +29,10 @@ def find_run_state_type(run_state):
         db.session.add(run_state_type)
 
     return run_state_type
+
+
+def find_pipeline_run(uuid):
+    """ Find a PipelineRun. """
+    return PipelineRun.query.join(Pipeline).filter(
+        and_(PipelineRun.uuid == uuid, Pipeline.is_deleted == False,)
+    ).one_or_none()

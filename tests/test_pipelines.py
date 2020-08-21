@@ -1,5 +1,6 @@
 from app.models import Pipeline, db
 from app.queries import find_pipeline
+from app.services import create_pipeline_run
 from app.pipelines import toISO8601
 
 
@@ -171,3 +172,36 @@ def test_create_run(client, pipeline):
             }
         ],
     }
+
+
+def test_get_pipeline_run(client, pipeline):
+    result = client.get("/v1/pipelines/no-id/runs/no-id")
+    assert result.status_code == 404
+
+    # no such pipeline_run_id
+    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/no-id")
+    assert result.status_code == 404
+
+    # successfully fetch a pipeline_run
+    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    db.session.commit()
+    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}")
+    assert result.status_code == 200
+    assert result.json == {
+        "uuid": pipeline_run.uuid,
+        "sequence": pipeline_run.sequence,
+        "created_at": toISO8601(pipeline_run.created_at),
+        "inputs": [],
+        "states": [
+            {
+                "state": pipeline_run.pipeline_run_states[0].name,
+                "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+            }
+        ],
+    }
+
+    # fails if the pipeline is deleted.
+    pipeline.is_deleted = True
+    db.session.commit()
+    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}")
+    assert result.status_code == 404
