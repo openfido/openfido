@@ -9,3 +9,4 @@ def test_create_pipeline(app):
 
     assert set(Pipeline.query.all()) == set([pipeline])
     assert len(pipeline.uuid) > 0
+    assert not pipeline.is_deleted

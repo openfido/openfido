@@ -1,5 +1,7 @@
 import pytest
 from app import services
+from app.models import db
+from app.queries import find_pipeline
 
 A_NAME = "a pipeline"
 A_DESCRIPTION = "a description"
@@ -37,3 +39,20 @@ def test_create_pipeline_version(app):
     assert pipeline.docker_image_url == A_DOCKER_IMAGE
     assert pipeline.repository_ssh_url == A_SSH_URL
     assert pipeline.repository_branch == A_BRANCH
+
+
+def test_delete_pipeline_no_record(app):
+    with pytest.raises(ValueError):
+        services.delete_pipeline("fake-id")
+
+
+def test_delete_pipeline(app):
+    pipeline = services.create_pipeline(
+        A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
+    )
+    db.session.add(pipeline)
+    db.session.commit()
+
+    services.delete_pipeline(pipeline.uuid)
+
+    assert pipeline.is_deleted
