@@ -1,4 +1,5 @@
 import pytest
+
 from app import services
 from app.models import db
 from app.queries import find_pipeline
@@ -46,13 +47,7 @@ def test_delete_pipeline_no_record(app):
         services.delete_pipeline("fake-id")
 
 
-def test_delete_pipeline(app):
-    pipeline = services.create_pipeline(
-        A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
-    )
-    db.session.add(pipeline)
-    db.session.commit()
-
+def test_delete_pipeline(app, pipeline):
     services.delete_pipeline(pipeline.uuid)
 
     assert pipeline.is_deleted
@@ -63,13 +58,7 @@ def test_create_pipeline_run_no_pipeline(app):
         pipeline_run = services.create_pipeline_run("no-id", [])
 
 
-def test_create_pipeline_run(app):
-    pipeline = services.create_pipeline(
-        A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
-    )
-    db.session.add(pipeline)
-    db.session.commit()
-
+def test_create_pipeline_run(app, pipeline):
     input1 = {
         "name": "name1.pdf",
         "url": "https://example.com/name1.pdf",
@@ -84,3 +73,4 @@ def test_create_pipeline_run(app):
     assert len(pipeline_run.pipeline_run_inputs) == 2
     assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
     assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]
+    assert len(pipeline_run.pipeline_run_states) == 1

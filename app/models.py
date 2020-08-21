@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from enum import Enum, unique
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -38,6 +39,16 @@ class Pipeline(CommonColumnsMixin, db.Model):
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     pipeline_runs = db.relationship("PipelineRun", backref="pipeline", lazy="select")
+
+
+@unique
+class RunState(Enum):
+    """ Run states currently supported in PipelineRunState """
+
+    NOT_STARTED = 1
+    RUNNING = 2
+    FAILED = 3
+    COMPLETED = 4
 
 
 class RunStateType(CommonColumnsMixin, db.Model):

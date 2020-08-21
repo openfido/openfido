@@ -1,4 +1,4 @@
-from .models import Pipeline
+from .models import Pipeline, RunStateType, db
 from sqlalchemy import and_
 
 
@@ -12,3 +12,20 @@ def find_pipeline(uuid):
 def find_pipelines():
     """ Find all pipelines """
     return Pipeline.query.filter(Pipeline.is_deleted == False)
+
+
+def find_run_state_type(run_state):
+    """ Find a specific RunStateType.
+
+    If the RunStateType doesn't exist, create it and return it.
+    """
+    run_state_type = RunStateType.query.filter(
+        RunStateType.code == run_state.value
+    ).one_or_none()
+    if run_state_type is None:
+        run_state_type = RunStateType(
+            name=run_state.name, description=run_state.name, code=run_state.value,
+        )
+        db.session.add(run_state_type)
+
+    return run_state_type

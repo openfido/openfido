@@ -9,7 +9,6 @@ black = "*"
 flasgger = "*"
 pylint-flask-sqlalchemy = "*"
 invoke = "*"
-simplejson = "*"
 
 [packages]
 flask = "*"
@@ -19,6 +18,7 @@ psycopg2 = "*"
 pytest = "*"
 pytest-cov = "*"
 celery = "*"
+simplejson = "*"
 
 [requires]
 python_version = "3.7"

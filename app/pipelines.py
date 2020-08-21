@@ -5,11 +5,16 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from .models import db
 from .queries import find_pipeline, find_pipelines
-from .services import create_pipeline, delete_pipeline
+from .services import create_pipeline, create_pipeline_run, delete_pipeline
 
 logger = logging.getLogger("pipelines")
 
 pipeline_bp = Blueprint("pipelines", __name__)
+
+
+def toISO8601(date):
+    """ Return an ISO8601 formatted date """
+    return date.isoformat()
 
 
 def pipeline_to_json(pipeline):
@@ -20,8 +25,8 @@ def pipeline_to_json(pipeline):
         "docker_image_url": pipeline.docker_image_url,
         "repository_ssh_url": pipeline.repository_ssh_url,
         "repository_branch": pipeline.repository_branch,
-        "created_at": pipeline.created_at,
-        "updated_at": pipeline.updated_at,
+        "created_at": toISO8601(pipeline.created_at),
+        "updated_at": toISO8601(pipeline.updated_at),
     }
 
 
@@ -239,3 +244,71 @@ def list_pipelines():
     """
     pipelines = find_pipelines()
     return jsonify(list(map(pipeline_to_json, pipelines)))
+
+
+@pipeline_bp.route("/<uuid>/runs", methods=["POST"])
+@verify_content_type_and_params(["inputs"], [])
+def create_run(uuid):
+    """Create a new pipeline run.
+    ---
+
+    requestBody:
+      description: "A list of inputs"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    url:
+                      type: string
+    responses:
+      "200":
+        description: "Created"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                TODO - the remaining fields
+      "400":
+        description: "Bad request"
+    """
+    # Validate the input fields are all strings and only have name/url in
+    # them
+    inputs = request.json["inputs"]
+    if not isinstance(inputs, list):
+        return {}, 400
+    for i in inputs:
+        allowed_keys = set(["name", "url"])
+        if set(i.keys()) != allowed_keys:
+            return {}, 400
+
+    try:
+        pipeline_run = create_pipeline_run(uuid, inputs)
+        db.session.commit()
+
+        return jsonify(
+            uuid=pipeline_run.uuid,
+            sequence=pipeline_run.sequence,
+            created_at=toISO8601(pipeline_run.created_at),
+            inputs=[
+                {"name": i.filename, "url": i.url,}
+                for i in pipeline_run.pipeline_run_inputs
+            ],
+            states=[
+                {"state": s.run_state_type.name, "created_at": toISO8601(s.created_at),}
+                for s in pipeline_run.pipeline_run_states
+            ],
+        )
+    except ValueError:
+        return {}, 400
