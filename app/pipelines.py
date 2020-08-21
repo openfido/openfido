@@ -357,7 +357,7 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
     ---
     responses:
       "200":
-        description: "Created"
+        description: "Fetched"
         content:
           application/json:
             schema:
@@ -417,7 +417,7 @@ def get_runs(pipeline_uuid):
     ---
     responses:
       "200":
-        description: "Created"
+        description: "Fetched"
         content:
           application/json:
             schema:
@@ -467,3 +467,35 @@ def get_runs(pipeline_uuid):
         return {}, 404
 
     return jsonify(list(map(pipeline_run_to_json, pipeline.pipeline_runs)))
+
+
+@pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])
+def get_run_output(pipeline_uuid, pipeline_run_uuid):
+    """ Get the console output of a run.
+    ---
+    responses:
+      "200":
+        description: "Fetched"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                std_out:
+                  type: string
+                std_err:
+                  type: string
+      "400":
+        description: "Bad request"
+    """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        return {}, 404
+
+    pipeline_run = find_pipeline_run(pipeline_run_uuid)
+    if pipeline_run is None:
+        return {}, 404
+
+    return jsonify(
+        std_out=pipeline_run.std_out or "", std_err=pipeline_run.std_err or "",
+    )
