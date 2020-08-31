@@ -18,6 +18,7 @@ psycopg2 = "*"
 pytest = "*"
 pytest-cov = "*"
 celery = "*"
+simplejson = "*"
 
 [requires]
 python_version = "3.7"
