@@ -8,7 +8,7 @@ from .queries import is_permitted
 
 logger = logging.getLogger("roles")
 
-
+ROLES_KEY = "Workflow-Key"
 
 def make_permission_decorator(permissions_enum):
     """ Create a decorator that allows permissions defined by permissions_enum. """
@@ -21,11 +21,11 @@ def make_permission_decorator(permissions_enum):
         def decorator(view):
             @wraps(view)
             def wrapper(*args, **kwargs):
-                if "Workflow-Key" not in request.headers:
+                if ROLES_KEY not in request.headers:
                     logger.warning("no authorization header")
                     return {}, 401
 
-                g.api_key = request.headers["Workflow-Key"]
+                g.api_key = request.headers[ROLES_KEY]
 
                 for permission in permissions:
                     required_permission = permissions_enum(permission)
