@@ -1,7 +1,6 @@
 from .models import db, Application, ApplicationSystemPermission, SystemPermission
 
 
-# TODO support permission_code as a list.
 def is_permitted(api_key, permission):
     """ Returns True when the Application associated with permission_code exists. """
     system_permission = get_system_permission(permission)
@@ -15,8 +14,6 @@ def is_permitted(api_key, permission):
         filter(Application.application_system_permissions.any(
             ApplicationSystemPermission.system_permission_id.in_(permission_subquery)
         ))
-    # import pdb; pdb.set_trace()
-    # print(application)
 
     return application.one_or_none() is not None
 

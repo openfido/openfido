@@ -23,10 +23,10 @@ Docs:
 
 Create a separate 'application roles' package and set of models within this
 project that can be imported separately from the pipelines API.
- - [ ] Ensure that both logic to enforce a permission (a decorator enforcing a
+ - [x] Ensure that both logic to enforce a permission (a decorator enforcing a
    requirement of a specific set of SystemPermissions) is included in this
    package.
- - [ ] Models are included in such a way that they can be included in an existing
+ - [x] Models are included in such a way that they can be included in an existing
    Alembic database schema (have one central 'db' that is configured by the
    importing app)
  - [ ] Create a setup.py file and reference flask project that imports this project

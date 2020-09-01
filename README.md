@@ -13,7 +13,7 @@ Summary: A [Flask](https://flask.palletsprojects.com/en/1.1.x/) API server that 
 
  * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
  * [2. Pipelines](docs/adr/0002-pipelines.md)
- * [3. Authentication](docs/adr/0002-authentication.md)
+ * [3. Authentication](docs/adr/0003-authentication.md)
 
 ## Development
 

@@ -3,7 +3,6 @@ from .queries import get_system_permission
 
 
 def create_application(name, permissions):
-    # TODO support multiple permissions.
     application = Application(name=name)
     application_system_permission = ApplicationSystemPermission()
     system_permission = get_system_permission(permissions)
