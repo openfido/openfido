@@ -96,7 +96,7 @@ def verify_content_type_and_params(required_keys, optional_keys):
     ],
     [],
 )
-@permissions_required(SystemPermissionEnum.PIPELINES_CLIENT)
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create():
     """ Create a pipeline.
     ---
@@ -167,6 +167,7 @@ def create():
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get(pipeline_uuid):
     """ Get a pipeline.
     ---
@@ -211,6 +212,7 @@ def get(pipeline_uuid):
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["DELETE"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def remove(pipeline_uuid):
     """ Delete a pipeline.
     ---
@@ -234,6 +236,7 @@ def remove(pipeline_uuid):
 
 @pipeline_bp.route("", methods=["GET"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def list_pipelines():
     """ List all pipelines.
     ---
@@ -272,6 +275,7 @@ def list_pipelines():
 
 @pipeline_bp.route("/<pipeline_uuid>/runs", methods=["POST"])
 @verify_content_type_and_params(["inputs"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create_run(pipeline_uuid):
     """Create a new pipeline run.
     ---
@@ -360,6 +364,7 @@ def create_run(pipeline_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_run(pipeline_uuid, pipeline_run_uuid):
     """ Get a pipeline run.
     ---
@@ -420,6 +425,7 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_runs(pipeline_uuid):
     """ Get a all pipeline runs for a pipeline.
     ---
@@ -478,6 +484,7 @@ def get_runs(pipeline_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_run_output(pipeline_uuid, pipeline_run_uuid):
     """ Get the console output of a run.
     ---
@@ -511,6 +518,7 @@ def get_run_output(pipeline_uuid, pipeline_run_uuid):
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["PUT"])
 @verify_content_type_and_params(["std_out", "std_err"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_WORKER])
 def upload_run_output(pipeline_uuid, pipeline_run_uuid):
     """ Update the console output.
     ---

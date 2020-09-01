@@ -12,6 +12,8 @@ Summary: A [Flask](https://flask.palletsprojects.com/en/1.1.x/) API server that 
 ## Architectural Decision Records
 
  * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
+ * [2. Pipelines](docs/adr/0002-pipelines.md)
+ * [3. Authentication](docs/adr/0002-authentication.md)
 
 ## Development
 
@@ -51,6 +53,48 @@ Other tasks are available, in particular the `precommit` task, which mirrors the
 tests performed by CircleCI.
 
 Endpoints have been documented with [swagger](https://swagger.io/blog/news/whats-new-in-openapi-3-0/), which is configured to be easily explored in the default `run.py` configuration. When the flask server is running visit http://localhost:5000/apidocs to see documentation and interact with the API directly.
+
+## Authentication Roles
+
+This package includes a subset of libraries for role-based application
+authentication. To use it, simply include this library in your project's
+dependencies:
+
+Configure your application to use your application's specific roles:
+
+    from enum import IntEnum, unique
+
+    @unique
+    class ExamplePermissions(IntEnum):
+        """ Permissions used for Flask endpoints """
+
+        ROLE_1 = 1
+        ROLE_2 = 2
+
+Make sure that your application's [Flask Migrate](https://flask-migrate.readthedocs.io/en/latest/) configuration includes the tables used to manage these roles.
+
+    # file that sets up 'db':
+    from roles.models import db as roles_db
+
+    # import your own models
+    from .models import db
+
+Finally, make a decorator to enforce these permissions in your views:
+
+    from roles.decorators import make_permission_decorator
+
+    permissions_required = make_permission_decorator(ExamplePermissions)
+
+    @permissions_required([ExamplePermissions.ROLE_1])
+    @route("/protected_route")
+    def protected_route():
+        return 'private info'
+
+
+HTTP clients must then pass a `Authentication` header with a bearer token
+containing an api_key.
+
+TODO how to create these api_keys.
 
 ## Deployment
 

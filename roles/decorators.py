@@ -2,7 +2,6 @@ import logging
 import re
 from enum import Enum
 from functools import wraps
-from typing import List, TypeVar
 
 from flask import g, request
 
@@ -11,20 +10,14 @@ from .queries import is_permitted
 logger = logging.getLogger("roles")
 
 
-PermissionOrPermissionList = TypeVar('PermissionOrPermissionList', int, List[int])
 
-def make_permission_decorator(permissions_enum: Enum):
+def make_permission_decorator(permissions_enum):
     """ Create a decorator that allows permissions defined by permissions_enum. """
 
-    def permissions_required_decorator(permission: PermissionOrPermissionList):
-        """ Decorator that ensures endpoint is called with an api_token with the
-        required SystemPermission.code
-
-
-        'permission' may be one permission code, or a list of permission codes.
+    def permissions_required_decorator(permissions):
+        """ Decorator that ensures endpoint is called with an api_token that is
+        associated with the required list of SystemPermission values.
         """
-
-        required_permission = permissions_enum(permission)
 
         def decorator(view):
             @wraps(view)
@@ -43,13 +36,12 @@ def make_permission_decorator(permissions_enum: Enum):
 
                 g.api_key = matches.group(1)
 
-                if not g.api_key:
-                    logger.warning("unable to get api_key")
-                    return {}, 401
+                for permission in permissions:
+                    required_permission = permissions_enum(permission)
 
-                if not is_permitted(g.api_key, required_permission):
-                    logger.warning(f"no permission found for {required_permission}")
-                    return {}, 401
+                    if not is_permitted(g.api_key, required_permission):
+                        logger.warning(f"no permission found for {required_permission}")
+                        return {}, 401
 
                 return view(*args, **kwargs)
 

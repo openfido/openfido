@@ -12,7 +12,7 @@ def test(c, cov=False, cov_report=False, junit=False, enforce_percent=0):
     if enforce_percent > 0:
         command += f" --cov-fail-under={enforce_percent}"
     if cov or cov_report or junit or enforce_percent:
-        command += " --cov app"
+        command += " --cov app --cov roles"
     else:
         command += " app tests"
 

@@ -100,8 +100,13 @@ def test_create_pipeline(client, client_application):
     assert pipeline.name == "a pipeline"
 
 
-def test_list_pipelines(client):
-    result = client.get("/v1/pipelines", content_type="application/json")
+def test_list_pipelines(client, client_application):
+    db.session.commit()
+    result = client.get(
+        "/v1/pipelines",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
     assert len(result.json) == 0
 
@@ -123,56 +128,76 @@ def test_list_pipelines(client):
     db.session.add(p2)
     db.session.commit()
 
-    result = client.get("/v1/pipelines", content_type="application/json")
+    result = client.get(
+        "/v1/pipelines",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
     assert len(result.json) == 2
     assert result.json[0]["name"] == p1.name
     assert result.json[1]["name"] == p2.name
 
 
-def test_get_pipeline_no_match(client):
+def test_get_pipeline_no_match(client, client_application):
+    db.session.commit()
     result = client.get(
-        "/v1/pipelines/1111ddddeeee2222", content_type="application/json"
+        "/v1/pipelines/1111ddddeeee2222",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 404
 
 
-def test_get_pipeline(client, pipeline):
+def test_get_pipeline(client, pipeline, client_application):
+    db.session.commit()
     result = client.get(
-        f"/v1/pipelines/{pipeline.uuid}", content_type="application/json"
+        f"/v1/pipelines/{pipeline.uuid}",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 200
 
 
-def test_remove_pipeline_no_match(client):
+def test_remove_pipeline_no_match(client, client_application):
+    db.session.commit()
     result = client.delete(
-        "/v1/pipelines/1111ddddeeee2222", content_type="application/json"
+        "/v1/pipelines/1111ddddeeee2222",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 400
 
 
-def test_remove_pipeline(client, pipeline):
+def test_remove_pipeline(client, pipeline, client_application):
+    db.session.commit()
     result = client.delete(
-        f"/v1/pipelines/{pipeline.uuid}", content_type="application/json"
+        f"/v1/pipelines/{pipeline.uuid}",
+        content_type="application/json",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 200
     assert find_pipeline(pipeline.uuid) is None
 
 
-def test_create_run_no_such_uuid(client):
+def test_create_run_no_such_uuid(client, client_application):
+    db.session.commit()
     result = client.post(
         "/v1/pipelines/1111abcd/runs",
         content_type="application/json",
         json={"inputs": []},
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 400
 
 
-def test_create_run_bad_input_name(client, pipeline):
+def test_create_run_bad_input_name(client, pipeline, client_application):
+    db.session.commit()
     result = client.post(
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
         json={"inputs": [{"name": "name1.pdf"}]},
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 400
 
@@ -180,6 +205,7 @@ def test_create_run_bad_input_name(client, pipeline):
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
         json={"inputs": [{"name": "name1.pdf", "url": "aurl", "extrakey": "badinput"}]},
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 400
 
@@ -187,15 +213,18 @@ def test_create_run_bad_input_name(client, pipeline):
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
         json={"inputs": "[]"},
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 400
 
 
-def test_create_run(client, pipeline):
+def test_create_run(client, pipeline, client_application):
+    db.session.commit()
     result = client.post(
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
         json={"inputs": [{"name": "name1.pdf", "url": "aurl"}]},
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 200
     assert len(pipeline.pipeline_runs) == 1
@@ -217,18 +246,28 @@ def test_create_run(client, pipeline):
     }
 
 
-def test_get_pipeline_run(client, pipeline):
-    result = client.get("/v1/pipelines/no-id/runs/no-id")
+def test_get_pipeline_run(client, pipeline, client_application):
+    db.session.commit()
+    result = client.get(
+        "/v1/pipelines/no-id/runs/no-id",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
     # no such pipeline_run_id
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/no-id")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs/no-id",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
     pipeline_run = create_pipeline_run(pipeline.uuid, [])
     db.session.commit()
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
     assert result.json == {
         "uuid": pipeline_run.uuid,
@@ -246,22 +285,35 @@ def test_get_pipeline_run(client, pipeline):
     # fails if the pipeline is deleted.
     pipeline.is_deleted = True
     db.session.commit()
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
 
-def test_list_pipeline_runs(client, pipeline):
-    result = client.get(f"/v1/pipelines/no-id/runs")
+def test_list_pipeline_runs(client, pipeline, client_application):
+    db.session.commit()
+    result = client.get(
+        f"/v1/pipelines/no-id/runs",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
     assert result.json == []
 
     # successfully fetch a pipeline_run
     pipeline_run = create_pipeline_run(pipeline.uuid, [])
     db.session.commit()
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
     assert result.json == [
         {
@@ -281,12 +333,19 @@ def test_list_pipeline_runs(client, pipeline):
     ]
 
 
-def test_get_pipeline_run_output(client, pipeline):
-    result = client.get("/v1/pipelines/no-id/runs/no-id/console")
+def test_get_pipeline_run_output(client, pipeline, client_application):
+    db.session.commit()
+    result = client.get(
+        "/v1/pipelines/no-id/runs/no-id/console",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
     # no such pipeline_run_id
-    result = client.get(f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console")
+    result = client.get(
+        f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
@@ -294,7 +353,8 @@ def test_get_pipeline_run_output(client, pipeline):
     pipeline_run.std_out = "stdout"
     db.session.commit()
     result = client.get(
-        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console"
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
     )
     assert result.status_code == 200
     assert result.json == {
@@ -303,7 +363,8 @@ def test_get_pipeline_run_output(client, pipeline):
     }
 
 
-def test_update_pipeline_run_output(client, pipeline):
+def test_update_pipeline_run_output(client, pipeline, worker_application):
+    db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, [])
     db.session.commit()
 
@@ -311,6 +372,7 @@ def test_update_pipeline_run_output(client, pipeline):
         "/v1/pipelines/no-id/runs/no-id/console",
         content_type="application/json",
         json={"std_out": "stdout", "std_err": "stderr",},
+        headers={"Authorization": f"Bearer {worker_application.api_key}"},
     )
     assert result.status_code == 404
 
@@ -319,6 +381,7 @@ def test_update_pipeline_run_output(client, pipeline):
         f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console",
         content_type="application/json",
         json={"std_out": "stdout", "std_err": "stderr",},
+        headers={"Authorization": f"Bearer {worker_application.api_key}"},
     )
     assert result.status_code == 404
 
@@ -327,6 +390,7 @@ def test_update_pipeline_run_output(client, pipeline):
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
         content_type="application/json",
         json={"std_out": "stdout", "std_err": "stderr",},
+        headers={"Authorization": f"Bearer {worker_application.api_key}"},
     )
     assert result.status_code == 200
     assert pipeline_run.std_out == "stdout"
