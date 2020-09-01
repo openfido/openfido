@@ -1,5 +1,4 @@
 import logging
-import re
 from enum import Enum
 from functools import wraps
 
@@ -22,19 +21,11 @@ def make_permission_decorator(permissions_enum):
         def decorator(view):
             @wraps(view)
             def wrapper(*args, **kwargs):
-                if "Authorization" not in request.headers:
+                if "Workflow-Key" not in request.headers:
                     logger.warning("no authorization header")
                     return {}, 401
-                if not request.headers["Authorization"].startswith("Bearer "):
-                    logger.warning("authorization header not a bearer type")
-                    return {}, 401
 
-                matches = re.match(r"^Bearer (\S+)$", request.headers["Authorization"])
-                if not matches:
-                    logger.warning("invalid bearer token format")
-                    return {}, 401
-
-                g.api_key = matches.group(1)
+                g.api_key = request.headers["Workflow-Key"]
 
                 for permission in permissions:
                     required_permission = permissions_enum(permission)

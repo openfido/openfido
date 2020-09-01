@@ -91,8 +91,7 @@ Finally, make a decorator to enforce these permissions in your views:
         return 'private info'
 
 
-HTTP clients must then pass a `Authentication` header with a bearer token
-containing an api_key.
+HTTP clients must then pass a `Workflow-Key` header with their api_key.
 
 TODO how to create these api_keys.
 
