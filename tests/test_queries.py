@@ -21,7 +21,10 @@ def test_find_pipeline_is_deleted(app):
 
 
 def test_find_pipeline(app):
-    pipeline = Pipeline(name="a pipeline", description="a description",)
+    pipeline = Pipeline(
+        name="a pipeline",
+        description="a description",
+    )
     db.session.add(pipeline)
     db.session.commit()
 
@@ -33,7 +36,10 @@ def test_find_pipelines_no_pipelines(app):
 
 
 def test_find_pipelines(app):
-    p1 = Pipeline(name="a pipeline", description="a description",)
+    p1 = Pipeline(
+        name="a pipeline",
+        description="a description",
+    )
     p2 = Pipeline(name="a pipeline", description="a description", is_deleted=True)
     db.session.add(p1)
     db.session.add(p2)

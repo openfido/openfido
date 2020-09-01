@@ -10,7 +10,7 @@ from .queries import find_pipeline, find_run_state_type, find_pipeline_run
 
 
 def delete_pipeline(uuid):
-    """ Delete a pipeline.
+    """Delete a pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
@@ -24,7 +24,7 @@ def delete_pipeline(uuid):
 def create_pipeline(
     name, description, docker_image_url, repository_ssh_url, repository_branch
 ):
-    """ Create a Pipeline.
+    """Create a Pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """

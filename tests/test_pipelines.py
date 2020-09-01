@@ -5,7 +5,10 @@ from app.pipelines import toISO8601
 
 
 def test_create_pipeline_wrong_content_type(client):
-    result = client.post("/v1/pipelines", content_type="application/badtype",)
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/badtype",
+    )
     assert result.status_code == 400
 
 
@@ -25,7 +28,11 @@ def test_create_pipeline_wrong_params(client):
         "repository_ssh_url": "",
         "repository_branch": "",
     }
-    result = client.post("/v1/pipelines", content_type="application/json", json=params,)
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+    )
     assert result.status_code == 400
 
 
@@ -56,7 +63,11 @@ def test_create_pipeline_no_auth(client):
         "repository_ssh_url": "ssh+github url",
         "repository_branch": "master",
     }
-    result = client.post("/v1/pipelines", content_type="application/json", json=params,)
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+    )
     assert result.status_code == 401
 
 
@@ -236,7 +247,12 @@ def test_create_run(client, pipeline, client_application):
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
         "created_at": toISO8601(pipeline_run.created_at),
-        "inputs": [{"name": "name1.pdf", "url": "aurl",}],
+        "inputs": [
+            {
+                "name": "name1.pdf",
+                "url": "aurl",
+            }
+        ],
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
@@ -371,7 +387,10 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
     result = client.put(
         "/v1/pipelines/no-id/runs/no-id/console",
         content_type="application/json",
-        json={"std_out": "stdout", "std_err": "stderr",},
+        json={
+            "std_out": "stdout",
+            "std_err": "stderr",
+        },
         headers={"Workflow-Key": worker_application.api_key},
     )
     assert result.status_code == 404
@@ -380,7 +399,10 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
     result = client.put(
         f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console",
         content_type="application/json",
-        json={"std_out": "stdout", "std_err": "stderr",},
+        json={
+            "std_out": "stdout",
+            "std_err": "stderr",
+        },
         headers={"Workflow-Key": worker_application.api_key},
     )
     assert result.status_code == 404
@@ -389,7 +411,10 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
     result = client.put(
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
         content_type="application/json",
-        json={"std_out": "stdout", "std_err": "stderr",},
+        json={
+            "std_out": "stdout",
+            "std_err": "stderr",
+        },
         headers={"Workflow-Key": worker_application.api_key},
     )
     assert result.status_code == 200

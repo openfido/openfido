@@ -3,7 +3,8 @@ from app.models import db
 
 def test_make_permission_decorator_no_auth(client, pipeline):
     result = client.get(
-        f"/v1/pipelines/{pipeline.uuid}", content_type="application/json",
+        f"/v1/pipelines/{pipeline.uuid}",
+        content_type="application/json",
     )
     assert result.status_code == 401
 
