@@ -29,7 +29,8 @@ def test_create_pipeline_wrong_params(client):
     assert result.status_code == 400
 
 
-def test_create_pipeline_non_empty_params(client):
+def test_create_pipeline_non_empty_params(client, client_application):
+    db.session.commit()
     # An error is returned if no configuration information is supplied.
     params = {
         "name": "a pipeline",
@@ -38,11 +39,16 @@ def test_create_pipeline_non_empty_params(client):
         "repository_ssh_url": "",
         "repository_branch": "",
     }
-    result = client.post("/v1/pipelines", content_type="application/json", json=params,)
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 400
 
 
-def test_create_pipeline(client):
+def test_create_pipeline_no_auth(client):
     params = {
         "name": "a pipeline",
         "description": "a description",
@@ -51,6 +57,43 @@ def test_create_pipeline(client):
         "repository_branch": "master",
     }
     result = client.post("/v1/pipelines", content_type="application/json", json=params,)
+    assert result.status_code == 401
+
+
+def test_create_pipeline_wrong_auth(client, worker_application):
+    db.session.commit()
+    # using an api_key that doesn't have client permissions will fail:
+    params = {
+        "name": "a pipeline",
+        "description": "a description",
+        "docker_image_url": "a/url",
+        "repository_ssh_url": "ssh+github url",
+        "repository_branch": "master",
+    }
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+        headers={"Authorization": f"Bearer {worker_application.api_key}"},
+    )
+    assert result.status_code == 401
+
+
+def test_create_pipeline(client, client_application):
+    db.session.commit()
+    params = {
+        "name": "a pipeline",
+        "description": "a description",
+        "docker_image_url": "a/url",
+        "repository_ssh_url": "ssh+github url",
+        "repository_branch": "master",
+    }
+    result = client.post(
+        "/v1/pipelines",
+        content_type="application/json",
+        json=params,
+        headers={"Authorization": f"Bearer {client_application.api_key}"},
+    )
     assert result.status_code == 200
 
     pipeline = Pipeline.query.filter(Pipeline.name == params["name"]).one_or_none()

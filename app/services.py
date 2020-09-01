@@ -3,7 +3,7 @@ from .models import (
     PipelineRun,
     PipelineRunInput,
     PipelineRunState,
-    RunState,
+    RunStateEnum,
     db,
 )
 from .queries import find_pipeline, find_run_state_type, find_pipeline_run
@@ -74,7 +74,7 @@ def create_pipeline_run(uuid, inputs):
         )
 
     pipeline_run.pipeline_run_states.append(
-        create_pipeline_run_state(RunState.NOT_STARTED)
+        create_pipeline_run_state(RunStateEnum.NOT_STARTED)
     )
     pipeline.pipeline_runs.append(pipeline_run)
     db.session.add(pipeline)

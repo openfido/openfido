@@ -1,7 +1,8 @@
 import pytest
 
 from app import create_app
-from app.models import db, Pipeline
+from app.models import db, Pipeline, SystemPermissionEnum
+from roles.services import create_application
 
 
 @pytest.fixture
@@ -44,3 +45,13 @@ def pipeline(app):
     db.session.commit()
 
     return pipeline
+
+
+@pytest.fixture
+def client_application(app):
+    return create_application("test client", SystemPermissionEnum.PIPELINES_CLIENT)
+
+
+@pytest.fixture
+def worker_application(app):
+    return create_application("test client", SystemPermissionEnum.PIPELINES_WORKER)

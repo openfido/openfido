@@ -3,6 +3,9 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 
+# not used, just want it included in our app's schema
+from roles.models import db as roles_db
+
 from .models import db
 from .pipelines import pipeline_bp
 from .tasks import make_celery

@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Blueprint, current_app, g, jsonify, request
 
-from .models import db
+from .models import db, SystemPermissionEnum
 from .queries import find_pipeline, find_pipeline_run, find_pipelines
 from .services import (
     create_pipeline,
@@ -11,10 +11,12 @@ from .services import (
     delete_pipeline,
     update_pipeline_run_output,
 )
+from roles.decorators import make_permission_decorator
 
 logger = logging.getLogger("pipelines")
 
 pipeline_bp = Blueprint("pipelines", __name__)
+permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
 def toISO8601(date):
@@ -94,6 +96,7 @@ def verify_content_type_and_params(required_keys, optional_keys):
     ],
     [],
 )
+@permissions_required(SystemPermissionEnum.PIPELINES_CLIENT)
 def create():
     """ Create a pipeline.
     ---
