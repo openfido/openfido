@@ -1,29 +1,9 @@
-import uuid
-from datetime import datetime
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 from flask_sqlalchemy import SQLAlchemy
+from .model_utils import get_db, CommonColumnsMixin
 
-db = SQLAlchemy()
-
-
-class CommonColumnsMixin(object):
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(
-        db.String(32),
-        nullable=False,
-        server_default="",
-        default=lambda: uuid.uuid4().hex,
-    )
-    created_at = db.Column(
-        db.DateTime, nullable=False, default=lambda: datetime.utcnow()
-    )
-    updated_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=lambda: datetime.utcnow(),
-        onupdate=lambda: datetime.utcnow(),
-    )
+db = get_db()
 
 
 class Pipeline(CommonColumnsMixin, db.Model):
@@ -42,7 +22,15 @@ class Pipeline(CommonColumnsMixin, db.Model):
 
 
 @unique
-class RunState(Enum):
+class SystemPermissionEnum(IntEnum):
+    """ All possible types of SystemPermission for Pipelines """
+
+    PIPELINES_CLIENT = 1
+    PIPELINES_WORKER = 2
+
+
+@unique
+class RunStateEnum(IntEnum):
     """ Run states currently supported in PipelineRunState """
 
     NOT_STARTED = 1

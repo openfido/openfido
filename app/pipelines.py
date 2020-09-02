@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Blueprint, current_app, g, jsonify, request
 
-from .models import db
+from .models import db, SystemPermissionEnum
 from .queries import find_pipeline, find_pipeline_run, find_pipelines
 from .services import (
     create_pipeline,
@@ -11,10 +11,12 @@ from .services import (
     delete_pipeline,
     update_pipeline_run_output,
 )
+from roles.decorators import make_permission_decorator
 
 logger = logging.getLogger("pipelines")
 
 pipeline_bp = Blueprint("pipelines", __name__)
+permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
 def toISO8601(date):
@@ -41,11 +43,17 @@ def pipeline_run_to_json(pipeline_run):
         "sequence": pipeline_run.sequence,
         "created_at": toISO8601(pipeline_run.created_at),
         "inputs": [
-            {"name": i.filename, "url": i.url,}
+            {
+                "name": i.filename,
+                "url": i.url,
+            }
             for i in pipeline_run.pipeline_run_inputs
         ],
         "states": [
-            {"state": s.run_state_type.name, "created_at": toISO8601(s.created_at),}
+            {
+                "state": s.run_state_type.name,
+                "created_at": toISO8601(s.created_at),
+            }
             for s in pipeline_run.pipeline_run_states
         ],
     }
@@ -94,8 +102,9 @@ def verify_content_type_and_params(required_keys, optional_keys):
     ],
     [],
 )
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create():
-    """ Create a pipeline.
+    """Create a pipeline.
     ---
 
     requestBody:
@@ -164,8 +173,9 @@ def create():
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get(pipeline_uuid):
-    """ Get a pipeline.
+    """Get a pipeline.
     ---
     parameters:
       - name: uuid
@@ -208,8 +218,9 @@ def get(pipeline_uuid):
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["DELETE"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def remove(pipeline_uuid):
-    """ Delete a pipeline.
+    """Delete a pipeline.
     ---
     parameters:
       - name: uuid
@@ -231,8 +242,9 @@ def remove(pipeline_uuid):
 
 @pipeline_bp.route("", methods=["GET"])
 @verify_content_type_and_params([], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def list_pipelines():
-    """ List all pipelines.
+    """List all pipelines.
     ---
     responses:
       "200":
@@ -269,6 +281,7 @@ def list_pipelines():
 
 @pipeline_bp.route("/<pipeline_uuid>/runs", methods=["POST"])
 @verify_content_type_and_params(["inputs"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create_run(pipeline_uuid):
     """Create a new pipeline run.
     ---
@@ -357,8 +370,9 @@ def create_run(pipeline_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_run(pipeline_uuid, pipeline_run_uuid):
-    """ Get a pipeline run.
+    """Get a pipeline run.
     ---
     responses:
       "200":
@@ -417,8 +431,9 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_runs(pipeline_uuid):
-    """ Get a all pipeline runs for a pipeline.
+    """Get a all pipeline runs for a pipeline.
     ---
     responses:
       "200":
@@ -475,8 +490,9 @@ def get_runs(pipeline_uuid):
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_run_output(pipeline_uuid, pipeline_run_uuid):
-    """ Get the console output of a run.
+    """Get the console output of a run.
     ---
     responses:
       "200":
@@ -502,14 +518,16 @@ def get_run_output(pipeline_uuid, pipeline_run_uuid):
         return {}, 404
 
     return jsonify(
-        std_out=pipeline_run.std_out or "", std_err=pipeline_run.std_err or "",
+        std_out=pipeline_run.std_out or "",
+        std_err=pipeline_run.std_err or "",
     )
 
 
 @pipeline_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["PUT"])
 @verify_content_type_and_params(["std_out", "std_err"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_WORKER])
 def upload_run_output(pipeline_uuid, pipeline_run_uuid):
-    """ Update the console output.
+    """Update the console output.
     ---
     requestBody:
       description: "standard output and error"

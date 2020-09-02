@@ -12,7 +12,7 @@ def test(c, cov=False, cov_report=False, junit=False, enforce_percent=0):
     if enforce_percent > 0:
         command += f" --cov-fail-under={enforce_percent}"
     if cov or cov_report or junit or enforce_percent:
-        command += " --cov app"
+        command += " --cov app --cov roles"
     else:
         command += " app tests"
 
@@ -44,3 +44,21 @@ def precommit(c):
     test(c, junit=True, enforce_percent=100)
     style(c)
     lint(c, fail_under=7)
+
+
+@task
+def create_application_key(c, name, permission):
+    """ Create an application api_key.
+
+    name = name of the application
+    permission = permission to support.
+    """
+    from app import create_app
+    from roles.services import create_application
+    from app.models import SystemPermissionEnum
+
+    (app, db, _, _) = create_app()
+    with app.app_context():
+        application = create_application(name, SystemPermissionEnum[permission])
+        db.session.commit()
+        print("api_key = {0}".format(application.api_key))
