@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from roles.models import db as roles_db
 
 from .models import db
-from .pipelines import pipeline_bp
+from .routes import pipeline_bp, run_bp
 from .tasks import make_celery
 
 # Allow a specific set of environmental variables to be configurable:
@@ -40,5 +40,6 @@ def create_app(config=None):
     celery = make_celery(app)
 
     app.register_blueprint(pipeline_bp, url_prefix="/v1/pipelines")
+    app.register_blueprint(run_bp, url_prefix="/v1/pipelines")
 
     return (app, db, celery, migrate)
