@@ -231,3 +231,24 @@ def test_update_pipeline(client, client_application, pipeline):
     assert pipeline.docker_image_url == "updated url"
     assert pipeline.repository_ssh_url == "updated ssh"
     assert pipeline.repository_branch == "updated branch"
+
+
+def test_search_pipelines(client, client_application, pipeline):
+    db.session.commit()
+    result = client.post(
+        "/v1/pipelines/search",
+        content_type="application/json",
+        json={"search": "pipe"},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 1
+
+    result = client.post(
+        "/v1/pipelines/search",
+        content_type="application/json",
+        json={"search": "nomatch"},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 0

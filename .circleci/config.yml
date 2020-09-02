@@ -31,4 +31,4 @@ jobs:
       - run:
           command: pipenv run invoke style
       - run:
-          command: pipenv run invoke lint --fail-under=7
+          command: pipenv run invoke lint --fail-under=8
