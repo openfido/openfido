@@ -35,17 +35,21 @@ def test_find_pipelines_no_pipelines(app):
     assert list(find_pipelines()) == []
 
 
-def test_find_pipelines(app):
-    p1 = Pipeline(
-        name="a pipeline",
-        description="a description",
+def test_find_pipelines(app, pipeline):
+    p2 = Pipeline(
+        name="pipeline 2",
+        description="description 2",
     )
-    p2 = Pipeline(name="a pipeline", description="a description", is_deleted=True)
-    db.session.add(p1)
+    deleted_p = Pipeline(
+        name="a pipeline", description="a description", is_deleted=True
+    )
     db.session.add(p2)
+    db.session.add(deleted_p)
     db.session.commit()
 
-    assert set(find_pipelines()) == set([p1])
+    assert set(find_pipelines()) == set([pipeline, p2])
+    assert set(find_pipelines([p2.uuid, deleted_p.uuid])) == set([p2])
+    assert set(find_pipelines([p2.uuid, pipeline.uuid])) == set([pipeline, p2])
 
 
 def test_find_run_state_type(app):

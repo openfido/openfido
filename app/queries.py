@@ -12,9 +12,14 @@ def find_pipeline(uuid):
     ).one_or_none()
 
 
-def find_pipelines():
-    """ Find all pipelines """
-    return Pipeline.query.filter(Pipeline.is_deleted == False)
+def find_pipelines(uuids=None):
+    """ Find all pipelines, or a list of them. """
+    query = Pipeline.query.filter(Pipeline.is_deleted == False)
+
+    if uuids is not None:
+        query = query.filter(Pipeline.uuid.in_(uuids))
+
+    return query
 
 
 def find_run_state_type(run_state):

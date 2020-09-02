@@ -294,3 +294,56 @@ def update(pipeline_uuid):
         return jsonify(pipeline_to_json(pipeline))
     except ValueError:
         return {}, 400
+
+
+@pipeline_bp.route("/search", methods=["POST"])
+@verify_content_type_and_params(["uuids"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def search():
+    """Search for pipelines with specific UUIDs.
+    ---
+
+    requestBody:
+      description: "Pipeline description and configuration."
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              uuids:
+                type: array
+                items:
+                  type: string
+                  example: "uuid1"
+    responses:
+      "200":
+        description: "Matching UUIDs"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  docker_image_url:
+                    type: string
+                  repository_ssh_url:
+                    type: string
+                  repository_branch:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+      "400":
+        description: "Bad request"
+    """
+    uuids = request.json["uuids"]
+    return jsonify(list(map(pipeline_to_json, find_pipelines(uuids))))
