@@ -8,7 +8,7 @@ from .queries import is_permitted
 
 logger = logging.getLogger("roles")
 
-ROLES_KEY = "Workflow-Key"
+ROLES_KEY = "X-API-Key"
 
 def make_permission_decorator(permissions_enum):
     """ Create a decorator that allows permissions defined by permissions_enum. """

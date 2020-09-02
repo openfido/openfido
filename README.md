@@ -91,7 +91,7 @@ Finally, make a decorator to enforce these permissions in your views:
         return 'private info'
 
 
-HTTP clients must then pass a `Workflow-Key` header with their api_key. Keys can
+HTTP clients must then pass a `X-API-Key` header with their api_key. Keys can
 be created using the sample code in tasks.py:
 
     # Create a new Application database record with PIPELINES_CLIENT role.
