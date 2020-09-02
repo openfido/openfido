@@ -1,5 +1,5 @@
 from app.models import Pipeline, db
-from app.pipelines import toISO8601
+from app.routes.utils import toISO8601
 from app.queries import find_pipeline
 from app.services import create_pipeline_run
 from roles.decorators import ROLES_KEY
