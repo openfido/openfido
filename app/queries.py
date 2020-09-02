@@ -1,5 +1,5 @@
 from .models import Pipeline, PipelineRun, RunStateType, db
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
 
 def find_pipeline(uuid):
@@ -12,17 +12,12 @@ def find_pipeline(uuid):
     ).one_or_none()
 
 
-def find_pipelines(search=None):
-    """ Find all pipelines with search in name/description. """
+def find_pipelines(uuids=None):
+    """ Find all pipelines, or a list of them. """
     query = Pipeline.query.filter(Pipeline.is_deleted == False)
 
-    if search is not None:
-        query = query.filter(
-            or_(
-                Pipeline.name.ilike(f"%{search}%"),
-                Pipeline.description.ilike(f"%{search}%"),
-            )
-        )
+    if uuids is not None:
+        query = query.filter(Pipeline.uuid.in_(uuids))
 
     return query
 

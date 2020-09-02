@@ -238,7 +238,7 @@ def test_search_pipelines(client, client_application, pipeline):
     result = client.post(
         "/v1/pipelines/search",
         content_type="application/json",
-        json={"search": "pipe"},
+        json={"uuids": [pipeline.uuid]},
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 200
@@ -247,7 +247,7 @@ def test_search_pipelines(client, client_application, pipeline):
     result = client.post(
         "/v1/pipelines/search",
         content_type="application/json",
-        json={"search": "nomatch"},
+        json={"uuids": "nomatch"},
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 200

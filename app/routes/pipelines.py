@@ -297,10 +297,10 @@ def update(pipeline_uuid):
 
 
 @pipeline_bp.route("/search", methods=["POST"])
-@verify_content_type_and_params(["search"], [])
+@verify_content_type_and_params(["uuids"], [])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def search():
-    """Search for pipelines.
+    """Search for pipelines with specific UUIDs.
     ---
 
     requestBody:
@@ -311,23 +311,39 @@ def search():
           schema:
             type: object
             properties:
-              search:
-                type: string
+              uuids:
+                type: array
+                items:
+                  type: string
+                  example: "uuid1"
     responses:
       "200":
         description: "Matching UUIDs"
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                uuids:
-                  type: array
-                  items:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
                     type: string
-                    example: "uuid1"
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  docker_image_url:
+                    type: string
+                  repository_ssh_url:
+                    type: string
+                  repository_branch:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
       "400":
         description: "Bad request"
     """
-    search = request.json["search"]
-    return jsonify(list(map(pipeline_to_json, find_pipelines(search))))
+    uuids = request.json["uuids"]
+    return jsonify(list(map(pipeline_to_json, find_pipelines(uuids))))
