@@ -1,14 +1,13 @@
 import logging
 
-from flask import Blueprint, current_app, g, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from ..models import db, SystemPermissionEnum
-from ..queries import find_pipeline, find_pipeline_run, find_pipelines
+from ..queries import find_pipeline, find_pipelines
 from ..services import (
     create_pipeline,
-    create_pipeline_run,
     delete_pipeline,
-    update_pipeline_run_output,
+    update_pipeline,
 )
 from .utils import toISO8601, verify_content_type_and_params, permissions_required
 
@@ -53,9 +52,6 @@ def create():
         application/json:
           schema:
             type: object
-            required:
-              - password
-              - reset_token
             properties:
               name:
                 type: string
@@ -216,3 +212,85 @@ def list_pipelines():
     """
     pipelines = find_pipelines()
     return jsonify(list(map(pipeline_to_json, pipelines)))
+
+
+@pipeline_bp.route("/<pipeline_uuid>", methods=["PUT"])
+@verify_content_type_and_params(
+    [
+        "name",
+        "description",
+        "docker_image_url",
+        "repository_ssh_url",
+        "repository_branch",
+    ],
+    [],
+)
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def update(pipeline_uuid):
+    """Update a pipeline.
+    ---
+
+    requestBody:
+      description: "Pipeline description and configuration."
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              docker_image_url:
+                type: string
+              repository_ssh_url:
+                type: string
+              repository_branch:
+                type: string
+    responses:
+      "200":
+        description: "Updated"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                docker_image_url:
+                  type: string
+                repository_ssh_url:
+                  type: string
+                repository_branch:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+    """
+    name = request.json["name"]
+    description = request.json["description"]
+    docker_image_url = request.json["docker_image_url"]
+    repository_ssh_url = request.json["repository_ssh_url"]
+    repository_branch = request.json["repository_branch"]
+    try:
+        pipeline = update_pipeline(
+            pipeline_uuid,
+            name,
+            description,
+            docker_image_url,
+            repository_ssh_url,
+            repository_branch,
+        )
+        db.session.commit()
+
+        return jsonify(pipeline_to_json(pipeline))
+    except ValueError:
+        return {}, 400

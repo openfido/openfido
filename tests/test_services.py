@@ -29,12 +29,28 @@ def test_create_pipeline_version_no_ssh_url(app):
         services.create_pipeline(A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, "", "")
 
 
-def test_create_pipeline_version(app):
-    # Given: good fields
+def test_create_pipeline(app):
     pipeline = services.create_pipeline(
         A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
     )
-    # Then: a pipeline is created
+    assert pipeline.name == A_NAME
+    assert pipeline.description == A_DESCRIPTION
+    assert pipeline.docker_image_url == A_DOCKER_IMAGE
+    assert pipeline.repository_ssh_url == A_SSH_URL
+    assert pipeline.repository_branch == A_BRANCH
+
+
+def test_update_pipeline_no_uuid(app):
+    with pytest.raises(ValueError):
+        services.update_pipeline(
+            "baduuid", A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
+        )
+
+
+def test_update_pipeline(app, pipeline):
+    pipeline = services.update_pipeline(
+        pipeline.uuid, A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
+    )
     assert pipeline.name == A_NAME
     assert pipeline.description == A_DESCRIPTION
     assert pipeline.docker_image_url == A_DOCKER_IMAGE
