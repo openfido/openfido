@@ -1,8 +1,8 @@
-"""creates pipeline and roles tables
+"""Creates pipeline and roles tables
 
-Revision ID: c3e101557254
+Revision ID: e289a4ff1765
 Revises: 
-Create Date: 2020-08-31 18:50:45.399699
+Create Date: 2020-09-02 18:38:42.107397
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c3e101557254'
+revision = 'e289a4ff1765'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -78,6 +78,7 @@ def upgrade():
     sa.Column('sequence', sa.Integer(), nullable=False),
     sa.Column('pipeline_id', sa.Integer(), nullable=False),
     sa.Column('worker_ip', sa.String(length=50), nullable=True),
+    sa.Column('callback_url', sa.String(length=2000), nullable=True),
     sa.Column('started_at', sa.DateTime(), nullable=True),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
     sa.Column('std_out', sa.Unicode(), nullable=True),

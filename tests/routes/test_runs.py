@@ -9,7 +9,7 @@ def test_create_run_no_such_uuid(client, client_application):
     result = client.post(
         "/v1/pipelines/1111abcd/runs",
         content_type="application/json",
-        json={"inputs": []},
+        json={"inputs": [], "callback_url": "http://example.com"},
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 400
@@ -28,7 +28,15 @@ def test_create_run_bad_input_name(client, pipeline, client_application):
     result = client.post(
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
-        json={"inputs": [{"name": "name1.pdf", "url": "aurl", "extrakey": "badinput"}]},
+        json={
+            "inputs": [
+                {
+                    "name": "name1.pdf",
+                    "url": "http://example.com",
+                    "extrakey": "badinput",
+                }
+            ]
+        },
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 400
@@ -42,18 +50,50 @@ def test_create_run_bad_input_name(client, pipeline, client_application):
     assert result.status_code == 400
 
 
+def test_create_run_bad_callback_url(client, pipeline, client_application):
+    db.session.commit()
+    result = client.post(
+        f"/v1/pipelines/{pipeline.uuid}/runs",
+        content_type="application/json",
+        json={
+            "inputs": [{"name": "name1.pdf", "url": "http://example.com"}],
+            "callback_url": "notaurl",
+        },
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+
+def test_create_run_bad_input_url(client, pipeline, client_application):
+    db.session.commit()
+    result = client.post(
+        f"/v1/pipelines/{pipeline.uuid}/runs",
+        content_type="application/json",
+        json={
+            "inputs": [{"name": "name1.pdf", "url": "notaurl"}],
+            "callback_url": "http://example.com",
+        },
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+
 def test_create_run(client, pipeline, client_application):
     db.session.commit()
     result = client.post(
         f"/v1/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
-        json={"inputs": [{"name": "name1.pdf", "url": "aurl"}]},
+        json={
+            "inputs": [{"name": "name1.pdf", "url": "http://example.com"}],
+            "callback_url": "http://callback.com",
+        },
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 200
     assert len(pipeline.pipeline_runs) == 1
     assert len(pipeline.pipeline_runs[0].pipeline_run_states) == 1
     assert len(pipeline.pipeline_runs[0].pipeline_run_inputs) == 1
+    assert pipeline.pipeline_runs[0].callback_url == "http://callback.com"
     pipeline_run = pipeline.pipeline_runs[0]
 
     assert result.json == {
@@ -63,7 +103,7 @@ def test_create_run(client, pipeline, client_application):
         "inputs": [
             {
                 "name": "name1.pdf",
-                "url": "aurl",
+                "url": "http://example.com",
             }
         ],
         "states": [
@@ -91,7 +131,7 @@ def test_get_pipeline_run(client, pipeline, client_application):
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
     db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
@@ -137,7 +177,7 @@ def test_list_pipeline_runs(client, pipeline, client_application):
     assert result.json == []
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
     db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs",
@@ -178,7 +218,7 @@ def test_get_pipeline_run_output(client, pipeline, client_application):
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
     pipeline_run.std_out = "stdout"
     db.session.commit()
     result = client.get(
@@ -194,7 +234,7 @@ def test_get_pipeline_run_output(client, pipeline, client_application):
 
 def test_update_pipeline_run_output(client, pipeline, worker_application):
     db.session.commit()
-    pipeline_run = create_pipeline_run(pipeline.uuid, [])
+    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
     db.session.commit()
 
     result = client.put(

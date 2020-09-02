@@ -1,10 +1,12 @@
 import logging
 from functools import wraps
 
+from marshmallow.exceptions import ValidationError
 from flask import Blueprint, jsonify, request
 
 from ..models import db, SystemPermissionEnum
 from ..queries import find_pipeline, find_pipeline_run
+from ..schemas import CreateRunSchema
 from ..services import (
     create_pipeline_run,
     update_pipeline_run_output,
@@ -39,7 +41,7 @@ def pipeline_run_to_json(pipeline_run):
 
 
 @run_bp.route("/<pipeline_uuid>/runs", methods=["POST"])
-@verify_content_type_and_params(["inputs"], [])
+@verify_content_type_and_params(["inputs", "callback_url"], [])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create_run(pipeline_uuid):
     """Create a new pipeline run.
@@ -53,7 +55,9 @@ def create_run(pipeline_uuid):
           schema:
             type: object
             properties:
-              items:
+              callback_url:
+                type: string
+              inputs:
                 type: array
                 items:
                   type: object
@@ -111,20 +115,21 @@ def create_run(pipeline_uuid):
     """
     # Validate the input fields are all strings and only have name/url in
     # them
-    inputs = request.json["inputs"]
-    if not isinstance(inputs, list):
-        return {}, 400
-    for i in inputs:
-        allowed_keys = set(["name", "url"])
-        if set(i.keys()) != allowed_keys:
-            return {}, 400
-
     try:
-        pipeline_run = create_pipeline_run(pipeline_uuid, inputs)
+        schema = CreateRunSchema()
+        data = schema.load(request.json)
+
+        pipeline_run = create_pipeline_run(
+            pipeline_uuid, data["inputs"], data["callback_url"]
+        )
         db.session.commit()
 
         return jsonify(pipeline_run_to_json(pipeline_run))
+    except ValidationError as e:
+        logger.warning(e)
+        return {}, 400
     except ValueError:
+        logger.warning("unable to create pipeline run")
         return {}, 400
 
 
@@ -180,10 +185,12 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
+        logger.warning("no pipeline found")
         return {}, 404
 
     pipeline_run = find_pipeline_run(pipeline_run_uuid)
     if pipeline_run is None:
+        logger.warning("no pipeline run found")
         return {}, 404
 
     return jsonify(pipeline_run_to_json(pipeline_run))
@@ -243,6 +250,7 @@ def get_runs(pipeline_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
+        logger.warning("no pipeline found")
         return {}, 404
 
     return jsonify(list(map(pipeline_run_to_json, pipeline.pipeline_runs)))
@@ -270,10 +278,12 @@ def get_run_output(pipeline_uuid, pipeline_run_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
+        logger.warning("no pipeline found")
         return {}, 404
 
     pipeline_run = find_pipeline_run(pipeline_run_uuid)
     if pipeline_run is None:
+        logger.warning("no pipeline run found")
         return {}, 404
 
     return jsonify(
@@ -308,10 +318,12 @@ def upload_run_output(pipeline_uuid, pipeline_run_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
+        logger.warning("no pipeline found")
         return {}, 404
 
     pipeline_run = find_pipeline_run(pipeline_run_uuid)
     if pipeline_run is None:
+        logger.warning("no pipeline run found")
         return {}, 404
 
     update_pipeline_run_output(

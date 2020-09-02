@@ -99,12 +99,14 @@ class PipelineRun(CommonColumnsMixin, db.Model):
     __tablename__ = "pipelinerun"
 
     sequence = db.Column(db.Integer, nullable=False)
-    pipeline_id = db.Column(db.Integer, db.ForeignKey("pipeline.id"), nullable=False)
     worker_ip = db.Column(db.String(50), nullable=True)
+    callback_url = db.Column(db.String(2000), nullable=True)
     started_at = db.Column(db.DateTime, nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
     std_out = db.Column(db.Unicode, nullable=True)
     std_err = db.Column(db.Unicode, nullable=True)
+
+    pipeline_id = db.Column(db.Integer, db.ForeignKey("pipeline.id"), nullable=False)
 
     pipeline_run_states = db.relationship(
         "PipelineRunState", backref="pipeline_run", lazy="immediate"
