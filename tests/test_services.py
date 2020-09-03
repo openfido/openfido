@@ -1,14 +1,21 @@
+import json
 import pytest
+from marshmallow.exceptions import ValidationError
+from urllib.error import URLError
 
 from app import services
-from app.models import db
+from app.models import RunStateEnum, db
 from app.queries import find_pipeline
+from app.services import urllib_request, CALLBACK_TIMEOUT
 
 A_NAME = "a pipeline"
 A_DESCRIPTION = "a description"
 A_DOCKER_IMAGE = "example/image"
 A_SSH_URL = "git@github.com:an_org/a_repo.git"
 A_BRANCH = "master"
+
+INVALID_CALLBACK_INPUT = { "inputs": [], "callback_url": "notaurl" }
+VALID_CALLBACK_INPUT = { "inputs": [], "callback_url": "http://example.com" }
 
 
 def test_create_pipeline_version_no_name(app):
@@ -71,12 +78,12 @@ def test_delete_pipeline(app, pipeline):
 
 def test_create_pipeline_bad_input(app):
     with pytest.raises(ValueError):
-        pipeline_run = services.create_pipeline_run("no-id", [], "invalidurl")
+        pipeline_run = services.create_pipeline_run("no-id", INVALID_CALLBACK_INPUT)
 
 
 def test_create_pipeline_run_no_pipeline(app):
     with pytest.raises(ValueError):
-        pipeline_run = services.create_pipeline_run("no-id", [], "http://example.com")
+        pipeline_run = services.create_pipeline_run("no-id", VALID_CALLBACK_INPUT)
 
 
 def test_create_pipeline_run(app, pipeline):
@@ -89,7 +96,7 @@ def test_create_pipeline_run(app, pipeline):
         "url": "https://example.com/name2.pdf",
     }
     pipeline_run = services.create_pipeline_run(
-        pipeline.uuid, [input1, input2], "http://example.com"
+        pipeline.uuid, { "inputs": [input1, input2], "callback_url": "http://example.com" }
     )
     assert pipeline_run.pipeline == pipeline
     assert pipeline_run.sequence == 1
@@ -99,13 +106,86 @@ def test_create_pipeline_run(app, pipeline):
     assert len(pipeline_run.pipeline_run_states) == 1
 
 
-def test_update_pipeline_run_output(app, pipeline):
+def test_update_pipeline_run_output_no_uuid(app, pipeline):
     with pytest.raises(ValueError):
         services.update_pipeline_run_output(None, "stdout", "stderr")
 
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, [], "http://example.com")
+
+def test_update_pipeline_run_output(app, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     db.session.commit()
 
     services.update_pipeline_run_output(pipeline_run.uuid, "stdout", "stderr")
     assert pipeline_run.std_out == "stdout"
     assert pipeline_run.std_err == "stderr"
+
+
+def test_update_pipeline_run_state_bad_state(app, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    with pytest.raises(ValidationError):
+        services.update_pipeline_run_state(pipeline_run.uuid, {"state": "fake",})
+
+    assert len(pipeline_run.pipeline_run_states) == 1
+
+
+def test_update_pipeline_run_state_dup_state(app, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    with pytest.raises(ValueError):
+        services.update_pipeline_run_state(
+            pipeline_run.uuid, {"state": RunStateEnum.NOT_STARTED.name,}
+        )
+    assert len(pipeline_run.pipeline_run_states) == 1
+
+def test_update_pipeline_run_state_bad_transition(app, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    with pytest.raises(ValueError):
+        services.update_pipeline_run_state(
+            pipeline_run.uuid, {"state": RunStateEnum.COMPLETED.name,}
+        )
+    assert len(pipeline_run.pipeline_run_states) == 1
+
+
+def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    # If a callback_url fails for some network reason, the update should still
+    # work:
+    def mock_urlopen(request, timeout):
+        raise URLError("a reason")
+
+    monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
+
+    services.update_pipeline_run_state(
+        pipeline_run.uuid, {"state": RunStateEnum.RUNNING.name,}
+    )
+    assert len(pipeline_run.pipeline_run_states) == 2
+    assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+
+
+def test_update_pipeline_run_state(app, monkeypatch, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    # A callback is made with the callback_url and the correct payload
+    def mock_urlopen(request, timeout):
+        assert request.full_url == pipeline_run.callback_url
+        assert json.loads(request.data.decode()) == {
+            "pipeline_run_uuid": pipeline_run.uuid,
+            "state": RunStateEnum.RUNNING.name,
+        }
+        assert timeout == CALLBACK_TIMEOUT
+
+    monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
+
+    services.update_pipeline_run_state(
+        pipeline_run.uuid, {"state": RunStateEnum.RUNNING.name,}
+    )
+    assert len(pipeline_run.pipeline_run_states) == 2
+    assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING

@@ -3,6 +3,8 @@ from app.routes.utils import toISO8601
 from app.services import create_pipeline_run
 from roles.decorators import ROLES_KEY
 
+from ..test_services import VALID_CALLBACK_INPUT
+
 
 def test_create_run_no_such_uuid(client, client_application):
     db.session.commit()
@@ -100,12 +102,7 @@ def test_create_run(client, pipeline, client_application):
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
         "created_at": toISO8601(pipeline_run.created_at),
-        "inputs": [
-            {
-                "name": "name1.pdf",
-                "url": "http://example.com",
-            }
-        ],
+        "inputs": [{"name": "name1.pdf", "url": "http://example.com",}],
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
@@ -131,7 +128,7 @@ def test_get_pipeline_run(client, pipeline, client_application):
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
@@ -164,8 +161,7 @@ def test_get_pipeline_run(client, pipeline, client_application):
 def test_list_pipeline_runs(client, pipeline, client_application):
     db.session.commit()
     result = client.get(
-        f"/v1/pipelines/no-id/runs",
-        headers={ROLES_KEY: client_application.api_key},
+        f"/v1/pipelines/no-id/runs", headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 404
 
@@ -177,7 +173,7 @@ def test_list_pipeline_runs(client, pipeline, client_application):
     assert result.json == []
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs",
@@ -218,7 +214,7 @@ def test_get_pipeline_run_output(client, pipeline, client_application):
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     pipeline_run.std_out = "stdout"
     db.session.commit()
     result = client.get(
@@ -234,16 +230,13 @@ def test_get_pipeline_run_output(client, pipeline, client_application):
 
 def test_update_pipeline_run_output(client, pipeline, worker_application):
     db.session.commit()
-    pipeline_run = create_pipeline_run(pipeline.uuid, [], "http://example.com")
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     db.session.commit()
 
     result = client.put(
         "/v1/pipelines/no-id/runs/no-id/console",
         content_type="application/json",
-        json={
-            "std_out": "stdout",
-            "std_err": "stderr",
-        },
+        json={"std_out": "stdout", "std_err": "stderr",},
         headers={ROLES_KEY: worker_application.api_key},
     )
     assert result.status_code == 404
@@ -252,10 +245,7 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
     result = client.put(
         f"/v1/pipelines/{pipeline.uuid}/runs/no-id/console",
         content_type="application/json",
-        json={
-            "std_out": "stdout",
-            "std_err": "stderr",
-        },
+        json={"std_out": "stdout", "std_err": "stderr",},
         headers={ROLES_KEY: worker_application.api_key},
     )
     assert result.status_code == 404
@@ -264,10 +254,7 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
     result = client.put(
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
         content_type="application/json",
-        json={
-            "std_out": "stdout",
-            "std_err": "stderr",
-        },
+        json={"std_out": "stdout", "std_err": "stderr",},
         headers={ROLES_KEY: worker_application.api_key},
     )
     assert result.status_code == 200

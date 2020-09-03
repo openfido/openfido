@@ -39,6 +39,16 @@ class RunStateEnum(IntEnum):
     COMPLETED = 4
 
 
+    def is_valid_transition(self, next_enum):
+        """ Return True when the current transition is valid. """
+        if self == RunStateEnum.NOT_STARTED:
+            return next_enum is RunStateEnum.RUNNING
+        if self == RunStateEnum.RUNNING:
+            return next_enum in set([RunStateEnum.FAILED, RunStateEnum.COMPLETED])
+
+        return False
+
+
 class RunStateType(CommonColumnsMixin, db.Model):
     """ Lookup table of run states. """
 

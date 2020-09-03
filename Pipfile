@@ -20,6 +20,7 @@ pytest-cov = "*"
 celery = "*"
 simplejson = "*"
 marshmallow = "*"
+marshmallow_enum = "*"
 
 [requires]
 python_version = "3.7"

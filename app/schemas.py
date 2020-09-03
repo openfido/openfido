@@ -1,4 +1,7 @@
 from marshmallow import Schema, fields
+from marshmallow_enum import EnumField
+
+from .models import RunStateEnum
 
 
 class InputSchema(Schema):
@@ -9,3 +12,7 @@ class InputSchema(Schema):
 class CreateRunSchema(Schema):
     inputs = fields.Nested(InputSchema, many=True)
     callback_url = fields.Url()
+
+
+class UpdateRunStateSchema(Schema):
+    state = EnumField(RunStateEnum)
