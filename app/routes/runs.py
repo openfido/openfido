@@ -114,9 +114,7 @@ def create_run(pipeline_uuid):
         description: "Bad request"
     """
     try:
-        pipeline_run = create_pipeline_run(
-            pipeline_uuid, request.json
-        )
+        pipeline_run = create_pipeline_run(pipeline_uuid, request.json)
         db.session.commit()
 
         return jsonify(pipeline_run_to_json(pipeline_run))

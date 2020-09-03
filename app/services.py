@@ -5,7 +5,14 @@ import urllib.request
 from urllib.error import URLError
 from marshmallow.exceptions import ValidationError
 
-from .models import Pipeline, PipelineRun, PipelineRunInput, PipelineRunState, RunStateEnum, db
+from .models import (
+    Pipeline,
+    PipelineRun,
+    PipelineRunInput,
+    PipelineRunState,
+    RunStateEnum,
+    db,
+)
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
 
@@ -101,10 +108,7 @@ def create_pipeline_run_state(run_state):
 
 def create_pipeline_run(uuid, inputs_json):
     """ Create a new PipelineRun for a Pipeline's uuid """
-    try:
-        CreateRunSchema().load(inputs_json)
-    except ValidationError as e:
-        raise ValueError(e)
+    CreateRunSchema().load(inputs_json)
 
     pipeline = find_pipeline(uuid)
     if pipeline is None:
@@ -158,7 +162,7 @@ def notify_callback(pipeline_run):
 
 
 def update_pipeline_run_state(uuid, run_state_json):
-    """ Update the pipeline run state.
+    """Update the pipeline run state.
 
     This method ensures that no invalid state transitions occur.
     """

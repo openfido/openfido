@@ -14,8 +14,8 @@ A_DOCKER_IMAGE = "example/image"
 A_SSH_URL = "git@github.com:an_org/a_repo.git"
 A_BRANCH = "master"
 
-INVALID_CALLBACK_INPUT = { "inputs": [], "callback_url": "notaurl" }
-VALID_CALLBACK_INPUT = { "inputs": [], "callback_url": "http://example.com" }
+INVALID_CALLBACK_INPUT = {"inputs": [], "callback_url": "notaurl"}
+VALID_CALLBACK_INPUT = {"inputs": [], "callback_url": "http://example.com"}
 
 
 def test_create_pipeline_version_no_name(app):
@@ -77,7 +77,7 @@ def test_delete_pipeline(app, pipeline):
 
 
 def test_create_pipeline_bad_input(app):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         pipeline_run = services.create_pipeline_run("no-id", INVALID_CALLBACK_INPUT)
 
 
@@ -96,7 +96,8 @@ def test_create_pipeline_run(app, pipeline):
         "url": "https://example.com/name2.pdf",
     }
     pipeline_run = services.create_pipeline_run(
-        pipeline.uuid, { "inputs": [input1, input2], "callback_url": "http://example.com" }
+        pipeline.uuid,
+        {"inputs": [input1, input2], "callback_url": "http://example.com"},
     )
     assert pipeline_run.pipeline == pipeline
     assert pipeline_run.sequence == 1
@@ -125,7 +126,12 @@ def test_update_pipeline_run_state_bad_state(app, pipeline):
     db.session.commit()
 
     with pytest.raises(ValidationError):
-        services.update_pipeline_run_state(pipeline_run.uuid, {"state": "fake",})
+        services.update_pipeline_run_state(
+            pipeline_run.uuid,
+            {
+                "state": "fake",
+            },
+        )
 
     assert len(pipeline_run.pipeline_run_states) == 1
 
@@ -136,9 +142,13 @@ def test_update_pipeline_run_state_dup_state(app, pipeline):
 
     with pytest.raises(ValueError):
         services.update_pipeline_run_state(
-            pipeline_run.uuid, {"state": RunStateEnum.NOT_STARTED.name,}
+            pipeline_run.uuid,
+            {
+                "state": RunStateEnum.NOT_STARTED.name,
+            },
         )
     assert len(pipeline_run.pipeline_run_states) == 1
+
 
 def test_update_pipeline_run_state_bad_transition(app, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
@@ -146,7 +156,10 @@ def test_update_pipeline_run_state_bad_transition(app, pipeline):
 
     with pytest.raises(ValueError):
         services.update_pipeline_run_state(
-            pipeline_run.uuid, {"state": RunStateEnum.COMPLETED.name,}
+            pipeline_run.uuid,
+            {
+                "state": RunStateEnum.COMPLETED.name,
+            },
         )
     assert len(pipeline_run.pipeline_run_states) == 1
 
@@ -163,10 +176,23 @@ def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline):
     monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
 
     services.update_pipeline_run_state(
-        pipeline_run.uuid, {"state": RunStateEnum.RUNNING.name,}
+        pipeline_run.uuid,
+        {
+            "state": RunStateEnum.RUNNING.name,
+        },
     )
     assert len(pipeline_run.pipeline_run_states) == 2
     assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+
+
+def test_update_pipeline_run_state_no_pipeline(app, monkeypatch, pipeline):
+    with pytest.raises(ValueError):
+        services.update_pipeline_run_state(
+            "nosuchid",
+            {
+                "state": RunStateEnum.RUNNING.name,
+            },
+        )
 
 
 def test_update_pipeline_run_state(app, monkeypatch, pipeline):
@@ -185,7 +211,10 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline):
     monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
 
     services.update_pipeline_run_state(
-        pipeline_run.uuid, {"state": RunStateEnum.RUNNING.name,}
+        pipeline_run.uuid,
+        {
+            "state": RunStateEnum.RUNNING.name,
+        },
     )
     assert len(pipeline_run.pipeline_run_states) == 2
     assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING

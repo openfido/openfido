@@ -38,7 +38,6 @@ class RunStateEnum(IntEnum):
     FAILED = 3
     COMPLETED = 4
 
-
     def is_valid_transition(self, next_enum):
         """ Return True when the current transition is valid. """
         if self == RunStateEnum.NOT_STARTED:
