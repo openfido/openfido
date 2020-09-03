@@ -69,9 +69,14 @@ def test_delete_pipeline(app, pipeline):
     assert pipeline.is_deleted
 
 
+def test_create_pipeline_bad_input(app):
+    with pytest.raises(ValueError):
+        pipeline_run = services.create_pipeline_run("no-id", [], "invalidurl")
+
+
 def test_create_pipeline_run_no_pipeline(app):
     with pytest.raises(ValueError):
-        pipeline_run = services.create_pipeline_run("no-id", [])
+        pipeline_run = services.create_pipeline_run("no-id", [], "http://example.com")
 
 
 def test_create_pipeline_run(app, pipeline):
@@ -83,7 +88,9 @@ def test_create_pipeline_run(app, pipeline):
         "name": "name2.pdf",
         "url": "https://example.com/name2.pdf",
     }
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, [input1, input2])
+    pipeline_run = services.create_pipeline_run(
+        pipeline.uuid, [input1, input2], "http://example.com"
+    )
     assert pipeline_run.pipeline == pipeline
     assert pipeline_run.sequence == 1
     assert len(pipeline_run.pipeline_run_inputs) == 2
@@ -96,7 +103,7 @@ def test_update_pipeline_run_output(app, pipeline):
     with pytest.raises(ValueError):
         services.update_pipeline_run_output(None, "stdout", "stderr")
 
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, [])
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, [], "http://example.com")
     db.session.commit()
 
     services.update_pipeline_run_output(pipeline_run.uuid, "stdout", "stderr")

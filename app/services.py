@@ -1,3 +1,5 @@
+from marshmallow.exceptions import ValidationError
+
 from .models import (
     Pipeline,
     PipelineRun,
@@ -7,6 +9,7 @@ from .models import (
     db,
 )
 from .queries import find_pipeline, find_run_state_type, find_pipeline_run
+from .schemas import CreateRunSchema
 
 
 def delete_pipeline(uuid):
@@ -91,14 +94,24 @@ def create_pipeline_run_state(run_state):
     return pipeline_run_state
 
 
-def create_pipeline_run(uuid, inputs):
+def create_pipeline_run(uuid, inputs, callback_url):
     """ Create a new PipelineRun for a Pipeline's uuid """
+    try:
+        CreateRunSchema().load(
+            {
+                "inputs": inputs,
+                "callback_url": callback_url,
+            }
+        )
+    except ValidationError as e:
+        raise ValueError(e)
+
     pipeline = find_pipeline(uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
     sequence = len(pipeline.pipeline_runs) + 1
-    pipeline_run = PipelineRun(sequence=sequence)
+    pipeline_run = PipelineRun(sequence=sequence, callback_url=callback_url)
 
     for i in inputs:
         pipeline_run.pipeline_run_inputs.append(
