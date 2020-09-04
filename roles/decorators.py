@@ -31,7 +31,7 @@ def make_permission_decorator(permissions_enum):
                     required_permission = permissions_enum(permission)
 
                     if not is_permitted(g.api_key, required_permission):
-                        logger.warning(f"no permission found for {required_permission}")
+                        logger.warning(f"no permission found for {required_permission.name}")
                         return {}, 401
 
                 return view(*args, **kwargs)

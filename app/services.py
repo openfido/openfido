@@ -1,13 +1,19 @@
 import json
 import logging
+import os
 import urllib.request
+import uuid
 
+from flask import current_app
+from werkzeug.utils import secure_filename
 from urllib.error import URLError
 from marshmallow.exceptions import ValidationError
 
+from .constants import BLOB_API_SERVER, BLOB_API_TOKEN
 from .models import (
     Pipeline,
     PipelineRun,
+    PipelineRunArtifact,
     PipelineRunInput,
     PipelineRunState,
     RunStateEnum,
@@ -130,6 +136,8 @@ def create_pipeline_run(uuid, inputs_json):
     pipeline.pipeline_runs.append(pipeline_run)
     db.session.add(pipeline)
 
+    db.session.commit()
+
     return pipeline_run
 
 
@@ -182,3 +190,30 @@ def update_pipeline_run_state(uuid, run_state_json):
     db.session.commit()
 
     notify_callback(pipeline_run)
+
+
+def create_pipeline_run_artifact(run_uuid, filename, request):
+    pipeline_run = find_pipeline_run(run_uuid)
+    if pipeline_run is None:
+        raise ValueError("pipeline run not found")
+
+    if current_app.config.get(BLOB_API_SERVER, False):
+        # TODO when there is a BLOB server implementation, create an
+        # implementation here.
+        pass
+
+    # Non Blob Server implementation: just save the file locally.
+    sname = secure_filename(filename)
+    artifact_uuid = uuid.uuid4().hex
+    with open(os.path.join(f"uploads/{artifact_uuid}-{sname}"), "bw") as f:
+        chunk_size = 4096
+        while True:
+            chunk = request.stream.read(chunk_size)
+            if len(chunk) == 0:
+                break
+            f.write(chunk)
+
+    artifact = PipelineRunArtifact(uuid=artifact_uuid, name=filename)
+    pipeline_run.pipeline_run_artifacts.append(artifact)
+
+    db.session.commit()

@@ -91,7 +91,7 @@ def upgrade():
     sa.Column('uuid', sa.String(length=32), server_default='', nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('name', sa.String(length=20), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('pipeline_run_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['pipeline_run_id'], ['pipelinerun.id'], ),
     sa.PrimaryKeyConstraint('id')

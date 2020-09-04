@@ -83,7 +83,8 @@ class PipelineRunArtifact(CommonColumnsMixin, db.Model):
 
     __tablename__ = "pipelinerunartifact"
 
-    name = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+
     pipeline_run_id = db.Column(
         db.Integer, db.ForeignKey("pipelinerun.id"), nullable=False
     )

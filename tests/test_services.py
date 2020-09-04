@@ -1,7 +1,9 @@
+import io
 import json
 import pytest
 from marshmallow.exceptions import ValidationError
 from urllib.error import URLError
+from unittest.mock import MagicMock
 
 from app import services
 from app.models import RunStateEnum, db
@@ -114,7 +116,6 @@ def test_update_pipeline_run_output_no_uuid(app, pipeline):
 
 def test_update_pipeline_run_output(app, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     services.update_pipeline_run_output(pipeline_run.uuid, "stdout", "stderr")
     assert pipeline_run.std_out == "stdout"
@@ -123,7 +124,6 @@ def test_update_pipeline_run_output(app, pipeline):
 
 def test_update_pipeline_run_state_bad_state(app, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     with pytest.raises(ValidationError):
         services.update_pipeline_run_state(
@@ -138,7 +138,6 @@ def test_update_pipeline_run_state_bad_state(app, pipeline):
 
 def test_update_pipeline_run_state_dup_state(app, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     with pytest.raises(ValueError):
         services.update_pipeline_run_state(
@@ -152,7 +151,6 @@ def test_update_pipeline_run_state_dup_state(app, pipeline):
 
 def test_update_pipeline_run_state_bad_transition(app, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     with pytest.raises(ValueError):
         services.update_pipeline_run_state(
@@ -166,7 +164,6 @@ def test_update_pipeline_run_state_bad_transition(app, pipeline):
 
 def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     # If a callback_url fails for some network reason, the update should still
     # work:
@@ -185,7 +182,7 @@ def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline):
     assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
 
 
-def test_update_pipeline_run_state_no_pipeline(app, monkeypatch, pipeline):
+def test_update_pipeline_run_state_no_pipeline(app):
     with pytest.raises(ValueError):
         services.update_pipeline_run_state(
             "nosuchid",
@@ -197,7 +194,6 @@ def test_update_pipeline_run_state_no_pipeline(app, monkeypatch, pipeline):
 
 def test_update_pipeline_run_state(app, monkeypatch, pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     # A callback is made with the callback_url and the correct payload
     def mock_urlopen(request, timeout):
@@ -218,3 +214,20 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline):
     )
     assert len(pipeline_run.pipeline_run_states) == 2
     assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+
+
+def test_create_pipeline_run_artifact_no_pipeline(app):
+    request_mock = MagicMock()
+    with pytest.raises(ValueError):
+        services.create_pipeline_run_artifact("nosuchid", "file.name", request_mock)
+
+
+def test_create_pipeline_run_artifact(app, pipeline):
+    request_mock = MagicMock()
+    request_mock.stream = io.BytesIO(b"this is data")
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+
+    services.create_pipeline_run_artifact(pipeline_run.uuid, "file.name", request_mock)
+
+    assert len(pipeline_run.pipeline_run_artifacts) == 1
+    assert pipeline_run.pipeline_run_artifacts[0].name == "file.name"

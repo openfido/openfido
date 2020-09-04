@@ -70,7 +70,6 @@ def test_find_pipeline_run(app, pipeline):
     assert find_pipeline_run("no-uid") is None
 
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     assert find_pipeline_run(pipeline_run.uuid) == pipeline_run
 

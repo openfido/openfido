@@ -1,6 +1,7 @@
-from app.models import db, RunStateEnum
+from app.models import db, RunStateEnum, PipelineRunArtifact
 from app.routes.utils import toISO8601
 from app.services import create_pipeline_run
+from app.routes import runs as runs_module
 from roles.decorators import ROLES_KEY
 
 from ..test_services import VALID_CALLBACK_INPUT
@@ -114,11 +115,17 @@ def test_create_run(client, pipeline, client_application):
                 "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
             }
         ],
+        "artifacts": [],
     }
 
 
 def test_get_pipeline_run(client, pipeline, client_application):
     db.session.commit()
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    artifact = PipelineRunArtifact(name="test.pdf")
+    pipeline_run.pipeline_run_artifacts.append(artifact)
+    db.session.commit()
+
     result = client.get(
         "/v1/pipelines/no-id/runs/no-id",
         headers={ROLES_KEY: client_application.api_key},
@@ -133,8 +140,6 @@ def test_get_pipeline_run(client, pipeline, client_application):
     assert result.status_code == 404
 
     # successfully fetch a pipeline_run
-    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
         headers={ROLES_KEY: client_application.api_key},
@@ -149,6 +154,13 @@ def test_get_pipeline_run(client, pipeline, client_application):
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
                 "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+            }
+        ],
+        "artifacts": [
+            {
+                "uuid": artifact.uuid,
+                "name": "test.pdf",
+                "url": "",
             }
         ],
     }
@@ -180,7 +192,6 @@ def test_list_pipeline_runs(client, pipeline, client_application):
 
     # successfully fetch a pipeline_run
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
     result = client.get(
         f"/v1/pipelines/{pipeline.uuid}/runs",
         headers={ROLES_KEY: client_application.api_key},
@@ -200,6 +211,7 @@ def test_list_pipeline_runs(client, pipeline, client_application):
                     ),
                 }
             ],
+            "artifacts": [],
         }
     ]
 
@@ -237,7 +249,6 @@ def test_get_pipeline_run_output(client, pipeline, client_application):
 def test_update_pipeline_run_output(client, pipeline, worker_application):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     result = client.put(
         "/v1/pipelines/no-id/runs/no-id/console",
@@ -280,7 +291,6 @@ def test_update_pipeline_run_output(client, pipeline, worker_application):
 def test_update_pipeline_run_state(client, pipeline, worker_application):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    db.session.commit()
 
     result = client.put(
         "/v1/pipelines/no-id/runs/no-id/state",
@@ -327,3 +337,57 @@ def test_update_pipeline_run_state(client, pipeline, worker_application):
     assert result.status_code == 200
     assert len(pipeline_run.pipeline_run_states) == 2
     assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+
+
+def test_upload_run_artifact_service_valueerror(
+    client, monkeypatch, pipeline, worker_application
+):
+    db.session.commit()
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+
+    def raise_error(*args, **kwargs):
+        raise ValueError("Test error")
+
+    monkeypatch.setattr(runs_module, "create_pipeline_run_artifact", raise_error)
+
+    result = client.post(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/artifacts?name=blah.file",
+        data=b"blahblah",
+        headers={ROLES_KEY: worker_application.api_key},
+    )
+    assert result.status_code == 400
+
+
+def test_upload_run_artifact(client, pipeline, worker_application):
+    db.session.commit()
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+
+    # no 'name' query parameter.
+    result = client.post(
+        "/v1/pipelines/no-id/runs/no-id/artifacts",
+        data=b"blahblah",
+        headers={ROLES_KEY: worker_application.api_key},
+    )
+    assert result.status_code == 400
+
+    result = client.post(
+        "/v1/pipelines/no-id/runs/no-id/artifacts?name=blah.file",
+        data=b"blahblah",
+        headers={ROLES_KEY: worker_application.api_key},
+    )
+    assert result.status_code == 404
+
+    # no such pipeline_run_id
+    result = client.post(
+        f"/v1/pipelines/{pipeline.uuid}/runs/no-id/artifacts?name=blah.file",
+        data=b"blahblah",
+        headers={ROLES_KEY: worker_application.api_key},
+    )
+    assert result.status_code == 404
+
+    result = client.post(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/artifacts?name=blah.file",
+        data=b"blahblah",
+        headers={ROLES_KEY: worker_application.api_key},
+    )
+    assert result.status_code == 200
