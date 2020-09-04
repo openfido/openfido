@@ -1,3 +1,8 @@
+import json
+import logging
+import urllib.request
+
+from urllib.error import URLError
 from marshmallow.exceptions import ValidationError
 
 from .models import (
@@ -8,8 +13,15 @@ from .models import (
     RunStateEnum,
     db,
 )
-from .queries import find_pipeline, find_run_state_type, find_pipeline_run
-from .schemas import CreateRunSchema
+from .queries import find_pipeline, find_pipeline_run, find_run_state_type
+from .schemas import CreateRunSchema, UpdateRunStateSchema
+
+# make the request lib mockable for testing:
+urllib_request = urllib.request
+
+CALLBACK_TIMEOUT = 100
+
+logger = logging.getLogger("services")
 
 
 def delete_pipeline(uuid):
@@ -94,26 +106,20 @@ def create_pipeline_run_state(run_state):
     return pipeline_run_state
 
 
-def create_pipeline_run(uuid, inputs, callback_url):
+def create_pipeline_run(uuid, inputs_json):
     """ Create a new PipelineRun for a Pipeline's uuid """
-    try:
-        CreateRunSchema().load(
-            {
-                "inputs": inputs,
-                "callback_url": callback_url,
-            }
-        )
-    except ValidationError as e:
-        raise ValueError(e)
+    CreateRunSchema().load(inputs_json)
 
     pipeline = find_pipeline(uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
     sequence = len(pipeline.pipeline_runs) + 1
-    pipeline_run = PipelineRun(sequence=sequence, callback_url=callback_url)
+    pipeline_run = PipelineRun(
+        sequence=sequence, callback_url=inputs_json["callback_url"]
+    )
 
-    for i in inputs:
+    for i in inputs_json["inputs"]:
         pipeline_run.pipeline_run_inputs.append(
             PipelineRunInput(filename=i["name"], url=i["url"])
         )
@@ -128,9 +134,51 @@ def create_pipeline_run(uuid, inputs, callback_url):
 
 
 def update_pipeline_run_output(uuid, std_out, std_err):
+    """ Update the pipeline run output. """
     pipeline_run = find_pipeline_run(uuid)
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 
     pipeline_run.std_out = std_out
     pipeline_run.std_err = std_err
+
+    db.session.commit()
+
+
+def notify_callback(pipeline_run):
+    uuid = pipeline_run.uuid
+    url = pipeline_run.callback_url
+    state = pipeline_run.pipeline_run_states[-1]
+
+    data = json.dumps({"pipeline_run_uuid": uuid, "state": state.name})
+
+    request = urllib_request.Request(
+        url, data.encode("ascii"), {"content-type": "application/json"}
+    )
+    try:
+        urllib_request.urlopen(request, timeout=CALLBACK_TIMEOUT)
+    except URLError as e:
+        logger.warning(e)
+
+
+def update_pipeline_run_state(uuid, run_state_json):
+    """Update the pipeline run state.
+
+    This method ensures that no invalid state transitions occur.
+    """
+    schema = UpdateRunStateSchema()
+    data = schema.load(run_state_json)
+
+    pipeline_run = find_pipeline_run(uuid)
+    if pipeline_run is None:
+        raise ValueError("pipeline run not found")
+
+    last_run_state = pipeline_run.pipeline_run_states[-1]
+    if not RunStateEnum(last_run_state.code).is_valid_transition(data["state"]):
+        raise ValueError("Invalid state transition")
+
+    pipeline_run.pipeline_run_states.append(create_pipeline_run_state(data["state"]))
+
+    db.session.commit()
+
+    notify_callback(pipeline_run)

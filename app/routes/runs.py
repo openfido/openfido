@@ -6,10 +6,10 @@ from flask import Blueprint, jsonify, request
 
 from ..models import db, SystemPermissionEnum
 from ..queries import find_pipeline, find_pipeline_run
-from ..schemas import CreateRunSchema
 from ..services import (
     create_pipeline_run,
     update_pipeline_run_output,
+    update_pipeline_run_state,
 )
 from .utils import toISO8601, verify_content_type_and_params, permissions_required
 
@@ -113,15 +113,8 @@ def create_run(pipeline_uuid):
       "400":
         description: "Bad request"
     """
-    # Validate the input fields are all strings and only have name/url in
-    # them
     try:
-        schema = CreateRunSchema()
-        data = schema.load(request.json)
-
-        pipeline_run = create_pipeline_run(
-            pipeline_uuid, data["inputs"], data["callback_url"]
-        )
+        pipeline_run = create_pipeline_run(pipeline_uuid, request.json)
         db.session.commit()
 
         return jsonify(pipeline_run_to_json(pipeline_run))
@@ -329,5 +322,50 @@ def upload_run_output(pipeline_uuid, pipeline_run_uuid):
     update_pipeline_run_output(
         pipeline_run.uuid, request.json["std_out"], request.json["std_err"]
     )
+
+    return {}, 200
+
+
+@run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/state", methods=["PUT"])
+@verify_content_type_and_params(["state"], [])
+@permissions_required([SystemPermissionEnum.PIPELINES_WORKER])
+def upload_run_state(pipeline_uuid, pipeline_run_uuid):
+    """Update a run state.
+    ---
+    requestBody:
+      description: "run state"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              state:
+                type: string
+                example: RUNNING
+    responses:
+      "200":
+        description: "Updated"
+      "400":
+        description: "Bad request"
+    """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        logger.warning("no pipeline found")
+        return {}, 404
+
+    pipeline_run = find_pipeline_run(pipeline_run_uuid)
+    if pipeline_run is None:
+        logger.warning("no pipeline run found")
+        return {}, 404
+
+    try:
+        update_pipeline_run_state(pipeline_run.uuid, request.json)
+    except ValidationError as e:
+        logger.warning(e)
+        return {}, 400
+    except ValueError as e:
+        logger.warning(e)
+        return {}, 400
 
     return {}, 200
