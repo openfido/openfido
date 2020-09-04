@@ -404,6 +404,9 @@ def upload_run_artifact(pipeline_uuid, pipeline_run_uuid):
         logger.warning("Invalid query arguments")
         return {}, 400
     filename = request.args["name"]
+    if len(filename) > 255:
+        logger.warning("filename too long")
+        return {}, 400
 
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
