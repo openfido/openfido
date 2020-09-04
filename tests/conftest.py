@@ -1,7 +1,13 @@
 import pytest
 
 from app import create_app
-from app.models import db, Pipeline, SystemPermissionEnum
+from app.constants import (
+    CELERY_ALWAYS_EAGER,
+    MAX_CONTENT_LENGTH,
+    SECRET_KEY,
+    SQLALCHEMY_DATABASE_URI,
+)
+from app.models import Pipeline, SystemPermissionEnum, db
 from roles.services import create_application
 
 
@@ -10,11 +16,12 @@ def app():
     # create a temporary file to isolate the database for each test
     (app, db, _, _) = create_app(
         {
-            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            SQLALCHEMY_DATABASE_URI: "sqlite://",
             "TESTING": True,
             "DEBUG": True,
-            "SECRET_KEY": "PYTEST",
-            "CELERY_ALWAYS_EAGER": True,
+            SECRET_KEY: "PYTEST",
+            CELERY_ALWAYS_EAGER: True,
+            MAX_CONTENT_LENGTH: "100",
         }
     )
 

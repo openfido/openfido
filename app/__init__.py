@@ -6,17 +6,21 @@ from flask_migrate import Migrate
 # not used, just want it included in our app's schema
 from roles.models import db as roles_db
 
+from . import constants
 from .models import db
 from .routes import pipeline_bp, run_bp
 from .tasks import make_celery
 
 # Allow a specific set of environmental variables to be configurable:
 CONFIG_VARS = (
-    "SECRET_KEY",
-    "SQLALCHEMY_DATABASE_URI",
-    "CELERY_RESULT_BACKEND",
-    "CELERY_BROKER_URL",
-    "CELERY_ALWAYS_EAGER",
+    constants.SECRET_KEY,
+    constants.SQLALCHEMY_DATABASE_URI,
+    constants.CELERY_RESULT_BACKEND,
+    constants.CELERY_BROKER_URL,
+    constants.CELERY_ALWAYS_EAGER,
+    constants.BLOB_API_SERVER,
+    constants.BLOB_API_TOKEN,
+    constants.MAX_CONTENT_LENGTH,
 )
 
 
@@ -33,6 +37,11 @@ def create_app(config=None):
 
     if config is not None:
         app.config.from_mapping(config)
+
+    if app.config[constants.MAX_CONTENT_LENGTH] is not None:
+        app.config[constants.MAX_CONTENT_LENGTH] = int(
+            app.config[constants.MAX_CONTENT_LENGTH]
+        )
 
     db.init_app(app)
     migrate = Migrate(app, db)

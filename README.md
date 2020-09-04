@@ -1,6 +1,8 @@
 # Workflow Service
 
-Summary: A [Flask](https://flask.palletsprojects.com/en/1.1.x/) API server that offers an ability to execute GridLabD jobs. 
+Summary: A [Flask](https://flask.palletsprojects.com/en/1.1.x/) API server that
+offers an ability to execute GridLabD jobs and store the resulting artifacts on
+a file server.
 
 ## Vocabulary
 
@@ -91,11 +93,27 @@ Finally, make a decorator to enforce these permissions in your views:
         return 'private info'
 
 
-HTTP clients must then pass a `X-API-Key` header with their api_key. Keys can
+HTTP clients must then pass a `Workflow-API-Key` header with their api_key. Keys can
 be created using the sample code in tasks.py:
 
     # Create a new Application database record with PIPELINES_CLIENT role.
     invoke create-application-key -n "new app" -p PIPELINES_CLIENT
+
+
+## Configuration
+
+Several environmental variables allow this server to be configured.
+
+ * **SECRET_KEY** = See [Flask documentation](https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY).
+ * **SQLALCHEMY_DATABASE_URI** = Database connection string.
+ * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
+ * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
+ * **CELERY_ALWAYS_EAGER** = When True, [execute celery jobs locally](https://docs.celeryproject.org/en/stable/userguide/configuration.html#std:setting-task_always_eager). Useful for development/testing purposes.
+ * **BLOB_API_SERVER** = When provided the 'upload artifact' endpoint will store
+     artifacts via this server. Otherwise files are stored locally (only useful
+     for local development and testing).
+ * **BLOB_API_TOKEN** = api_token required for calls to `BLOB_API_SERVER`.
+ * **MAX_CONTENT_LENGTH** = Configures [maximum upload file byte size](https://flask.palletsprojects.com/en/1.1.x/config/#MAX_CONTENT_LENGTH).
 
 ## Deployment
 

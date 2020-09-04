@@ -10,6 +10,7 @@ from ..services import (
     create_pipeline_run,
     update_pipeline_run_output,
     update_pipeline_run_state,
+    create_pipeline_run_artifact,
 )
 from .utils import toISO8601, verify_content_type_and_params, permissions_required
 
@@ -36,6 +37,14 @@ def pipeline_run_to_json(pipeline_run):
                 "created_at": toISO8601(s.created_at),
             }
             for s in pipeline_run.pipeline_run_states
+        ],
+        "artifacts": [
+            {
+                "uuid": a.uuid,
+                "name": a.name,
+                "url": "",
+            }
+            for a in pipeline_run.pipeline_run_artifacts
         ],
     }
 
@@ -115,7 +124,6 @@ def create_run(pipeline_uuid):
     """
     try:
         pipeline_run = create_pipeline_run(pipeline_uuid, request.json)
-        db.session.commit()
 
         return jsonify(pipeline_run_to_json(pipeline_run))
     except ValidationError as e:
@@ -369,3 +377,50 @@ def upload_run_state(pipeline_uuid, pipeline_run_uuid):
         return {}, 400
 
     return {}, 200
+
+
+@run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/artifacts", methods=["POST"])
+@permissions_required([SystemPermissionEnum.PIPELINES_WORKER])
+def upload_run_artifact(pipeline_uuid, pipeline_run_uuid):
+    """Upload an artifact associated with a pipeline run.
+    ---
+    parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+    requestBody:
+      description: "binary file content"
+      required: true
+    responses:
+      "200":
+        description: "Updated"
+      "400":
+        description: "Bad request"
+      "413":
+        description: "Payload Too Large"
+    """
+    if "name" not in request.args:
+        logger.warning("Invalid query arguments")
+        return {}, 400
+    filename = request.args["name"]
+    if len(filename) > 255:
+        logger.warning("filename too long")
+        return {}, 400
+
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        logger.warning("no pipeline found")
+        return {}, 404
+
+    pipeline_run = find_pipeline_run(pipeline_run_uuid)
+    if pipeline_run is None:
+        logger.warning("no pipeline run found")
+        return {}, 404
+
+    try:
+        create_pipeline_run_artifact(pipeline_run.uuid, filename, request)
+        return {}, 200
+    except ValueError as e:
+        logger.warning(e)
+        return {}, 400
