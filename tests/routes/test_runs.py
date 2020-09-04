@@ -387,7 +387,8 @@ def test_upload_run_artifact(client, pipeline, worker_application):
 
     # When the filename is too long, an error is returned.
     result = client.post(
-        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/artifacts?name=" + (256 * "X"),
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/artifacts?name="
+        + (256 * "X"),
         data=b"blahblah",
         headers={ROLES_KEY: worker_application.api_key},
     )
