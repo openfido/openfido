@@ -1,9 +1,9 @@
 import json
-import os
 import urllib.request
 
 from celery import Celery, Task, shared_task
 from celery.utils.log import get_task_logger
+from flask import current_app
 
 from app.constants import WORKER_API_TOKEN
 from app.models import RunStateEnum
@@ -31,19 +31,16 @@ def make_celery(app):
 
 
 def update_run_status(uuid, run_uuid, run_state_enum):
-    url = f"{os.environ['WORKER_API_SERVER']}/v1/pipelines/{uuid}/runs/{run_uuid}/state"
+    url = f"{current_app.config['WORKER_API_SERVER']}/v1/pipelines/{uuid}/runs/{run_uuid}/state"
     headers = {
-        ROLES_KEY: os.environ[WORKER_API_TOKEN],
+        ROLES_KEY: current_app.config[WORKER_API_TOKEN],
         "content-type": "application/json",
     }
     data = json.dumps({"state": run_state_enum.name})
 
     request = urllib_request.Request(url, data.encode("ascii"), headers, method="PUT")
-    try:
-        urllib_request.urlopen(request)
-        # TODO verify response.
-    except URLError as e:
-        logger.warning(e)
+    urllib_request.urlopen(request)
+    # TODO verify response and catch any errors.
 
 
 @shared_task
