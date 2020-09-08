@@ -175,7 +175,9 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
     assert result.status_code == 404
 
 
-def test_list_pipeline_runs(client, pipeline, client_application, mock_execute_pipeline):
+def test_list_pipeline_runs(
+    client, pipeline, client_application, mock_execute_pipeline
+):
     db.session.commit()
     result = client.get(
         f"/v1/pipelines/no-id/runs",
@@ -216,7 +218,9 @@ def test_list_pipeline_runs(client, pipeline, client_application, mock_execute_p
     ]
 
 
-def test_get_pipeline_run_output(client, pipeline, client_application, mock_execute_pipeline):
+def test_get_pipeline_run_output(
+    client, pipeline, client_application, mock_execute_pipeline
+):
     db.session.commit()
     result = client.get(
         "/v1/pipelines/no-id/runs/no-id/console",
@@ -246,7 +250,9 @@ def test_get_pipeline_run_output(client, pipeline, client_application, mock_exec
     }
 
 
-def test_update_pipeline_run_output(client, pipeline, worker_application, mock_execute_pipeline):
+def test_update_pipeline_run_output(
+    client, pipeline, worker_application, mock_execute_pipeline
+):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
@@ -288,7 +294,9 @@ def test_update_pipeline_run_output(client, pipeline, worker_application, mock_e
     assert pipeline_run.std_err == "stderr"
 
 
-def test_update_pipeline_run_state(client, pipeline, worker_application, mock_execute_pipeline):
+def test_update_pipeline_run_state(
+    client, pipeline, worker_application, mock_execute_pipeline
+):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
@@ -358,7 +366,9 @@ def test_upload_run_artifact_service_valueerror(
     assert result.status_code == 400
 
 
-def test_upload_run_artifact(client, pipeline, worker_application, mock_execute_pipeline):
+def test_upload_run_artifact(
+    client, pipeline, worker_application, mock_execute_pipeline
+):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 

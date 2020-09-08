@@ -162,7 +162,9 @@ def test_update_pipeline_run_state_bad_transition(app, pipeline, mock_execute_pi
     assert len(pipeline_run.pipeline_run_states) == 1
 
 
-def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline, mock_execute_pipeline):
+def test_update_pipeline_run_state_callback_err(
+    app, monkeypatch, pipeline, mock_execute_pipeline
+):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     # If a callback_url fails for some network reason, the update should still

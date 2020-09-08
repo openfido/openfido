@@ -144,7 +144,7 @@ def create_pipeline_run(uuid, inputs_json):
         pipeline_run.uuid,
         pipeline.docker_image_url,
         pipeline.repository_ssh_url,
-        pipeline.repository_branch
+        pipeline.repository_branch,
     )
 
     return pipeline_run
