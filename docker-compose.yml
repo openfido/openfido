@@ -54,6 +54,11 @@ services:
     volumes:
       - .:/opt/app:delegated
       - /var/run/docker.sock:/var/run/docker.sock
+      # The 'docker in docker' nature of this local configuration means that
+      # bind mounts happen on the 'host docker' not the first docker container.
+      # Make temp directories on the main host (otherwise files cannot be
+      # found).
+      - /tmp:/tmp
     depends_on:
       - queue
       - api

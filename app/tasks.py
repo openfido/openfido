@@ -1,5 +1,8 @@
 import json
-import urllib.request
+import os
+import subprocess
+import tempfile
+import urllib
 
 from celery import Celery, Task, shared_task
 from celery.utils.log import get_task_logger
@@ -43,10 +46,20 @@ def update_run_status(uuid, run_uuid, run_state_enum):
     # TODO verify response and catch any errors.
 
 
+def execute_command(command, directory):
+    """ Execute a command, raise an exception on nonzero error codes. """
+    result = subprocess.run(command.split(" "), cwd=directory, capture_output=True)
+    logger.warning(result)
+    if result.returncode != 0:
+        # TODO upload the stdout and stderr 
+        raise ValueError(f"Command returned nonzero code: {result.returncode}")
+
+
 @shared_task
 def execute_pipeline(
     pipeline_uuid,
     pipeline_run_uuid,
+    input_files,
     docker_image_url,
     repository_ssh_url,
     repository_branch,
@@ -54,7 +67,33 @@ def execute_pipeline(
     # TODO if we can't even mark it as running, tell celery to put the job back
     # on the queue?
     update_run_status(pipeline_uuid, pipeline_run_uuid, RunStateEnum.RUNNING)
-    logger.info("executed")
-    update_run_status(pipeline_uuid, pipeline_run_uuid, RunStateEnum.COMPLETED)
-    # TODO need params for the WORKER SERVER and an API_KEY
-    # TODO Make a call to the application updating the status to FINISHED.
+
+    try:
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            execute_command(f"docker pull {docker_image_url}", tmpdirname)
+            execute_command(f"git clone {repository_ssh_url} gitrepo", tmpdirname)
+            gitdirname = f"{tmpdirname}/gitrepo"
+            execute_command(f"git checkout {repository_branch}", gitdirname)
+            if not os.path.exists(f"{tmpdirname}/gitrepo/openfido.sh"):
+                raise ValueError("Openfido.sh does not exist in repository")
+            execute_command("mkdir input", gitdirname)
+            execute_command("mkdir output", gitdirname)
+            for input_file in input_files:
+                urllib_request.urlretrieve(input_file["url"], f"{gitdirname}/input/{input_file['name']}")
+
+            execute_command((
+                "docker run --rm "
+                f"-v {gitdirname}:/tmp/gitrepo "
+                "-w /tmp/gitrepo "
+                f"{docker_image_url} sh openfido.sh input output"
+            ), gitdirname)
+
+            # TODO upload output and stderr.
+            # TODO upload any artifacts that were found.
+
+        update_run_status(pipeline_uuid, pipeline_run_uuid, RunStateEnum.COMPLETED)
+        # TODO need params for the WORKER SERVER and an API_KEY
+        # TODO Make a call to the application updating the status to FINISHED.
+    except ValueError as e:
+        # TODO update the stdout/stderr to include the error.
+        update_run_status(pipeline_uuid, pipeline_run_uuid, RunStateEnum.FAILED)
