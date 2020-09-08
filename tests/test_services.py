@@ -88,7 +88,7 @@ def test_create_pipeline_run_no_pipeline(app):
         pipeline_run = services.create_pipeline_run("no-id", VALID_CALLBACK_INPUT)
 
 
-def test_create_pipeline_run(app, pipeline):
+def test_create_pipeline_run(app, pipeline, mock_execute_pipeline):
     input1 = {
         "name": "name1.pdf",
         "url": "https://example.com/name1.pdf",
@@ -114,7 +114,7 @@ def test_update_pipeline_run_output_no_uuid(app, pipeline):
         services.update_pipeline_run_output(None, "stdout", "stderr")
 
 
-def test_update_pipeline_run_output(app, pipeline):
+def test_update_pipeline_run_output(app, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     services.update_pipeline_run_output(pipeline_run.uuid, "stdout", "stderr")
@@ -122,7 +122,7 @@ def test_update_pipeline_run_output(app, pipeline):
     assert pipeline_run.std_err == "stderr"
 
 
-def test_update_pipeline_run_state_bad_state(app, pipeline):
+def test_update_pipeline_run_state_bad_state(app, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     with pytest.raises(ValidationError):
@@ -136,7 +136,7 @@ def test_update_pipeline_run_state_bad_state(app, pipeline):
     assert len(pipeline_run.pipeline_run_states) == 1
 
 
-def test_update_pipeline_run_state_dup_state(app, pipeline):
+def test_update_pipeline_run_state_dup_state(app, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     with pytest.raises(ValueError):
@@ -149,7 +149,7 @@ def test_update_pipeline_run_state_dup_state(app, pipeline):
     assert len(pipeline_run.pipeline_run_states) == 1
 
 
-def test_update_pipeline_run_state_bad_transition(app, pipeline):
+def test_update_pipeline_run_state_bad_transition(app, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     with pytest.raises(ValueError):
@@ -162,7 +162,7 @@ def test_update_pipeline_run_state_bad_transition(app, pipeline):
     assert len(pipeline_run.pipeline_run_states) == 1
 
 
-def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline):
+def test_update_pipeline_run_state_callback_err(app, monkeypatch, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     # If a callback_url fails for some network reason, the update should still
@@ -192,7 +192,7 @@ def test_update_pipeline_run_state_no_pipeline(app):
         )
 
 
-def test_update_pipeline_run_state(app, monkeypatch, pipeline):
+def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipeline):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
 
     # A callback is made with the callback_url and the correct payload
@@ -222,7 +222,7 @@ def test_create_pipeline_run_artifact_no_pipeline(app):
         services.create_pipeline_run_artifact("nosuchid", "file.name", request_mock)
 
 
-def test_create_pipeline_run_artifact(app, pipeline):
+def test_create_pipeline_run_artifact(app, pipeline, mock_execute_pipeline):
     request_mock = MagicMock()
     request_mock.stream = io.BytesIO(b"this is data")
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)

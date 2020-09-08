@@ -22,6 +22,9 @@ a file server.
 The local development environment has been set up with docker compose. Once you
 have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) execute the following commands to setup your local development environment:
 
+    # Set up worker configuration:
+    cp _worker_env.example .worker-env
+
     # Login to an docker instance of the flask app:
     docker-compose run --rm api bash
 
@@ -52,7 +55,12 @@ To run tests, use [invoke](https://pyinvoke.org):
     pipenv run invoke test
 
 Other tasks are available, in particular the `precommit` task, which mirrors the
-tests performed by CircleCI.
+tests performed by CircleCI. See `invoke -l` for a full list of tasks.
+
+The local docker worker will execute jobs, but requires an API key in order to
+update its status. Generate a key and store it in the .worker-env file:
+
+    invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
 
 Endpoints have been documented with [swagger](https://swagger.io/blog/news/whats-new-in-openapi-3-0/), which is configured to be easily explored in the default `run.py` configuration. When the flask server is running visit http://localhost:5000/apidocs to see documentation and interact with the API directly.
 
@@ -100,7 +108,7 @@ be created using the sample code in tasks.py:
     invoke create-application-key -n "new app" -p PIPELINES_CLIENT
 
 
-## Configuration
+## Server Configuration
 
 Several environmental variables allow this server to be configured.
 
@@ -114,6 +122,14 @@ Several environmental variables allow this server to be configured.
      for local development and testing).
  * **BLOB_API_TOKEN** = api_token required for calls to `BLOB_API_SERVER`.
  * **MAX_CONTENT_LENGTH** = Configures [maximum upload file byte size](https://flask.palletsprojects.com/en/1.1.x/config/#MAX_CONTENT_LENGTH).
+
+## Worker Configuration
+
+Celery workers only require the following parameters:
+ * **WORKER_API_SERVER** =
+ * **WORKER_API_TOKEN** =
+ * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
+ * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
 
 ## Deployment
 

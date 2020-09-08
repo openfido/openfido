@@ -61,4 +61,4 @@ def create_application_key(c, name, permission):
     with app.app_context():
         application = create_application(name, SystemPermissionEnum[permission])
         db.session.commit()
-        print("api_key = {0}".format(application.api_key))
+        print(f"API_TOKEN={application.api_key}")

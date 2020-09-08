@@ -8,6 +8,7 @@ from app.constants import (
     SQLALCHEMY_DATABASE_URI,
 )
 from app.models import Pipeline, SystemPermissionEnum, db
+from app.services import execute_pipeline
 from roles.services import create_application
 
 
@@ -52,6 +53,16 @@ def pipeline(app):
     db.session.commit()
 
     return pipeline
+
+
+@pytest.fixture
+def mock_execute_pipeline(app, pipeline, monkeypatch):
+    def no_op(*args, **kwargs):
+        pass
+
+    monkeypatch.setattr(execute_pipeline, "delay", no_op)
+
+    return no_op
 
 
 @pytest.fixture

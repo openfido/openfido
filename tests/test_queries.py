@@ -66,7 +66,7 @@ def test_find_run_state_type(app):
     assert set(RunStateType.query) == set([run_state_type])
 
 
-def test_find_pipeline_run(app, pipeline):
+def test_find_pipeline_run(app, pipeline, mock_execute_pipeline):
     assert find_pipeline_run("no-uid") is None
 
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
