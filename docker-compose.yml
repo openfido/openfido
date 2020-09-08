@@ -11,26 +11,9 @@ services:
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
-  worker:
-    build: .
-    command: celery -A app.worker worker
-    environment:
-      PGDATABASE: workflowservice
-      PGUSER: postgres
-      PGHOST: db
-      FLASK_APP: run.py
-      FLASK_ENV: development
-      SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
-      CELERY_RESULT_BACKEND: "amqp://rabbit-user:rabbit-password@queue/api-queue"
-      CELERY_BROKER_URL: "amqp://rabbit-user:rabbit-password@queue/api-queue"
-    volumes:
-      - .:/opt/app:delegated
-    depends_on:
-      - db
-      - queue
   api:
     build: .
+    image: presencepg/presence-workflow
     command: flask run -h 0.0.0.0
     environment:
       PGDATABASE: workflowservice
@@ -49,3 +32,28 @@ services:
     depends_on:
       - db
       - queue
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: presencepg/presence-workflow-worker
+    command: celery -A app.worker worker
+    environment:
+      PGDATABASE: workflowservice
+      PGUSER: postgres
+      PGHOST: db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
+      CELERY_RESULT_BACKEND: "amqp://rabbit-user:rabbit-password@queue/api-queue"
+      CELERY_BROKER_URL: "amqp://rabbit-user:rabbit-password@queue/api-queue"
+      WORKER_API_SERVER: "http://api:5000"
+    env_file:
+      - .worker-env
+    volumes:
+      - .:/opt/app:delegated
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - queue
+      - api

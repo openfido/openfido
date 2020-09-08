@@ -21,6 +21,7 @@ from .models import (
 )
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
+from .tasks import execute_pipeline
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
@@ -137,6 +138,14 @@ def create_pipeline_run(uuid, inputs_json):
     db.session.add(pipeline)
 
     db.session.commit()
+
+    execute_pipeline.delay(
+        uuid,
+        pipeline_run.uuid,
+        pipeline.docker_image_url,
+        pipeline.repository_ssh_url,
+        pipeline.repository_branch,
+    )
 
     return pipeline_run
 

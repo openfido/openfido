@@ -21,6 +21,8 @@ CONFIG_VARS = (
     constants.BLOB_API_SERVER,
     constants.BLOB_API_TOKEN,
     constants.MAX_CONTENT_LENGTH,
+    constants.WORKER_API_SERVER,
+    constants.WORKER_API_TOKEN,
 )
 
 

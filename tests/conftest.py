@@ -6,8 +6,11 @@ from app.constants import (
     MAX_CONTENT_LENGTH,
     SECRET_KEY,
     SQLALCHEMY_DATABASE_URI,
+    WORKER_API_SERVER,
+    WORKER_API_TOKEN,
 )
 from app.models import Pipeline, SystemPermissionEnum, db
+from app.services import execute_pipeline
 from roles.services import create_application
 
 
@@ -22,6 +25,8 @@ def app():
             SECRET_KEY: "PYTEST",
             CELERY_ALWAYS_EAGER: True,
             MAX_CONTENT_LENGTH: "100",
+            WORKER_API_SERVER: "http://example.com",
+            WORKER_API_TOKEN: "atoken",
         }
     )
 
@@ -52,6 +57,16 @@ def pipeline(app):
     db.session.commit()
 
     return pipeline
+
+
+@pytest.fixture
+def mock_execute_pipeline(app, pipeline, monkeypatch):
+    def no_op(*args, **kwargs):
+        pass
+
+    monkeypatch.setattr(execute_pipeline, "delay", no_op)
+
+    return no_op
 
 
 @pytest.fixture
