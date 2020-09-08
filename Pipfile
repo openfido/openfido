@@ -21,7 +21,6 @@ celery = "*"
 simplejson = "*"
 marshmallow = "*"
 marshmallow_enum = "*"
-requests = "*"
 
 [requires]
 python_version = "3.7"
