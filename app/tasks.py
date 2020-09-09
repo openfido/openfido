@@ -85,12 +85,15 @@ def execute_pipeline(
                     input_file["url"], f"{gitdirname}/input/{input_file['name']}"
                 )
 
+            # input/output should not  be in the github repo
             execute_command(
                 (
                     "docker run --rm "
                     f"-v {gitdirname}:/tmp/gitrepo "
+                    f"-v {tmpdirname}/input:/tmp/input "
+                    f"-v {tmpdirname}/output:/tmp/output "
                     "-w /tmp/gitrepo "
-                    f"{docker_image_url} sh openfido.sh input output"
+                    f"{docker_image_url} sh openfido.sh /tmp/input /tmp/output"
                 ),
                 gitdirname,
             )
