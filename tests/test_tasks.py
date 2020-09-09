@@ -41,6 +41,17 @@ def test_update_run_status(urlopen_mock, app):
     assert RunStateEnum.RUNNING.name in request.data.decode("utf-8")
 
 
+@patch("app.tasks.urllib_request.urlopen")
+def test_upload_artifact(urlopen_mock, app):
+    executor = RunExecutor("uuid", "run_uuid")
+    executor.upload_artifact("example.txt", "tests/sample_db.py")
+    assert urlopen_mock.call_count == 1
+    request = urlopen_mock.call_args_list[0][0][0]
+    assert request.full_url.endswith("run_uuid/artifacts?name=example.txt")
+    uppered_key = ROLES_KEY[0] + ROLES_KEY[1:].lower()
+    assert uppered_key in request.headers.keys()
+
+
 class ReturnValue:
     def __init__(self, value, stdout="", stderr=""):
         self.returncode = value
@@ -78,7 +89,7 @@ def test_run(run_mock, app):
     executor.update_run_output.assert_called()
 
 
-@patch("app.tasks.RunExecutor._make_request")
+@patch("app.tasks.RunExecutor._put")
 def test_update_run_output(request_mock, app):
     executor = RunExecutor("uuid", "run_uuid")
 
@@ -93,6 +104,11 @@ def test_update_run_output(request_mock, app):
     request_mock.assert_called_once_with(
         "console", {"std_out": "\nstdout\nmore", "std_err": "\nstderr\nand more"}
     )
+
+    # calls that makes no call
+    request_mock.reset_mock()
+    executor.update_run_output("", "")
+    assert not request_mock.called
 
 
 @patch("app.tasks.RunExecutor.update_run_output")
@@ -200,18 +216,26 @@ def test_execute_pipeline_valueerror(
 
 @patch("app.tasks.RunExecutor.update_run_output")
 @patch("app.tasks.RunExecutor.update_run_status")
+@patch("app.tasks.RunExecutor.upload_artifact")
 @patch("app.tasks.RunExecutor.run")
 @patch("os.path.exists")
+@patch("os.listdir")
+@patch("os.path.isfile")
 @patch("app.tasks.urllib_request.urlretrieve")
 def test_execute_pipeline(
     retrieve_mock,
+    isfile_mock,
+    listdir_mock,
     exists_mock,
     run_mock,
+    upload_artifact_mock,
     update_run_status_mock,
     update_run_output_mock,
     app,
 ):
     exists_mock.return_value = True
+    listdir_mock.return_value = ["output.txt"]
+    isfile_mock.return_value = False
 
     execute_pipeline(
         "uuid",
@@ -244,3 +268,6 @@ def test_execute_pipeline(
 
     assert retrieve_mock.call_count == 1
     assert retrieve_mock.call_args_list[0][0][0] == "https://example.com"
+
+    assert upload_artifact_mock.call_count == 1
+    assert upload_artifact_mock.call_args_list[0][0][0] == "output.txt"
