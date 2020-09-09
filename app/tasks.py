@@ -43,15 +43,17 @@ def update_run_status(uuid, run_uuid, run_state_enum):
 
     request = urllib_request.Request(url, data.encode("ascii"), headers, method="PUT")
     urllib_request.urlopen(request)
-    # TODO verify response and catch any errors.
+    # TODO verify response and catch any errors in future ticket
 
 
 def execute_command(command, directory):
     """ Execute a command, raise an exception on nonzero error codes. """
     result = subprocess.run(command.split(" "), cwd=directory, capture_output=True)
-    logger.warning(result)
+
+    logger.info(result)
+
     if result.returncode != 0:
-        # TODO upload the stdout and stderr 
+        # TODO upload the stdout and stderr in future ticket
         raise ValueError(f"Command returned nonzero code: {result.returncode}")
 
 
@@ -79,14 +81,19 @@ def execute_pipeline(
             execute_command("mkdir input", gitdirname)
             execute_command("mkdir output", gitdirname)
             for input_file in input_files:
-                urllib_request.urlretrieve(input_file["url"], f"{gitdirname}/input/{input_file['name']}")
+                urllib_request.urlretrieve(
+                    input_file["url"], f"{gitdirname}/input/{input_file['name']}"
+                )
 
-            execute_command((
-                "docker run --rm "
-                f"-v {gitdirname}:/tmp/gitrepo "
-                "-w /tmp/gitrepo "
-                f"{docker_image_url} sh openfido.sh input output"
-            ), gitdirname)
+            execute_command(
+                (
+                    "docker run --rm "
+                    f"-v {gitdirname}:/tmp/gitrepo "
+                    "-w /tmp/gitrepo "
+                    f"{docker_image_url} sh openfido.sh input output"
+                ),
+                gitdirname,
+            )
 
             # TODO upload output and stderr.
             # TODO upload any artifacts that were found.
