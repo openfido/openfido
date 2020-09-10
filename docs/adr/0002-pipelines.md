@@ -26,13 +26,14 @@ Organize the database logic into a simplified CQRS-inspired style code structure
  * app/services.py contain all db commands that modify database state.
  * app/queries.py contain all db queries to the database.
 
+Use the structure of the [presence-account-service](https://github.com/PresencePG/presence-account-service) project as a reference.
 
 ## Consequences
 
 Initially I'd used manual validation of parameters passed to routes - but as I
 implemented more and more of the routes I realized they needed improved
 validation (verify that URLs are really URLs, that nested array structures are
-I added the [marshmallow library](https://marshmallow.readthedocs.io/en/stable/)
+correctly structured). I added the [marshmallow library](https://marshmallow.readthedocs.io/en/stable/)
 to enforce more consistent validation (and less work!). As a consequence, some
 older/simpler routes that I implemented early on aren't validated with
 marshmallow, and aren't consistent -- they will be refactored over time to use
