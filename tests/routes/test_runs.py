@@ -1,5 +1,6 @@
-from app.models import db, RunStateEnum, PipelineRunArtifact
-from app.routes.utils import toISO8601
+from app.models import db, PipelineRunArtifact
+from app.model_utils import RunStateEnum
+from app.utils import to_iso8601
 from app.services import create_pipeline_run
 from app.routes import runs as runs_module
 from roles.decorators import ROLES_KEY
@@ -102,7 +103,7 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
     assert result.json == {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
-        "created_at": toISO8601(pipeline_run.created_at),
+        "created_at": to_iso8601(pipeline_run.created_at),
         "inputs": [
             {
                 "name": "name1.pdf",
@@ -112,7 +113,7 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
-                "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+                "created_at": to_iso8601(pipeline_run.pipeline_run_states[0].created_at),
             }
         ],
         "artifacts": [],
@@ -148,12 +149,12 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
     assert result.json == {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
-        "created_at": toISO8601(pipeline_run.created_at),
+        "created_at": to_iso8601(pipeline_run.created_at),
         "inputs": [],
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
-                "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+                "created_at": to_iso8601(pipeline_run.pipeline_run_states[0].created_at),
             }
         ],
         "artifacts": [
@@ -203,12 +204,12 @@ def test_list_pipeline_runs(
         {
             "uuid": pipeline_run.uuid,
             "sequence": pipeline_run.sequence,
-            "created_at": toISO8601(pipeline_run.created_at),
+            "created_at": to_iso8601(pipeline_run.created_at),
             "inputs": [],
             "states": [
                 {
                     "state": pipeline_run.pipeline_run_states[0].name,
-                    "created_at": toISO8601(
+                    "created_at": to_iso8601(
                         pipeline_run.pipeline_run_states[0].created_at
                     ),
                 }

@@ -1,33 +1,19 @@
 import json
 import logging
-import os
 import urllib.request
 import uuid
 from urllib.error import URLError
 
-import boto3
-from botocore.client import Config
-from flask import current_app
-from marshmallow.exceptions import ValidationError
 from werkzeug.utils import secure_filename
 
-from .constants import BLOB_API_SERVER, BLOB_API_TOKEN
 from .models import (
-    Pipeline, PipelineRun, PipelineRunArtifact, PipelineRunInput, PipelineRunState, RunStateEnum,
+    Pipeline, PipelineRun, PipelineRunArtifact, PipelineRunInput, PipelineRunState,
     db)
+from .model_utils import RunStateEnum
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
 from .tasks import execute_pipeline
-
-# TODO make this configurable
-s3 = boto3.client(
-    "s3",
-    endpoint_url="http://storage:9000",
-    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
-    aws_secret_access_key="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-    config=Config(signature_version="s3v4"),
-    region_name="us-east-1",
-)
+from .utils import s3
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
@@ -37,12 +23,12 @@ CALLBACK_TIMEOUT = 100
 logger = logging.getLogger("services")
 
 
-def delete_pipeline(uuid):
+def delete_pipeline(pipeline_uuid):
     """Delete a pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
-    pipeline = find_pipeline(uuid)
+    pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
@@ -84,7 +70,7 @@ def create_pipeline(
 
 
 def update_pipeline(
-    uuid, name, description, docker_image_url, repository_ssh_url, repository_branch
+    pipeline_uuid, name, description, docker_image_url, repository_ssh_url, repository_branch
 ):
     """Update a Pipeline.
 
@@ -93,7 +79,7 @@ def update_pipeline(
     _validate_pipeline_params(
         name, description, docker_image_url, repository_ssh_url, repository_branch
     )
-    pipeline = find_pipeline(uuid)
+    pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
@@ -119,11 +105,11 @@ def create_pipeline_run_state(run_state):
     return pipeline_run_state
 
 
-def create_pipeline_run(uuid, inputs_json):
+def create_pipeline_run(pipeline_uuid, inputs_json):
     """ Create a new PipelineRun for a Pipeline's uuid """
     CreateRunSchema().load(inputs_json)
 
-    pipeline = find_pipeline(uuid)
+    pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
@@ -146,7 +132,7 @@ def create_pipeline_run(uuid, inputs_json):
     db.session.commit()
 
     execute_pipeline.delay(
-        uuid,
+        pipeline_uuid,
         pipeline_run.uuid,
         inputs_json["inputs"],
         pipeline.docker_image_url,
@@ -157,9 +143,9 @@ def create_pipeline_run(uuid, inputs_json):
     return pipeline_run
 
 
-def update_pipeline_run_output(uuid, std_out, std_err):
+def update_pipeline_run_output(pipeline_uuid, std_out, std_err):
     """ Update the pipeline run output. """
-    pipeline_run = find_pipeline_run(uuid)
+    pipeline_run = find_pipeline_run(pipeline_uuid)
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 
@@ -170,11 +156,11 @@ def update_pipeline_run_output(uuid, std_out, std_err):
 
 
 def notify_callback(pipeline_run):
-    uuid = pipeline_run.uuid
+    pipeline_uuid = pipeline_run.uuid
     url = pipeline_run.callback_url
     state = pipeline_run.pipeline_run_states[-1]
 
-    data = json.dumps({"pipeline_run_uuid": uuid, "state": state.name})
+    data = json.dumps({"pipeline_run_uuid": pipeline_uuid, "state": state.name})
 
     request = urllib_request.Request(
         url, data.encode("ascii"), {"content-type": "application/json"}
@@ -185,7 +171,7 @@ def notify_callback(pipeline_run):
         logger.warning(e)
 
 
-def update_pipeline_run_state(uuid, run_state_json):
+def update_pipeline_run_state(pipeline_uuid, run_state_json):
     """Update the pipeline run state.
 
     This method ensures that no invalid state transitions occur.
@@ -193,7 +179,7 @@ def update_pipeline_run_state(uuid, run_state_json):
     schema = UpdateRunStateSchema()
     data = schema.load(run_state_json)
 
-    pipeline_run = find_pipeline_run(uuid)
+    pipeline_run = find_pipeline_run(pipeline_uuid)
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 

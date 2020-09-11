@@ -4,7 +4,8 @@ from functools import wraps
 from marshmallow.exceptions import ValidationError
 from flask import Blueprint, jsonify, request
 
-from ..models import db, SystemPermissionEnum
+from ..models import db
+from ..model_utils import SystemPermissionEnum
 from ..queries import find_pipeline, find_pipeline_run
 from ..services import (
     create_pipeline_run,
@@ -12,7 +13,7 @@ from ..services import (
     update_pipeline_run_state,
     create_pipeline_run_artifact,
 )
-from .utils import toISO8601, verify_content_type_and_params, permissions_required
+from ..utils import to_iso8601, verify_content_type_and_params, permissions_required
 
 logger = logging.getLogger("pipeline-runs")
 
@@ -23,7 +24,7 @@ def pipeline_run_to_json(pipeline_run):
     return {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
-        "created_at": toISO8601(pipeline_run.created_at),
+        "created_at": to_iso8601(pipeline_run.created_at),
         "inputs": [
             {
                 "name": i.filename,
@@ -34,7 +35,7 @@ def pipeline_run_to_json(pipeline_run):
         "states": [
             {
                 "state": s.run_state_type.name,
-                "created_at": toISO8601(s.created_at),
+                "created_at": to_iso8601(s.created_at),
             }
             for s in pipeline_run.pipeline_run_states
         ],
@@ -42,7 +43,7 @@ def pipeline_run_to_json(pipeline_run):
             {
                 "uuid": a.uuid,
                 "name": a.name,
-                "url": "",
+                "url": a.public_url(),
             }
             for a in pipeline_run.pipeline_run_artifacts
         ],

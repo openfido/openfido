@@ -3,15 +3,28 @@ from functools import wraps
 
 from flask import request
 
+import boto3
+from botocore.client import Config
 from roles.decorators import make_permission_decorator
-from ..models import SystemPermissionEnum
+from .model_utils import SystemPermissionEnum
 
-logger = logging.getLogger("route-utils")
+logger = logging.getLogger("utils")
 
 permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
-def toISO8601(date):
+# TODO make this configurable
+s3 = boto3.client(
+    "s3",
+    endpoint_url="http://storage:9000",
+    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
+    aws_secret_access_key="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+    config=Config(signature_version="s3v4"),
+    region_name="us-east-1",
+)
+
+
+def to_iso8601(date):
     """ Return an ISO8601 formatted date """
     return date.isoformat()
 

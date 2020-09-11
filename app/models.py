@@ -1,7 +1,7 @@
-from enum import IntEnum, unique
-
 from flask_sqlalchemy import SQLAlchemy
-from .model_utils import get_db, CommonColumnsMixin
+
+from .model_utils import CommonColumnsMixin, get_db
+from .utils import s3
 
 db = get_db()
 
@@ -19,33 +19,6 @@ class Pipeline(CommonColumnsMixin, db.Model):
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     pipeline_runs = db.relationship("PipelineRun", backref="pipeline", lazy="select")
-
-
-@unique
-class SystemPermissionEnum(IntEnum):
-    """ All possible types of SystemPermission for Pipelines """
-
-    PIPELINES_CLIENT = 1
-    PIPELINES_WORKER = 2
-
-
-@unique
-class RunStateEnum(IntEnum):
-    """ Run states currently supported in PipelineRunState """
-
-    NOT_STARTED = 1
-    RUNNING = 2
-    FAILED = 3
-    COMPLETED = 4
-
-    def is_valid_transition(self, next_enum):
-        """ Return True when the current transition is valid. """
-        if self == RunStateEnum.NOT_STARTED:
-            return next_enum is RunStateEnum.RUNNING
-        if self == RunStateEnum.RUNNING:
-            return next_enum in set([RunStateEnum.FAILED, RunStateEnum.COMPLETED])
-
-        return False
 
 
 class RunStateType(CommonColumnsMixin, db.Model):
@@ -88,6 +61,17 @@ class PipelineRunArtifact(CommonColumnsMixin, db.Model):
     pipeline_run_id = db.Column(
         db.Integer, db.ForeignKey("pipelinerun.id"), nullable=False
     )
+
+    # generate public URL for the resource.
+    def public_url(self):
+        return s3.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": "artifacts",
+                "Key": f"{self.uuid}-{self.name}",
+            },
+            ExpiresIn=300,
+        )
 
 
 class PipelineRunInput(CommonColumnsMixin, db.Model):

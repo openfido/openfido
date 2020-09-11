@@ -1,4 +1,5 @@
-from app.models import db, Pipeline, PipelineRun, RunStateEnum
+from app.models import db, Pipeline, PipelineRun
+from app.model_utils import RunStateEnum
 
 
 def test_create_pipeline(app):

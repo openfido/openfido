@@ -6,7 +6,8 @@ from urllib.error import URLError
 from unittest.mock import MagicMock
 
 from app import services
-from app.models import RunStateEnum, db
+from app.models import db
+from app.model_utils import RunStateEnum
 from app.queries import find_pipeline
 from app.services import urllib_request, CALLBACK_TIMEOUT
 

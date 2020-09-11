@@ -1,4 +1,5 @@
-from app.models import Pipeline, RunStateEnum, RunStateType, db
+from app.models import Pipeline, RunStateType, db
+from app.model_utils import RunStateEnum
 from app.queries import (
     find_pipeline,
     find_pipelines,
