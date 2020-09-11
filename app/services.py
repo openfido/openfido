@@ -3,25 +3,31 @@ import logging
 import os
 import urllib.request
 import uuid
-
-from flask import current_app
-from werkzeug.utils import secure_filename
 from urllib.error import URLError
+
+import boto3
+from botocore.client import Config
+from flask import current_app
 from marshmallow.exceptions import ValidationError
+from werkzeug.utils import secure_filename
 
 from .constants import BLOB_API_SERVER, BLOB_API_TOKEN
 from .models import (
-    Pipeline,
-    PipelineRun,
-    PipelineRunArtifact,
-    PipelineRunInput,
-    PipelineRunState,
-    RunStateEnum,
-    db,
-)
+    Pipeline, PipelineRun, PipelineRunArtifact, PipelineRunInput, PipelineRunState, RunStateEnum,
+    db)
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
 from .tasks import execute_pipeline
+
+# TODO make this configurable
+s3 = boto3.client(
+    "s3",
+    endpoint_url="http://storage:9000",
+    aws_access_key_id="AKIAIOSFODNN7EXAMPLE",
+    aws_secret_access_key="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+    config=Config(signature_version="s3v4"),
+    region_name="us-east-1",
+)
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
@@ -207,21 +213,11 @@ def create_pipeline_run_artifact(run_uuid, filename, request):
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 
-    if current_app.config.get(BLOB_API_SERVER, False):
-        # TODO when there is a BLOB server implementation, create an
-        # implementation here.
-        pass
-
-    # Non Blob Server implementation: just save the file locally.
     sname = secure_filename(filename)
     artifact_uuid = uuid.uuid4().hex
-    with open(os.path.join(f"uploads/{artifact_uuid}-{sname}"), "bw") as f:
-        chunk_size = 4096
-        while True:
-            chunk = request.stream.read(chunk_size)
-            if len(chunk) == 0:
-                break
-            f.write(chunk)
+    if "artifacts" not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.Bucket("artifacts").create()
+    s3.upload_fileobj(request.stream, "artifacts", f"{artifact_uuid}-{sname}")
 
     artifact = PipelineRunArtifact(uuid=artifact_uuid, name=filename)
     pipeline_run.pipeline_run_artifacts.append(artifact)

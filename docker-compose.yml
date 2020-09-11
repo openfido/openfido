@@ -11,6 +11,14 @@ services:
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
+  storage:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
+      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - ./uploads:/data:delegated
   api:
     build: .
     image: presencepg/presence-workflow
@@ -32,6 +40,7 @@ services:
     depends_on:
       - db
       - queue
+      - storage
   worker:
     build:
       context: .
@@ -39,13 +48,6 @@ services:
     image: presencepg/presence-workflow-worker
     command: celery -A app.worker worker -l DEBUG
     environment:
-      PGDATABASE: workflowservice
-      PGUSER: postgres
-      PGHOST: db
-      FLASK_APP: run.py
-      FLASK_ENV: development
-      SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@db/workflowservice"
       CELERY_RESULT_BACKEND: "amqp://rabbit-user:rabbit-password@queue/api-queue"
       CELERY_BROKER_URL: "amqp://rabbit-user:rabbit-password@queue/api-queue"
       WORKER_API_SERVER: "http://api:5000"
