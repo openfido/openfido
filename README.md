@@ -107,8 +107,22 @@ be created using the sample code in tasks.py:
     # Create a new Application database record with PIPELINES_CLIENT role.
     invoke create-application-key -n "new app" -p PIPELINES_CLIENT
 
+## Configuration
 
-## Server Configuration
+Common settings used by both server and workers:
+
+ * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
+ * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
+ * **S3_ACCESS_KEY_ID** = Access key for uploaded artifacts.
+ * **S3_SECRET_ACCESS_KEY** = Secret key for uploaded artifacts.
+ * **S3_ENDPOINT_URL** = Hostname of the S3 service.
+ * **S3_REGION_NAME** = S3 region.
+ * **S3_BUCKET** = Bucket where uploaded artifacts are kept.
+ * **S3_PRESIGNED_TIMEOUT** = Number of seconds presigned URLs should be
+     accessible.
+
+
+### Server Configuration
 
 Several environmental variables allow this server to be configured.
 
@@ -123,15 +137,13 @@ Several environmental variables allow this server to be configured.
  * **BLOB_API_TOKEN** = api_token required for calls to `BLOB_API_SERVER`.
  * **MAX_CONTENT_LENGTH** = Configures [maximum upload file byte size](https://flask.palletsprojects.com/en/1.1.x/config/#MAX_CONTENT_LENGTH).
 
-## Worker Configuration
+### Worker Configuration
 
 Celery workers only require the following parameters:
  * **WORKER_API_SERVER** = The Workflow API server. Celery workers require access to this Workflow API in
      order to update pipeline run states, and upload artifacts.
  * **WORKER_API_TOKEN** = An application access token to access pipeline run
      endpoints.
- * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
- * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
 
 To generate a token that a worker may use to interact with the API, use the
 following command:

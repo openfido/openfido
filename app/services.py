@@ -9,8 +9,13 @@ from werkzeug.utils import secure_filename
 
 from .constants import S3_BUCKET
 from .models import (
-    Pipeline, PipelineRun, PipelineRunArtifact, PipelineRunInput, PipelineRunState,
-    db)
+    Pipeline,
+    PipelineRun,
+    PipelineRunArtifact,
+    PipelineRunInput,
+    PipelineRunState,
+    db,
+)
 from .model_utils import RunStateEnum
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
@@ -72,7 +77,12 @@ def create_pipeline(
 
 
 def update_pipeline(
-    pipeline_uuid, name, description, docker_image_url, repository_ssh_url, repository_branch
+    pipeline_uuid,
+    name,
+    description,
+    docker_image_url,
+    repository_ssh_url,
+    repository_branch,
 ):
     """Update a Pipeline.
 
@@ -207,7 +217,11 @@ def create_pipeline_run_artifact(run_uuid, filename, request):
     bucket = current_app.config[S3_BUCKET]
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
-    s3.upload_fileobj(request.stream, bucket, f"{pipeline_run.pipeline.uuid}/{run_uuid}/{artifact_uuid}-{sname}")
+    s3.upload_fileobj(
+        request.stream,
+        bucket,
+        f"{pipeline_run.pipeline.uuid}/{run_uuid}/{artifact_uuid}-{sname}",
+    )
 
     artifact = PipelineRunArtifact(uuid=artifact_uuid, name=filename)
     pipeline_run.pipeline_run_artifacts.append(artifact)

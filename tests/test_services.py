@@ -1,15 +1,17 @@
 import io
 import json
+from unittest.mock import MagicMock, patch
+from urllib.error import URLError
+
 import pytest
 from marshmallow.exceptions import ValidationError
-from urllib.error import URLError
-from unittest.mock import MagicMock
 
 from app import services
-from app.models import db
+from app.constants import S3_BUCKET
 from app.model_utils import RunStateEnum
+from app.models import db
 from app.queries import find_pipeline
-from app.services import urllib_request, CALLBACK_TIMEOUT
+from app.services import CALLBACK_TIMEOUT, urllib_request
 
 A_NAME = "a pipeline"
 A_DESCRIPTION = "a description"
@@ -225,7 +227,28 @@ def test_create_pipeline_run_artifact_no_pipeline(app):
         services.create_pipeline_run_artifact("nosuchid", "file.name", request_mock)
 
 
-def test_create_pipeline_run_artifact(app, pipeline, mock_execute_pipeline):
+@patch("app.services.get_s3")
+def test_create_pipeline_run_artifact_no_bucket(
+    get_s3_mock, app, pipeline, mock_execute_pipeline
+):
+    request_mock = MagicMock()
+    request_mock.stream = io.BytesIO(b"this is data")
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+
+    services.create_pipeline_run_artifact(pipeline_run.uuid, "file.name", request_mock)
+
+    assert get_s3_mock().create_bucket.called
+    assert get_s3_mock().upload_fileobj.called
+
+
+@patch("app.services.get_s3")
+def test_create_pipeline_run_artifact(
+    get_s3_mock, app, pipeline, mock_execute_pipeline
+):
+    get_s3_mock().list_buckets.return_value = {
+        "Buckets": [{"Name": app.config[S3_BUCKET]}]
+    }
+
     request_mock = MagicMock()
     request_mock.stream = io.BytesIO(b"this is data")
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
@@ -234,3 +257,5 @@ def test_create_pipeline_run_artifact(app, pipeline, mock_execute_pipeline):
 
     assert len(pipeline_run.pipeline_run_artifacts) == 1
     assert pipeline_run.pipeline_run_artifacts[0].name == "file.name"
+    assert not get_s3_mock().create_bucket.called
+    assert get_s3_mock().upload_fileobj.called

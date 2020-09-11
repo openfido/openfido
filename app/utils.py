@@ -7,7 +7,12 @@ import boto3
 from botocore.client import Config
 from roles.decorators import make_permission_decorator
 from .model_utils import SystemPermissionEnum
-from .constants import S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_ENDPOINT_URL, S3_REGION_NAME
+from .constants import (
+    S3_ACCESS_KEY_ID,
+    S3_SECRET_ACCESS_KEY,
+    S3_ENDPOINT_URL,
+    S3_REGION_NAME,
+)
 
 logger = logging.getLogger("utils")
 
