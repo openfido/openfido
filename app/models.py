@@ -1,7 +1,9 @@
+from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 
+from .constants import S3_BUCKET
 from .model_utils import CommonColumnsMixin, get_db
-from .utils import s3
+from .utils import get_s3
 
 db = get_db()
 
@@ -64,11 +66,11 @@ class PipelineRunArtifact(CommonColumnsMixin, db.Model):
 
     # generate public URL for the resource.
     def public_url(self):
-        return s3.generate_presigned_url(
+        return get_s3().generate_presigned_url(
             "get_object",
             Params={
-                "Bucket": "artifacts",
-                "Key": f"{self.uuid}-{self.name}",
+                "Bucket": current_app.config[S3_BUCKET],
+                "Key": f"{self.pipeline_run.pipeline.uuid}/{self.pipeline_run.uuid}/{self.uuid}-{self.name}",
             },
             ExpiresIn=300,
         )

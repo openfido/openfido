@@ -4,8 +4,10 @@ import urllib.request
 import uuid
 from urllib.error import URLError
 
+from flask import current_app
 from werkzeug.utils import secure_filename
 
+from .constants import S3_BUCKET
 from .models import (
     Pipeline, PipelineRun, PipelineRunArtifact, PipelineRunInput, PipelineRunState,
     db)
@@ -13,7 +15,7 @@ from .model_utils import RunStateEnum
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
 from .tasks import execute_pipeline
-from .utils import s3
+from .utils import get_s3
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
@@ -201,9 +203,11 @@ def create_pipeline_run_artifact(run_uuid, filename, request):
 
     sname = secure_filename(filename)
     artifact_uuid = uuid.uuid4().hex
-    if "artifacts" not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
-        s3.Bucket("artifacts").create()
-    s3.upload_fileobj(request.stream, "artifacts", f"{artifact_uuid}-{sname}")
+    s3 = get_s3()
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+    s3.upload_fileobj(request.stream, bucket, f"{pipeline_run.pipeline.uuid}/{run_uuid}/{artifact_uuid}-{sname}")
 
     artifact = PipelineRunArtifact(uuid=artifact_uuid, name=filename)
     pipeline_run.pipeline_run_artifacts.append(artifact)

@@ -23,6 +23,11 @@ CONFIG_VARS = (
     constants.MAX_CONTENT_LENGTH,
     constants.WORKER_API_SERVER,
     constants.WORKER_API_TOKEN,
+    constants.S3_ACCESS_KEY_ID,
+    constants.S3_SECRET_ACCESS_KEY,
+    constants.S3_ENDPOINT_URL,
+    constants.S3_REGION_NAME,
+    constants.S3_BUCKET,
 )
 
 
