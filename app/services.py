@@ -142,6 +142,7 @@ def create_pipeline_run(uuid, inputs_json):
     execute_pipeline.delay(
         uuid,
         pipeline_run.uuid,
+        inputs_json["inputs"],
         pipeline.docker_image_url,
         pipeline.repository_ssh_url,
         pipeline.repository_branch,
