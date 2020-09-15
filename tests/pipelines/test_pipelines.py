@@ -1,5 +1,5 @@
-from app.models import Pipeline, db
-from app.queries import find_pipeline
+from app.pipelines.models import Pipeline, db
+from app.pipelines.queries import find_pipeline
 from roles.decorators import ROLES_KEY
 
 

@@ -1,4 +1,4 @@
-from app.models import db
+from app import db
 from roles.decorators import ROLES_KEY
 
 

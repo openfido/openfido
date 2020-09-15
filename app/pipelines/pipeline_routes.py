@@ -2,10 +2,10 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
-from ..models import db
+from .models import db
 from ..model_utils import SystemPermissionEnum
-from ..queries import find_pipeline, find_pipelines
-from ..services import (
+from .queries import find_pipeline, find_pipelines
+from .services import (
     create_pipeline,
     delete_pipeline,
     update_pipeline,

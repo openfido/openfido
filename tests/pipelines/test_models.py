@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from app.models import db, Pipeline, PipelineRun, PipelineRunArtifact
+from app.pipelines.models import db, Pipeline, PipelineRun, PipelineRunArtifact
 from app.model_utils import RunStateEnum
 
 
@@ -27,7 +27,7 @@ def test_create_pipeline_run(app, pipeline):
     assert set(PipelineRun.query.all()) == set([pipeline_run])
 
 
-@patch("app.models.get_s3")
+@patch("app.pipelines.models.get_s3")
 def test_public_url(get_s3_mock, app, pipeline):
     s3_mock = MagicMock()
     get_s3_mock.return_value = s3_mock

@@ -10,9 +10,9 @@ from app.constants import (
     WORKER_API_SERVER,
     WORKER_API_TOKEN,
 )
-from app.models import Pipeline, db
+from app.pipelines.models import Pipeline, db
 from app.model_utils import SystemPermissionEnum
-from app.services import execute_pipeline
+from app.pipelines.services import execute_pipeline
 from roles.services import create_application
 
 

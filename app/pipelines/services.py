@@ -7,7 +7,10 @@ from urllib.error import URLError
 from flask import current_app
 from werkzeug.utils import secure_filename
 
-from .constants import S3_BUCKET
+from ..constants import S3_BUCKET
+from ..model_utils import RunStateEnum
+from ..tasks import execute_pipeline
+from ..utils import get_s3
 from .models import (
     Pipeline,
     PipelineRun,
@@ -16,15 +19,13 @@ from .models import (
     PipelineRunState,
     db,
 )
-from .model_utils import RunStateEnum
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
 from .schemas import CreateRunSchema, UpdateRunStateSchema
-from .tasks import execute_pipeline
-from .utils import get_s3
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
 
+# TODO move to constants.py
 CALLBACK_TIMEOUT = 100
 
 logger = logging.getLogger("services")

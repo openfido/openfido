@@ -1,0 +1,63 @@
+from unittest.mock import patch
+
+from roles.decorators import ROLES_KEY
+from app.workflows.models import db, Workflow
+from app.utils import to_iso8601
+
+
+def test_create_workflow_bad_content_type(client, client_application):
+    db.session.commit()
+    result = client.post(
+        "/v1/workflows",
+        content_type="text/html",
+        json={"name": "a workflow", "description": "desc"},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message"])
+
+
+@patch("app.workflows.routes.create_workflow")
+def test_create_workflow_(create_workflow_mock, client, client_application):
+    create_workflow_mock.side_effect = ValueError("failure")
+    db.session.commit()
+    result = client.post(
+        "/v1/workflows",
+        content_type="application/json",
+        json={"name": "a workflow", "description": "desc"},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message"])
+
+
+def test_create_workflow_bad_input(client, client_application):
+    db.session.commit()
+    result = client.post(
+        "/v1/workflows",
+        content_type="application/json",
+        json={},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json["errors"].keys()) == set(["description", "name"])
+
+
+def test_create_workflow(client, client_application):
+    db.session.commit()
+    params = {"name": "a workflow", "description": "desc"}
+    result = client.post(
+        "/v1/workflows",
+        content_type="application/json",
+        json=params,
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    workflow = Workflow.query.filter(Workflow.name == params["name"]).one_or_none()
+    assert result.json == {
+        "uuid": workflow.uuid,
+        "name": workflow.name,
+        "description": workflow.description,
+        "created_at": to_iso8601(workflow.created_at),
+        "updated_at": to_iso8601(workflow.updated_at),
+    }
