@@ -38,6 +38,7 @@ def delete_pipeline(pipeline_uuid):
         raise ValueError("no pipeline found")
 
     pipeline.is_deleted = True
+    db.session.commit()
 
 
 def _validate_pipeline_params(
