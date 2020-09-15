@@ -113,13 +113,14 @@ Common settings used by both server and workers:
 
  * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
  * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
- * **S3_ACCESS_KEY_ID** = Access key for uploaded artifacts.
- * **S3_SECRET_ACCESS_KEY** = Secret key for uploaded artifacts.
+ * **S3_ACCESS_KEY_ID** = Access key for uploaded artifacts (optional).
+ * **S3_SECRET_ACCESS_KEY** = Secret key for uploaded artifacts (optional).
  * **S3_ENDPOINT_URL** = Hostname of the S3 service.
- * **S3_REGION_NAME** = S3 region.
+ * **S3_REGION_NAME** = S3 region (default: us-east-1).
  * **S3_BUCKET** = Bucket where uploaded artifacts are kept.
- * **S3_PRESIGNED_TIMEOUT** = Number of seconds presigned URLs should be
-     accessible.
+
+See the [constants.py](app/constants.py) for additional non-configurable
+options.
 
 
 ### Server Configuration

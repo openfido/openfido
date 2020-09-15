@@ -20,13 +20,18 @@ permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
 def get_s3():
+    params = {
+        "endpoint_url": current_app.config[S3_ENDPOINT_URL],
+        "config": Config(signature_version="s3v4"),
+        "region_name": current_app.config[S3_REGION_NAME],
+    }
+    if S3_ACCESS_KEY_ID in current_app.config:
+        params["aws_access_key_id"] = current_app.config[S3_ACCESS_KEY_ID]
+        params["aws_secret_access_key"] = current_app.config[S3_SECRET_ACCESS_KEY]
+
     return boto3.client(
         "s3",
-        endpoint_url=current_app.config[S3_ENDPOINT_URL],
-        aws_access_key_id=current_app.config[S3_ACCESS_KEY_ID],
-        aws_secret_access_key=current_app.config[S3_SECRET_ACCESS_KEY],
-        config=Config(signature_version="s3v4"),
-        region_name=current_app.config[S3_REGION_NAME],
+        **params
     )
 
 
