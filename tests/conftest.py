@@ -6,6 +6,7 @@ from app.constants import (
     MAX_CONTENT_LENGTH,
     SECRET_KEY,
     SQLALCHEMY_DATABASE_URI,
+    S3_ENDPOINT_URL,
     WORKER_API_SERVER,
     WORKER_API_TOKEN,
 )
@@ -26,6 +27,7 @@ def app():
             SECRET_KEY: "PYTEST",
             CELERY_ALWAYS_EAGER: True,
             MAX_CONTENT_LENGTH: "100",
+            S3_ENDPOINT_URL: "http://example.com",
             WORKER_API_SERVER: "http://example.com",
             WORKER_API_TOKEN: "atoken",
         }

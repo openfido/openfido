@@ -29,10 +29,7 @@ def get_s3():
         params["aws_access_key_id"] = current_app.config[S3_ACCESS_KEY_ID]
         params["aws_secret_access_key"] = current_app.config[S3_SECRET_ACCESS_KEY]
 
-    return boto3.client(
-        "s3",
-        **params
-    )
+    return boto3.client("s3", **params)
 
 
 def to_iso8601(date):
