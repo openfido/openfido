@@ -3,6 +3,7 @@ from unittest.mock import patch
 from roles.decorators import ROLES_KEY
 from app.workflows.models import db, Workflow
 from app.utils import to_iso8601
+from app.workflows.queries import find_workflow
 
 
 def test_create_workflow_bad_content_type(client, client_application):
@@ -61,3 +62,23 @@ def test_create_workflow(client, client_application):
         "created_at": to_iso8601(workflow.created_at),
         "updated_at": to_iso8601(workflow.updated_at),
     }
+
+
+def test_remove_workflow_no_uuid(client, client_application):
+    db.session.commit()
+    result = client.delete(
+        f"/v1/workflows/nouuid",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+
+def test_remove_workflow(client, client_application, workflow):
+    the_uuid = workflow.uuid
+    db.session.commit()
+    result = client.delete(
+        f"/v1/workflows/{the_uuid}",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert find_workflow(the_uuid) is None

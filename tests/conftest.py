@@ -11,6 +11,7 @@ from app.constants import (
     WORKER_API_TOKEN,
 )
 from app.pipelines.models import Pipeline, db
+from app.workflows.models import Workflow
 from app.model_utils import SystemPermissionEnum
 from app.pipelines.services import execute_pipeline
 from roles.services import create_application
@@ -60,6 +61,18 @@ def pipeline(app):
     db.session.commit()
 
     return pipeline
+
+
+@pytest.fixture
+def workflow(app):
+    workflow = Workflow(
+        name="a workflow",
+        description="a description",
+    )
+    db.session.add(workflow)
+    db.session.commit()
+
+    return workflow
 
 
 @pytest.fixture

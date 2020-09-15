@@ -32,10 +32,7 @@ logger = logging.getLogger("services")
 
 
 def delete_pipeline(pipeline_uuid):
-    """Delete a pipeline.
-
-    Note: The db.session is not committed. Be sure to commit the session.
-    """
+    """ Delete a pipeline. """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")

@@ -6,7 +6,7 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
 from .schemas import WorkflowSchema
-from .services import create_workflow
+from .services import create_workflow, delete_workflow
 
 logger = logging.getLogger("workflows")
 
@@ -75,4 +75,25 @@ def create():
     except ValueError:
         return {
             "message": "Unable to create workflow",
+        }, 400
+
+
+@workflow_bp.route("/<workflow_uuid>", methods=["DELETE"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def remove(workflow_uuid):
+    """Delete a Workflow.
+    ---
+
+    responses:
+      "200":
+        description: "Removed"
+      "400":
+        description: "Bad request"
+    """
+    try:
+        delete_workflow(workflow_uuid)
+        return {}, 200
+    except ValueError:
+        return {
+            "message": "Unable to delete workflow",
         }, 400

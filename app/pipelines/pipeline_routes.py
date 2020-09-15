@@ -104,7 +104,7 @@ def create():
 
         return jsonify(pipeline_to_json(pipeline))
     except ValueError:
-        return {}, 400
+        return {"message": "Unable to create pipeline"}, 400
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
@@ -147,7 +147,7 @@ def get(pipeline_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
-        return {}, 404
+        return {"message": "Pipeline not found"}, 404
 
     return jsonify(pipeline_to_json(pipeline))
 
@@ -173,7 +173,9 @@ def remove(pipeline_uuid):
         delete_pipeline(pipeline_uuid)
         return {}, 200
     except ValueError:
-        return {}, 400
+        return {
+            "message": "Unable to delete workflow",
+        }, 400
 
 
 @pipeline_bp.route("", methods=["GET"])
@@ -294,7 +296,7 @@ def update(pipeline_uuid):
 
         return jsonify(pipeline_to_json(pipeline))
     except ValueError:
-        return {}, 400
+        return {"message": "Unable to update pipeline"}, 400
 
 
 @pipeline_bp.route("/search", methods=["POST"])
