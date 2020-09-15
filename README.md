@@ -7,9 +7,11 @@ a file server.
 ## Vocabulary
 
  * Pipeline = a GridLabD job.
+ * Pipeline Run = An execution of a Pipeline.
  * Application = an HTTP client that is authorized to access a REST endpoint.
  * Application System Permission = an assignment of an Application to a specific System Permission.
  * System Permission = a specific operation that an application is allowed to perform.
+ * Workflow = A collection of interdependent Pipelines.
 
 ## Architectural Decision Records
 

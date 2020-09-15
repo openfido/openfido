@@ -10,6 +10,7 @@ from . import constants
 from .model_utils import get_db
 from .pipelines import models as pipeline_models
 from .pipelines import pipeline_bp, run_bp
+from .workflows import workflow_bp
 from .tasks import make_celery
 
 db = get_db()
@@ -60,5 +61,6 @@ def create_app(config=None):
 
     app.register_blueprint(pipeline_bp, url_prefix="/v1/pipelines")
     app.register_blueprint(run_bp, url_prefix="/v1/pipelines")
+    app.register_blueprint(workflow_bp, url_prefix="/v1/workflows")
 
     return (app, db, celery, migrate)

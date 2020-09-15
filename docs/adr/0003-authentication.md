@@ -29,7 +29,7 @@ project that can be imported separately from the pipelines API.
  - [x] Models are included in such a way that they can be included in an existing
    Alembic database schema (have one central 'db' that is configured by the
    importing app)
- - [ ] Create a setup.py file and reference flask project that imports this project
+ - [x] Create a setup.py file and reference flask project that imports this project
    (basis example for other projects).
 
 ## Consequences
