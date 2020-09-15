@@ -38,3 +38,16 @@ to enforce more consistent validation (and less work!). As a consequence, some
 older/simpler routes that I implemented early on aren't validated with
 marshmallow, and aren't consistent -- they will be refactored over time to use
 marshmallow.
+
+Error messages were not very verbose, since the 'auth project' this initial
+template was copied from were deliberately empty. For an API deliberately
+targeted at application development this API should have been more informative.
+
+The models and routes ultimately formed two big domains: pipelines, and
+workflows. Having all routes and models in single files was unwieldy. The
+general structure was refactored so that each submodule (pipelines, workflows)
+
+ * app/pipelines/models.py
+ * app/pipelines/routes.py
+ * app/pipelines/services.py
+ * app/pipelines/queries.py

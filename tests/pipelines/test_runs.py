@@ -1,13 +1,13 @@
 from unittest.mock import Mock, patch
 
-from app.models import db, PipelineRunArtifact
+from app.pipelines.models import db, PipelineRunArtifact
 from app.model_utils import RunStateEnum
 from app.utils import to_iso8601
-from app.services import create_pipeline_run
-from app.routes import runs as runs_module
+from app.pipelines.services import create_pipeline_run
+from app.pipelines import run_routes as runs_module
 from roles.decorators import ROLES_KEY
 
-from ..test_services import VALID_CALLBACK_INPUT
+from .test_services import VALID_CALLBACK_INPUT
 
 
 def test_create_run_no_such_uuid(client, client_application):
@@ -375,7 +375,7 @@ def test_upload_run_artifact_service_valueerror(
     assert result.status_code == 400
 
 
-@patch("app.services.get_s3")
+@patch("app.pipelines.services.get_s3")
 def test_upload_run_artifact(
     get_s3_mock, client, pipeline, worker_application, mock_execute_pipeline
 ):

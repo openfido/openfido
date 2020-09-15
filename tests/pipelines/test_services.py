@@ -6,12 +6,11 @@ from urllib.error import URLError
 import pytest
 from marshmallow.exceptions import ValidationError
 
-from app import services
 from app.constants import S3_BUCKET
 from app.model_utils import RunStateEnum
-from app.models import db
-from app.queries import find_pipeline
-from app.services import CALLBACK_TIMEOUT, urllib_request
+from app.pipelines import services
+from app.pipelines.models import db
+from app.pipelines.queries import find_pipeline
 
 A_NAME = "a pipeline"
 A_DESCRIPTION = "a description"
@@ -175,7 +174,7 @@ def test_update_pipeline_run_state_callback_err(
     def mock_urlopen(request, timeout):
         raise URLError("a reason")
 
-    monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
+    monkeypatch.setattr(services.urllib_request, "urlopen", mock_urlopen)
 
     services.update_pipeline_run_state(
         pipeline_run.uuid,
@@ -207,9 +206,9 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
             "pipeline_run_uuid": pipeline_run.uuid,
             "state": RunStateEnum.RUNNING.name,
         }
-        assert timeout == CALLBACK_TIMEOUT
+        assert timeout == services.CALLBACK_TIMEOUT
 
-    monkeypatch.setattr(urllib_request, "urlopen", mock_urlopen)
+    monkeypatch.setattr(services.urllib_request, "urlopen", mock_urlopen)
 
     services.update_pipeline_run_state(
         pipeline_run.uuid,
@@ -227,7 +226,7 @@ def test_create_pipeline_run_artifact_no_pipeline(app):
         services.create_pipeline_run_artifact("nosuchid", "file.name", request_mock)
 
 
-@patch("app.services.get_s3")
+@patch("app.pipelines.services.get_s3")
 def test_create_pipeline_run_artifact_no_bucket(
     get_s3_mock, app, pipeline, mock_execute_pipeline
 ):
@@ -241,7 +240,7 @@ def test_create_pipeline_run_artifact_no_bucket(
     assert get_s3_mock().upload_fileobj.called
 
 
-@patch("app.services.get_s3")
+@patch("app.pipelines.services.get_s3")
 def test_create_pipeline_run_artifact(
     get_s3_mock, app, pipeline, mock_execute_pipeline
 ):

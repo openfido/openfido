@@ -1,9 +1,9 @@
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 
-from .constants import S3_BUCKET, S3_PRESIGNED_TIMEOUT
-from .model_utils import CommonColumnsMixin, get_db
-from .utils import get_s3
+from ..constants import S3_BUCKET, S3_PRESIGNED_TIMEOUT
+from ..model_utils import CommonColumnsMixin, get_db
+from ..utils import get_s3
 
 db = get_db()
 

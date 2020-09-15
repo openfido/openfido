@@ -1,12 +1,12 @@
-from app.models import Pipeline, RunStateType, db
+from app.pipelines.models import Pipeline, RunStateType, db
 from app.model_utils import RunStateEnum
-from app.queries import (
+from app.pipelines.queries import (
     find_pipeline,
     find_pipelines,
     find_run_state_type,
     find_pipeline_run,
 )
-from app.services import create_pipeline_run
+from app.pipelines.services import create_pipeline_run
 from .test_services import VALID_CALLBACK_INPUT
 
 
