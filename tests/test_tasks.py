@@ -3,7 +3,7 @@ from urllib.error import URLError
 
 import pytest
 
-from app.models import RunStateEnum
+from app.model_utils import RunStateEnum
 from app.tasks import RunExecutor, execute_pipeline, make_celery
 from roles.decorators import ROLES_KEY
 

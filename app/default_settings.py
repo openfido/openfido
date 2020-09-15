@@ -1,1 +1,3 @@
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+S3_BUCKET = "workflow-service"
+S3_REGION_NAME = "us-east-1"

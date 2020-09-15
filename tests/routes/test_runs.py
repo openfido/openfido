@@ -1,5 +1,8 @@
-from app.models import db, RunStateEnum, PipelineRunArtifact
-from app.routes.utils import toISO8601
+from unittest.mock import Mock, patch
+
+from app.models import db, PipelineRunArtifact
+from app.model_utils import RunStateEnum
+from app.utils import to_iso8601
 from app.services import create_pipeline_run
 from app.routes import runs as runs_module
 from roles.decorators import ROLES_KEY
@@ -102,7 +105,7 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
     assert result.json == {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
-        "created_at": toISO8601(pipeline_run.created_at),
+        "created_at": to_iso8601(pipeline_run.created_at),
         "inputs": [
             {
                 "name": "name1.pdf",
@@ -112,7 +115,9 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
-                "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+                "created_at": to_iso8601(
+                    pipeline_run.pipeline_run_states[0].created_at
+                ),
             }
         ],
         "artifacts": [],
@@ -123,6 +128,8 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     artifact = PipelineRunArtifact(name="test.pdf")
+    artifact.public_url = Mock()
+    artifact.public_url.return_value = "http://fake.example.com/url"
     pipeline_run.pipeline_run_artifacts.append(artifact)
     db.session.commit()
 
@@ -148,19 +155,21 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
     assert result.json == {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
-        "created_at": toISO8601(pipeline_run.created_at),
+        "created_at": to_iso8601(pipeline_run.created_at),
         "inputs": [],
         "states": [
             {
                 "state": pipeline_run.pipeline_run_states[0].name,
-                "created_at": toISO8601(pipeline_run.pipeline_run_states[0].created_at),
+                "created_at": to_iso8601(
+                    pipeline_run.pipeline_run_states[0].created_at
+                ),
             }
         ],
         "artifacts": [
             {
                 "uuid": artifact.uuid,
                 "name": "test.pdf",
-                "url": "",
+                "url": "http://fake.example.com/url",
             }
         ],
     }
@@ -203,12 +212,12 @@ def test_list_pipeline_runs(
         {
             "uuid": pipeline_run.uuid,
             "sequence": pipeline_run.sequence,
-            "created_at": toISO8601(pipeline_run.created_at),
+            "created_at": to_iso8601(pipeline_run.created_at),
             "inputs": [],
             "states": [
                 {
                     "state": pipeline_run.pipeline_run_states[0].name,
-                    "created_at": toISO8601(
+                    "created_at": to_iso8601(
                         pipeline_run.pipeline_run_states[0].created_at
                     ),
                 }
@@ -366,8 +375,9 @@ def test_upload_run_artifact_service_valueerror(
     assert result.status_code == 400
 
 
+@patch("app.services.get_s3")
 def test_upload_run_artifact(
-    client, pipeline, worker_application, mock_execute_pipeline
+    get_s3_mock, client, pipeline, worker_application, mock_execute_pipeline
 ):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)

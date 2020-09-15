@@ -1,17 +1,38 @@
 import logging
 from functools import wraps
 
-from flask import request
+from flask import request, current_app
 
+import boto3
+from botocore.client import Config
 from roles.decorators import make_permission_decorator
-from ..models import SystemPermissionEnum
+from .model_utils import SystemPermissionEnum
+from .constants import (
+    S3_ACCESS_KEY_ID,
+    S3_SECRET_ACCESS_KEY,
+    S3_ENDPOINT_URL,
+    S3_REGION_NAME,
+)
 
-logger = logging.getLogger("route-utils")
+logger = logging.getLogger("utils")
 
 permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
-def toISO8601(date):
+def get_s3():
+    params = {
+        "endpoint_url": current_app.config[S3_ENDPOINT_URL],
+        "config": Config(signature_version="s3v4"),
+        "region_name": current_app.config[S3_REGION_NAME],
+    }
+    if S3_ACCESS_KEY_ID in current_app.config:
+        params["aws_access_key_id"] = current_app.config[S3_ACCESS_KEY_ID]
+        params["aws_secret_access_key"] = current_app.config[S3_SECRET_ACCESS_KEY]
+
+    return boto3.client("s3", **params)
+
+
+def to_iso8601(date):
     """ Return an ISO8601 formatted date """
     return date.isoformat()
 

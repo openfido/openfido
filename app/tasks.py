@@ -10,7 +10,7 @@ from celery.utils.log import get_task_logger
 from flask import current_app
 
 from app.constants import WORKER_API_TOKEN
-from app.models import RunStateEnum
+from app.model_utils import RunStateEnum
 from roles.decorators import ROLES_KEY
 
 # make the request lib mockable for testing:

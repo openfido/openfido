@@ -6,10 +6,12 @@ from app.constants import (
     MAX_CONTENT_LENGTH,
     SECRET_KEY,
     SQLALCHEMY_DATABASE_URI,
+    S3_ENDPOINT_URL,
     WORKER_API_SERVER,
     WORKER_API_TOKEN,
 )
-from app.models import Pipeline, SystemPermissionEnum, db
+from app.models import Pipeline, db
+from app.model_utils import SystemPermissionEnum
 from app.services import execute_pipeline
 from roles.services import create_application
 
@@ -25,6 +27,7 @@ def app():
             SECRET_KEY: "PYTEST",
             CELERY_ALWAYS_EAGER: True,
             MAX_CONTENT_LENGTH: "100",
+            S3_ENDPOINT_URL: "http://example.com",
             WORKER_API_SERVER: "http://example.com",
             WORKER_API_TOKEN: "atoken",
         }

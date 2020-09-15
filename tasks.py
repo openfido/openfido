@@ -55,7 +55,7 @@ def create_application_key(c, name, permission):
     """
     from app import create_app
     from roles.services import create_application
-    from app.models import SystemPermissionEnum
+    from app.model_utils import SystemPermissionEnum
 
     (app, db, _, _) = create_app()
     with app.app_context():

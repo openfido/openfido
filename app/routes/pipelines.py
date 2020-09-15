@@ -2,14 +2,15 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
-from ..models import db, SystemPermissionEnum
+from ..models import db
+from ..model_utils import SystemPermissionEnum
 from ..queries import find_pipeline, find_pipelines
 from ..services import (
     create_pipeline,
     delete_pipeline,
     update_pipeline,
 )
-from .utils import toISO8601, verify_content_type_and_params, permissions_required
+from ..utils import to_iso8601, verify_content_type_and_params, permissions_required
 
 logger = logging.getLogger("pipelines")
 
@@ -24,8 +25,8 @@ def pipeline_to_json(pipeline):
         "docker_image_url": pipeline.docker_image_url,
         "repository_ssh_url": pipeline.repository_ssh_url,
         "repository_branch": pipeline.repository_branch,
-        "created_at": toISO8601(pipeline.created_at),
-        "updated_at": toISO8601(pipeline.updated_at),
+        "created_at": to_iso8601(pipeline.created_at),
+        "updated_at": to_iso8601(pipeline.updated_at),
     }
 
 

@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from marshmallow_enum import EnumField
 
-from .models import RunStateEnum
+from .model_utils import RunStateEnum
 
 
 class InputSchema(Schema):
