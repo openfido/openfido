@@ -73,4 +73,6 @@ def create():
     except ValidationError as ve:
         return {"message": "Validation error", "errors": ve.messages}, 400
     except ValueError:
-        return {"message": "Unable to create workflow",}, 400
+        return {
+            "message": "Unable to create workflow",
+        }, 400
