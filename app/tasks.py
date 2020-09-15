@@ -3,6 +3,7 @@ import os
 import subprocess
 import tempfile
 import urllib
+from os.path import join
 
 from celery import Celery, Task, shared_task
 from celery.utils.log import get_task_logger
@@ -42,28 +43,44 @@ class RunExecutor:
         self.stdout = ""
         self.stderr = ""
 
-    def _make_request(self, path, data):
+    def _make_request(self, path, data, additional_headers, method="PUT"):
         server = current_app.config["WORKER_API_SERVER"]
         url = f"{server}/v1/pipelines/{self.uuid}/runs/{self.run_uuid}/{path}"
         headers = {
             ROLES_KEY: current_app.config[WORKER_API_TOKEN],
-            "content-type": "application/json",
         }
+        headers.update(additional_headers)
 
-        request = urllib_request.Request(
-            url, json.dumps(data).encode("ascii"), headers, method="PUT"
-        )
+        request = urllib_request.Request(url, data, headers, method=method)
         urllib_request.urlopen(request)
+
+    def _put(self, path, data):
+        self._make_request(
+            path,
+            json.dumps(data).encode("ascii"),
+            {
+                "content-type": "application/json",
+            },
+        )
 
     def update_run_output(self, stdout, stderr=""):
         """ Append addition stdout/stderr to run's output. """
+        if len(stdout) == 0 and len(stderr) == 0:
+            # don't make an HTTP request that does nothing (many successful
+            # commands actually don't produce any output at all)
+            return
+
         self.stdout += "\n" + stdout
         self.stderr += "\n" + stderr
         data = {"std_out": self.stdout, "std_err": self.stderr}
-        return self._make_request("console", data)
+        return self._put("console", data)
 
     def update_run_status(self, run_state_enum):
-        return self._make_request("state", {"state": run_state_enum.name})
+        return self._put("state", {"state": run_state_enum.name})
+
+    def upload_artifact(self, filename, location):
+        with open(location) as f:
+            self._make_request(f"artifacts?name={filename}", f, {}, "POST")
 
     def run(self, command, directory):
         """ Execute a command, raise an exception on nonzero error codes. """
@@ -100,38 +117,45 @@ def execute_pipeline(
         executor = RunExecutor(pipeline_uuid, pipeline_run_uuid)
         executor.update_run_status(RunStateEnum.RUNNING)
 
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            gitdirname = f"{tmpdirname}/gitrepo"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            gitdir = join(tmpdir, "gitrepo")
+            inputdir = join(tmpdir, "input")
+            outputdir = join(tmpdir, "output")
 
-            executor.run(f"docker pull {docker_image_url}", tmpdirname)
-            executor.run(f"git clone {repository_ssh_url} gitrepo", tmpdirname)
-            executor.run(f"git checkout {repository_branch}", gitdirname)
+            executor.run(f"docker pull {docker_image_url}", tmpdir)
+            executor.run(f"git clone {repository_ssh_url} gitrepo", tmpdir)
+            executor.run(f"git checkout {repository_branch}", gitdir)
 
-            if not os.path.exists(f"{tmpdirname}/gitrepo/openfido.sh"):
+            if not os.path.exists(join(gitdir, "openfido.sh")):
                 raise ValueError("Openfido.sh does not exist in repository")
 
-            executor.run("mkdir input", gitdirname)
-            executor.run("mkdir output", gitdirname)
+            executor.run("mkdir input", tmpdir)
+            executor.run("mkdir output", tmpdir)
 
             for input_file in input_files:
                 urllib_request.urlretrieve(
-                    input_file["url"], f"{gitdirname}/input/{input_file['name']}"
+                    input_file["url"], join(inputdir, input_file["name"])
                 )
 
-            # input/output should not  be in the github repo
             executor.run(
                 (
                     "docker run --rm "
-                    f"-v {gitdirname}:/tmp/gitrepo "
-                    f"-v {tmpdirname}/input:/tmp/input "
-                    f"-v {tmpdirname}/output:/tmp/output "
+                    f"-v {gitdir}:/tmp/gitrepo "
+                    f"-v {inputdir}:/tmp/input "
+                    f"-v {outputdir}:/tmp/output "
+                    f"-e OPENFIDO_INPUT=/tmp/input "
+                    f"-e OPENFIDO_OUTPUT=/tmp/output "
                     "-w /tmp/gitrepo "
-                    f"{docker_image_url} sh openfido.sh /tmp/input /tmp/output"
+                    f"{docker_image_url} sh openfido.sh"
                 ),
-                gitdirname,
+                gitdir,
             )
 
-            # TODO upload any artifacts that were found.
+            for f in os.listdir(outputdir):
+                if not os.path.isfile(join(outputdir, f)):
+                    next
+                executor.upload_artifact(f, join(outputdir, f))
+
         executor.update_run_status(RunStateEnum.COMPLETED)
     except ValueError as v_e:
         failed(v_e)

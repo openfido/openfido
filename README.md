@@ -126,10 +126,17 @@ Several environmental variables allow this server to be configured.
 ## Worker Configuration
 
 Celery workers only require the following parameters:
- * **WORKER_API_SERVER** =
- * **WORKER_API_TOKEN** =
+ * **WORKER_API_SERVER** = The Workflow API server. Celery workers require access to this Workflow API in
+     order to update pipeline run states, and upload artifacts.
+ * **WORKER_API_TOKEN** = An application access token to access pipeline run
+     endpoints.
  * **CELERY_RESULT_BACKEND** = Location of a [result backend](https://docs.celeryproject.org/en/stable/userguide/configuration.html#result-backend).
  * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
+
+To generate a token that a worker may use to interact with the API, use the
+following command:
+
+    invoke create-application-key -n "local worker" -p PIPELINES_WORKER
 
 ## Deployment
 
