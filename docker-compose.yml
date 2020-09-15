@@ -15,8 +15,8 @@ services:
     image: minio/minio
     command: server /data
     environment:
-      MINIO_ACCESS_KEY: AKIAIOSFODNN7EXAMPLE
-      MINIO_SECRET_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: minio123
     volumes:
       - ./uploads:/data:delegated
   api:
@@ -33,8 +33,8 @@ services:
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@db/workflowservice
       CELERY_RESULT_BACKEND: amqp://rabbit-user:rabbit-password@queue/api-queue
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
-      S3_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-      S3_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://storage:9000
     volumes:
       - .:/opt/app:delegated
@@ -54,8 +54,8 @@ services:
       CELERY_RESULT_BACKEND: amqp://rabbit-user:rabbit-password@queue/api-queue
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
       WORKER_API_SERVER: http://api:5000
-      S3_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
-      S3_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://storage:9000
     env_file:
       - .worker-env
