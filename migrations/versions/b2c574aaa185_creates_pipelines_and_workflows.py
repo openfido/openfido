@@ -1,8 +1,8 @@
-"""Creates pipeline and roles tables
+"""creates pipelines and workflows
 
-Revision ID: e289a4ff1765
+Revision ID: b2c574aaa185
 Revises: 
-Create Date: 2020-09-02 18:38:42.107397
+Create Date: 2020-09-15 17:52:50.805002
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e289a4ff1765'
+revision = 'b2c574aaa185'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -59,6 +59,16 @@ def upgrade():
     sa.Column('code', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('workflow',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('uuid', sa.String(length=32), server_default='', nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('name', sa.String(length=50), nullable=False),
+    sa.Column('description', sa.String(length=300), nullable=False),
+    sa.Column('is_deleted', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('applicationsystempermission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('uuid', sa.String(length=32), server_default='', nullable=False),
@@ -76,13 +86,13 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('sequence', sa.Integer(), nullable=False),
-    sa.Column('pipeline_id', sa.Integer(), nullable=False),
     sa.Column('worker_ip', sa.String(length=50), nullable=True),
     sa.Column('callback_url', sa.String(length=2000), nullable=True),
     sa.Column('started_at', sa.DateTime(), nullable=True),
     sa.Column('completed_at', sa.DateTime(), nullable=True),
     sa.Column('std_out', sa.Unicode(), nullable=True),
     sa.Column('std_err', sa.Unicode(), nullable=True),
+    sa.Column('pipeline_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['pipeline_id'], ['pipeline.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -131,6 +141,7 @@ def downgrade():
     op.drop_table('pipelinerunartifact')
     op.drop_table('pipelinerun')
     op.drop_table('applicationsystempermission')
+    op.drop_table('workflow')
     op.drop_table('systempermission')
     op.drop_table('runstatetype')
     op.drop_table('pipeline')
