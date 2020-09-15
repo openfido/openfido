@@ -4,8 +4,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow.exceptions import ValidationError
 
 from ..model_utils import SystemPermissionEnum
-from ..utils import permissions_required, to_iso8601, verify_content_type
-from .models import db
+from ..utils import permissions_required, verify_content_type
 from .schemas import WorkflowSchema
 from .services import create_workflow
 
@@ -53,8 +52,20 @@ def create():
                   type: string
       "400":
         description: "Bad request"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                errors:
+                  type: object
+            examples:
+              message_and_error:
+                value: { "message": "An error", "errors": { "name": "Must be provided" } }
+                summary: An error with validation messages.
     """
-    # TODO provide better error message formatting.
     try:
         workflow = create_workflow(request.json)
 
@@ -62,6 +73,4 @@ def create():
     except ValidationError as ve:
         return {"message": "Validation error", "errors": ve.messages}, 400
     except ValueError:
-        return {
-            "message": "Unable to create workflow",
-        }, 400
+        return {"message": "Unable to create workflow",}, 400
