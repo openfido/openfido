@@ -155,3 +155,36 @@ def test_get_workflow(client, client_application, workflow):
         "created_at": to_iso8601(workflow.created_at),
         "updated_at": to_iso8601(workflow.updated_at),
     }
+
+
+def test_list_workflows(client, client_application):
+    db.session.commit()
+    result = client.get(
+        "/v1/workflows",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 0
+
+    p1 = Workflow(
+        name="workflow 1",
+        description="a description",
+    )
+    db.session.add(p1)
+    p2 = Workflow(
+        name="workflow 2",
+        description="a description",
+    )
+    db.session.add(p2)
+    db.session.commit()
+
+    result = client.get(
+        "/v1/workflows",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 2
+    assert result.json[0]["name"] == p1.name
+    assert result.json[1]["name"] == p2.name
