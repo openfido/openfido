@@ -20,6 +20,14 @@ def create():
     """Create a Workflow.
     ---
 
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Workflow name and description"
       required: true
@@ -84,6 +92,14 @@ def remove(workflow_uuid):
     """Delete a Workflow.
     ---
 
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Removed"
@@ -106,6 +122,14 @@ def update(workflow_uuid):
     """Update a Workflow.
     ---
 
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Workflow name and description"
       required: true
