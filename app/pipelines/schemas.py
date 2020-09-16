@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from marshmallow_enum import EnumField
 
 from ..model_utils import RunStateEnum
@@ -22,3 +22,9 @@ class UpdateRunStateSchema(Schema):
     """ Validation schema for update_run_status() """
 
     state = EnumField(RunStateEnum)
+
+
+class SearchPipelinesSchema(Schema):
+    """ Schema for find_pipelines() queries. """
+
+    uuids = fields.List(fields.String(validate=validate.Regexp(r"[a-f0-9]{32}")))

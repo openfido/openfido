@@ -1,6 +1,7 @@
 import logging
 
 from flask import Blueprint, jsonify, request
+from marshmallow.exceptions import ValidationError
 
 from .models import db
 from ..model_utils import SystemPermissionEnum
@@ -395,6 +396,21 @@ def search():
                     type: string
       "400":
         description: "Bad request"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                errors:
+                  type: object
+            examples:
+              message_and_error:
+                value: { "message": "An error", "errors": { "name": "invalid uuid format" } }
+                summary: An error with validation messages.
     """
-    uuids = request.json["uuids"]
-    return jsonify(list(map(pipeline_to_json, find_pipelines(uuids))))
+    try:
+        return jsonify(list(map(pipeline_to_json, find_pipelines(request.json))))
+    except ValidationError as ve:
+        return {"message": "Unable to search pipeline", "errors": ve.messages}, 400

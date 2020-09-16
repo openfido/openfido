@@ -250,5 +250,5 @@ def test_search_pipelines(client, client_application, pipeline):
         json={"uuids": "nomatch"},
         headers={ROLES_KEY: client_application.api_key},
     )
-    assert result.status_code == 200
-    assert len(result.json) == 0
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message", "errors"])

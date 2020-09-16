@@ -50,8 +50,10 @@ def test_find_pipelines(app, pipeline):
     db.session.commit()
 
     assert set(find_pipelines()) == set([pipeline, p2])
-    assert set(find_pipelines([p2.uuid, deleted_p.uuid])) == set([p2])
-    assert set(find_pipelines([p2.uuid, pipeline.uuid])) == set([pipeline, p2])
+    assert set(find_pipelines({"uuids": [p2.uuid, deleted_p.uuid]})) == set([p2])
+    assert set(find_pipelines({"uuids": [p2.uuid, pipeline.uuid]})) == set(
+        [pipeline, p2]
+    )
 
 
 def test_find_run_state_type(app):
