@@ -21,6 +21,24 @@ def test_create_workflow_bad_params(app):
     assert workflow.description == "desc"
 
 
+def test_update_workflow_bad_params(app, workflow):
+    with pytest.raises(ValueError):
+        services.update_workflow("no-id", {"name": "", "description": ""})
+    with pytest.raises(ValidationError):
+        services.update_workflow(workflow.uuid, {})
+    with pytest.raises(ValidationError):
+        services.update_workflow(workflow.uuid, {"name": "", "description": ""})
+
+
+def test_update_workflow_bad_params(app, workflow):
+    workflow = services.update_workflow(
+        workflow.uuid, {"name": "updated workflow", "description": "update desc"}
+    )
+    assert workflow.uuid is not None
+    assert workflow.name == "updated workflow"
+    assert workflow.description == "update desc"
+
+
 def test_delete_workflow_no_id(app):
     with pytest.raises(ValueError):
         services.delete_workflow("no-id")

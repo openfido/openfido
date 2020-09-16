@@ -19,6 +19,8 @@ services:
       MINIO_SECRET_KEY: minio123
     volumes:
       - ./uploads:/data:delegated
+    ports:
+      - "9000:9000"
   api:
     build: .
     image: presencepg/presence-workflow
