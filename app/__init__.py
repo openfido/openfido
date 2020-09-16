@@ -41,7 +41,7 @@ def create_app(config=None):
     app.config.from_object("app.default_settings")
 
     environmental_vars = dict(
-        (var, os.environ.get(var)) for var in os.environ.keys() if var in CONFIG_VARS
+        (var, os.environ.get(var)) for var in os.environ if var in CONFIG_VARS
     )
 
     app.config.from_mapping(environmental_vars)

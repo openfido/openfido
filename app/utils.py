@@ -20,6 +20,8 @@ permissions_required = make_permission_decorator(SystemPermissionEnum)
 
 
 def get_s3():
+    """ Get access to the Boto s3 service. """
+
     params = {
         "endpoint_url": current_app.config[S3_ENDPOINT_URL],
         "config": Config(signature_version="s3v4"),
@@ -72,7 +74,8 @@ def verify_content_type_and_params(required_keys, optional_keys):
             request_keys = set(request.json.keys())
             if not required_set <= request_keys:
                 message = (
-                    f"create: invalid payload keys {list(request.json.keys())}, requires {required_keys}",
+                    f"create: invalid payload keys {list(request.json.keys())}, "
+                    + f"requires {required_keys}",
                 )
                 logger.warning(message)
                 return {"message": message}, 400

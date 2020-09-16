@@ -6,7 +6,7 @@ from urllib.error import URLError
 import pytest
 from marshmallow.exceptions import ValidationError
 
-from app.constants import S3_BUCKET
+from app.constants import S3_BUCKET, CALLBACK_TIMEOUT
 from app.model_utils import RunStateEnum
 from app.pipelines import services
 from app.pipelines.models import db
@@ -206,7 +206,7 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
             "pipeline_run_uuid": pipeline_run.uuid,
             "state": RunStateEnum.RUNNING.name,
         }
-        assert timeout == services.CALLBACK_TIMEOUT
+        assert timeout == CALLBACK_TIMEOUT
 
     monkeypatch.setattr(services.urllib_request, "urlopen", mock_urlopen)
 
