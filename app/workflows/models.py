@@ -4,10 +4,50 @@ db = get_db()
 
 
 class Workflow(CommonColumnsMixin, db.Model):
-    """ Represents a Workflow: a collection of connected pipelines. """
+    """ A collection of connected pipelines and runs. """
 
     __tablename__ = "workflow"
 
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(300), nullable=False)
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
+    workflow_pipelines = db.relationship(
+        "WorkflowPipeline", backref="workflow", lazy="select"
+    )
+
+
+class WorkflowPipeline(CommonColumnsMixin, db.Model):
+    """ A pipeline that is part of a workflow. """
+
+    __tablename__ = "workflow_pipeline"
+
+    pipeline_id = db.Column(db.Integer, db.ForeignKey("pipeline.id"), nullable=False)
+    workflow_id = db.Column(db.Integer, db.ForeignKey("workflow.id"), nullable=False)
+
+    source_workflow_pipelines = db.relationship(
+        "WorkflowPipelineDependency", backref="source_workflow_pipeline", lazy="select",
+        foreign_keys="[WorkflowPipelineDependency.source_workflow_pipeline_id]"
+    )
+
+    dest_workflow_pipelines = db.relationship(
+        "WorkflowPipelineDependency", backref="dest_workflow_pipeline", lazy="select",
+        foreign_keys="[WorkflowPipelineDependency.dest_workflow_pipeline_id]"
+    )
+
+    def __repr__(self):
+        return f"<WorkflowPipeline {self.id}: {self.workflow.name}->{self.pipeline.name}>"
+
+
+class WorkflowPipelineDependency(CommonColumnsMixin, db.Model):
+    """ A dependency between pipelines. """
+
+    __tablename__ = "workflow_pipeline_dependency"
+
+    source_workflow_pipeline_id = db.Column(
+        db.Integer, db.ForeignKey("workflow_pipeline.id"), nullable=False
+    )
+
+    dest_workflow_pipeline_id = db.Column(
+        db.Integer, db.ForeignKey("workflow_pipeline.id"), nullable=False
+    )
