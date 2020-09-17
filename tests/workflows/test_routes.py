@@ -126,3 +126,32 @@ def test_update_workflow(client, client_application, workflow):
         "created_at": to_iso8601(workflow.created_at),
         "updated_at": to_iso8601(workflow.updated_at),
     }
+
+
+def test_get_workflow_failure(client, client_application):
+    db.session.commit()
+    result = client.get(
+        "/v1/workflows/no-id",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message"])
+
+
+def test_get_workflow(client, client_application, workflow):
+    db.session.commit()
+    result = client.get(
+        f"/v1/workflows/{workflow.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    workflow = Workflow.query.filter(Workflow.name == workflow.name).one_or_none()
+    assert result.json == {
+        "uuid": workflow.uuid,
+        "name": workflow.name,
+        "description": workflow.description,
+        "created_at": to_iso8601(workflow.created_at),
+        "updated_at": to_iso8601(workflow.updated_at),
+    }

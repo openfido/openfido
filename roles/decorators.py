@@ -22,8 +22,11 @@ def make_permission_decorator(permissions_enum):
             @wraps(view)
             def wrapper(*args, **kwargs):
                 if ROLES_KEY not in request.headers:
-                    logger.warning("no authorization header")
-                    return {}, 401
+                    message = "no authorization header"
+                    logger.warning(message)
+                    return {
+                        "message": message
+                    }, 401
 
                 g.api_key = request.headers[ROLES_KEY]
 
@@ -31,8 +34,11 @@ def make_permission_decorator(permissions_enum):
                     required_permission = permissions_enum(permission)
 
                     if not is_permitted(g.api_key, required_permission):
-                        logger.warning(f"no permission found for {required_permission.name}")
-                        return {}, 401
+                        message = f"no permission found for {required_permission.name}"
+                        logger.warning(message)
+                        return {
+                            "message": message
+                        }, 401
 
                 return view(*args, **kwargs)
 

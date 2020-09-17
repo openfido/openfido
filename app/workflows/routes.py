@@ -5,6 +5,7 @@ from marshmallow.exceptions import ValidationError
 
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
+from .queries import find_workflow
 from .schemas import WorkflowSchema
 from .services import create_workflow, update_workflow, delete_workflow
 
@@ -79,11 +80,72 @@ def create():
 
         return jsonify(WorkflowSchema().dump(workflow))
     except ValidationError as ve:
+        logger.warning(ve)
         return {"message": "Validation error", "errors": ve.messages}, 400
-    except ValueError:
+    except ValueError as e:
+        logger.warning(e)
         return {
             "message": "Unable to create workflow",
         }, 400
+
+
+@workflow_bp.route("/<workflow_uuid>", methods=["GET"])
+@verify_content_type()
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def get(workflow_uuid):
+    """Get a Workflow.
+    ---
+
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Found"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                errors:
+                  type: object
+            examples:
+              message_and_error:
+                value: { "message": "An error occurred" }
+                summary: An error occurred
+    """
+    workflow = find_workflow(workflow_uuid)
+    if workflow is None:
+        logger.warning("no workflow found")
+        return {
+            "message": "Unable to get workflow",
+        }, 400
+
+    return jsonify(WorkflowSchema().dump(workflow))
 
 
 @workflow_bp.route("/<workflow_uuid>", methods=["DELETE"])
@@ -181,8 +243,10 @@ def update(workflow_uuid):
 
         return jsonify(WorkflowSchema().dump(workflow))
     except ValidationError as ve:
+        logger.warning(ve)
         return {"message": "Validation error", "errors": ve.messages}, 400
-    except ValueError:
+    except ValueError as e:
+        logger.warning(e)
         return {
             "message": "Unable to update workflow",
         }, 400
