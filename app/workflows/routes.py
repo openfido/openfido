@@ -5,7 +5,7 @@ from marshmallow.exceptions import ValidationError
 
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
-from .queries import find_workflow
+from .queries import find_workflow, find_workflows
 from .schemas import WorkflowSchema
 from .services import create_workflow, update_workflow, delete_workflow
 
@@ -87,6 +87,62 @@ def create():
         return {
             "message": "Unable to create workflow",
         }, 400
+
+
+@workflow_bp.route("", methods=["GET"])
+@verify_content_type()
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def list():
+    """List Workflows.
+    ---
+
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Found"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+      "400":
+        description: "Bad request"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                errors:
+                  type: object
+            examples:
+              message_and_error:
+                value: { "message": "An error occurred" }
+                summary: An error occurred
+    """
+    workflows = find_workflows()
+
+    return jsonify([WorkflowSchema().dump(w) for w in workflows])
 
 
 @workflow_bp.route("/<workflow_uuid>", methods=["GET"])

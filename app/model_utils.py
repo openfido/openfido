@@ -37,6 +37,7 @@ class RunStateEnum(IntEnum):
 
 
 def get_db(path=os.environ.get("SQLACHEMY_DB_INSTANCE", None)):
+    """ Get access to an instance of the SqlAchemy database. """
     if path is None:
         return db
 
@@ -44,7 +45,9 @@ def get_db(path=os.environ.get("SQLACHEMY_DB_INSTANCE", None)):
     return db_import.db
 
 
-class CommonColumnsMixin(object):
+class CommonColumnsMixin:
+    """ id, uuid, created_at and updated_at SqlAchemy mixin. """
+
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(
         db.String(32),
