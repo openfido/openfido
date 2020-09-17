@@ -45,7 +45,14 @@ def pipeline_to_json(pipeline):
 def create():
     """Create a pipeline.
     ---
-
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true
@@ -113,6 +120,14 @@ def create():
 def get(pipeline_uuid):
     """Get a pipeline.
     ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     parameters:
       - name: uuid
         in: path
@@ -158,7 +173,14 @@ def get(pipeline_uuid):
 def remove(pipeline_uuid):
     """Delete a pipeline.
     ---
+    tags:
+      - pipelines
     parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
       - name: uuid
         in: path
         required: true
@@ -184,6 +206,14 @@ def remove(pipeline_uuid):
 def list_pipelines():
     """List all pipelines.
     ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Listed"
@@ -233,6 +263,14 @@ def update(pipeline_uuid):
     """Update a pipeline.
     ---
 
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true
@@ -306,6 +344,14 @@ def search():
     """Search for pipelines with specific UUIDs.
     ---
 
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true
