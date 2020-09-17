@@ -45,7 +45,14 @@ def pipeline_to_json(pipeline):
 def create():
     """Create a pipeline.
     ---
-
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true
@@ -104,7 +111,7 @@ def create():
 
         return jsonify(pipeline_to_json(pipeline))
     except ValueError:
-        return {}, 400
+        return {"message": "Unable to create pipeline"}, 400
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
@@ -113,6 +120,14 @@ def create():
 def get(pipeline_uuid):
     """Get a pipeline.
     ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     parameters:
       - name: uuid
         in: path
@@ -147,7 +162,7 @@ def get(pipeline_uuid):
     """
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
-        return {}, 404
+        return {"message": "Pipeline not found"}, 404
 
     return jsonify(pipeline_to_json(pipeline))
 
@@ -158,7 +173,14 @@ def get(pipeline_uuid):
 def remove(pipeline_uuid):
     """Delete a pipeline.
     ---
+    tags:
+      - pipelines
     parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
       - name: uuid
         in: path
         required: true
@@ -173,7 +195,9 @@ def remove(pipeline_uuid):
         delete_pipeline(pipeline_uuid)
         return {}, 200
     except ValueError:
-        return {}, 400
+        return {
+            "message": "Unable to delete workflow",
+        }, 400
 
 
 @pipeline_bp.route("", methods=["GET"])
@@ -182,6 +206,14 @@ def remove(pipeline_uuid):
 def list_pipelines():
     """List all pipelines.
     ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Listed"
@@ -231,6 +263,14 @@ def update(pipeline_uuid):
     """Update a pipeline.
     ---
 
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true
@@ -294,7 +334,7 @@ def update(pipeline_uuid):
 
         return jsonify(pipeline_to_json(pipeline))
     except ValueError:
-        return {}, 400
+        return {"message": "Unable to update pipeline"}, 400
 
 
 @pipeline_bp.route("/search", methods=["POST"])
@@ -304,6 +344,14 @@ def search():
     """Search for pipelines with specific UUIDs.
     ---
 
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "Pipeline description and configuration."
       required: true

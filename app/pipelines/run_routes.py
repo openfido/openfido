@@ -55,6 +55,14 @@ def create_run(pipeline_uuid):
     """Create a new pipeline run.
     ---
 
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     requestBody:
       description: "A list of inputs"
       required: true
@@ -138,6 +146,15 @@ def create_run(pipeline_uuid):
 def get_run(pipeline_uuid, pipeline_run_uuid):
     """Get a pipeline run.
     ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Fetched"
@@ -201,6 +218,15 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
 def get_runs(pipeline_uuid):
     """Get a all pipeline runs for a pipeline.
     ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Fetched"
@@ -261,6 +287,15 @@ def get_runs(pipeline_uuid):
 def get_run_output(pipeline_uuid, pipeline_run_uuid):
     """Get the console output of a run.
     ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
     responses:
       "200":
         description: "Fetched"
@@ -298,6 +333,15 @@ def get_run_output(pipeline_uuid, pipeline_run_uuid):
 def upload_run_output(pipeline_uuid, pipeline_run_uuid):
     """Update the console output.
     ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_WORKER
+        schema:
+          type: string
     requestBody:
       description: "standard output and error"
       required: true
@@ -339,6 +383,15 @@ def upload_run_output(pipeline_uuid, pipeline_run_uuid):
 def upload_run_state(pipeline_uuid, pipeline_run_uuid):
     """Update a run state.
     ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_WORKER
+        schema:
+          type: string
     requestBody:
       description: "run state"
       required: true
@@ -383,7 +436,15 @@ def upload_run_state(pipeline_uuid, pipeline_run_uuid):
 def upload_run_artifact(pipeline_uuid, pipeline_run_uuid):
     """Upload an artifact associated with a pipeline run.
     ---
+
+    tags:
+      - pipeline runs
     parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_WORKER
+        schema:
+          type: string
       - in: query
         name: name
         schema:

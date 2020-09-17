@@ -3,7 +3,7 @@ from sqlalchemy import and_
 
 
 def find_pipeline(uuid):
-    """ Find a pipelines """
+    """ Find a pipeline """
     return Pipeline.query.filter(
         and_(
             Pipeline.uuid == uuid,
