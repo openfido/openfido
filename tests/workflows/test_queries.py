@@ -23,20 +23,20 @@ def test_find_workflows_no_workflows(app):
 
 
 def test_find_workflows(app, workflow):
-    p2 = Workflow(
+    w2 = Workflow(
         name="workflow 2",
         description="description 2",
     )
-    deleted_p = Workflow(
+    deleted_w = Workflow(
         name="a workflow", description="a description", is_deleted=True
     )
-    db.session.add(p2)
-    db.session.add(deleted_p)
+    db.session.add(w2)
+    db.session.add(deleted_w)
     db.session.commit()
 
-    assert set(queries.find_workflows()) == set([workflow, p2])
-    assert set(queries.find_workflows([p2.uuid, deleted_p.uuid])) == set([p2])
-    assert set(queries.find_workflows([p2.uuid, workflow.uuid])) == set([workflow, p2])
+    assert set(queries.find_workflows()) == set([workflow, w2])
+    assert set(queries.find_workflows([w2.uuid, deleted_w.uuid])) == set([w2])
+    assert set(queries.find_workflows([w2.uuid, workflow.uuid])) == set([workflow, w2])
 
 
 def test_is_dag(app, workflow, pipeline):

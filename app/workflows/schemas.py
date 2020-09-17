@@ -17,7 +17,7 @@ class WorkflowSchema(Schema):
 class SearchWorkflowsSchema(Schema):
     """ Schema for find_workflows() queries. """
 
-    uuids = fields.Nested(fields.UUID(), many=True)
+    uuids = fields.List(fields.UUID(), many=True)
 
 
 class CreateWorkflowSchema(Schema):

@@ -411,6 +411,7 @@ def search():
                 summary: An error with validation messages.
     """
     try:
-        return jsonify(list(map(pipeline_to_json, find_pipelines(request.json))))
+        print(find_pipelines(request.json))
+        return jsonifdy(list(map(pipeline_to_json, find_pipelines(request.json))))
     except ValidationError as ve:
         return {"message": "Unable to search pipeline", "errors": ve.messages}, 400
