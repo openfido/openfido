@@ -142,7 +142,7 @@ def get(workflow_uuid):
     if workflow is None:
         logger.warning("no workflow found")
         return {
-            "message": "Unable to create workflow",
+            "message": "Unable to get workflow",
         }, 400
 
     return jsonify(WorkflowSchema().dump(workflow))
