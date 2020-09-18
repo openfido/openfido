@@ -1,7 +1,7 @@
 from app.pipelines.queries import find_pipeline
 
 from .models import Workflow, db, WorkflowPipeline, WorkflowPipelineDependency
-from .queries import find_workflow, find_workflow_pipeline
+from .queries import find_workflow, find_workflow_pipeline, is_dag
 from .schemas import CreateWorkflowSchema, CreateWorkflowPipelineSchema
 
 
@@ -56,8 +56,6 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
     if pipeline is None:
         raise ValueError(f"Pipeline {pipeline} not found")
 
-    # TODO detect DAG
-
     workflow_pipeline = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
     db.session.add(workflow_pipeline)
 
@@ -67,9 +65,15 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
             db.session.rollback()
             raise ValueError(f"WorkflowPipeline {workflow_pipeline_uuid} not found")
 
+        if not is_dag(workflow, workflow_pipeline, source_workflow_pipeline):
+            db.session.rollback()
+            raise ValueError(
+                f"Adding source_workflow_pipelines {workflow_pipeline_uuid} introduces a cycle."
+            )
+
         source_to_wp = WorkflowPipelineDependency(
-            to_workflow_pipeline=source_workflow_pipeline,
             from_workflow_pipeline=workflow_pipeline,
+            to_workflow_pipeline=source_workflow_pipeline,
         )
         db.session.add(source_to_wp)
 
@@ -78,6 +82,12 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
         if dest_workflow_pipeline is None:
             db.session.rollback()
             raise ValueError(f"WorkflowPipeline {workflow_pipeline_uuid} not found")
+
+        if not is_dag(workflow, workflow_pipeline, dest_workflow_pipeline):
+            db.session.rollback()
+            raise ValueError(
+                f"Adding dest_workflow_pipelines {workflow_pipeline_uuid} introduces a cycle."
+            )
 
         wp_to_dest = WorkflowPipelineDependency(
             to_workflow_pipeline=workflow_pipeline,

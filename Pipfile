@@ -22,6 +22,7 @@ simplejson = "*"
 marshmallow = "*"
 marshmallow_enum = "*"
 boto3 = "*"
+networkx = "*"
 
 [requires]
 python_version = "3.7"

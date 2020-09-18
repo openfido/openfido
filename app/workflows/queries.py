@@ -1,5 +1,6 @@
-from .models import Workflow, WorkflowPipeline
-from sqlalchemy import and_
+from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from sqlalchemy import and_, or_
+import networkx as nx
 
 
 def find_workflow(uuid):
@@ -34,3 +35,42 @@ def find_workflow_pipeline(workflow_pipeline_uuid):
         )
         .one_or_none()
     )
+
+
+def find_workflow_pipeline_dependencies(workflow_uuid):
+    workflow_pipeline_sq = (
+        db.session.query(WorkflowPipeline.id)
+        .join(Workflow)
+        .filter(
+            Workflow.is_deleted == False,
+            Workflow.uuid == workflow_uuid,
+        )
+        .subquery("workflow_pipeline_sq")
+    )
+    return WorkflowPipelineDependency.query.filter(
+        or_(
+            WorkflowPipelineDependency.from_workflow_pipeline_id.in_(
+                workflow_pipeline_sq
+            ),
+            WorkflowPipelineDependency.to_workflow_pipeline_id.in_(
+                workflow_pipeline_sq
+            ),
+        )
+    )
+
+
+def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
+    """Returns True if the graph supplied a directed acyclic graph and adding a
+    new edge would not introduce a cycle."""
+
+    dependencies = find_workflow_pipeline_dependencies(workflow.uuid)
+    digraph = nx.DiGraph()
+    for dependency in dependencies:
+        digraph.add_edge(
+            dependency.from_workflow_pipeline_id, dependency.to_workflow_pipeline_id
+        )
+
+    if from_workflow_pipeline is not None and to_workflow_pipeline is not None:
+        digraph.add_edge(from_workflow_pipeline.id, to_workflow_pipeline.id)
+
+    return nx.is_directed_acyclic_graph(digraph)

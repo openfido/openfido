@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from marshmallow.exceptions import ValidationError
 
@@ -109,6 +111,41 @@ def test_create_workflow_pipeline_no_dest(app, pipeline, workflow):
         ).one_or_none()
         is None
     )
+
+
+@patch("app.workflows.services.is_dag")
+def test_create_workflow_pipeline_from_cycle(is_dag_mock, app, pipeline, workflow):
+    is_dag_mock.return_value = False
+
+    workflow_pipeline = services.create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [],
+            "destination_workflow_pipelines": [],
+        },
+    )
+
+    with pytest.raises(ValueError):
+        services.create_workflow_pipeline(
+            workflow.uuid,
+            {
+                "pipeline_uuid": pipeline.uuid,
+                "source_workflow_pipelines": [workflow_pipeline.uuid],
+                "destination_workflow_pipelines": [],
+            },
+        )
+
+    with pytest.raises(ValueError):
+        services.create_workflow_pipeline(
+            workflow.uuid,
+            {
+                "pipeline_uuid": pipeline.uuid,
+                "source_workflow_pipelines": [],
+                "destination_workflow_pipelines": [workflow_pipeline.uuid],
+            },
+        )
+
 
 
 def test_create_workflow_pipeline(app, pipeline, workflow):
