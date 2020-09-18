@@ -6,6 +6,7 @@ from marshmallow.exceptions import ValidationError
 from .models import db
 from ..model_utils import SystemPermissionEnum
 from .queries import find_pipeline, find_pipelines
+from .schemas import PipelineSchema
 from .services import (
     create_pipeline,
     delete_pipeline,
@@ -16,21 +17,6 @@ from ..utils import to_iso8601, verify_content_type_and_params, permissions_requ
 logger = logging.getLogger("pipelines")
 
 pipeline_bp = Blueprint("pipelines", __name__)
-
-
-def pipeline_to_json(pipeline):
-    """ Deprecated - replace with marshmallow serialization """
-
-    return {
-        "uuid": pipeline.uuid,
-        "name": pipeline.name,
-        "description": pipeline.description,
-        "docker_image_url": pipeline.docker_image_url,
-        "repository_ssh_url": pipeline.repository_ssh_url,
-        "repository_branch": pipeline.repository_branch,
-        "created_at": to_iso8601(pipeline.created_at),
-        "updated_at": to_iso8601(pipeline.updated_at),
-    }
 
 
 @pipeline_bp.route("", methods=["POST"])
@@ -112,7 +98,7 @@ def create():
         )
         db.session.commit()
 
-        return jsonify(pipeline_to_json(pipeline))
+        return jsonify(PipelineSchema().dump(pipeline))
     except ValueError:
         return {"message": "Unable to create pipeline"}, 400
 
@@ -167,7 +153,7 @@ def get(pipeline_uuid):
     if pipeline is None:
         return {"message": "Pipeline not found"}, 404
 
-    return jsonify(pipeline_to_json(pipeline))
+    return jsonify(PipelineSchema().dump(pipeline))
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["DELETE"])
@@ -247,7 +233,7 @@ def list_pipelines():
         description: "Bad request"
     """
     pipelines = find_pipelines()
-    return jsonify(list(map(pipeline_to_json, pipelines)))
+    return jsonify([PipelineSchema().dump(p) for p in pipelines])
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["PUT"])
@@ -335,7 +321,7 @@ def update(pipeline_uuid):
         )
         db.session.commit()
 
-        return jsonify(pipeline_to_json(pipeline))
+        return jsonify(PipelineSchema().dump(pipeline))
     except ValueError:
         return {"message": "Unable to update pipeline"}, 400
 
@@ -411,7 +397,8 @@ def search():
                 summary: An error with validation messages.
     """
     try:
-        print(find_pipelines(request.json))
-        return jsonifdy(list(map(pipeline_to_json, find_pipelines(request.json))))
+        pipelines = find_pipelines(request.json)
+
+        return jsonify([PipelineSchema().dump(p) for p in pipelines])
     except ValidationError as ve:
         return {"message": "Unable to search pipeline", "errors": ve.messages}, 400

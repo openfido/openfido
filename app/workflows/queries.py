@@ -20,7 +20,7 @@ def find_workflows(uuids=None):
     """ Find all workflows, or a list of them. """
     query = Workflow.query.filter(Workflow.is_deleted == False)
 
-    if uuids is not None:\
+    if uuids is not None:
         data = SearchWorkflowsSchema().load(uuids)
         query = query.filter(Workflow.uuid.in_(map(str, data["uuids"])))
 

@@ -204,7 +204,7 @@ def test_search_workflows(client, client_application, workflow):
     result = client.post(
         "/v1/workflows/search",
         content_type="application/json",
-        json={"uuids": "nomatch"},
+        json={"uuids": ["nomatch"]},
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 200

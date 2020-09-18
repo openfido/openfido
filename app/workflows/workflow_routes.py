@@ -6,23 +6,13 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
 from .queries import find_workflow, find_workflows
-from .schemas import WorkflowSchema
+from .schemas import WorkflowSchema, SearchWorkflowsSchema
 from .services import create_workflow, update_workflow, delete_workflow
 from ..utils import to_iso8601, verify_content_type_and_params, permissions_required
 
 logger = logging.getLogger("workflows")
 
 workflow_bp = Blueprint("workflow", __name__)
-
-
-def workflow_to_json(workflow):
-    return {
-        "uuid": workflow.uuid,
-        "name": workflow.name,
-        "description": workflow.description,
-        "created_at": to_iso8601(workflow.created_at),
-        "updated_at": to_iso8601(workflow.updated_at),
-    }
 
 
 @workflow_bp.route("", methods=["POST"])
@@ -380,11 +370,12 @@ def search():
                   type: object
             examples:
               message_and_error:
-                value: { "message": "An error", "errors": { "name": "invalid uuid format" } }
+                value: { "message": "Unable to search workflow", "errors": { "name": "invalid uuid format" } }
                 summary: An error with validation messages.
     """
     try:
-        print(find_workflows(request.json))
-        return jsonify(list(map(workflow_to_json, find_workflows(request.json))))
+        workflows = find_workflows(request.json)
+
+        return jsonify([WorkflowSchema().dump(w) for w in workflows])
     except ValidationError as ve:
         return {"message": "Unable to search workflow", "errors": ve.messages}, 400

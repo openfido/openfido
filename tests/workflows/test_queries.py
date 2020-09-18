@@ -35,8 +35,8 @@ def test_find_workflows(app, workflow):
     db.session.commit()
 
     assert set(queries.find_workflows()) == set([workflow, w2])
-    assert set(queries.find_workflows([w2.uuid, deleted_w.uuid])) == set([w2])
-    assert set(queries.find_workflows([w2.uuid, workflow.uuid])) == set([workflow, w2])
+    assert set(queries.find_workflows({"uuids": [w2.uuid, deleted_w.uuid]})) == set([w2])
+    assert set(queries.find_workflows({"uuids": [w2.uuid, workflow.uuid]})) == set([workflow, w2])
 
 
 def test_is_dag(app, workflow, pipeline):
