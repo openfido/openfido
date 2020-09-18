@@ -26,13 +26,13 @@ class WorkflowPipeline(CommonColumnsMixin, db.Model):
     workflow_id = db.Column(db.Integer, db.ForeignKey("workflow.id"), nullable=False)
 
     source_workflow_pipelines = db.relationship(
-        "WorkflowPipelineDependency", backref="source_workflow_pipeline", lazy="select",
-        foreign_keys="[WorkflowPipelineDependency.source_workflow_pipeline_id]"
+        "WorkflowPipelineDependency", backref="from_workflow_pipeline", lazy="select",
+        foreign_keys="[WorkflowPipelineDependency.from_workflow_pipeline_id]"
     )
 
     dest_workflow_pipelines = db.relationship(
-        "WorkflowPipelineDependency", backref="dest_workflow_pipeline", lazy="select",
-        foreign_keys="[WorkflowPipelineDependency.dest_workflow_pipeline_id]"
+        "WorkflowPipelineDependency", backref="to_workflow_pipeline", lazy="select",
+        foreign_keys="[WorkflowPipelineDependency.to_workflow_pipeline_id]"
     )
 
     def __repr__(self):
@@ -44,10 +44,10 @@ class WorkflowPipelineDependency(CommonColumnsMixin, db.Model):
 
     __tablename__ = "workflow_pipeline_dependency"
 
-    source_workflow_pipeline_id = db.Column(
+    from_workflow_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("workflow_pipeline.id"), nullable=False
     )
 
-    dest_workflow_pipeline_id = db.Column(
+    to_workflow_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("workflow_pipeline.id"), nullable=False
     )

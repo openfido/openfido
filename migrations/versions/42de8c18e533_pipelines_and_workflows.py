@@ -1,8 +1,8 @@
 """pipelines and workflows
 
-Revision ID: 5951b6064367
+Revision ID: 42de8c18e533
 Revises: 
-Create Date: 2020-09-17 15:59:00.767940
+Create Date: 2020-09-17 20:06:42.570771
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5951b6064367'
+revision = '42de8c18e533'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -147,10 +147,10 @@ def upgrade():
     sa.Column('uuid', sa.String(length=32), server_default='', nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('source_workflow_pipeline_id', sa.Integer(), nullable=False),
-    sa.Column('dest_workflow_pipeline_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['dest_workflow_pipeline_id'], ['workflow_pipeline.id'], ),
-    sa.ForeignKeyConstraint(['source_workflow_pipeline_id'], ['workflow_pipeline.id'], ),
+    sa.Column('from_workflow_pipeline_id', sa.Integer(), nullable=False),
+    sa.Column('to_workflow_pipeline_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['from_workflow_pipeline_id'], ['workflow_pipeline.id'], ),
+    sa.ForeignKeyConstraint(['to_workflow_pipeline_id'], ['workflow_pipeline.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

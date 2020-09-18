@@ -1,6 +1,8 @@
-from .models import Workflow, db
-from .queries import find_workflow
-from .schemas import CreateWorkflowSchema
+from app.pipelines.queries import find_pipeline
+
+from .models import Workflow, db, WorkflowPipeline, WorkflowPipelineDependency
+from .queries import find_workflow, find_workflow_pipeline
+from .schemas import CreateWorkflowSchema, CreateWorkflowPipelineSchema
 
 
 def create_workflow(workflow_json):
@@ -40,3 +42,50 @@ def delete_workflow(workflow_uuid):
 
     workflow.is_deleted = True
     db.session.commit()
+
+
+def create_workflow_pipeline(workflow_uuid, pipeline_json):
+    """ Create a WorkflowPipeline """
+    workflow = find_workflow(workflow_uuid)
+    if workflow is None:
+        raise ValueError("no workflow found")
+
+    data = CreateWorkflowPipelineSchema().load(pipeline_json)
+
+    pipeline = find_pipeline(data["pipeline_uuid"])
+    if pipeline is None:
+        raise ValueError(f"Pipeline {pipeline} not found")
+
+    # TODO detect DAG
+
+    workflow_pipeline = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    db.session.add(workflow_pipeline)
+    # db.session.begin_nested()
+
+    for workflow_pipeline_uuid in data["source_workflow_pipelines"]:
+        source_workflow_pipeline = find_workflow_pipeline(workflow_pipeline_uuid)
+        if workflow_pipeline is None:
+            # TODO abort session
+            raise ValueError(f"WorkflowPipeline {source_workflow_pipeline_uuid} not found")
+
+        source_to_wp = WorkflowPipelineDependency(
+            from_workflow_pipeline=source_workflow_pipeline,
+            to_workflow_pipeline=workflow_pipeline,
+        )
+        db.session.add(source_to_wp)
+
+    for workflow_pipeline_uuid in data["destination_workflow_pipelines"]:
+        dest_workflow_pipeline = find_workflow_pipeline(workflow_pipeline_uuid)
+        if workflow_pipeline is None:
+            # session abort
+            raise ValueError(f"WorkflowPipeline {dest_workflow_pipeline_uuid} not found")
+
+        wp_to_dest = WorkflowPipelineDependency(
+            from_workflow_pipeline=workflow_pipeline,
+            to_workflow_pipeline=dest_workflow_pipeline,
+        )
+        db.session.add(wp_to_dest)
+
+    db.session.commit()
+
+    return workflow_pipeline
