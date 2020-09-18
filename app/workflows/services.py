@@ -60,29 +60,28 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
 
     workflow_pipeline = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
     db.session.add(workflow_pipeline)
-    # db.session.begin_nested()
 
     for workflow_pipeline_uuid in data["source_workflow_pipelines"]:
         source_workflow_pipeline = find_workflow_pipeline(workflow_pipeline_uuid)
-        if workflow_pipeline is None:
-            # TODO abort session
-            raise ValueError(f"WorkflowPipeline {source_workflow_pipeline_uuid} not found")
+        if source_workflow_pipeline is None:
+            db.session.rollback()
+            raise ValueError(f"WorkflowPipeline {workflow_pipeline_uuid} not found")
 
         source_to_wp = WorkflowPipelineDependency(
-            from_workflow_pipeline=source_workflow_pipeline,
-            to_workflow_pipeline=workflow_pipeline,
+            to_workflow_pipeline=source_workflow_pipeline,
+            from_workflow_pipeline=workflow_pipeline,
         )
         db.session.add(source_to_wp)
 
     for workflow_pipeline_uuid in data["destination_workflow_pipelines"]:
         dest_workflow_pipeline = find_workflow_pipeline(workflow_pipeline_uuid)
-        if workflow_pipeline is None:
-            # session abort
-            raise ValueError(f"WorkflowPipeline {dest_workflow_pipeline_uuid} not found")
+        if dest_workflow_pipeline is None:
+            db.session.rollback()
+            raise ValueError(f"WorkflowPipeline {workflow_pipeline_uuid} not found")
 
         wp_to_dest = WorkflowPipelineDependency(
-            from_workflow_pipeline=workflow_pipeline,
-            to_workflow_pipeline=dest_workflow_pipeline,
+            to_workflow_pipeline=workflow_pipeline,
+            from_workflow_pipeline=dest_workflow_pipeline,
         )
         db.session.add(wp_to_dest)
 

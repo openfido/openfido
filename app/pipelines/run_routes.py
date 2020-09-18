@@ -19,6 +19,7 @@ run_bp = Blueprint("pipeline-runs", __name__)
 
 
 def pipeline_run_to_json(pipeline_run):
+    """ Deprecated - replace with marshmallow. """
     return {
         "uuid": pipeline_run.uuid,
         "sequence": pipeline_run.sequence,
@@ -133,8 +134,8 @@ def create_run(pipeline_uuid):
         pipeline_run = create_pipeline_run(pipeline_uuid, request.json)
 
         return jsonify(pipeline_run_to_json(pipeline_run))
-    except ValidationError as e:
-        logger.warning(e)
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
         return {}, 400
     except ValueError:
         logger.warning("unable to create pipeline run")
@@ -421,11 +422,11 @@ def upload_run_state(pipeline_uuid, pipeline_run_uuid):
 
     try:
         update_pipeline_run_state(pipeline_run.uuid, request.json)
-    except ValidationError as e:
-        logger.warning(e)
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
         return {}, 400
-    except ValueError as e:
-        logger.warning(e)
+    except ValueError as value_err:
+        logger.warning(value_err)
         return {}, 400
 
     return {}, 200
@@ -481,6 +482,6 @@ def upload_run_artifact(pipeline_uuid, pipeline_run_uuid):
     try:
         create_pipeline_run_artifact(pipeline_run.uuid, filename, request)
         return {}, 200
-    except ValueError as e:
-        logger.warning(e)
+    except ValueError as value_err:
+        logger.warning(value_err)
         return {}, 400

@@ -21,7 +21,9 @@ class Pipeline(CommonColumnsMixin, db.Model):
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     pipeline_runs = db.relationship("PipelineRun", backref="pipeline", lazy="select")
-    workflow_pipelines = db.relationship("WorkflowPipeline", backref="pipeline", lazy="select")
+    workflow_pipelines = db.relationship(
+        "WorkflowPipeline", backref="pipeline", lazy="select"
+    )
 
 
 class RunStateType(CommonColumnsMixin, db.Model):

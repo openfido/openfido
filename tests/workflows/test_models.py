@@ -1,4 +1,10 @@
-from app.workflows.models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from app.workflows.models import (
+    db,
+    Workflow,
+    WorkflowPipeline,
+    WorkflowPipelineDependency,
+)
+
 
 def test_workflow_pipeline(app, workflow, pipeline):
     # a workflow initially has no pipelines

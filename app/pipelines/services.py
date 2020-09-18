@@ -41,6 +41,7 @@ def delete_pipeline(pipeline_uuid):
 def _validate_pipeline_params(
     name, description, docker_image_url, repository_ssh_url, repository_branch
 ):
+    """ Deprecated - replace with marshmallow validation. """
     if len(name) == 0 or len(description) == 0:
         raise ValueError("name and description must be supplied.")
     if len(docker_image_url) == 0:
