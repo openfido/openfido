@@ -11,7 +11,7 @@ from .services import create_workflow, update_workflow, delete_workflow
 
 logger = logging.getLogger("workflows")
 
-workflow_bp = Blueprint("workflows", __name__)
+workflow_bp = Blueprint("workflow", __name__)
 
 
 @workflow_bp.route("", methods=["POST"])
@@ -79,11 +79,11 @@ def create():
         workflow = create_workflow(request.json)
 
         return jsonify(WorkflowSchema().dump(workflow))
-    except ValidationError as ve:
-        logger.warning(ve)
-        return {"message": "Validation error", "errors": ve.messages}, 400
-    except ValueError as e:
-        logger.warning(e)
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
+    except ValueError as value_err:
+        logger.warning(value_err)
         return {
             "message": "Unable to create workflow",
         }, 400
@@ -298,11 +298,11 @@ def update(workflow_uuid):
         workflow = update_workflow(workflow_uuid, request.json)
 
         return jsonify(WorkflowSchema().dump(workflow))
-    except ValidationError as ve:
-        logger.warning(ve)
-        return {"message": "Validation error", "errors": ve.messages}, 400
-    except ValueError as e:
-        logger.warning(e)
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
+    except ValueError as value_err:
+        logger.warning(value_err)
         return {
             "message": "Unable to update workflow",
         }, 400

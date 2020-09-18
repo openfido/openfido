@@ -1,12 +1,13 @@
 from marshmallow import Schema, fields, validate
 
 from .models import Workflow
+from ..schemas import UUID
 
 
 class WorkflowSchema(Schema):
     """ Serialized public view of a Workflow. """
 
-    uuid = fields.Str()
+    uuid = UUID()
     name = fields.Str()
     description = fields.Str()
     created_at = fields.DateTime()
@@ -22,3 +23,27 @@ class CreateWorkflowSchema(Schema):
     description = fields.Str(
         required=True, validate=validate.Length(max=Workflow.description.type.length)
     )
+
+
+class CreateWorkflowPipelineSchema(Schema):
+    """ Schema for create_workflow_pipeline() service. """
+
+    pipeline_uuid = UUID(required=True)
+    source_workflow_pipelines = fields.List(UUID(), required=True)
+    destination_workflow_pipelines = fields.List(UUID(), required=True)
+
+
+class WorkflowPipelineSchema(Schema):
+    """ Serialized public view of a WorkflowPipeline. """
+
+    uuid = UUID()
+    pipeline_uuid = UUID(attribute="pipeline.uuid")
+    source_workflow_pipelines = fields.List(fields.Function(lambda obj: obj.uuid))
+
+    def dump_dests(obj):
+        """ dump the destination uuids of the from uuid. """
+        return [wp.from_workflow_pipeline.uuid for wp in obj.dest_workflow_pipelines]
+
+    destination_workflow_pipelines = fields.Function(dump_dests)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()

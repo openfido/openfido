@@ -1,4 +1,4 @@
-from .models import Workflow
+from .models import Workflow, WorkflowPipeline
 from sqlalchemy import and_
 
 
@@ -20,3 +20,17 @@ def find_workflows(uuids=None):
         query = query.filter(Workflow.uuid.in_(uuids))
 
     return query
+
+
+def find_workflow_pipeline(workflow_pipeline_uuid):
+    """ Find a WorkflowPipeline. """
+    return (
+        WorkflowPipeline.query.join(Workflow)
+        .filter(
+            and_(
+                WorkflowPipeline.uuid == workflow_pipeline_uuid,
+                Workflow.is_deleted == False,
+            )
+        )
+        .one_or_none()
+    )

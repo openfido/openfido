@@ -18,7 +18,7 @@ def test_create_workflow_bad_content_type(client, client_application):
     assert set(result.json.keys()) == set(["message"])
 
 
-@patch("app.workflows.routes.create_workflow")
+@patch("app.workflows.workflow_routes.create_workflow")
 def test_create_workflow_failure(create_workflow_mock, client, client_application):
     create_workflow_mock.side_effect = ValueError("failure")
     db.session.commit()

@@ -18,6 +18,8 @@ pipeline_bp = Blueprint("pipelines", __name__)
 
 
 def pipeline_to_json(pipeline):
+    """ Deprecated - replace with marshmallow serialization """
+
     return {
         "uuid": pipeline.uuid,
         "name": pipeline.name,

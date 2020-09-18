@@ -3,6 +3,7 @@ from marshmallow.exceptions import ValidationError
 
 from app.workflows import services
 from app.workflows.queries import find_workflow
+from app.workflows.models import WorkflowPipeline
 
 
 def test_create_workflow_bad_params(app):
@@ -48,3 +49,133 @@ def test_delete_workflow(app, workflow):
     the_uuid = workflow.uuid
     services.delete_workflow(the_uuid)
     assert find_workflow(the_uuid) is None
+
+
+def test_create_workflow_pipeline_no_workflow(app):
+    with pytest.raises(ValueError):
+        workflow_pipeline = services.create_workflow_pipeline(
+            "no-id",
+            {
+                "pipeline_uuid": "no-id",
+                "source_workflow_pipelines": [],
+                "destination_workflow_pipelines": [],
+            },
+        )
+
+
+def test_create_workflow_pipeline_no_pipeline(app, workflow):
+    with pytest.raises(ValueError):
+        workflow_pipeline = services.create_workflow_pipeline(
+            workflow.uuid,
+            {
+                "pipeline_uuid": "a" * 32,
+                "source_workflow_pipelines": [],
+                "destination_workflow_pipelines": [],
+            },
+        )
+
+
+def test_create_workflow_pipeline_no_source(app, pipeline, workflow):
+    with pytest.raises(ValueError):
+        services.create_workflow_pipeline(
+            workflow.uuid,
+            {
+                "pipeline_uuid": pipeline.uuid,
+                "source_workflow_pipelines": ["a" * 32],
+                "destination_workflow_pipelines": [],
+            },
+        )
+    assert (
+        WorkflowPipeline.query.filter(
+            WorkflowPipeline.pipeline == pipeline
+        ).one_or_none()
+        is None
+    )
+
+
+def test_create_workflow_pipeline_no_dest(app, pipeline, workflow):
+    with pytest.raises(ValueError):
+        services.create_workflow_pipeline(
+            workflow.uuid,
+            {
+                "pipeline_uuid": pipeline.uuid,
+                "source_workflow_pipelines": [],
+                "destination_workflow_pipelines": ["a" * 32],
+            },
+        )
+    assert (
+        WorkflowPipeline.query.filter(
+            WorkflowPipeline.pipeline == pipeline
+        ).one_or_none()
+        is None
+    )
+
+
+def test_create_workflow_pipeline(app, pipeline, workflow):
+    # Creating a workflow pipeline with no sources/destinations is possible.
+    workflow_pipeline = services.create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [],
+            "destination_workflow_pipelines": [],
+        },
+    )
+    assert workflow_pipeline.pipeline == pipeline
+    assert workflow_pipeline.source_workflow_pipelines == []
+    assert workflow_pipeline.dest_workflow_pipelines == []
+
+    # Creating a workflow pipeline with a source
+    source_workflow_pipeline = services.create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [workflow_pipeline.uuid],
+            "destination_workflow_pipelines": [],
+        },
+    )
+    assert source_workflow_pipeline.pipeline == pipeline
+    assert len(source_workflow_pipeline.source_workflow_pipelines) == 1
+    assert len(source_workflow_pipeline.dest_workflow_pipelines) == 0
+    assert (
+        source_workflow_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        == workflow_pipeline
+    )
+
+    # Creating a workflow pipeline with a destination
+    source_workflow_pipeline = services.create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [],
+            "destination_workflow_pipelines": [workflow_pipeline.uuid],
+        },
+    )
+    assert source_workflow_pipeline.pipeline == pipeline
+    assert len(source_workflow_pipeline.source_workflow_pipelines) == 0
+    assert len(source_workflow_pipeline.dest_workflow_pipelines) == 1
+    assert (
+        source_workflow_pipeline.dest_workflow_pipelines[0].from_workflow_pipeline
+        == workflow_pipeline
+    )
+
+    # Creating a workflow pipeline with a destination
+    with_both_pipeline = services.create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [source_workflow_pipeline.uuid],
+            "destination_workflow_pipelines": [workflow_pipeline.uuid],
+        },
+    )
+    assert with_both_pipeline.pipeline == pipeline
+    assert len(with_both_pipeline.source_workflow_pipelines) == 1
+    assert len(with_both_pipeline.dest_workflow_pipelines) == 1
+    assert (
+        with_both_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        == source_workflow_pipeline
+    )
+    assert (
+        with_both_pipeline.dest_workflow_pipelines[0].from_workflow_pipeline
+        == workflow_pipeline
+    )
