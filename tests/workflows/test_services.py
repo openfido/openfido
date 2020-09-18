@@ -147,7 +147,6 @@ def test_create_workflow_pipeline_from_cycle(is_dag_mock, app, pipeline, workflo
         )
 
 
-
 def test_create_workflow_pipeline(app, pipeline, workflow):
     # Creating a workflow pipeline with no sources/destinations is possible.
     workflow_pipeline = services.create_workflow_pipeline(
