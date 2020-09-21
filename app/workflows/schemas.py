@@ -17,7 +17,7 @@ class WorkflowSchema(Schema):
 class SearchWorkflowsSchema(Schema):
     """ Schema for find_workflows() queries. """
 
-    uuids = fields.List(fields.String(validate=validate.Regexp(r"[a-f0-9]{32}")))
+    uuids = fields.List(UUID())
 
 
 class CreateWorkflowSchema(Schema):

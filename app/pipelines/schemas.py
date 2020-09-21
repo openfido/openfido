@@ -2,6 +2,7 @@ from marshmallow import Schema, fields, validate
 from marshmallow_enum import EnumField
 
 from ..model_utils import RunStateEnum
+from ..schemas import UUID
 
 
 class InputSchema(Schema):
@@ -40,4 +41,4 @@ class PipelineSchema(Schema):
 class SearchPipelinesSchema(Schema):
     """ Schema for find_pipelines() queries. """
 
-    uuids = fields.List(fields.String(validate=validate.Regexp(r"[a-f0-9]{32}")))
+    uuids = fields.List(UUID())
