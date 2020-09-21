@@ -65,3 +65,77 @@ def test_create_workflow_pipeline(
         "created_at": to_iso8601(workflow_pipeline.created_at),
         "updated_at": to_iso8601(workflow_pipeline.updated_at),
     }
+
+
+def test_get_workflow_pipelines(
+    client, client_application, pipeline, workflow, workflow_pipeline
+):
+    db.session.commit()
+    result = client.get(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert result.json == {
+        "uuid": workflow_pipeline.uuid,
+        "pipeline_uuid": pipeline.uuid,
+        "source_workflow_pipelines": [],
+        "destination_workflow_pipelines": [],
+        "created_at": to_iso8601(workflow_pipeline.created_at),
+        "updated_at": to_iso8601(workflow_pipeline.updated_at),
+    }
+
+
+def test_list_workflow_pipelines(
+    client, client_application, pipeline, workflow
+):
+    db.session.commit()
+    result = client.get(
+        f"/v1/workflows/{workflow.uuid}/pipelines",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 0
+
+    wp1 = create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [],
+            "destination_workflow_pipelines": [],
+        },
+    )
+
+    wp2 = create_workflow_pipeline(
+        workflow.uuid,
+        {
+            "pipeline_uuid": pipeline.uuid,
+            "source_workflow_pipelines": [],
+            "destination_workflow_pipelines": [],
+        },
+    )
+
+    result = client.get(
+        f"/v1/workflows/{workflow.uuid}/pipelines",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 2
+    assert result.json[0]["uuid"] == wp1.uuid
+    assert result.json[1]["uuid"] == wp2.uuid
+
+
+def test_delete_workflow_pipeline(
+    client, client_application, pipeline, workflow, workflow_pipeline
+):
+    db.session.commit()
+    result = client.delete(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 0

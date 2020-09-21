@@ -63,6 +63,13 @@ def find_workflow_pipeline_dependencies(workflow_uuid):
     )
 
 
+def find_workflow_pipelines(workflow_uuid):
+    """ Find all workflow pipelines, or a list of them. """
+    query = WorkflowPipeline.query.filter(Workflow.workflow_id == workflow_uuid)
+
+    return query
+
+
 def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
     """Returns True if the graph supplied a directed acyclic graph and adding a
     new edge would not introduce a cycle."""

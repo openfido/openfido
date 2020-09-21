@@ -138,3 +138,13 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
     db.session.commit()
 
     return workflow_run
+
+
+def delete_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
+    """ Delete a WorkflowPipeline """
+    workflow_pipeline = find_workflow_pipeline(workflow_pipeline_uuid)
+    if workflow_pipeline is None:
+        raise ValueError("no workflow_pipeline found")
+
+    db.session.delete(workflow_pipeline)
+    db.session.commit()
