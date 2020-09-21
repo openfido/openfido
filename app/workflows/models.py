@@ -15,9 +15,7 @@ class Workflow(CommonColumnsMixin, db.Model):
     workflow_pipelines = db.relationship(
         "WorkflowPipeline", backref="workflow", lazy="select"
     )
-    workflow_runs = db.relationship(
-        "WorkflowRun", backref="workflow", lazy="select"
-    )
+    workflow_runs = db.relationship("WorkflowRun", backref="workflow", lazy="select")
 
 
 class WorkflowPipeline(CommonColumnsMixin, db.Model):
@@ -67,6 +65,9 @@ class WorkflowRun(CommonColumnsMixin, db.Model):
     workflow_run_states = db.relationship(
         "WorkflowRunState", backref="workflow_run", lazy="select"
     )
+    workflow_pipeline_runs = db.relationship(
+        "WorkflowPipelineRun", backref="workflow_run", lazy="select"
+    )
 
 
 class WorkflowRunState(CommonColumnsMixin, db.Model):
@@ -74,8 +75,12 @@ class WorkflowRunState(CommonColumnsMixin, db.Model):
 
     __tablename__ = "workflowrunstate"
 
-    workflow_run_id = db.Column(db.Integer, db.ForeignKey("workflowrun.id"), nullable=False)
-    run_state_type_id = db.Column(db.Integer, db.ForeignKey("runstatetype.id"), nullable=False)
+    workflow_run_id = db.Column(
+        db.Integer, db.ForeignKey("workflowrun.id"), nullable=False
+    )
+    run_state_type_id = db.Column(
+        db.Integer, db.ForeignKey("runstatetype.id"), nullable=False
+    )
 
 
 class WorkflowPipelineRun(CommonColumnsMixin, db.Model):
@@ -83,5 +88,9 @@ class WorkflowPipelineRun(CommonColumnsMixin, db.Model):
 
     __tablename__ = "workflowpipelinerun"
 
-    workflow_run_id = db.Column(db.Integer, db.ForeignKey("workflowrun.id"), nullable=False)
-    pipeline_run_id = db.Column(db.Integer, db.ForeignKey("pipelinerun.id"), nullable=False)
+    workflow_run_id = db.Column(
+        db.Integer, db.ForeignKey("workflowrun.id"), nullable=False
+    )
+    pipeline_run_id = db.Column(
+        db.Integer, db.ForeignKey("pipelinerun.id"), nullable=False
+    )

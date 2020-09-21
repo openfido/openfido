@@ -190,6 +190,18 @@ def test_list_workflows(client, client_application):
     assert result.json[1]["name"] == p2.name
 
 
+def test_search_workflows_validation(client, client_application, workflow):
+    db.session.commit()
+    result = client.post(
+        "/v1/workflows/search",
+        content_type="application/json",
+        json={"uuids": ["badid"]},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message", "errors"])
+
+
 def test_search_workflows(client, client_application, workflow):
     db.session.commit()
     result = client.post(

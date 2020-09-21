@@ -1,7 +1,8 @@
+from app.pipelines.schemas import PipelineRunSchema
 from marshmallow import Schema, fields, validate
 
-from .models import Workflow
 from ..schemas import UUID
+from .models import Workflow
 
 
 class WorkflowSchema(Schema):
@@ -51,5 +52,22 @@ class WorkflowPipelineSchema(Schema):
         return [wp.from_workflow_pipeline.uuid for wp in obj.dest_workflow_pipelines]
 
     destination_workflow_pipelines = fields.Function(dump_dests)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
+
+class WorkflowPipelineRunSchema(Schema):
+    """ Serialized public view of WorkflowRun """
+
+    uuid = UUID()
+    pipeline_run = fields.Nested(PipelineRunSchema)
+
+
+class WorkflowRunSchema(Schema):
+    """ Serialized public view of WorkflowRun """
+
+    uuid = UUID()
+    workflow_pipeline_runs = fields.Nested(WorkflowPipelineRunSchema, many=True)
+    # state = EnumField(RunStateEnum)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()

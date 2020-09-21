@@ -1,8 +1,8 @@
 """pipelines and workflows
 
-Revision ID: 02afc88dce4b
+Revision ID: 5bb2b22eb907
 Revises: 
-Create Date: 2020-09-21 13:35:30.814880
+Create Date: 2020-09-21 17:31:12.901610
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '02afc88dce4b'
+revision = '5bb2b22eb907'
 down_revision = None
 branch_labels = None
 depends_on = None

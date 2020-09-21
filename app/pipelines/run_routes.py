@@ -6,6 +6,7 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, to_iso8601, verify_content_type_and_params
 from .queries import find_pipeline, find_pipeline_run
+from .schemas import PipelineRunSchema
 from .services import (
     create_pipeline_run,
     create_pipeline_run_artifact,
@@ -16,37 +17,6 @@ from .services import (
 logger = logging.getLogger("pipeline-runs")
 
 run_bp = Blueprint("pipeline-runs", __name__)
-
-
-def pipeline_run_to_json(pipeline_run):
-    """ Deprecated - replace with marshmallow. """
-    return {
-        "uuid": pipeline_run.uuid,
-        "sequence": pipeline_run.sequence,
-        "created_at": to_iso8601(pipeline_run.created_at),
-        "inputs": [
-            {
-                "name": i.filename,
-                "url": i.url,
-            }
-            for i in pipeline_run.pipeline_run_inputs
-        ],
-        "states": [
-            {
-                "state": s.run_state_type.name,
-                "created_at": to_iso8601(s.created_at),
-            }
-            for s in pipeline_run.pipeline_run_states
-        ],
-        "artifacts": [
-            {
-                "uuid": a.uuid,
-                "name": a.name,
-                "url": a.public_url(),
-            }
-            for a in pipeline_run.pipeline_run_artifacts
-        ],
-    }
 
 
 @run_bp.route("/<pipeline_uuid>/runs", methods=["POST"])
@@ -133,13 +103,15 @@ def create_run(pipeline_uuid):
     try:
         pipeline_run = create_pipeline_run(pipeline_uuid, request.json)
 
-        return jsonify(pipeline_run_to_json(pipeline_run))
+        return jsonify(PipelineRunSchema().dump(pipeline_run))
     except ValidationError as validation_err:
         logger.warning(validation_err)
-        return {}, 400
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
     except ValueError:
         logger.warning("unable to create pipeline run")
-        return {}, 400
+        return {
+            "message": "Unable to create workflow",
+        }, 400
 
 
 @run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["GET"])
@@ -211,7 +183,7 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
         logger.warning("no pipeline run found")
         return {}, 404
 
-    return jsonify(pipeline_run_to_json(pipeline_run))
+    return jsonify(PipelineRunSchema().dump(pipeline_run))
 
 
 @run_bp.route("/<pipeline_uuid>/runs", methods=["GET"])
@@ -280,7 +252,7 @@ def get_runs(pipeline_uuid):
         logger.warning("no pipeline found")
         return {}, 404
 
-    return jsonify(list(map(pipeline_run_to_json, pipeline.pipeline_runs)))
+    return jsonify([PipelineRunSchema().dump(pr) for pr in pipeline.pipeline_runs])
 
 
 @run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])

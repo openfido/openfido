@@ -6,6 +6,7 @@ from marshmallow.exceptions import ValidationError
 from app.workflows import services
 from app.workflows.queries import find_workflow
 from app.workflows.models import WorkflowPipeline
+from app.model_utils import RunStateEnum
 
 
 def test_create_workflow_bad_params(app):
@@ -215,3 +216,42 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
         with_both_pipeline.dest_workflow_pipelines[0].from_workflow_pipeline
         == workflow_pipeline
     )
+
+
+def test_create_workflow_pipeline_run_no_workflow(app, pipeline, workflow):
+    with pytest.raises(ValueError):
+        services.create_workflow_pipeline_run(
+            "no-id", {"callback_url": "https://example.com", "inputs": []}
+        )
+
+
+def test_create_workflow_pipeline_run(app, pipeline, workflow_pipeline):
+    create_data = {
+        "callback_url": "https://example.com",
+        "inputs": [
+            {
+                "name": "aname.pdf",
+                "url": "https://example.com/ex.pdf",
+            }
+        ],
+    }
+    # A new WorkflowPipelineRun creates new PipelineRuns as QUEUED...when the
+    # celery worker runs it'll update their states appropriately.
+    workflow_pipeline_run = services.create_workflow_pipeline_run(
+        workflow_pipeline.workflow.uuid, create_data
+    )
+    assert len(workflow_pipeline_run.workflow_run_states) == 1
+    assert (
+        workflow_pipeline_run.workflow_run_states[0].run_state_type.code
+        == RunStateEnum.NOT_STARTED
+    )
+    assert len(workflow_pipeline_run.workflow_pipeline_runs) == 1
+    pipeline_run = workflow_pipeline_run.workflow_pipeline_runs[0].pipeline_run
+    assert pipeline_run.callback_url == create_data["callback_url"]
+    assert len(pipeline_run.pipeline_run_states) == 1
+    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.QUEUED
+    assert len(pipeline_run.pipeline_run_inputs) == 1
+    assert (
+        pipeline_run.pipeline_run_inputs[0].filename == create_data["inputs"][0]["name"]
+    )
+    assert pipeline_run.pipeline_run_inputs[0].url == create_data["inputs"][0]["url"]

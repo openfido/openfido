@@ -109,6 +109,29 @@ def test_create_pipeline_run(app, pipeline, mock_execute_pipeline):
     assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
     assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]
     assert len(pipeline_run.pipeline_run_states) == 1
+    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.NOT_STARTED
+
+
+def test_create_queued_pipeline_run(app, pipeline):
+    input1 = {
+        "name": "name1.pdf",
+        "url": "https://example.com/name1.pdf",
+    }
+    input2 = {
+        "name": "name2.pdf",
+        "url": "https://example.com/name2.pdf",
+    }
+    pipeline_run = services.create_queued_pipeline_run(
+        pipeline.uuid,
+        {"inputs": [input1, input2], "callback_url": "http://example.com"},
+    )
+    assert pipeline_run.pipeline == pipeline
+    assert pipeline_run.sequence == 1
+    assert len(pipeline_run.pipeline_run_inputs) == 2
+    assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
+    assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]
+    assert len(pipeline_run.pipeline_run_states) == 1
+    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.QUEUED
 
 
 def test_update_pipeline_run_output_no_uuid(app, pipeline):

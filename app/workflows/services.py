@@ -1,8 +1,19 @@
-from app.pipelines.queries import find_pipeline
+from app.model_utils import RunStateEnum
+from app.pipelines.queries import find_pipeline, find_run_state_type
+from app.pipelines.schemas import CreateRunSchema
+from app.pipelines.services import create_pipeline_run_state, create_queued_pipeline_run
 
-from .models import Workflow, db, WorkflowPipeline, WorkflowPipelineDependency
+from .models import (
+    Workflow,
+    WorkflowPipeline,
+    WorkflowPipelineDependency,
+    WorkflowPipelineRun,
+    WorkflowRun,
+    WorkflowRunState,
+    db,
+)
 from .queries import find_workflow, find_workflow_pipeline, is_dag
-from .schemas import CreateWorkflowSchema, CreateWorkflowPipelineSchema
+from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
 
 
 def create_workflow(workflow_json):
@@ -98,3 +109,32 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
     db.session.commit()
 
     return workflow_pipeline
+
+
+def create_workflow_pipeline_run(workflow_uuid, run_json):
+    """ Create a new workflow pipeline run """
+    data = CreateRunSchema().load(run_json)
+
+    workflow = find_workflow(workflow_uuid)
+    if workflow is None:
+        raise ValueError("no workflow found")
+
+    workflow_run = WorkflowRun(workflow=workflow)
+    workflow_run.workflow_run_states.append(
+        WorkflowRunState(run_state_type=find_run_state_type(RunStateEnum.NOT_STARTED))
+    )
+
+    for workflow_pipeline in workflow.workflow_pipelines:
+        pipeline_run = create_queued_pipeline_run(workflow_pipeline.pipeline.uuid, data)
+        workflow_pipeline_run = WorkflowPipelineRun(
+            workflow_run=workflow_run, pipeline_run=pipeline_run
+        )
+        db.session.add(workflow_pipeline_run)
+
+    # TODO start a new celery worker task
+
+    db.session.add(workflow_run)
+
+    db.session.commit()
+
+    return workflow_run
