@@ -2,6 +2,9 @@ from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from sqlalchemy import and_, or_
 import networkx as nx
 
+from .models import Workflow
+from .schemas import SearchWorkflowsSchema
+
 
 def find_workflow(uuid):
     """ Find a workflow. """
@@ -18,7 +21,8 @@ def find_workflows(uuids=None):
     query = Workflow.query.filter(Workflow.is_deleted == False)
 
     if uuids is not None:
-        query = query.filter(Workflow.uuid.in_(uuids))
+        data = SearchWorkflowsSchema().load(uuids)
+        query = query.filter(Workflow.uuid.in_(map(str, data["uuids"])))
 
     return query
 

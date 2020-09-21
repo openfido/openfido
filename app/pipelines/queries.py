@@ -1,5 +1,7 @@
-from .models import Pipeline, PipelineRun, RunStateType, db
 from sqlalchemy import and_
+
+from .models import Pipeline, PipelineRun, RunStateType, db
+from .schemas import SearchPipelinesSchema
 
 
 def find_pipeline(uuid):
@@ -17,7 +19,8 @@ def find_pipelines(uuids=None):
     query = Pipeline.query.filter(Pipeline.is_deleted == False)
 
     if uuids is not None:
-        query = query.filter(Pipeline.uuid.in_(uuids))
+        data = SearchPipelinesSchema().load(uuids)
+        query = query.filter(Pipeline.uuid.in_(map(str, data["uuids"])))
 
     return query
 

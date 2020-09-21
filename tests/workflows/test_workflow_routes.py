@@ -188,3 +188,24 @@ def test_list_workflows(client, client_application):
     assert len(result.json) == 2
     assert result.json[0]["name"] == p1.name
     assert result.json[1]["name"] == p2.name
+
+
+def test_search_workflows(client, client_application, workflow):
+    db.session.commit()
+    result = client.post(
+        "/v1/workflows/search",
+        content_type="application/json",
+        json={"uuids": [workflow.uuid]},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 1
+
+    result = client.post(
+        "/v1/workflows/search",
+        content_type="application/json",
+        json={"uuids": ["a" * 32]},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert len(result.json) == 0

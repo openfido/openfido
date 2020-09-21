@@ -4,7 +4,7 @@ from invoke import task
 @task
 def test(c, cov=False, cov_report=False, junit=False, enforce_percent=0):
     """ Run unit tests. """
-    command = "pytest"
+    command = "pytest --disable-warnings"
     if cov_report:
         command += " --cov-report=html"
     if junit:

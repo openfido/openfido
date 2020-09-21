@@ -1,7 +1,8 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from marshmallow_enum import EnumField
 
 from ..model_utils import RunStateEnum
+from ..schemas import UUID
 
 
 class InputSchema(Schema):
@@ -22,3 +23,22 @@ class UpdateRunStateSchema(Schema):
     """ Validation schema for update_run_status() """
 
     state = EnumField(RunStateEnum)
+
+
+class PipelineSchema(Schema):
+    """ Serialized public view of a Workflow. """
+
+    uuid = fields.Str()
+    name = fields.Str()
+    description = fields.Str()
+    docker_image_url = fields.Str()
+    repository_ssh_url = fields.Str()
+    repository_branch = fields.Str()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
+
+class SearchPipelinesSchema(Schema):
+    """ Schema for find_pipelines() queries. """
+
+    uuids = fields.List(UUID())

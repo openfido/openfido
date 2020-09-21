@@ -14,6 +14,12 @@ class WorkflowSchema(Schema):
     updated_at = fields.DateTime()
 
 
+class SearchWorkflowsSchema(Schema):
+    """ Schema for find_workflows() queries. """
+
+    uuids = fields.List(UUID())
+
+
 class CreateWorkflowSchema(Schema):
     """ Schema for create_workflow() service. """
 
