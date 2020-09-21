@@ -6,7 +6,12 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
 from .schemas import WorkflowPipelineSchema
-from .services import create_workflow_pipeline, delete_workflow_pipeline, find_workflow, find_workflow_pipeline
+from .services import (
+    create_workflow_pipeline,
+    delete_workflow_pipeline,
+    find_workflow,
+    find_workflow_pipeline,
+)
 
 logger = logging.getLogger("workflow-pipeline")
 
@@ -151,10 +156,14 @@ def list_workflow_pipelines(workflow_uuid):
         logger.warning("no workflow found")
         return {}, 404
 
-    return jsonify([WorkflowPipelineSchema().dump(wp) for wp in workflow.workflow_pipelines])
+    return jsonify(
+        [WorkflowPipelineSchema().dump(wp) for wp in workflow.workflow_pipelines]
+    )
 
 
-@workflow_pipeline_bp.route("/<workflow_uuid>/pipelines/<workflow_pipeline_uuid>", methods=["GET"])
+@workflow_pipeline_bp.route(
+    "/<workflow_uuid>/pipelines/<workflow_pipeline_uuid>", methods=["GET"]
+)
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
     """Get a workflow pipeline.
@@ -208,7 +217,9 @@ def get_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
     return jsonify(WorkflowPipelineSchema().dump(workflow_pipeline))
 
 
-@workflow_pipeline_bp.route("/<workflow_uuid>/pipelines/<workflow_pipeline_uuid>", methods=["DELETE"])
+@workflow_pipeline_bp.route(
+    "/<workflow_uuid>/pipelines/<workflow_pipeline_uuid>", methods=["DELETE"]
+)
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def delete(workflow_uuid, workflow_pipeline_uuid):
     """Delete a workflow pipeline.

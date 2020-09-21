@@ -87,9 +87,7 @@ def test_get_workflow_pipelines(
     }
 
 
-def test_list_workflow_pipelines(
-    client, client_application, pipeline, workflow
-):
+def test_list_workflow_pipelines(client, client_application, pipeline, workflow):
     db.session.commit()
     result = client.get(
         f"/v1/workflows/{workflow.uuid}/pipelines",
