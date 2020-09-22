@@ -121,6 +121,6 @@ class PipelineRun(CommonColumnsMixin, db.Model):
         "PipelineRunInput", backref="pipeline_run", lazy="immediate"
     )
 
-    workflow_pipeline_runs = db.relationship(
-        "WorkflowPipelineRun", backref="pipeline_run", lazy="immediate"
+    workflow_pipeline_run = db.relationship(
+        "WorkflowPipelineRun", backref="pipeline_run", lazy="immediate", uselist=False
     )

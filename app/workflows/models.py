@@ -40,6 +40,12 @@ class WorkflowPipeline(CommonColumnsMixin, db.Model):
         foreign_keys="[WorkflowPipelineDependency.to_workflow_pipeline_id]",
     )
 
+    workflow_pipeline_runs = db.relationship(
+        "WorkflowPipelineRun",
+        backref="workflow_pipeline",
+        lazy="select",
+    )
+
 
 class WorkflowPipelineDependency(CommonColumnsMixin, db.Model):
     """ A dependency between pipelines. """
@@ -93,4 +99,7 @@ class WorkflowPipelineRun(CommonColumnsMixin, db.Model):
     )
     pipeline_run_id = db.Column(
         db.Integer, db.ForeignKey("pipelinerun.id"), nullable=False
+    )
+    workflow_pipeline_id = db.Column(
+        db.Integer, db.ForeignKey("workflowpipeline.id"), nullable=False
     )
