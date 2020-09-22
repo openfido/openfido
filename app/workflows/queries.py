@@ -1,8 +1,7 @@
-from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from sqlalchemy import and_, or_
 import networkx as nx
 
-from .models import Workflow
+from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from .schemas import SearchWorkflowsSchema
 
 
@@ -83,3 +82,16 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
         digraph.add_edge(from_workflow_pipeline.id, to_workflow_pipeline.id)
 
     return nx.is_directed_acyclic_graph(digraph)
+
+
+def pipeline_has_workflow_pipeline(pipeline_id):
+    """ Find a WorkflowPipeline by pipeline ID. """
+    return (
+        WorkflowPipeline.query.join(Workflow)
+        .filter(
+            and_(
+                WorkflowPipeline.pipeline_id == pipeline_id,
+                Workflow.is_deleted == False,
+            )
+        )
+    ) is not None
