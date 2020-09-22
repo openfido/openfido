@@ -137,3 +137,4 @@ def test_delete_workflow_pipeline(
     )
     assert result.status_code == 200
     assert len(result.json) == 0
+    assert find_workflow_pipeline(workflow_pipeline.uuid) is None

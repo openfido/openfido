@@ -65,9 +65,7 @@ def find_workflow_pipeline_dependencies(workflow_uuid):
 
 def find_workflow_pipelines(workflow_uuid):
     """ Find all workflow pipelines, or a list of them. """
-    query = WorkflowPipeline.query.filter(Workflow.workflow_id == workflow_uuid)
-
-    return query
+    return WorkflowPipeline.query.filter(Workflow.workflow_id == workflow_uuid)
 
 
 def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
