@@ -7,7 +7,7 @@ from urllib.error import URLError
 from flask import current_app
 from werkzeug.utils import secure_filename
 
-from ..constants import S3_BUCKET, CALLBACK_TIMEOUT
+from ..constants import CALLBACK_TIMEOUT, S3_BUCKET
 from ..model_utils import RunStateEnum
 from ..tasks import execute_pipeline
 from ..utils import get_s3
@@ -114,31 +114,43 @@ def create_pipeline_run_state(run_state):
     return pipeline_run_state
 
 
-def create_pipeline_run(pipeline_uuid, inputs_json):
-    """ Create a new PipelineRun for a Pipeline's uuid """
-    CreateRunSchema().load(inputs_json)
+def _create_pipeline_run(pipeline_uuid, inputs_json, run_state_enum):
+    """ Create a PipelineRun """
+
+    data = CreateRunSchema().load(inputs_json)
 
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
     sequence = len(pipeline.pipeline_runs) + 1
-    pipeline_run = PipelineRun(
-        sequence=sequence, callback_url=inputs_json["callback_url"]
-    )
+    pipeline_run = PipelineRun(sequence=sequence, callback_url=data["callback_url"])
 
-    for i in inputs_json["inputs"]:
+    for i in data["inputs"]:
         pipeline_run.pipeline_run_inputs.append(
             PipelineRunInput(filename=i["name"], url=i["url"])
         )
 
-    pipeline_run.pipeline_run_states.append(
-        create_pipeline_run_state(RunStateEnum.NOT_STARTED)
-    )
+    pipeline_run.pipeline_run_states.append(create_pipeline_run_state(run_state_enum))
     pipeline.pipeline_runs.append(pipeline_run)
     db.session.add(pipeline)
 
     db.session.commit()
+
+    return (pipeline, pipeline_run)
+
+
+def create_queued_pipeline_run(pipeline_uuid, inputs_json):
+    """ Create a new PipelineRun for a Pipeline's uuid -- but not queued in celery. """
+    return _create_pipeline_run(pipeline_uuid, inputs_json, RunStateEnum.QUEUED)[1]
+
+
+def create_pipeline_run(pipeline_uuid, inputs_json):
+    """ Create a new PipelineRun for a Pipeline's uuid and queue celery task. """
+
+    (pipeline, pipeline_run) = _create_pipeline_run(
+        pipeline_uuid, inputs_json, RunStateEnum.NOT_STARTED
+    )
 
     execute_pipeline.delay(
         pipeline_uuid,

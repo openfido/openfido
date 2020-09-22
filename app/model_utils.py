@@ -21,13 +21,26 @@ class SystemPermissionEnum(IntEnum):
 class RunStateEnum(IntEnum):
     """ Run states currently supported in PipelineRunState """
 
-    NOT_STARTED = 1
-    RUNNING = 2
-    FAILED = 3
-    COMPLETED = 4
+    # Pipeline queued, but not ready to start yet (workflow celery task will
+    # determine when proper input requirements have been satisfied to transition
+    # to NOT_STARTED)
+    QUEUED = 1
+    # Pipeline has been put on the celery queue, but a worker has not yet picked
+    # up the job.
+    NOT_STARTED = 2
+    # Pipeline is running on a celery worker.
+    RUNNING = 3
+    # Pipeline failed.
+    FAILED = 4
+    # Pipeline successfully completed.
+    COMPLETED = 5
+    # Pipeline ABORTED from QUEUED state (its inputs were never satisfied)
+    ABORTED = 6
 
     def is_valid_transition(self, next_enum):
         """ Return True when the current transition is valid. """
+        if self == RunStateEnum.QUEUED:
+            return next_enum in set([RunStateEnum.NOT_STARTED, RunStateEnum.ABORTED])
         if self == RunStateEnum.NOT_STARTED:
             return next_enum is RunStateEnum.RUNNING
         if self == RunStateEnum.RUNNING:

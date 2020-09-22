@@ -233,6 +233,18 @@ def test_update_pipeline(client, client_application, pipeline):
     assert pipeline.repository_branch == "updated branch"
 
 
+def test_search_pipelines_validation(client, client_application, pipeline):
+    db.session.commit()
+    result = client.post(
+        "/v1/pipelines/search",
+        content_type="application/json",
+        json={"uuids": ["badid"]},
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+    assert set(result.json.keys()) == set(["message", "errors"])
+
+
 def test_search_pipelines(client, client_application, pipeline):
     db.session.commit()
     result = client.post(

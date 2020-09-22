@@ -38,6 +38,9 @@ class RunStateType(CommonColumnsMixin, db.Model):
     pipeline_run_states = db.relationship(
         "PipelineRunState", backref="run_state_type", lazy="immediate"
     )
+    workflow_run_states = db.relationship(
+        "WorkflowRunState", backref="run_state_type", lazy="immediate"
+    )
 
 
 class PipelineRunState(CommonColumnsMixin, db.Model):
@@ -116,4 +119,8 @@ class PipelineRun(CommonColumnsMixin, db.Model):
     )
     pipeline_run_inputs = db.relationship(
         "PipelineRunInput", backref="pipeline_run", lazy="immediate"
+    )
+
+    workflow_pipeline_runs = db.relationship(
+        "WorkflowPipelineRun", backref="pipeline_run", lazy="immediate"
     )
