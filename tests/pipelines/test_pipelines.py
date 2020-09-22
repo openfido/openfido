@@ -179,15 +179,31 @@ def test_remove_pipeline_no_match(client, client_application):
     assert result.status_code == 400
 
 
-def test_remove_pipeline(client, pipeline, client_application):
+def test_remove_pipeline(client, client_application, pipeline, workflow, workflow_pipeline):
     db.session.commit()
     result = client.delete(
         f"/v1/pipelines/{pipeline.uuid}",
         content_type="application/json",
         headers={ROLES_KEY: client_application.api_key},
     )
+    assert result.status_code == 400
+
+    p1 = Pipeline(
+        name="pipeline 1",
+        description="a description",
+        docker_image_url="",
+        repository_ssh_url="",
+        repository_branch="",
+    )
+    db.session.add(p1)
+    db.session.commit()
+    result = client.delete(
+        f"/v1/pipelines/{p1.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
     assert result.status_code == 200
-    assert find_pipeline(pipeline.uuid) is None
+    assert find_pipeline(p1.uuid) is None
 
 
 def test_update_pipeline_bad_id(client, client_application):
