@@ -22,14 +22,14 @@ class InputExportSchema(Schema):
 class CreateRunSchema(Schema):
     """ Validation schema for create_run() """
 
-    inputs = fields.Nested(InputSchema, many=True)
-    callback_url = fields.Url()
+    inputs = fields.Nested(InputSchema, many=True, required=True)
+    callback_url = fields.Url(required=True)
 
 
 class UpdateRunStateSchema(Schema):
     """ Validation schema for update_run_status() """
 
-    state = EnumField(RunStateEnum)
+    state = EnumField(RunStateEnum, required=True)
 
 
 class RunStateSchema(Schema):
@@ -55,7 +55,7 @@ class PipelineSchema(Schema):
 class SearchPipelinesSchema(Schema):
     """ Schema for find_pipelines() queries. """
 
-    uuids = fields.List(UUID())
+    uuids = fields.List(UUID(), required=True)
 
 
 class ArtifactSchema(Schema):

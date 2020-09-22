@@ -3,7 +3,6 @@ from .models import db, Application, ApplicationSystemPermission, SystemPermissi
 
 def is_permitted(api_key, permission):
     """ Returns True when the Application associated with permission_code exists. """
-    system_permission = get_system_permission(permission)
     permission_subquery = db.session.query(ApplicationSystemPermission.id). \
         join(SystemPermission). \
         filter(SystemPermission.code == permission.value). \
