@@ -189,6 +189,7 @@ def test_remove_pipeline(
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 400
+    assert find_pipeline(pipeline.uuid) == pipeline
 
     p1 = Pipeline(
         name="pipeline 1",
