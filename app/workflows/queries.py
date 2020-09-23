@@ -1,7 +1,7 @@
 from sqlalchemy import and_, or_
 import networkx as nx
 
-from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency, WorkflowRun
 from .schemas import SearchWorkflowsSchema
 
 
@@ -96,3 +96,17 @@ def pipeline_has_workflow_pipeline(pipeline_id):
         )
         .scalar()
     ) is not None
+
+
+def find_workflow_run(workflow_run_uuid):
+    """ Find a WorkflowPipeline. """
+    return (
+        WorkflowRun.query.join(Workflow)
+        .filter(
+            and_(
+                WorkflowRun.uuid == workflow_run_uuid,
+                Workflow.is_deleted == False,
+            )
+        )
+        .one_or_none()
+    )

@@ -85,3 +85,35 @@ def test_start_workflow(client, client_application, workflow_pipeline):
         "created_at": to_iso8601(workflow_run.created_at),
         "updated_at": to_iso8601(workflow_run.updated_at),
     }
+
+    result = client.get(
+        f"/v1/workflows/{workflow_pipeline.workflow.uuid}/runs/{workflow_run.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert result.json == {
+        "uuid": workflow_run.uuid,
+        "workflow_pipeline_runs": [
+          {
+              "uuid": workflow_pipeline_run.uuid,
+              "pipeline_run": {
+                  "uuid": pipeline_run.uuid,
+                  "sequence": pipeline_run.sequence,
+                  "inputs": [],
+                  "states": [
+                      {
+                          "created_at": to_iso8601(
+                              pipeline_run.pipeline_run_states[0].created_at
+                          ),
+                          "state": pipeline_run.pipeline_run_states[0].name,
+                      }
+                  ],
+                  "artifacts": [],
+                  "created_at": to_iso8601(pipeline_run.created_at),
+              },
+          }
+        ],
+        "created_at": to_iso8601(workflow_run.created_at),
+        "updated_at": to_iso8601(workflow_run.updated_at),
+    }
