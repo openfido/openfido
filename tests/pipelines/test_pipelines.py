@@ -179,7 +179,9 @@ def test_remove_pipeline_no_match(client, client_application):
     assert result.status_code == 400
 
 
-def test_remove_pipeline(client, client_application, pipeline, workflow, workflow_pipeline):
+def test_remove_pipeline(
+    client, client_application, pipeline, workflow, workflow_pipeline
+):
     db.session.commit()
     result = client.delete(
         f"/v1/pipelines/{pipeline.uuid}",
