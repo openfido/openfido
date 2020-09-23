@@ -99,7 +99,7 @@ def pipeline_has_workflow_pipeline(pipeline_id):
 
 
 def find_workflow_run(workflow_run_uuid):
-    """ Find a WorkflowPipeline. """
+    """ Find a WorkflowRun. """
     return (
         WorkflowRun.query.join(Workflow)
         .filter(
