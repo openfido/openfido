@@ -95,24 +95,24 @@ def test_start_workflow(client, client_application, workflow_pipeline):
     assert result.json == {
         "uuid": workflow_run.uuid,
         "workflow_pipeline_runs": [
-          {
-              "uuid": workflow_pipeline_run.uuid,
-              "pipeline_run": {
-                  "uuid": pipeline_run.uuid,
-                  "sequence": pipeline_run.sequence,
-                  "inputs": [],
-                  "states": [
-                      {
-                          "created_at": to_iso8601(
-                              pipeline_run.pipeline_run_states[0].created_at
-                          ),
-                          "state": pipeline_run.pipeline_run_states[0].name,
-                      }
-                  ],
-                  "artifacts": [],
-                  "created_at": to_iso8601(pipeline_run.created_at),
-              },
-          }
+            {
+                "uuid": workflow_pipeline_run.uuid,
+                "pipeline_run": {
+                    "uuid": pipeline_run.uuid,
+                    "sequence": pipeline_run.sequence,
+                    "inputs": [],
+                    "states": [
+                        {
+                            "created_at": to_iso8601(
+                                pipeline_run.pipeline_run_states[0].created_at
+                            ),
+                            "state": pipeline_run.pipeline_run_states[0].name,
+                        }
+                    ],
+                    "artifacts": [],
+                    "created_at": to_iso8601(pipeline_run.created_at),
+                },
+            }
         ],
         "created_at": to_iso8601(workflow_run.created_at),
         "updated_at": to_iso8601(workflow_run.updated_at),

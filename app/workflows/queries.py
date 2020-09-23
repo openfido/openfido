@@ -1,7 +1,13 @@
 from sqlalchemy import and_, or_
 import networkx as nx
 
-from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency, WorkflowRun
+from .models import (
+    db,
+    Workflow,
+    WorkflowPipeline,
+    WorkflowPipelineDependency,
+    WorkflowRun,
+)
 from .schemas import SearchWorkflowsSchema
 
 
