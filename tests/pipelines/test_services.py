@@ -84,7 +84,7 @@ def test_delete_pipeline_has_workflow(app, pipeline, workflow, workflow_pipeline
     with pytest.raises(ValueError):
         services.delete_pipeline(pipeline.uuid)
 
-        assert pipeline.is_deleted
+    assert not pipeline.is_deleted
 
 
 def test_create_pipeline_bad_input(app):
