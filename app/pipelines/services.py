@@ -11,7 +11,6 @@ from ..constants import CALLBACK_TIMEOUT, S3_BUCKET
 from ..model_utils import RunStateEnum
 from ..tasks import execute_pipeline
 from ..utils import get_s3
-from ..workflows.queries import pipeline_has_workflow_pipeline
 from .models import (
     Pipeline,
     PipelineRun,
@@ -35,6 +34,8 @@ def delete_pipeline(pipeline_uuid):
     if pipeline is None:
         raise ValueError("no pipeline found")
 
+    from ..workflows.queries import pipeline_has_workflow_pipeline
+    print(pipeline.id)
     if pipeline_has_workflow_pipeline(pipeline.id):
         raise ValueError("pipeline has an associated workflow pipeline")
 

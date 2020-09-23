@@ -93,5 +93,5 @@ def pipeline_has_workflow_pipeline(pipeline_id):
                 WorkflowPipeline.pipeline_id == pipeline_id,
                 Workflow.is_deleted == False,
             )
-        )
+        ).scalar()
     ) is not None
