@@ -35,7 +35,6 @@ def delete_pipeline(pipeline_uuid):
         raise ValueError("no pipeline found")
 
     from ..workflows.queries import pipeline_has_workflow_pipeline
-    print(pipeline.id)
     if pipeline_has_workflow_pipeline(pipeline.id):
         raise ValueError("pipeline has an associated workflow pipeline")
 
