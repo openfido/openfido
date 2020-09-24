@@ -45,11 +45,16 @@ class WorkflowPipelineSchema(Schema):
 
     uuid = UUID()
     pipeline_uuid = UUID(attribute="pipeline.uuid")
-    source_workflow_pipelines = fields.List(fields.Function(lambda obj: obj.uuid))
+
+    def dump_sources(obj):
+        """ dump the source uuids of the from uuid. """
+        return [wp.to_workflow_pipeline.uuid for wp in obj.source_workflow_pipelines]
+
+    source_workflow_pipelines = fields.Function(dump_sources)
 
     def dump_dests(obj):
         """ dump the destination uuids of the from uuid. """
-        return [wp.from_workflow_pipeline.uuid for wp in obj.dest_workflow_pipelines]
+        return [wp.to_workflow_pipeline.uuid for wp in obj.dest_workflow_pipelines]
 
     destination_workflow_pipelines = fields.Function(dump_dests)
     created_at = fields.DateTime()

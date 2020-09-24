@@ -1,4 +1,4 @@
-from ..model_utils import CommonColumnsMixin, get_db
+from ..model_utils import CommonColumnsMixin, get_db, RunStateEnum
 
 db = get_db()
 
@@ -28,16 +28,16 @@ class WorkflowPipeline(CommonColumnsMixin, db.Model):
 
     source_workflow_pipelines = db.relationship(
         "WorkflowPipelineDependency",
-        backref="from_workflow_pipeline",
+        backref="to_workflow_pipeline",
         lazy="select",
-        foreign_keys="[WorkflowPipelineDependency.from_workflow_pipeline_id]",
+        foreign_keys="[WorkflowPipelineDependency.to_workflow_pipeline_id]",
     )
 
     dest_workflow_pipelines = db.relationship(
         "WorkflowPipelineDependency",
-        backref="to_workflow_pipeline",
+        backref="from_workflow_pipeline",
         lazy="select",
-        foreign_keys="[WorkflowPipelineDependency.to_workflow_pipeline_id]",
+        foreign_keys="[WorkflowPipelineDependency.from_workflow_pipeline_id]",
     )
 
     workflow_pipeline_runs = db.relationship(
@@ -60,6 +60,9 @@ class WorkflowPipelineDependency(CommonColumnsMixin, db.Model):
         db.Integer, db.ForeignKey("workflowpipeline.id"), nullable=False
     )
 
+    def __repr__(self):
+        return f"{self.from_workflow_pipeline_id}->{self.to_workflow_pipeline_id}"
+
 
 class WorkflowRun(CommonColumnsMixin, db.Model):
     """ An execution of a Workflow. """
@@ -75,6 +78,10 @@ class WorkflowRun(CommonColumnsMixin, db.Model):
         "WorkflowPipelineRun", backref="workflow_run", lazy="select"
     )
 
+    def run_state_enum(self):
+        """ Return the current stat of this run (the last run state) """
+        return self.workflow_run_states[-1].run_state_enum()
+
 
 class WorkflowRunState(CommonColumnsMixin, db.Model):
     """ A lookup table of states of a WorkflowRun """
@@ -87,6 +94,10 @@ class WorkflowRunState(CommonColumnsMixin, db.Model):
     run_state_type_id = db.Column(
         db.Integer, db.ForeignKey("runstatetype.id"), nullable=False
     )
+
+    def run_state_enum(self):
+        """ Return the current stat of this run """
+        return RunStateEnum(self.run_state_type.code)
 
 
 class WorkflowPipelineRun(CommonColumnsMixin, db.Model):
@@ -103,3 +114,7 @@ class WorkflowPipelineRun(CommonColumnsMixin, db.Model):
     workflow_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("workflowpipeline.id"), nullable=False
     )
+
+    def run_state_enum(self):
+        """ Return the current stat of this run (the last run state) """
+        return self.pipeline_run.run_state_enum()

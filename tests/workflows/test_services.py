@@ -1,12 +1,21 @@
 from unittest.mock import patch
 
 import pytest
+from app import db
+from app.model_utils import RunStateEnum
+from app.pipelines.services import create_pipeline_run, create_pipeline_run_state
+from app.workflows import services
+from app.workflows.models import WorkflowPipeline
+from app.workflows.queries import find_workflow
+from app.workflows.services import (
+    create_workflow_pipeline,
+    create_workflow_pipeline_run,
+    create_workflow_run_state,
+    update_workflow_run,
+)
 from marshmallow.exceptions import ValidationError
 
-from app.workflows import services
-from app.workflows.queries import find_workflow
-from app.workflows.models import WorkflowPipeline
-from app.model_utils import RunStateEnum
+from ..pipelines.test_services import VALID_CALLBACK_INPUT
 
 
 def test_create_workflow_bad_params(app):
@@ -175,8 +184,12 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
     assert len(source_workflow_pipeline.source_workflow_pipelines) == 1
     assert len(source_workflow_pipeline.dest_workflow_pipelines) == 0
     assert (
-        source_workflow_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        source_workflow_pipeline.source_workflow_pipelines[0].from_workflow_pipeline
         == workflow_pipeline
+    )
+    assert (
+        source_workflow_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        == source_workflow_pipeline
     )
 
     # Creating a workflow pipeline with a destination
@@ -193,6 +206,10 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
     assert len(source_workflow_pipeline.dest_workflow_pipelines) == 1
     assert (
         source_workflow_pipeline.dest_workflow_pipelines[0].from_workflow_pipeline
+        == source_workflow_pipeline
+    )
+    assert (
+        source_workflow_pipeline.dest_workflow_pipelines[0].to_workflow_pipeline
         == workflow_pipeline
     )
 
@@ -209,11 +226,19 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
     assert len(with_both_pipeline.source_workflow_pipelines) == 1
     assert len(with_both_pipeline.dest_workflow_pipelines) == 1
     assert (
-        with_both_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        with_both_pipeline.source_workflow_pipelines[0].from_workflow_pipeline
         == source_workflow_pipeline
     )
     assert (
+        with_both_pipeline.source_workflow_pipelines[0].to_workflow_pipeline
+        == with_both_pipeline
+    )
+    assert (
         with_both_pipeline.dest_workflow_pipelines[0].from_workflow_pipeline
+        == with_both_pipeline
+    )
+    assert (
+        with_both_pipeline.dest_workflow_pipelines[0].to_workflow_pipeline
         == workflow_pipeline
     )
 
@@ -255,3 +280,93 @@ def test_create_workflow_pipeline_run(app, pipeline, workflow_pipeline):
         pipeline_run.pipeline_run_inputs[0].filename == create_data["inputs"][0]["name"]
     )
     assert pipeline_run.pipeline_run_inputs[0].url == create_data["inputs"][0]["url"]
+
+
+@patch("app.pipelines.services.execute_pipeline")
+def test_update_workflow_run_no_workflow(execute_pipeline_mock, app, pipeline):
+    # a pipeline_run not associated with workflow_pipeline_run nothing breaks
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    assert update_workflow_run(pipeline_run) is None
+
+
+def _configure_run_state(workflow, run_state_enum):
+    """ Update first PipelineRun to run_state_enum and call update_workflow_run() """
+    create_workflow_pipeline_run(
+        workflow.uuid,
+        {
+            "callback_url": "http://example.com/cb",
+            "inputs": [],
+        },
+    )
+    pipeline_runs = [
+        wpr.pipeline_run for wpr in workflow.workflow_runs[0].workflow_pipeline_runs
+    ]
+    pipeline_runs[0].pipeline_run_states.append(
+        create_pipeline_run_state(run_state_enum)
+    )
+    db.session.commit()
+
+    return (update_workflow_run(pipeline_runs[0]), pipeline_runs)
+
+
+@patch("app.pipelines.services.execute_pipeline")
+def test_update_workflow_run_FAILED(
+    execute_pipeline_mock, app, pipeline, workflow_line
+):
+    # when a PipelineRun fails, then all the remaining PRs should be marked as
+    # ABORTED -- and the WorkflowRun itself should be FAILED.
+    (workflow_run, pipeline_runs) = _configure_run_state(
+        workflow_line, RunStateEnum.FAILED
+    )
+
+    assert workflow_run.run_state_enum() == RunStateEnum.FAILED
+    assert pipeline_runs[1].run_state_enum() == RunStateEnum.ABORTED
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.ABORTED
+    assert not execute_pipeline_mock.called
+
+
+@patch("app.pipelines.services.execute_pipeline")
+def test_update_workflow_run_RUNNING(
+    execute_pipeline_mock, app, pipeline, workflow_line
+):
+    (workflow_run, pipeline_runs) = _configure_run_state(
+        workflow_line, RunStateEnum.RUNNING
+    )
+
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    assert pipeline_runs[1].run_state_enum() == RunStateEnum.QUEUED
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.QUEUED
+    assert not execute_pipeline_mock.called
+
+
+@patch("app.pipelines.services.execute_pipeline.delay")
+def test_update_workflow_run_RUNNING_line(delay_mock, app, pipeline, workflow_line):
+    (workflow_run, pipeline_runs) = _configure_run_state(
+        workflow_line, RunStateEnum.COMPLETED
+    )
+    workflow_run.workflow_run_states.append(
+        create_workflow_run_state(RunStateEnum.RUNNING)
+    )
+
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    # TODO also assert that any artifacts are passed along.
+    assert pipeline_runs[1].run_state_enum() == RunStateEnum.NOT_STARTED
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.QUEUED
+    delay_mock.assert_called_once()
+
+
+@patch("app.pipelines.services.execute_pipeline.delay")
+def test_update_workflow_run_RUNNING_square(delay_mock, app, pipeline, workflow_square):
+    (workflow_run, pipeline_runs) = _configure_run_state(
+        workflow_square, RunStateEnum.COMPLETED
+    )
+    workflow_run.workflow_run_states.append(
+        create_workflow_run_state(RunStateEnum.RUNNING)
+    )
+
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    # TODO also assert that any artifacts are passed along.
+    assert pipeline_runs[1].run_state_enum() == RunStateEnum.NOT_STARTED
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.NOT_STARTED
+    assert pipeline_runs[3].run_state_enum() == RunStateEnum.QUEUED
+    assert delay_mock.call_count == 2

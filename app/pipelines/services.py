@@ -102,20 +102,20 @@ def update_pipeline(
     return pipeline
 
 
-def create_pipeline_run_state(run_state):
-    run_state_type = find_run_state_type(run_state)
+def create_pipeline_run_state(run_state_enum):
+    run_state_type = find_run_state_type(run_state_enum)
     pipeline_run_state = PipelineRunState(
         name=run_state_type.name,
         description=run_state_type.description,
-        code=run_state_type.code,
+        code=int(run_state_type.code),
     )
     run_state_type.pipeline_run_states.append(pipeline_run_state)
 
     return pipeline_run_state
 
 
-def _create_pipeline_run(pipeline_uuid, inputs_json, run_state_enum):
-    """ Create a PipelineRun """
+def create_pipeline_run(pipeline_uuid, inputs_json, queued=False):
+    """ Create a new PipelineRun for a Pipeline's uuid. """
 
     data = CreateRunSchema().load(inputs_json)
 
@@ -131,31 +131,38 @@ def _create_pipeline_run(pipeline_uuid, inputs_json, run_state_enum):
             PipelineRunInput(filename=i["name"], url=i["url"])
         )
 
-    pipeline_run.pipeline_run_states.append(create_pipeline_run_state(run_state_enum))
+    pipeline_run.pipeline_run_states.append(
+        create_pipeline_run_state(RunStateEnum.QUEUED)
+    )
     pipeline.pipeline_runs.append(pipeline_run)
     db.session.add(pipeline)
 
     db.session.commit()
 
-    return (pipeline, pipeline_run)
+    if not queued:
+        start_pipeline_run(pipeline_run)
+
+    return pipeline_run
 
 
-def create_queued_pipeline_run(pipeline_uuid, inputs_json):
-    """ Create a new PipelineRun for a Pipeline's uuid -- but not queued in celery. """
-    return _create_pipeline_run(pipeline_uuid, inputs_json, RunStateEnum.QUEUED)[1]
+def start_pipeline_run(pipeline_run):
+    """ Begin the Celery process for a PipelineRun """
 
+    if pipeline_run.run_state_enum() != RunStateEnum.QUEUED:
+        raise ValueError("Only PipelineRun in state QUEUED can be started.")
 
-def create_pipeline_run(pipeline_uuid, inputs_json):
-    """ Create a new PipelineRun for a Pipeline's uuid and queue celery task. """
-
-    (pipeline, pipeline_run) = _create_pipeline_run(
-        pipeline_uuid, inputs_json, RunStateEnum.NOT_STARTED
+    pipeline = pipeline_run.pipeline
+    pipeline_run.pipeline_run_states.append(
+        create_pipeline_run_state(RunStateEnum.NOT_STARTED)
     )
 
     execute_pipeline.delay(
-        pipeline_uuid,
+        pipeline.uuid,
         pipeline_run.uuid,
-        inputs_json["inputs"],
+        [
+            {"name": pri.filename, "url": pri.url}
+            for pri in pipeline_run.pipeline_run_inputs
+        ],
         pipeline.docker_image_url,
         pipeline.repository_ssh_url,
         pipeline.repository_branch,
@@ -192,7 +199,9 @@ def notify_callback(pipeline_run):
         logger.warning(e)
 
 
-def update_pipeline_run_state(pipeline_uuid, run_state_json):
+def update_pipeline_run_state(
+    pipeline_uuid, run_state_json, apply_to_workflow_run=True
+):
     """Update the pipeline run state.
 
     This method ensures that no invalid state transitions occur.
@@ -204,8 +213,7 @@ def update_pipeline_run_state(pipeline_uuid, run_state_json):
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 
-    last_run_state = pipeline_run.pipeline_run_states[-1]
-    if not RunStateEnum(last_run_state.code).is_valid_transition(data["state"]):
+    if not pipeline_run.run_state_enum().is_valid_transition(data["state"]):
         raise ValueError("Invalid state transition")
 
     pipeline_run.pipeline_run_states.append(create_pipeline_run_state(data["state"]))
@@ -213,6 +221,15 @@ def update_pipeline_run_state(pipeline_uuid, run_state_json):
     db.session.commit()
 
     notify_callback(pipeline_run)
+
+    if apply_to_workflow_run:
+        from app.workflows.services import update_workflow_run
+
+        update_workflow_run(pipeline_run)
+
+
+def copy_pipeline_run_artifact(pipeline_run_artifact, to_pipeline_run):
+    pass
 
 
 def create_pipeline_run_artifact(run_uuid, filename, request):

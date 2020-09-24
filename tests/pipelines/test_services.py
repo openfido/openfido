@@ -108,8 +108,9 @@ def test_create_pipeline_run(app, pipeline, mock_execute_pipeline):
     assert len(pipeline_run.pipeline_run_inputs) == 2
     assert pipeline_run.pipeline_run_inputs[0].filename == input1["name"]
     assert pipeline_run.pipeline_run_inputs[1].filename == input2["name"]
-    assert len(pipeline_run.pipeline_run_states) == 1
-    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.NOT_STARTED
+    assert len(pipeline_run.pipeline_run_states) == 2
+    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.QUEUED
+    assert pipeline_run.pipeline_run_states[1].code == RunStateEnum.NOT_STARTED
 
 
 def test_create_queued_pipeline_run(app, pipeline):
@@ -121,9 +122,10 @@ def test_create_queued_pipeline_run(app, pipeline):
         "name": "name2.pdf",
         "url": "https://example.com/name2.pdf",
     }
-    pipeline_run = services.create_queued_pipeline_run(
+    pipeline_run = services.create_pipeline_run(
         pipeline.uuid,
         {"inputs": [input1, input2], "callback_url": "http://example.com"},
+        True,
     )
     assert pipeline_run.pipeline == pipeline
     assert pipeline_run.sequence == 1
@@ -158,7 +160,7 @@ def test_update_pipeline_run_state_bad_state(app, pipeline, mock_execute_pipelin
             },
         )
 
-    assert len(pipeline_run.pipeline_run_states) == 1
+    assert len(pipeline_run.pipeline_run_states) == 2
 
 
 def test_update_pipeline_run_state_dup_state(app, pipeline, mock_execute_pipeline):
@@ -171,7 +173,7 @@ def test_update_pipeline_run_state_dup_state(app, pipeline, mock_execute_pipelin
                 "state": RunStateEnum.NOT_STARTED.name,
             },
         )
-    assert len(pipeline_run.pipeline_run_states) == 1
+    assert len(pipeline_run.pipeline_run_states) == 2
 
 
 def test_update_pipeline_run_state_bad_transition(app, pipeline, mock_execute_pipeline):
@@ -184,7 +186,7 @@ def test_update_pipeline_run_state_bad_transition(app, pipeline, mock_execute_pi
                 "state": RunStateEnum.COMPLETED.name,
             },
         )
-    assert len(pipeline_run.pipeline_run_states) == 1
+    assert len(pipeline_run.pipeline_run_states) == 2
 
 
 def test_update_pipeline_run_state_callback_err(
@@ -205,8 +207,8 @@ def test_update_pipeline_run_state_callback_err(
             "state": RunStateEnum.RUNNING.name,
         },
     )
-    assert len(pipeline_run.pipeline_run_states) == 2
-    assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+    assert len(pipeline_run.pipeline_run_states) == 3
+    assert pipeline_run.run_state_enum() == RunStateEnum.RUNNING
 
 
 def test_update_pipeline_run_state_no_pipeline(app):
@@ -239,8 +241,8 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
             "state": RunStateEnum.RUNNING.name,
         },
     )
-    assert len(pipeline_run.pipeline_run_states) == 2
-    assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+    assert len(pipeline_run.pipeline_run_states) == 3
+    assert pipeline_run.run_state_enum() == RunStateEnum.RUNNING
 
 
 def test_create_pipeline_run_artifact_no_pipeline(app):
