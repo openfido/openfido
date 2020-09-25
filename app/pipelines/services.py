@@ -238,11 +238,13 @@ def update_pipeline_run_state(
 
 
 def copy_pipeline_run_artifact(pipeline_run_artifact, to_pipeline_run):
-    return create_pipeline_run_artifact(
-        to_pipeline_run.uuid,
-        pipeline_run_artifact.name,
-        urllib_request.urlopen(pipeline_run_artifact.public_url()),
+    """ Copy an artifact to a new run as input. """
+    to_pipeline_run.pipeline_run_inputs.append(
+        PipelineRunInput(
+            filename=pipeline_run_artifact.name, url=pipeline_run_artifact.public_url()
+        )
     )
+    db.session.commit()
 
 
 def create_pipeline_run_artifact(run_uuid, filename, stream):

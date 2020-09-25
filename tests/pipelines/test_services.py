@@ -277,8 +277,10 @@ def test_copy_pipeline_run_artifact(urlopen_mock, s3_mock, services_s3_mock, pip
     db.session.add(artifact)
     db.session.commit()
 
-    new_artifact = services.copy_pipeline_run_artifact(artifact, another_run)
-    assert new_artifact.name == artifact.name
+    services.copy_pipeline_run_artifact(artifact, another_run)
+    assert len(another_run.pipeline_run_inputs) == 1
+    assert another_run.pipeline_run_inputs[0].filename == "ex.csv"
+    assert another_run.pipeline_run_inputs[0].url == "http://example.com/presigned"
 
 
 def test_create_pipeline_run_artifact_no_pipeline(app):

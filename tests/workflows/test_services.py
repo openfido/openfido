@@ -359,6 +359,27 @@ def _configure_run_state(workflow, run_state_enum, delay_mock):
     return (services.update_workflow_run(pipeline_runs[0]), pipeline_runs)
 
 
+def test_update_workflow_run_state(app, workflow):
+    services.create_workflow_pipeline_run(
+        workflow.uuid,
+        {
+            "callback_url": "http://example.com/cb",
+            "inputs": [],
+        },
+    )
+    # Setting a pipeline to its current state does nothing.
+    services.update_workflow_run_state(
+        workflow.workflow_runs[0], RunStateEnum.NOT_STARTED
+    )
+    assert workflow.workflow_runs[0].run_state_enum() == RunStateEnum.NOT_STARTED
+
+    # Trying to make an bad state transition is an error.
+    with pytest.raises(ValueError):
+        services.update_workflow_run_state(
+            workflow.workflow_runs[0], RunStateEnum.COMPLETED
+        )
+
+
 @patch("app.pipelines.services.execute_pipeline")
 def test_update_workflow_run_QUEUE(execute_pipeline_mock, app, pipeline, workflow_line):
     # when a PipelineRun gives some unexpected state, an error is thrown
@@ -373,12 +394,12 @@ def test_update_workflow_run_FAILED(
     execute_pipeline_mock, app, pipeline, workflow_line
 ):
     # when a PipelineRun fails, then all the remaining PRs should be marked as
-    # ABORTED -- and the WorkflowRun itself should be FAILED.
+    # ABORTED -- and the WorkflowRun itself should be ABORTED.
     (workflow_run, pipeline_runs) = _configure_run_state(
         workflow_line, RunStateEnum.FAILED, execute_pipeline_mock
     )
 
-    assert workflow_run.run_state_enum() == RunStateEnum.FAILED
+    assert workflow_run.run_state_enum() == RunStateEnum.ABORTED
     assert pipeline_runs[1].run_state_enum() == RunStateEnum.ABORTED
     assert pipeline_runs[2].run_state_enum() == RunStateEnum.ABORTED
     assert not execute_pipeline_mock.called

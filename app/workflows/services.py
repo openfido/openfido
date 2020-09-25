@@ -141,8 +141,13 @@ def update_workflow_run_state(workflow_run, run_state_enum):
     If the state is terminal (FAILED, ABORTED, COMPLETED) underlying
     WorkflowPipelineRun instances will be updated appropriately as well.
     """
+    if workflow_run.run_state_enum() == run_state_enum:
+        return
 
-    # TODO make sure that the transition is valid.
+    if not workflow_run.run_state_enum().is_valid_transition(run_state_enum):
+        raise ValueError(
+            f"Invalid state transition: {workflow_run.run_state_enum().name}->{run_state_enum.name}"
+        )
 
     workflow_run.workflow_run_states.append(create_workflow_run_state(run_state_enum))
     db.session.commit()
@@ -218,14 +223,14 @@ def update_workflow_run(pipeline_run):
                 apply_to_workflow_run=False,
             )
 
-        return update_workflow_run_state(workflow_run, RunStateEnum.FAILED)
+        return update_workflow_run_state(workflow_run, RunStateEnum.ABORTED)
 
     if pipeline_run.run_state_enum() != RunStateEnum.COMPLETED:
         error = f"Unexpected state encountered: {pipeline_run.run_state_enum()}"
         logger.warning(error)
         raise ValueError(error)
 
-    # When a PipelineRun has completed we can continue the workflow:
+    # When a PipelineRun has COMPLETED we can continue the workflow:
     #  1. Pass its artifacts onward to any dest_workflow_pipelines
     #  2. Start new PipelineRuns for those pipelines.
     #  3. If there are none remaining, then this WorkflowRun is finished!
