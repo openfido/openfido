@@ -83,3 +83,36 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
         digraph.add_edge(from_workflow_pipeline.id, to_workflow_pipeline.id)
 
     return nx.is_directed_acyclic_graph(digraph)
+
+
+def find_pipeline_runs_for_workflow_run(workflow_run):
+    workflow_pipeline_runs = [wpr for wpr in workflow_run.workflow_pipeline_runs]
+    return [wpr.pipeline_run for wpr in workflow_pipeline_runs]
+
+
+def find_dest_workflow_runs(workflow_pipeline_run):
+    workflow_run = workflow_pipeline_run.workflow_run
+    # TODO this should be a sql query for optimal speed -- or I should be
+    # able to find this from the workflow_run itself?
+    result = []
+    for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
+        result.extend([
+            wpr.pipeline_run
+            for wpr in dest_wp.to_workflow_pipeline.workflow_pipeline_runs
+            if wpr.workflow_run == workflow_run
+        ])
+    return result
+
+
+def find_source_workflow_runs(workflow_pipeline_run):
+    workflow_run = workflow_pipeline_run.workflow_run
+    # TODO this should be a sql query for optimal speed -- or I should be
+    # able to find this from the workflow_run itself?
+    result = []
+    for dest_wp in workflow_pipeline_run.workflow_pipeline.source_workflow_pipelines:
+        result.extend([
+            wpr.pipeline_run
+            for wpr in dest_wp.from_workflow_pipeline.workflow_pipeline_runs
+            if wpr.workflow_run == workflow_run
+        ])
+    return result

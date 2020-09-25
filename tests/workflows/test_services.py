@@ -359,6 +359,28 @@ def test_update_workflow_run_RUNNING_line(delay_mock, copy_mock, app, pipeline, 
     assert pipeline_runs[2].run_state_enum() == RunStateEnum.QUEUED
     delay_mock.assert_called_once()
 
+    # when the second run finished it'll start the last one
+    delay_mock.reset_mock()
+    copy_mock.reset_mock()
+    pipeline_runs[1].pipeline_run_artifacts.append(PipelineRunArtifact(name="anotherfile.txt"))
+    pipeline_runs[1].pipeline_run_states.append(
+        create_pipeline_run_state(RunStateEnum.COMPLETED)
+    )
+    update_workflow_run(pipeline_runs[1])
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    copy_mock.assert_called_once_with(pipeline_runs[1].pipeline_run_artifacts[0], pipeline_runs[2])
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.NOT_STARTED
+
+    # Finally, when the last run finishes, the workflow is finished
+    delay_mock.reset_mock()
+    copy_mock.reset_mock()
+    pipeline_runs[2].pipeline_run_states.append(
+        create_pipeline_run_state(RunStateEnum.COMPLETED)
+    )
+    update_workflow_run(pipeline_runs[2])
+    assert workflow_run.run_state_enum() == RunStateEnum.COMPLETED
+    assert not copy_mock.called
+
 
 @patch("app.workflows.services.copy_pipeline_run_artifact")
 @patch("app.pipelines.services.execute_pipeline.delay")
@@ -379,3 +401,34 @@ def test_update_workflow_run_RUNNING_square(delay_mock, copy_mock, app, pipeline
     assert pipeline_runs[2].run_state_enum() == RunStateEnum.NOT_STARTED
     assert pipeline_runs[3].run_state_enum() == RunStateEnum.QUEUED
     assert delay_mock.call_count == 2
+
+    # when one of the second ones finishes - the third one gets its artifact,
+    # but it doesn't start (b/c it needs artifacts from both!)
+    delay_mock.reset_mock()
+    copy_mock.reset_mock()
+    pipeline_runs[1].pipeline_run_artifacts.append(PipelineRunArtifact(name="anotherfile.txt"))
+    pipeline_runs[1].pipeline_run_states.append(create_pipeline_run_state(RunStateEnum.COMPLETED))
+    update_workflow_run(pipeline_runs[1])
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    copy_mock.assert_called_once_with(pipeline_runs[1].pipeline_run_artifacts[0], pipeline_runs[3])
+    assert pipeline_runs[3].run_state_enum() == RunStateEnum.QUEUED
+
+    # when the third one finishes - the fourth starts b/c it has all its inputs
+    delay_mock.reset_mock()
+    copy_mock.reset_mock()
+    pipeline_runs[2].pipeline_run_artifacts.append(PipelineRunArtifact(name="anotherfile.txt"))
+    pipeline_runs[2].pipeline_run_states.append(create_pipeline_run_state(RunStateEnum.COMPLETED))
+    update_workflow_run(pipeline_runs[2])
+    assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
+    copy_mock.assert_called_once_with(pipeline_runs[2].pipeline_run_artifacts[0], pipeline_runs[3])
+    assert pipeline_runs[3].run_state_enum() == RunStateEnum.NOT_STARTED
+
+    # Finally, when the last run finishes, the workflow is finished
+    delay_mock.reset_mock()
+    copy_mock.reset_mock()
+    pipeline_runs[3].pipeline_run_states.append(
+        create_pipeline_run_state(RunStateEnum.COMPLETED)
+    )
+    update_workflow_run(pipeline_runs[3])
+    assert workflow_run.run_state_enum() == RunStateEnum.COMPLETED
+    assert not copy_mock.called

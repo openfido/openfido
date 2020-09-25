@@ -20,7 +20,7 @@ from .models import (
     WorkflowRunState,
     db,
 )
-from .queries import find_workflow, find_workflow_pipeline, is_dag
+from .queries import find_workflow, find_workflow_pipeline, is_dag, find_dest_workflow_runs, find_source_workflow_runs
 from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
 
 logger = logging.getLogger("workflow-services")
@@ -227,20 +227,16 @@ def update_workflow_run(pipeline_run):
     #  2. Start new PipelineRuns for those pipelines.
     #  3. If there are none remaining, then this WorkflowRun is finished!
 
-    for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
-        # TODO this should be a sql query for optimal speed
-        runs = [
-            wpr.pipeline_run
-            for wpr in dest_wp.to_workflow_pipeline.workflow_pipeline_runs
-            if wpr.workflow_run == workflow_run
-        ]
-        for run in runs:
-            for artifact in pipeline_run.pipeline_run_artifacts:
-                copy_pipeline_run_artifact(artifact, run)
-            # TODO check the inputs - are they all satisfied? If so, then kick
-            # this job off
+    for run in find_dest_workflow_runs(workflow_pipeline_run):
+        for artifact in pipeline_run.pipeline_run_artifacts:
+            copy_pipeline_run_artifact(artifact, run)
+
+        sources = find_source_workflow_runs(run.workflow_pipeline_run)
+        if set([s.run_state_enum() for s in sources]) == set([RunStateEnum.COMPLETED]):
             start_pipeline_run(run)
 
-    # TODO check all the runs. Are they finished?
+    run_states = [wpr.pipeline_run.run_state_enum() for wpr in workflow_run.workflow_pipeline_runs]
+    if set(run_states) == set([RunStateEnum.COMPLETED]):
+        return update_workflow_run_state(workflow_run, RunStateEnum.COMPLETED)
 
     return workflow_run
