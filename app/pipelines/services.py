@@ -233,7 +233,8 @@ def copy_pipeline_run_artifact(pipeline_run_artifact, to_pipeline_run):
     return create_pipeline_run_artifact(
         to_pipeline_run.uuid,
         pipeline_run_artifact.name,
-        urllib_request.urlopen(pipeline_run_artifact.public_url()))
+        urllib_request.urlopen(pipeline_run_artifact.public_url()),
+    )
 
 
 def create_pipeline_run_artifact(run_uuid, filename, stream):

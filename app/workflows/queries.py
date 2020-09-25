@@ -91,11 +91,13 @@ def find_dest_workflow_runs(workflow_pipeline_run):
     # able to find this from the workflow_run itself?
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
-        result.extend([
-            wpr.pipeline_run
-            for wpr in dest_wp.to_workflow_pipeline.workflow_pipeline_runs
-            if wpr.workflow_run == workflow_run
-        ])
+        result.extend(
+            [
+                wpr.pipeline_run
+                for wpr in dest_wp.to_workflow_pipeline.workflow_pipeline_runs
+                if wpr.workflow_run == workflow_run
+            ]
+        )
     return result
 
 
@@ -105,9 +107,11 @@ def find_source_workflow_runs(workflow_pipeline_run):
     # able to find this from the workflow_run itself?
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.source_workflow_pipelines:
-        result.extend([
-            wpr.pipeline_run
-            for wpr in dest_wp.from_workflow_pipeline.workflow_pipeline_runs
-            if wpr.workflow_run == workflow_run
-        ])
+        result.extend(
+            [
+                wpr.pipeline_run
+                for wpr in dest_wp.from_workflow_pipeline.workflow_pipeline_runs
+                if wpr.workflow_run == workflow_run
+            ]
+        )
     return result

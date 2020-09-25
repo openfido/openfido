@@ -20,7 +20,13 @@ from .models import (
     WorkflowRunState,
     db,
 )
-from .queries import find_workflow, find_workflow_pipeline, is_dag, find_dest_workflow_runs, find_source_workflow_runs
+from .queries import (
+    find_workflow,
+    find_workflow_pipeline,
+    is_dag,
+    find_dest_workflow_runs,
+    find_source_workflow_runs,
+)
 from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
 
 logger = logging.getLogger("workflow-services")
@@ -236,7 +242,9 @@ def update_workflow_run(pipeline_run):
         if set([s.run_state_enum() for s in sources]) == set([RunStateEnum.COMPLETED]):
             start_pipeline_run(run)
 
-    run_states = [wpr.pipeline_run.run_state_enum() for wpr in workflow_run.workflow_pipeline_runs]
+    run_states = [
+        wpr.pipeline_run.run_state_enum() for wpr in workflow_run.workflow_pipeline_runs
+    ]
     if set(run_states) == set([RunStateEnum.COMPLETED]):
         return update_workflow_run_state(workflow_run, RunStateEnum.COMPLETED)
 
