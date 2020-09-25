@@ -267,8 +267,12 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
 def test_copy_pipeline_run_artifact(urlopen_mock, s3_mock, services_s3_mock, pipeline):
     s3_mock().generate_presigned_url.return_value = "http://example.com/presigned"
     urlopen_mock.return_value = io.BytesIO(b"this is data")
-    another_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    another_run = services.create_pipeline_run(
+        pipeline.uuid, VALID_CALLBACK_INPUT, True
+    )
+    pipeline_run = services.create_pipeline_run(
+        pipeline.uuid, VALID_CALLBACK_INPUT, True
+    )
     artifact = PipelineRunArtifact(name="ex.csv", pipeline_run=pipeline_run)
     db.session.add(artifact)
     db.session.commit()

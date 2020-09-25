@@ -141,11 +141,11 @@ def create_pipeline_run(pipeline_uuid, inputs_json, queued=False):
         create_pipeline_run_state(RunStateEnum.QUEUED)
     )
     pipeline.pipeline_runs.append(pipeline_run)
-    db.session.add(pipeline)
 
     if not queued:
         start_pipeline_run(pipeline_run)
 
+    db.session.add(pipeline_run)
     db.session.commit()
 
     return pipeline_run

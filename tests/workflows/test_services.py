@@ -7,13 +7,7 @@ from app.pipelines.models import PipelineRunArtifact
 from app.pipelines.services import create_pipeline_run, create_pipeline_run_state
 from app.workflows import services
 from app.workflows.models import WorkflowPipeline
-from app.workflows.queries import find_workflow
-from app.workflows.services import (
-    create_workflow_pipeline,
-    create_workflow_pipeline_run,
-    create_workflow_run_state,
-    update_workflow_run,
-)
+from app.workflows.queries import find_workflow, find_workflow_pipeline
 from marshmallow.exceptions import ValidationError
 
 from ..pipelines.test_services import VALID_CALLBACK_INPUT
@@ -62,6 +56,19 @@ def test_delete_workflow(app, workflow):
     the_uuid = workflow.uuid
     services.delete_workflow(the_uuid)
     assert find_workflow(the_uuid) is None
+
+
+def test_delete_workflow_pipeline_no_id(app, workflow):
+    with pytest.raises(ValueError):
+        services.delete_workflow_pipeline("no-id", "no-id")
+    with pytest.raises(ValueError):
+        services.delete_workflow_pipeline(workflow.uuid, "no-id")
+
+
+def test_delete_workflow_pipeline(app, workflow, workflow_pipeline):
+    the_uuid = workflow_pipeline.uuid
+    services.delete_workflow_pipeline(workflow.uuid, workflow_pipeline.uuid)
+    assert find_workflow_pipeline(the_uuid) is None
 
 
 def test_create_workflow_pipeline_no_workflow(app):
@@ -324,12 +331,12 @@ def test_create_workflow_pipeline_run(execute_pipeline_mock, app, workflow_squar
 def test_update_workflow_run_no_workflow(execute_pipeline_mock, app, pipeline):
     # a pipeline_run not associated with workflow_pipeline_run nothing breaks
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-    assert update_workflow_run(pipeline_run) is None
+    assert services.update_workflow_run(pipeline_run) is None
 
 
 def _configure_run_state(workflow, run_state_enum, delay_mock):
     """ Update first PipelineRun to run_state_enum and call update_workflow_run() """
-    create_workflow_pipeline_run(
+    services.create_workflow_pipeline_run(
         workflow.uuid,
         {
             "callback_url": "http://example.com/cb",
@@ -349,7 +356,7 @@ def _configure_run_state(workflow, run_state_enum, delay_mock):
 
     delay_mock.reset_mock()
 
-    return (update_workflow_run(pipeline_runs[0]), pipeline_runs)
+    return (services.update_workflow_run(pipeline_runs[0]), pipeline_runs)
 
 
 @patch("app.pipelines.services.execute_pipeline")
@@ -400,7 +407,7 @@ def test_update_workflow_run_RUNNING_line(
         workflow_line, RunStateEnum.COMPLETED, delay_mock
     )
     workflow_run.workflow_run_states.append(
-        create_workflow_run_state(RunStateEnum.RUNNING)
+        services.create_workflow_run_state(RunStateEnum.RUNNING)
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
@@ -420,7 +427,7 @@ def test_update_workflow_run_RUNNING_line(
     pipeline_runs[1].pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.COMPLETED)
     )
-    update_workflow_run(pipeline_runs[1])
+    services.update_workflow_run(pipeline_runs[1])
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
     copy_mock.assert_called_once_with(
         pipeline_runs[1].pipeline_run_artifacts[0], pipeline_runs[2]
@@ -433,7 +440,7 @@ def test_update_workflow_run_RUNNING_line(
     pipeline_runs[2].pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.COMPLETED)
     )
-    update_workflow_run(pipeline_runs[2])
+    services.update_workflow_run(pipeline_runs[2])
     assert workflow_run.run_state_enum() == RunStateEnum.COMPLETED
     assert not copy_mock.called
 
@@ -447,7 +454,7 @@ def test_update_workflow_run_RUNNING_square(
         workflow_square, RunStateEnum.COMPLETED, delay_mock
     )
     workflow_run.workflow_run_states.append(
-        create_workflow_run_state(RunStateEnum.RUNNING)
+        services.create_workflow_run_state(RunStateEnum.RUNNING)
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
@@ -472,7 +479,7 @@ def test_update_workflow_run_RUNNING_square(
     pipeline_runs[1].pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.COMPLETED)
     )
-    update_workflow_run(pipeline_runs[1])
+    services.update_workflow_run(pipeline_runs[1])
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
     copy_mock.assert_called_once_with(
         pipeline_runs[1].pipeline_run_artifacts[0], pipeline_runs[3]
@@ -488,7 +495,7 @@ def test_update_workflow_run_RUNNING_square(
     pipeline_runs[2].pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.COMPLETED)
     )
-    update_workflow_run(pipeline_runs[2])
+    services.update_workflow_run(pipeline_runs[2])
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
     copy_mock.assert_called_once_with(
         pipeline_runs[2].pipeline_run_artifacts[0], pipeline_runs[3]
@@ -501,6 +508,6 @@ def test_update_workflow_run_RUNNING_square(
     pipeline_runs[3].pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.COMPLETED)
     )
-    update_workflow_run(pipeline_runs[3])
+    services.update_workflow_run(pipeline_runs[3])
     assert workflow_run.run_state_enum() == RunStateEnum.COMPLETED
     assert not copy_mock.called
