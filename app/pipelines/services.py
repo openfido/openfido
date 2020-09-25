@@ -1,5 +1,6 @@
 import json
 import logging
+import urllib
 import urllib.request
 import uuid
 from urllib.error import URLError
@@ -229,10 +230,14 @@ def update_pipeline_run_state(
 
 
 def copy_pipeline_run_artifact(pipeline_run_artifact, to_pipeline_run):
-    pass
+    return create_pipeline_run_artifact(
+        to_pipeline_run.uuid,
+        pipeline_run_artifact.name,
+        urllib_request.urlopen(pipeline_run_artifact.public_url()))
 
 
-def create_pipeline_run_artifact(run_uuid, filename, request):
+def create_pipeline_run_artifact(run_uuid, filename, stream):
+    """ Create a PipelineRunArtifact from a stream. """
     pipeline_run = find_pipeline_run(run_uuid)
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
@@ -244,7 +249,7 @@ def create_pipeline_run_artifact(run_uuid, filename, request):
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
     s3.upload_fileobj(
-        request.stream,
+        stream,
         bucket,
         f"{pipeline_run.pipeline.uuid}/{run_uuid}/{artifact_uuid}-{sname}",
     )
@@ -253,3 +258,5 @@ def create_pipeline_run_artifact(run_uuid, filename, request):
     pipeline_run.pipeline_run_artifacts.append(artifact)
 
     db.session.commit()
+
+    return artifact

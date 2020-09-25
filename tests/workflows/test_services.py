@@ -1,8 +1,9 @@
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import pytest
 from app import db
 from app.model_utils import RunStateEnum
+from app.pipelines.models import PipelineRunArtifact
 from app.pipelines.services import create_pipeline_run, create_pipeline_run_state
 from app.workflows import services
 from app.workflows.models import WorkflowPipeline
@@ -304,6 +305,9 @@ def _configure_run_state(workflow, run_state_enum):
     pipeline_runs[0].pipeline_run_states.append(
         create_pipeline_run_state(run_state_enum)
     )
+    pipeline_runs[0].pipeline_run_artifacts.append(
+        PipelineRunArtifact(name="afile.txt")
+    )
     db.session.commit()
 
     return (update_workflow_run(pipeline_runs[0]), pipeline_runs)
@@ -339,8 +343,9 @@ def test_update_workflow_run_RUNNING(
     assert not execute_pipeline_mock.called
 
 
+@patch("app.workflows.services.copy_pipeline_run_artifact")
 @patch("app.pipelines.services.execute_pipeline.delay")
-def test_update_workflow_run_RUNNING_line(delay_mock, app, pipeline, workflow_line):
+def test_update_workflow_run_RUNNING_line(delay_mock, copy_mock, app, pipeline, workflow_line):
     (workflow_run, pipeline_runs) = _configure_run_state(
         workflow_line, RunStateEnum.COMPLETED
     )
@@ -349,14 +354,15 @@ def test_update_workflow_run_RUNNING_line(delay_mock, app, pipeline, workflow_li
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
-    # TODO also assert that any artifacts are passed along.
+    copy_mock.assert_called_once_with(pipeline_runs[0].pipeline_run_artifacts[0], pipeline_runs[1])
     assert pipeline_runs[1].run_state_enum() == RunStateEnum.NOT_STARTED
     assert pipeline_runs[2].run_state_enum() == RunStateEnum.QUEUED
     delay_mock.assert_called_once()
 
 
+@patch("app.workflows.services.copy_pipeline_run_artifact")
 @patch("app.pipelines.services.execute_pipeline.delay")
-def test_update_workflow_run_RUNNING_square(delay_mock, app, pipeline, workflow_square):
+def test_update_workflow_run_RUNNING_square(delay_mock, copy_mock, app, pipeline, workflow_square):
     (workflow_run, pipeline_runs) = _configure_run_state(
         workflow_square, RunStateEnum.COMPLETED
     )
@@ -365,7 +371,10 @@ def test_update_workflow_run_RUNNING_square(delay_mock, app, pipeline, workflow_
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
-    # TODO also assert that any artifacts are passed along.
+    copy_mock.assert_has_calls([
+        call(pipeline_runs[0].pipeline_run_artifacts[0], pipeline_runs[1]),
+        call(pipeline_runs[0].pipeline_run_artifacts[0], pipeline_runs[2]),
+    ])
     assert pipeline_runs[1].run_state_enum() == RunStateEnum.NOT_STARTED
     assert pipeline_runs[2].run_state_enum() == RunStateEnum.NOT_STARTED
     assert pipeline_runs[3].run_state_enum() == RunStateEnum.QUEUED
