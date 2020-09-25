@@ -314,6 +314,17 @@ def _configure_run_state(workflow, run_state_enum):
 
 
 @patch("app.pipelines.services.execute_pipeline")
+def test_update_workflow_run_QUEUE(
+    execute_pipeline_mock, app, pipeline, workflow_line
+):
+    # when a PipelineRun gives some unexpected state, an error is thrown
+    with pytest.raises(ValueError):
+        (workflow_run, pipeline_runs) = _configure_run_state(
+            workflow_line, RunStateEnum.QUEUED
+        )
+
+
+@patch("app.pipelines.services.execute_pipeline")
 def test_update_workflow_run_FAILED(
     execute_pipeline_mock, app, pipeline, workflow_line
 ):

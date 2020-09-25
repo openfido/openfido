@@ -219,8 +219,9 @@ def update_workflow_run(pipeline_run):
         return update_workflow_run_state(workflow_run, RunStateEnum.FAILED)
 
     if pipeline_run.run_state_enum() != RunStateEnum.COMPLETED:
-        logger.warning(f"Unexpected state encountered: {pipeline_run.run_state_enum()}")
-        return workflow_run
+        error = f"Unexpected state encountered: {pipeline_run.run_state_enum()}"
+        logger.warning(error)
+        raise ValueError(error)
 
     # When a PipelineRun has completed we can continue the workflow:
     #  1. Pass its artifacts onward to any dest_workflow_pipelines

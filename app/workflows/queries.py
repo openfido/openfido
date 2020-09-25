@@ -85,11 +85,6 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
     return nx.is_directed_acyclic_graph(digraph)
 
 
-def find_pipeline_runs_for_workflow_run(workflow_run):
-    workflow_pipeline_runs = [wpr for wpr in workflow_run.workflow_pipeline_runs]
-    return [wpr.pipeline_run for wpr in workflow_pipeline_runs]
-
-
 def find_dest_workflow_runs(workflow_pipeline_run):
     workflow_run = workflow_pipeline_run.workflow_run
     # TODO this should be a sql query for optimal speed -- or I should be

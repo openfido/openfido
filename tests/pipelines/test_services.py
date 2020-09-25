@@ -90,6 +90,15 @@ def test_create_pipeline_run_no_pipeline(app):
         pipeline_run = services.create_pipeline_run("no-id", VALID_CALLBACK_INPUT)
 
 
+def test_start_pipeline_run_bad_state(app, pipeline):
+    pipeline_run = services.create_pipeline_run(
+        pipeline.uuid,
+        {"inputs": [], "callback_url": "http://example.com"},
+    )
+    with pytest.raises(ValueError):
+        services.start_pipeline_run(pipeline_run)
+
+
 def test_create_pipeline_run(app, pipeline, mock_execute_pipeline):
     input1 = {
         "name": "name1.pdf",
