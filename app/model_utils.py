@@ -1,6 +1,6 @@
 import importlib
 import os
-import uuid
+import uuid as uuid_lib
 from datetime import datetime
 from enum import IntEnum, unique
 
@@ -78,7 +78,7 @@ class CommonColumnsMixin:
         db.String(32),
         nullable=False,
         server_default="",
-        default=lambda: uuid.uuid4().hex,
+        default=lambda: uuid_lib.uuid4().hex,
     )
     created_at = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.utcnow()

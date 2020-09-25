@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow.exceptions import ValidationError
 
 from ..model_utils import SystemPermissionEnum
-from ..utils import permissions_required, to_iso8601, verify_content_type_and_params
+from ..utils import permissions_required, verify_content_type_and_params
 from .queries import find_pipeline, find_pipeline_run
 from .schemas import PipelineRunSchema
 from .services import (

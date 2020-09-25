@@ -98,11 +98,11 @@ def create(workflow_uuid):
         workflow_pipeline = create_workflow_pipeline(workflow_uuid, request.json)
 
         return jsonify(WorkflowPipelineSchema().dump(workflow_pipeline))
-    except ValidationError as ve:
-        logger.warning(ve)
-        return {"message": "Validation error", "errors": ve.messages}, 400
-    except ValueError as e:
-        logger.warning(e)
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
+    except ValueError as value_err:
+        logger.warning(value_err)
         return {
             "message": "Unable to create WorkflowPipeline",
         }, 400

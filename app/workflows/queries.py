@@ -1,8 +1,8 @@
-from .models import db, Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from sqlalchemy import and_, or_
+
 import networkx as nx
 
-from .models import Workflow
+from .models import Workflow, WorkflowPipeline, WorkflowPipelineDependency, db
 from .schemas import SearchWorkflowsSchema
 
 
@@ -42,6 +42,7 @@ def find_workflow_pipeline(workflow_pipeline_uuid):
 
 
 def find_workflow_pipeline_dependencies(workflow_uuid):
+    """ Return all WorkflowPipelineDependency for a Workflow. """
     workflow_pipeline_sq = (
         db.session.query(WorkflowPipeline.id)
         .join(Workflow)
@@ -86,9 +87,9 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
 
 
 def find_dest_workflow_runs(workflow_pipeline_run):
+    """Find all PipelineRuns associated with the dest_workflow_pipelines of
+    this WorkflowPipelineRun"""
     workflow_run = workflow_pipeline_run.workflow_run
-    # TODO this should be a sql query for optimal speed -- or I should be
-    # able to find this from the workflow_run itself?
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
         result.extend(
@@ -102,9 +103,9 @@ def find_dest_workflow_runs(workflow_pipeline_run):
 
 
 def find_source_workflow_runs(workflow_pipeline_run):
+    """Find all PipelineRuns associated with the source_workflow_pipelines of
+    this WorkflowPipelineRun"""
     workflow_run = workflow_pipeline_run.workflow_run
-    # TODO this should be a sql query for optimal speed -- or I should be
-    # able to find this from the workflow_run itself?
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.source_workflow_pipelines:
         result.extend(

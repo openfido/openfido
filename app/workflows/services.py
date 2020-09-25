@@ -143,20 +143,6 @@ def update_workflow_run_state(workflow_run, run_state_enum):
     """
 
     # TODO make sure that the transition is valid.
-    if run_state_enum == RunStateEnum.FAILED:
-        # TODO THIS SHOULD JUST BE IN ITS OWN METHOD
-        for wpr in workflow_run.workflow_pipeline_runs:
-            # TODO optimization - if we store the Celery AsyncResult id in a
-            # PipelineRun we could explicitly cancel any other PipelineRuns that
-            # might be running, and associated with this WorkflowRun.
-            if wpr.run_state_enum().in_final_state():
-                continue
-
-            update_pipeline_run_state(
-                wpr.pipeline_run.uuid,
-                {"state": RunStateEnum.ABORTED.name},
-                apply_to_workflow_run=False,
-            )
 
     workflow_run.workflow_run_states.append(create_workflow_run_state(run_state_enum))
     db.session.commit()
@@ -222,6 +208,16 @@ def update_workflow_run(pipeline_run):
         return update_workflow_run_state(workflow_run, RunStateEnum.RUNNING)
 
     if pipeline_run.run_state_enum() == RunStateEnum.FAILED:
+        for wpr in workflow_run.workflow_pipeline_runs:
+            if wpr.run_state_enum().in_final_state():
+                continue
+
+            update_pipeline_run_state(
+                wpr.pipeline_run.uuid,
+                {"state": RunStateEnum.ABORTED.name},
+                apply_to_workflow_run=False,
+            )
+
         return update_workflow_run_state(workflow_run, RunStateEnum.FAILED)
 
     if pipeline_run.run_state_enum() != RunStateEnum.COMPLETED:

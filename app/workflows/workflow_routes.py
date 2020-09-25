@@ -6,9 +6,9 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
 from .queries import find_workflow, find_workflows
-from .schemas import WorkflowSchema, SearchWorkflowsSchema
+from .schemas import WorkflowSchema
 from .services import create_workflow, update_workflow, delete_workflow
-from ..utils import to_iso8601, verify_content_type_and_params, permissions_required
+from ..utils import verify_content_type_and_params, permissions_required
 
 logger = logging.getLogger("workflows")
 
