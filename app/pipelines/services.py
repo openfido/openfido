@@ -143,10 +143,10 @@ def create_pipeline_run(pipeline_uuid, inputs_json, queued=False):
     pipeline.pipeline_runs.append(pipeline_run)
     db.session.add(pipeline)
 
-    db.session.commit()
-
     if not queued:
         start_pipeline_run(pipeline_run)
+
+    db.session.commit()
 
     return pipeline_run
 
@@ -161,6 +161,7 @@ def start_pipeline_run(pipeline_run):
     pipeline_run.pipeline_run_states.append(
         create_pipeline_run_state(RunStateEnum.NOT_STARTED)
     )
+    db.session.commit()
 
     execute_pipeline.delay(
         pipeline.uuid,
@@ -220,7 +221,9 @@ def update_pipeline_run_state(
         raise ValueError("pipeline run not found")
 
     if not pipeline_run.run_state_enum().is_valid_transition(data["state"]):
-        raise ValueError("Invalid state transition")
+        raise ValueError(
+            f"Invalid state transition: {pipeline_run.run_state_enum().name}->{data['state'].name}"
+        )
 
     pipeline_run.pipeline_run_states.append(create_pipeline_run_state(data["state"]))
 

@@ -68,10 +68,20 @@ class WorkflowPipelineRunSchema(Schema):
     pipeline_run = fields.Nested(PipelineRunSchema)
 
 
+class WorkflowRunStateSchema(Schema):
+    """ Export WorkflowRunState """
+
+    state = fields.Function(lambda obj: obj.run_state_enum().name)
+    created_at = fields.DateTime()
+
+
 class WorkflowRunSchema(Schema):
     """ Serialized public view of WorkflowRun """
 
     uuid = UUID()
+    states = fields.Nested(
+        WorkflowRunStateSchema, many=True, attribute="workflow_run_states"
+    )
     workflow_pipeline_runs = fields.Nested(WorkflowPipelineRunSchema, many=True)
     # state = EnumField(RunStateEnum)
     created_at = fields.DateTime()

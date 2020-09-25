@@ -251,7 +251,10 @@ def test_create_workflow_pipeline_run_no_workflow(app, pipeline, workflow):
         )
 
 
-def test_create_workflow_pipeline_run(app, pipeline, workflow_pipeline):
+@patch("app.pipelines.services.execute_pipeline")
+def test_create_workflow_pipeline_run(
+    execute_pipeline_mock, app, pipeline, workflow_pipeline
+):
     create_data = {
         "callback_url": "https://example.com",
         "inputs": [
@@ -274,13 +277,47 @@ def test_create_workflow_pipeline_run(app, pipeline, workflow_pipeline):
     assert len(workflow_pipeline_run.workflow_pipeline_runs) == 1
     pipeline_run = workflow_pipeline_run.workflow_pipeline_runs[0].pipeline_run
     assert pipeline_run.callback_url == create_data["callback_url"]
-    assert len(pipeline_run.pipeline_run_states) == 1
-    assert pipeline_run.pipeline_run_states[0].code == RunStateEnum.QUEUED
+    assert [prs.code for prs in pipeline_run.pipeline_run_states] == [
+        RunStateEnum.QUEUED,
+        RunStateEnum.NOT_STARTED,
+    ]
     assert len(pipeline_run.pipeline_run_inputs) == 1
     assert (
         pipeline_run.pipeline_run_inputs[0].filename == create_data["inputs"][0]["name"]
     )
     assert pipeline_run.pipeline_run_inputs[0].url == create_data["inputs"][0]["url"]
+
+
+@patch("app.pipelines.services.execute_pipeline")
+def test_create_workflow_pipeline_run(execute_pipeline_mock, app, workflow_square):
+    create_data = {
+        "callback_url": "https://example.com",
+        "inputs": [
+            {
+                "name": "aname.pdf",
+                "url": "https://example.com/ex.pdf",
+            }
+        ],
+    }
+    # A complex workflow with only one WorkflowPipeline w/o input should be the
+    # only thing to start initially.
+    workflow_pipeline_run = services.create_workflow_pipeline_run(
+        workflow_square.uuid, create_data
+    )
+    assert len(workflow_pipeline_run.workflow_run_states) == 1
+    assert (
+        workflow_pipeline_run.workflow_run_states[0].run_state_type.code
+        == RunStateEnum.NOT_STARTED
+    )
+    assert len(workflow_pipeline_run.workflow_pipeline_runs) == 4
+    assert [
+        wpr.run_state_enum() for wpr in workflow_pipeline_run.workflow_pipeline_runs
+    ] == [
+        RunStateEnum.NOT_STARTED,
+        RunStateEnum.QUEUED,
+        RunStateEnum.QUEUED,
+        RunStateEnum.QUEUED,
+    ]
 
 
 @patch("app.pipelines.services.execute_pipeline")
@@ -290,7 +327,7 @@ def test_update_workflow_run_no_workflow(execute_pipeline_mock, app, pipeline):
     assert update_workflow_run(pipeline_run) is None
 
 
-def _configure_run_state(workflow, run_state_enum):
+def _configure_run_state(workflow, run_state_enum, delay_mock):
     """ Update first PipelineRun to run_state_enum and call update_workflow_run() """
     create_workflow_pipeline_run(
         workflow.uuid,
@@ -310,6 +347,8 @@ def _configure_run_state(workflow, run_state_enum):
     )
     db.session.commit()
 
+    delay_mock.reset_mock()
+
     return (update_workflow_run(pipeline_runs[0]), pipeline_runs)
 
 
@@ -318,7 +357,7 @@ def test_update_workflow_run_QUEUE(execute_pipeline_mock, app, pipeline, workflo
     # when a PipelineRun gives some unexpected state, an error is thrown
     with pytest.raises(ValueError):
         (workflow_run, pipeline_runs) = _configure_run_state(
-            workflow_line, RunStateEnum.QUEUED
+            workflow_line, RunStateEnum.QUEUED, execute_pipeline_mock
         )
 
 
@@ -329,7 +368,7 @@ def test_update_workflow_run_FAILED(
     # when a PipelineRun fails, then all the remaining PRs should be marked as
     # ABORTED -- and the WorkflowRun itself should be FAILED.
     (workflow_run, pipeline_runs) = _configure_run_state(
-        workflow_line, RunStateEnum.FAILED
+        workflow_line, RunStateEnum.FAILED, execute_pipeline_mock
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.FAILED
@@ -343,7 +382,7 @@ def test_update_workflow_run_RUNNING(
     execute_pipeline_mock, app, pipeline, workflow_line
 ):
     (workflow_run, pipeline_runs) = _configure_run_state(
-        workflow_line, RunStateEnum.RUNNING
+        workflow_line, RunStateEnum.RUNNING, execute_pipeline_mock
     )
 
     assert workflow_run.run_state_enum() == RunStateEnum.RUNNING
@@ -358,7 +397,7 @@ def test_update_workflow_run_RUNNING_line(
     delay_mock, copy_mock, app, pipeline, workflow_line
 ):
     (workflow_run, pipeline_runs) = _configure_run_state(
-        workflow_line, RunStateEnum.COMPLETED
+        workflow_line, RunStateEnum.COMPLETED, delay_mock
     )
     workflow_run.workflow_run_states.append(
         create_workflow_run_state(RunStateEnum.RUNNING)
@@ -405,7 +444,7 @@ def test_update_workflow_run_RUNNING_square(
     delay_mock, copy_mock, app, pipeline, workflow_square
 ):
     (workflow_run, pipeline_runs) = _configure_run_state(
-        workflow_square, RunStateEnum.COMPLETED
+        workflow_square, RunStateEnum.COMPLETED, delay_mock
     )
     workflow_run.workflow_run_states.append(
         create_workflow_run_state(RunStateEnum.RUNNING)

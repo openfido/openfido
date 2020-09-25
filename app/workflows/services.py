@@ -163,8 +163,12 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
     )
 
     for workflow_pipeline in workflow.workflow_pipelines:
-        # TODO data should only go into those runs that have no source_workflow_pipelines
-        pipeline_run = create_pipeline_run(workflow_pipeline.pipeline.uuid, data, True)
+        queue_run = len(workflow_pipeline.source_workflow_pipelines) > 0
+        no_input_data = {"callback_url": data["callback_url"], "inputs": []}
+        run_data = no_input_data if queue_run else data
+        pipeline_run = create_pipeline_run(
+            workflow_pipeline.pipeline.uuid, run_data, queue_run
+        )
         workflow_pipeline_run = WorkflowPipelineRun(
             workflow_run=workflow_run,
             pipeline_run=pipeline_run,
@@ -172,11 +176,7 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
         )
         db.session.add(workflow_pipeline_run)
 
-    # TODO start the new tasks that are allowed to be started here - or rather,
-    # call the service for this task
-
     db.session.add(workflow_run)
-
     db.session.commit()
 
     return workflow_run
