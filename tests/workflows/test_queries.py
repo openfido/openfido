@@ -1,6 +1,7 @@
 from app.workflows import queries
 from app import db
 from app.workflows.models import Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from app.pipelines.models import Pipeline
 
 
 def test_find_workflow_bad_id(app):
@@ -53,3 +54,19 @@ def test_is_dag(app, workflow_line, pipeline):
 
     # trying to make a cycle fails
     assert not queries.is_dag(workflow_line, c, a)
+
+
+def test_pipeline_has_workflow_pipeline(app, workflow, pipeline, workflow_pipeline):
+    assert queries.pipeline_has_workflow_pipeline(pipeline.id)
+
+    p1 = Pipeline(
+        name="pipeline 1",
+        description="a description",
+        docker_image_url="",
+        repository_ssh_url="",
+        repository_branch="",
+    )
+    db.session.add(p1)
+    db.session.commit()
+
+    assert not queries.pipeline_has_workflow_pipeline(p1.id)

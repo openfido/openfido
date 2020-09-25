@@ -35,6 +35,11 @@ def delete_pipeline(pipeline_uuid):
     if pipeline is None:
         raise ValueError("no pipeline found")
 
+    from ..workflows.queries import pipeline_has_workflow_pipeline
+
+    if pipeline_has_workflow_pipeline(pipeline.id):
+        raise ValueError("pipeline has an associated workflow pipeline")
+
     pipeline.is_deleted = True
     db.session.commit()
 

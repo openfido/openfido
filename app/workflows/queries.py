@@ -116,3 +116,17 @@ def find_source_workflow_runs(workflow_pipeline_run):
             ]
         )
     return result
+
+
+def pipeline_has_workflow_pipeline(pipeline_id):
+    """ Find a WorkflowPipeline by pipeline ID. """
+    return (
+        WorkflowPipeline.query.join(Workflow)
+        .filter(
+            and_(
+                WorkflowPipeline.pipeline_id == pipeline_id,
+                Workflow.is_deleted == False,
+            )
+        )
+        .scalar()
+    ) is not None
