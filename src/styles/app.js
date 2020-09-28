@@ -75,9 +75,8 @@ export const StyledTitle = styled.div`
 `;
 
 export const StyledText = styled.span`
-  width: 100%;
   ${({
-    color, fontweight, indent, size, bordercolor, padding, margin, align,
+    color, fontweight, indent, size, bordercolor, padding, margin, align, float, height,
   }) => (`
   ${color in colors ? (`
   color: ${colors[color]};
@@ -93,8 +92,10 @@ export const StyledText = styled.span`
   line-height: 21px;
   `) : ''}
   ${size === 'middle' ? (`
-  font-size: 16px;
-  line-height: 19px;
+  font-size: 14px;
+  font-size: 0.875rem;
+  line-height: 16px;
+  line-height: 1rem;
   `) : ''}
   ${size === 'small' ? (`
   font-size: 12px;
@@ -112,6 +113,9 @@ export const StyledText = styled.span`
   `) : ''}
   ${align ? (`
   text-align: ${align};
+  `) : ''}
+  ${float ? (`
+  float: ${float};
   `) : ''}
   `)}
 `;
