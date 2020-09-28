@@ -1,8 +1,8 @@
 """pipelines and workflows
 
-Revision ID: 78252b219ab0
+Revision ID: 9bb47f61b8cd
 Revises: 
-Create Date: 2020-09-22 20:12:10.481766
+Create Date: 2020-09-28 13:39:16.797018
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '78252b219ab0'
+revision = '9bb47f61b8cd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -103,6 +103,7 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('pipeline_id', sa.Integer(), nullable=False),
     sa.Column('workflow_id', sa.Integer(), nullable=False),
+    sa.Column('is_deleted', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['pipeline_id'], ['pipeline.id'], ),
     sa.ForeignKeyConstraint(['workflow_id'], ['workflow.id'], ),
     sa.PrimaryKeyConstraint('id')

@@ -154,8 +154,8 @@ def update_workflow_run_state(workflow_run, run_state_enum):
     return workflow_run
 
 
-def create_workflow_pipeline_run(workflow_uuid, run_json):
-    """ Create a new workflow pipeline run """
+def create_workflow_run(workflow_uuid, run_json):
+    """ Create a new WorkflowRun """
     data = CreateRunSchema().load(run_json)
 
     workflow = find_workflow(workflow_uuid)
@@ -167,7 +167,10 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
         WorkflowRunState(run_state_type=find_run_state_type(RunStateEnum.NOT_STARTED))
     )
 
+    added_run = False
     for workflow_pipeline in workflow.workflow_pipelines:
+        if workflow_pipeline.is_deleted:
+            continue
         queue_run = len(workflow_pipeline.source_workflow_pipelines) > 0
         no_input_data = {"callback_url": data["callback_url"], "inputs": []}
         run_data = no_input_data if queue_run else data
@@ -180,6 +183,11 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
             workflow_pipeline=workflow_pipeline,
         )
         db.session.add(workflow_pipeline_run)
+        added_run = True
+
+    if not added_run:
+        db.session.rollback()
+        raise ValueError("No WorkflowPipelines exist!")
 
     db.session.add(workflow_run)
     db.session.commit()
@@ -193,7 +201,7 @@ def delete_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
     if workflow_pipeline is None:
         raise ValueError("no workflow_pipeline found")
 
-    db.session.delete(workflow_pipeline)
+    workflow_pipeline.is_deleted = True
     db.session.commit()
 
 

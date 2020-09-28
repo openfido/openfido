@@ -25,6 +25,7 @@ class WorkflowPipeline(CommonColumnsMixin, db.Model):
 
     pipeline_id = db.Column(db.Integer, db.ForeignKey("pipeline.id"), nullable=False)
     workflow_id = db.Column(db.Integer, db.ForeignKey("workflow.id"), nullable=False)
+    is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     source_workflow_pipelines = db.relationship(
         "WorkflowPipelineDependency",

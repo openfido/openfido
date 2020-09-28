@@ -40,6 +40,7 @@ def find_workflow_pipeline(workflow_pipeline_uuid):
         .filter(
             and_(
                 WorkflowPipeline.uuid == workflow_pipeline_uuid,
+                WorkflowPipeline.is_deleted == False,
                 Workflow.is_deleted == False,
             )
         )
@@ -88,11 +89,12 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
 
 
 def find_dest_workflow_runs(workflow_pipeline_run):
-    """Find all PipelineRuns associated with the dest_workflow_pipelines of
-    this WorkflowPipelineRun"""
+    """Find all PipelineRuns.dest_workflow_pipelines of a WorkflowPipelineRun"""
     workflow_run = workflow_pipeline_run.workflow_run
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
+        if dest_wp.to_workflow_pipeline.is_deleted:
+            continue
         result.extend(
             [
                 wpr.pipeline_run
@@ -104,11 +106,12 @@ def find_dest_workflow_runs(workflow_pipeline_run):
 
 
 def find_source_workflow_runs(workflow_pipeline_run):
-    """Find all PipelineRuns associated with the source_workflow_pipelines of
-    this WorkflowPipelineRun"""
+    """Find all PipelineRuns.source_workflow_pipelines of a WorkflowPipelineRun"""
     workflow_run = workflow_pipeline_run.workflow_run
     result = []
     for dest_wp in workflow_pipeline_run.workflow_pipeline.source_workflow_pipelines:
+        if dest_wp.from_workflow_pipeline.is_deleted:
+            continue
         result.extend(
             [
                 wpr.pipeline_run

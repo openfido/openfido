@@ -68,7 +68,13 @@ def test_delete_workflow_pipeline_no_id(app, workflow):
 def test_delete_workflow_pipeline(app, workflow, workflow_pipeline):
     the_uuid = workflow_pipeline.uuid
     services.delete_workflow_pipeline(workflow.uuid, workflow_pipeline.uuid)
+    assert workflow_pipeline.is_deleted
     assert find_workflow_pipeline(the_uuid) is None
+
+
+def test_delete_workflow_pipeline_via_delete_workflow(app, workflow, workflow_pipeline):
+    services.delete_workflow(workflow.uuid)
+    assert find_workflow_pipeline(workflow_pipeline.uuid) is None
 
 
 def test_create_workflow_pipeline_no_workflow(app):
@@ -251,17 +257,32 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
     )
 
 
-def test_create_workflow_pipeline_run_no_workflow(app, pipeline, workflow):
+def test_create_workflow_run_no_workflow(app, pipeline, workflow):
     with pytest.raises(ValueError):
-        services.create_workflow_pipeline_run(
+        services.create_workflow_run(
             "no-id", {"callback_url": "https://example.com", "inputs": []}
         )
 
 
 @patch("app.pipelines.services.execute_pipeline")
-def test_create_workflow_pipeline_run(
+def test_create_workflow_run_deleted_workflow_pipeline(
     execute_pipeline_mock, app, pipeline, workflow_pipeline
 ):
+    services.delete_workflow_pipeline(
+        workflow_pipeline.workflow.uuid, workflow_pipeline.uuid
+    )
+    create_data = {
+        "callback_url": "https://example.com",
+        "inputs": [],
+    }
+    workflow = workflow_pipeline.workflow
+    with pytest.raises(ValueError):
+        services.create_workflow_run(workflow.uuid, create_data)
+    assert len(workflow.workflow_runs) == 0
+
+
+@patch("app.pipelines.services.execute_pipeline")
+def test_create_workflow_run(execute_pipeline_mock, app, pipeline, workflow_pipeline):
     create_data = {
         "callback_url": "https://example.com",
         "inputs": [
@@ -273,7 +294,7 @@ def test_create_workflow_pipeline_run(
     }
     # A new WorkflowPipelineRun creates new PipelineRuns as QUEUED...when the
     # celery worker runs it'll update their states appropriately.
-    workflow_pipeline_run = services.create_workflow_pipeline_run(
+    workflow_pipeline_run = services.create_workflow_run(
         workflow_pipeline.workflow.uuid, create_data
     )
     assert len(workflow_pipeline_run.workflow_run_states) == 1
@@ -296,7 +317,7 @@ def test_create_workflow_pipeline_run(
 
 
 @patch("app.pipelines.services.execute_pipeline")
-def test_create_workflow_pipeline_run(execute_pipeline_mock, app, workflow_square):
+def test_create_workflow_run(execute_pipeline_mock, app, workflow_square):
     create_data = {
         "callback_url": "https://example.com",
         "inputs": [
@@ -308,7 +329,7 @@ def test_create_workflow_pipeline_run(execute_pipeline_mock, app, workflow_squar
     }
     # A complex workflow with only one WorkflowPipeline w/o input should be the
     # only thing to start initially.
-    workflow_pipeline_run = services.create_workflow_pipeline_run(
+    workflow_pipeline_run = services.create_workflow_run(
         workflow_square.uuid, create_data
     )
     assert len(workflow_pipeline_run.workflow_run_states) == 1
@@ -336,7 +357,7 @@ def test_update_workflow_run_no_workflow(execute_pipeline_mock, app, pipeline):
 
 def _configure_run_state(workflow, run_state_enum, delay_mock):
     """ Update first PipelineRun to run_state_enum and call update_workflow_run() """
-    services.create_workflow_pipeline_run(
+    services.create_workflow_run(
         workflow.uuid,
         {
             "callback_url": "http://example.com/cb",
@@ -359,14 +380,17 @@ def _configure_run_state(workflow, run_state_enum, delay_mock):
     return (services.update_workflow_run(pipeline_runs[0]), pipeline_runs)
 
 
-def test_update_workflow_run_state(app, workflow):
-    services.create_workflow_pipeline_run(
+def test_update_workflow_run_state(app, workflow_pipeline):
+    workflow = workflow_pipeline.workflow
+    services.create_workflow_run(
         workflow.uuid,
         {
             "callback_url": "http://example.com/cb",
             "inputs": [],
         },
     )
+    workflow = workflow_pipeline.workflow
+    db.session.add(workflow)
     # Setting a pipeline to its current state does nothing.
     services.update_workflow_run_state(
         workflow.workflow_runs[0], RunStateEnum.NOT_STARTED

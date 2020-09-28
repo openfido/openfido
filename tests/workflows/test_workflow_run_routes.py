@@ -8,7 +8,7 @@ from marshmallow.exceptions import ValidationError
 from roles.decorators import ROLES_KEY
 
 
-@patch("app.workflows.workflow_run_routes.create_workflow_pipeline_run")
+@patch("app.workflows.workflow_run_routes.create_workflow_run")
 def test_start_workflow_run_validation(
     create_run_mock, client, client_application, workflow_pipeline
 ):
@@ -27,7 +27,7 @@ def test_start_workflow_run_validation(
     assert set(result.json.keys()) == set(["message", "errors"])
 
 
-@patch("app.workflows.workflow_run_routes.create_workflow_pipeline_run")
+@patch("app.workflows.workflow_run_routes.create_workflow_run")
 def test_start_workflow_run_failure(
     create_run_mock, client, client_application, workflow_pipeline
 ):
