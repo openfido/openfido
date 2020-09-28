@@ -25,19 +25,19 @@ def find_pipelines(uuids=None):
     return query
 
 
-def find_run_state_type(run_state):
+def find_run_state_type(run_state_enum):
     """Find a specific RunStateType.
 
     If the RunStateType doesn't exist, create it and return it.
     """
     run_state_type = RunStateType.query.filter(
-        RunStateType.code == run_state.value
+        RunStateType.code == run_state_enum.value
     ).one_or_none()
     if run_state_type is None:
         run_state_type = RunStateType(
-            name=run_state.name,
-            description=run_state.name,
-            code=run_state.value,
+            name=run_state_enum.name,
+            description=run_state_enum.name,
+            code=run_state_enum.value,
         )
         db.session.add(run_state_type)
 

@@ -97,7 +97,7 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
     )
     assert result.status_code == 200
     assert len(pipeline.pipeline_runs) == 1
-    assert len(pipeline.pipeline_runs[0].pipeline_run_states) == 1
+    assert pipeline.pipeline_runs[0].run_state_enum() == RunStateEnum.NOT_STARTED
     assert len(pipeline.pipeline_runs[0].pipeline_run_inputs) == 1
     assert pipeline.pipeline_runs[0].callback_url == "http://callback.com"
     pipeline_run = pipeline.pipeline_runs[0]
@@ -114,11 +114,17 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
         ],
         "states": [
             {
-                "state": pipeline_run.pipeline_run_states[0].name,
+                "state": RunStateEnum.QUEUED.name,
                 "created_at": to_iso8601(
                     pipeline_run.pipeline_run_states[0].created_at
                 ),
-            }
+            },
+            {
+                "state": RunStateEnum.NOT_STARTED.name,
+                "created_at": to_iso8601(
+                    pipeline_run.pipeline_run_states[1].created_at
+                ),
+            },
         ],
         "artifacts": [],
     }
@@ -159,11 +165,17 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
         "inputs": [],
         "states": [
             {
-                "state": pipeline_run.pipeline_run_states[0].name,
+                "state": RunStateEnum.QUEUED.name,
                 "created_at": to_iso8601(
                     pipeline_run.pipeline_run_states[0].created_at
                 ),
-            }
+            },
+            {
+                "state": RunStateEnum.NOT_STARTED.name,
+                "created_at": to_iso8601(
+                    pipeline_run.pipeline_run_states[1].created_at
+                ),
+            },
         ],
         "artifacts": [
             {
@@ -216,11 +228,17 @@ def test_list_pipeline_runs(
             "inputs": [],
             "states": [
                 {
-                    "state": pipeline_run.pipeline_run_states[0].name,
+                    "state": RunStateEnum.QUEUED.name,
                     "created_at": to_iso8601(
                         pipeline_run.pipeline_run_states[0].created_at
                     ),
-                }
+                },
+                {
+                    "state": RunStateEnum.NOT_STARTED.name,
+                    "created_at": to_iso8601(
+                        pipeline_run.pipeline_run_states[1].created_at
+                    ),
+                },
             ],
             "artifacts": [],
         }
@@ -352,8 +370,8 @@ def test_update_pipeline_run_state(
         headers={ROLES_KEY: worker_application.api_key},
     )
     assert result.status_code == 200
-    assert len(pipeline_run.pipeline_run_states) == 2
-    assert pipeline_run.pipeline_run_states[-1].code == RunStateEnum.RUNNING
+    assert len(pipeline_run.pipeline_run_states) == 3
+    assert pipeline_run.run_state_enum() == RunStateEnum.RUNNING
 
 
 def test_upload_run_artifact_service_valueerror(

@@ -12,7 +12,7 @@ from .services import (
     delete_pipeline,
     update_pipeline,
 )
-from ..utils import to_iso8601, verify_content_type_and_params, permissions_required
+from ..utils import verify_content_type_and_params, permissions_required
 
 logger = logging.getLogger("pipelines")
 

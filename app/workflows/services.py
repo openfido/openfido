@@ -1,7 +1,15 @@
+import logging
+
 from app.model_utils import RunStateEnum
 from app.pipelines.queries import find_pipeline, find_run_state_type
 from app.pipelines.schemas import CreateRunSchema
-from app.pipelines.services import create_pipeline_run_state, create_queued_pipeline_run
+from app.pipelines.services import (
+    copy_pipeline_run_artifact,
+    create_pipeline_run_state,
+    create_pipeline_run,
+    update_pipeline_run_state,
+    start_pipeline_run,
+)
 
 from .models import (
     Workflow,
@@ -12,8 +20,16 @@ from .models import (
     WorkflowRunState,
     db,
 )
-from .queries import find_workflow, find_workflow_pipeline, is_dag
+from .queries import (
+    find_workflow,
+    find_workflow_pipeline,
+    is_dag,
+    find_dest_workflow_runs,
+    find_source_workflow_runs,
+)
 from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
+
+logger = logging.getLogger("workflow-services")
 
 
 def create_workflow(workflow_json):
@@ -83,8 +99,8 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
             )
 
         source_to_wp = WorkflowPipelineDependency(
-            from_workflow_pipeline=workflow_pipeline,
-            to_workflow_pipeline=source_workflow_pipeline,
+            to_workflow_pipeline=workflow_pipeline,
+            from_workflow_pipeline=source_workflow_pipeline,
         )
         db.session.add(source_to_wp)
 
@@ -101,14 +117,41 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
             )
 
         wp_to_dest = WorkflowPipelineDependency(
-            to_workflow_pipeline=workflow_pipeline,
-            from_workflow_pipeline=dest_workflow_pipeline,
+            from_workflow_pipeline=workflow_pipeline,
+            to_workflow_pipeline=dest_workflow_pipeline,
         )
         db.session.add(wp_to_dest)
 
     db.session.commit()
 
     return workflow_pipeline
+
+
+def create_workflow_run_state(run_state_enum):
+    run_state_type = find_run_state_type(run_state_enum)
+    workflow_run_state = WorkflowRunState()
+    run_state_type.workflow_run_states.append(workflow_run_state)
+
+    return workflow_run_state
+
+
+def update_workflow_run_state(workflow_run, run_state_enum):
+    """Change the run state of a WorkflowRun.
+
+    If the state is terminal (FAILED, ABORTED, COMPLETED) underlying
+    WorkflowPipelineRun instances will be updated appropriately as well.
+    """
+    if workflow_run.run_state_enum() == run_state_enum:
+        return
+
+    if not workflow_run.run_state_enum().is_valid_transition(run_state_enum):
+        raise ValueError(
+            f"Invalid state transition: {workflow_run.run_state_enum().name}->{run_state_enum.name}"
+        )
+
+    workflow_run.workflow_run_states.append(create_workflow_run_state(run_state_enum))
+    db.session.commit()
+    return workflow_run
 
 
 def create_workflow_pipeline_run(workflow_uuid, run_json):
@@ -125,16 +168,20 @@ def create_workflow_pipeline_run(workflow_uuid, run_json):
     )
 
     for workflow_pipeline in workflow.workflow_pipelines:
-        pipeline_run = create_queued_pipeline_run(workflow_pipeline.pipeline.uuid, data)
+        queue_run = len(workflow_pipeline.source_workflow_pipelines) > 0
+        no_input_data = {"callback_url": data["callback_url"], "inputs": []}
+        run_data = no_input_data if queue_run else data
+        pipeline_run = create_pipeline_run(
+            workflow_pipeline.pipeline.uuid, run_data, queue_run
+        )
         workflow_pipeline_run = WorkflowPipelineRun(
-            workflow_run=workflow_run, pipeline_run=pipeline_run
+            workflow_run=workflow_run,
+            pipeline_run=pipeline_run,
+            workflow_pipeline=workflow_pipeline,
         )
         db.session.add(workflow_pipeline_run)
 
-    # TODO start a new celery worker task
-
     db.session.add(workflow_run)
-
     db.session.commit()
 
     return workflow_run
@@ -148,3 +195,58 @@ def delete_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
 
     db.session.delete(workflow_pipeline)
     db.session.commit()
+
+
+def update_workflow_run(pipeline_run):
+    """If a pipeline_run is associated with a WorkflowPipelineRun, then update
+    the WorkflowRun on state transitions.
+
+    Returns updated WorkflowRun
+    """
+    if pipeline_run.workflow_pipeline_run is None:
+        return None
+
+    workflow_pipeline_run = pipeline_run.workflow_pipeline_run
+    workflow_run = workflow_pipeline_run.workflow_run
+
+    if pipeline_run.run_state_enum() == RunStateEnum.RUNNING:
+        return update_workflow_run_state(workflow_run, RunStateEnum.RUNNING)
+
+    if pipeline_run.run_state_enum() == RunStateEnum.FAILED:
+        for wpr in workflow_run.workflow_pipeline_runs:
+            if wpr.run_state_enum().in_final_state():
+                continue
+
+            update_pipeline_run_state(
+                wpr.pipeline_run.uuid,
+                {"state": RunStateEnum.ABORTED.name},
+                apply_to_workflow_run=False,
+            )
+
+        return update_workflow_run_state(workflow_run, RunStateEnum.ABORTED)
+
+    if pipeline_run.run_state_enum() != RunStateEnum.COMPLETED:
+        error = f"Unexpected state encountered: {pipeline_run.run_state_enum()}"
+        logger.warning(error)
+        raise ValueError(error)
+
+    # When a PipelineRun has COMPLETED we can continue the workflow:
+    #  1. Pass its artifacts onward to any dest_workflow_pipelines
+    #  2. Start new PipelineRuns for those pipelines.
+    #  3. If there are none remaining, then this WorkflowRun is finished!
+
+    for run in find_dest_workflow_runs(workflow_pipeline_run):
+        for artifact in pipeline_run.pipeline_run_artifacts:
+            copy_pipeline_run_artifact(artifact, run)
+
+        sources = find_source_workflow_runs(run.workflow_pipeline_run)
+        if set([s.run_state_enum() for s in sources]) == set([RunStateEnum.COMPLETED]):
+            start_pipeline_run(run)
+
+    run_states = [
+        wpr.pipeline_run.run_state_enum() for wpr in workflow_run.workflow_pipeline_runs
+    ]
+    if set(run_states) == set([RunStateEnum.COMPLETED]):
+        return update_workflow_run_state(workflow_run, RunStateEnum.COMPLETED)
+
+    return workflow_run

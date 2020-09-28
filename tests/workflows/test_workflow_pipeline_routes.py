@@ -67,6 +67,25 @@ def test_create_workflow_pipeline(
     }
 
 
+def test_get_workflow_pipelines_404(
+    client, client_application, pipeline, workflow, workflow_pipeline
+):
+    db.session.commit()
+    result = client.get(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{'0' * 32}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 404
+
+    result = client.get(
+        f"/v1/workflows/{'0' * 32}/pipelines/{'0' * 32}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 404
+
+
 def test_get_workflow_pipelines(
     client, client_application, pipeline, workflow, workflow_pipeline
 ):
@@ -85,6 +104,16 @@ def test_get_workflow_pipelines(
         "created_at": to_iso8601(workflow_pipeline.created_at),
         "updated_at": to_iso8601(workflow_pipeline.updated_at),
     }
+
+
+def test_list_workflow_pipelines_404(client, client_application, pipeline, workflow):
+    db.session.commit()
+    result = client.get(
+        f"/v1/workflows/{'0' * 32}/pipelines",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 404
 
 
 def test_list_workflow_pipelines(client, client_application, pipeline, workflow):
@@ -138,3 +167,17 @@ def test_delete_workflow_pipeline(
     assert result.status_code == 200
     assert len(result.json) == 0
     assert find_workflow_pipeline(workflow_pipeline.uuid) is None
+
+
+@patch("app.workflows.workflow_pipeline_routes.delete_workflow_pipeline")
+def test_delete_workflow_pipeline_error(
+    delete_mock, client, client_application, pipeline, workflow, workflow_pipeline
+):
+    delete_mock.side_effect = ValueError("something went wrong")
+    db.session.commit()
+    result = client.delete(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400

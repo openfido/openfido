@@ -1,8 +1,7 @@
 from flask import current_app
-from flask_sqlalchemy import SQLAlchemy
 
 from ..constants import S3_BUCKET, S3_PRESIGNED_TIMEOUT
-from ..model_utils import CommonColumnsMixin, get_db
+from ..model_utils import CommonColumnsMixin, get_db, RunStateEnum
 from ..utils import get_s3
 
 db = get_db()
@@ -121,6 +120,10 @@ class PipelineRun(CommonColumnsMixin, db.Model):
         "PipelineRunInput", backref="pipeline_run", lazy="immediate"
     )
 
-    workflow_pipeline_runs = db.relationship(
-        "WorkflowPipelineRun", backref="pipeline_run", lazy="immediate"
+    workflow_pipeline_run = db.relationship(
+        "WorkflowPipelineRun", backref="pipeline_run", lazy="immediate", uselist=False
     )
+
+    def run_state_enum(self):
+        """ Return the current stat of this run (the last run state) """
+        return RunStateEnum(self.pipeline_run_states[-1].code)

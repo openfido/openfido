@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from marshmallow.exceptions import ValidationError
 
 from ..model_utils import SystemPermissionEnum
-from ..utils import permissions_required, to_iso8601, verify_content_type_and_params
+from ..utils import permissions_required, verify_content_type_and_params
 from .queries import find_pipeline, find_pipeline_run
 from .schemas import PipelineRunSchema
 from .services import (
@@ -452,7 +452,7 @@ def upload_run_artifact(pipeline_uuid, pipeline_run_uuid):
         return {}, 404
 
     try:
-        create_pipeline_run_artifact(pipeline_run.uuid, filename, request)
+        create_pipeline_run_artifact(pipeline_run.uuid, filename, request.stream)
         return {}, 200
     except ValueError as value_err:
         logger.warning(value_err)

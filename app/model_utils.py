@@ -1,6 +1,6 @@
 import importlib
 import os
-import uuid
+import uuid as uuid_lib
 from datetime import datetime
 from enum import IntEnum, unique
 
@@ -40,13 +40,25 @@ class RunStateEnum(IntEnum):
     def is_valid_transition(self, next_enum):
         """ Return True when the current transition is valid. """
         if self == RunStateEnum.QUEUED:
-            return next_enum in set([RunStateEnum.NOT_STARTED, RunStateEnum.ABORTED])
+            return next_enum in [RunStateEnum.NOT_STARTED, RunStateEnum.ABORTED]
         if self == RunStateEnum.NOT_STARTED:
-            return next_enum is RunStateEnum.RUNNING
+            return next_enum in [RunStateEnum.RUNNING, RunStateEnum.ABORTED]
         if self == RunStateEnum.RUNNING:
-            return next_enum in set([RunStateEnum.FAILED, RunStateEnum.COMPLETED])
+            return next_enum in [
+                RunStateEnum.FAILED,
+                RunStateEnum.COMPLETED,
+                RunStateEnum.ABORTED,
+            ]
 
         return False
+
+    def in_final_state(self):
+        """ Returns True when this state can't transition to any other. """
+        return self in [
+            RunStateEnum.FAILED,
+            RunStateEnum.COMPLETED,
+            RunStateEnum.ABORTED,
+        ]
 
 
 def get_db(path=os.environ.get("SQLACHEMY_DB_INSTANCE", None)):
@@ -66,7 +78,7 @@ class CommonColumnsMixin:
         db.String(32),
         nullable=False,
         server_default="",
-        default=lambda: uuid.uuid4().hex,
+        default=lambda: uuid_lib.uuid4().hex,
     )
     created_at = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.utcnow()

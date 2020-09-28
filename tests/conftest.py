@@ -1,19 +1,19 @@
 import pytest
-
 from app import create_app
 from app.constants import (
     CELERY_ALWAYS_EAGER,
     MAX_CONTENT_LENGTH,
+    S3_ENDPOINT_URL,
     SECRET_KEY,
     SQLALCHEMY_DATABASE_URI,
-    S3_ENDPOINT_URL,
     WORKER_API_SERVER,
     WORKER_API_TOKEN,
 )
-from app.pipelines.models import Pipeline, db
-from app.workflows.models import Workflow, WorkflowPipeline
 from app.model_utils import SystemPermissionEnum
+from app.pipelines.models import Pipeline, db
 from app.pipelines.services import execute_pipeline
+from app.workflows.models import Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from app.workflows.services import create_workflow_pipeline
 from roles.services import create_application
 
 
@@ -102,3 +102,67 @@ def client_application(app):
 @pytest.fixture
 def worker_application(app):
     return create_application("test client", SystemPermissionEnum.PIPELINES_WORKER)
+
+
+@pytest.fixture
+def workflow_line(app, pipeline, workflow):
+    """ Three pipelines that feed into one another """
+    pipeline_a = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    pipeline_b = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    pipeline_c = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    db.session.add(pipeline_a)
+    db.session.add(pipeline_b)
+    db.session.add(pipeline_c)
+    db.session.commit()
+
+    a_to_b = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_a,
+        to_workflow_pipeline=pipeline_b,
+    )
+    b_to_c = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_b,
+        to_workflow_pipeline=pipeline_c,
+    )
+    db.session.add(a_to_b)
+    db.session.add(b_to_c)
+    db.session.commit()
+
+    return workflow
+
+
+@pytest.fixture
+def workflow_square(app, pipeline, workflow):
+    """ Four pipelines forming a diamond """
+    pipeline_a = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    pipeline_b = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    pipeline_c = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    pipeline_d = WorkflowPipeline(workflow=workflow, pipeline=pipeline)
+    db.session.add(pipeline_a)
+    db.session.add(pipeline_b)
+    db.session.add(pipeline_c)
+    db.session.add(pipeline_d)
+    db.session.commit()
+
+    a_to_b = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_a,
+        to_workflow_pipeline=pipeline_b,
+    )
+    a_to_c = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_a,
+        to_workflow_pipeline=pipeline_c,
+    )
+    b_to_d = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_b,
+        to_workflow_pipeline=pipeline_d,
+    )
+    c_to_d = WorkflowPipelineDependency(
+        from_workflow_pipeline=pipeline_c,
+        to_workflow_pipeline=pipeline_d,
+    )
+    db.session.add(a_to_b)
+    db.session.add(a_to_c)
+    db.session.add(b_to_d)
+    db.session.add(c_to_d)
+    db.session.commit()
+
+    return workflow

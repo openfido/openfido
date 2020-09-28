@@ -97,7 +97,7 @@ class RunExecutor:
             raise ValueError(f"Command returned nonzero code: {result.returncode}")
 
 
-@shared_task
+@shared_task(ignore_result=True)
 def execute_pipeline(
     pipeline_uuid,
     pipeline_run_uuid,
@@ -137,6 +137,9 @@ def execute_pipeline(
                     input_file["url"], join(inputdir, input_file["name"])
                 )
 
+            # TODO because these processes can take a long long time to run it'd
+            # be ideal to poll the output every interval to give viewers a sense
+            # of whether the job is doing.
             executor.run(
                 (
                     "docker run --rm "
@@ -161,3 +164,5 @@ def execute_pipeline(
         failed(v_e)
     except urllib.error.URLError as url_e:
         failed(url_e)
+    # TODO may need a more generic exception handling here, or possibly
+    # configure signal handling (errors) with celery itself.

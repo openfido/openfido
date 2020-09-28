@@ -1,4 +1,5 @@
 from sqlalchemy import and_, or_
+
 import networkx as nx
 
 from .models import (
@@ -47,6 +48,7 @@ def find_workflow_pipeline(workflow_pipeline_uuid):
 
 
 def find_workflow_pipeline_dependencies(workflow_uuid):
+    """ Return all WorkflowPipelineDependency for a Workflow. """
     workflow_pipeline_sq = (
         db.session.query(WorkflowPipeline.id)
         .join(Workflow)
@@ -68,11 +70,6 @@ def find_workflow_pipeline_dependencies(workflow_uuid):
     )
 
 
-def find_workflow_pipelines(workflow_uuid):
-    """ Find all workflow pipelines, or a list of them. """
-    return WorkflowPipeline.query.filter(Workflow.workflow_id == workflow_uuid)
-
-
 def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
     """Returns True if the graph supplied a directed acyclic graph and adding a
     new edge would not introduce a cycle."""
@@ -88,6 +85,38 @@ def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
         digraph.add_edge(from_workflow_pipeline.id, to_workflow_pipeline.id)
 
     return nx.is_directed_acyclic_graph(digraph)
+
+
+def find_dest_workflow_runs(workflow_pipeline_run):
+    """Find all PipelineRuns associated with the dest_workflow_pipelines of
+    this WorkflowPipelineRun"""
+    workflow_run = workflow_pipeline_run.workflow_run
+    result = []
+    for dest_wp in workflow_pipeline_run.workflow_pipeline.dest_workflow_pipelines:
+        result.extend(
+            [
+                wpr.pipeline_run
+                for wpr in dest_wp.to_workflow_pipeline.workflow_pipeline_runs
+                if wpr.workflow_run == workflow_run
+            ]
+        )
+    return result
+
+
+def find_source_workflow_runs(workflow_pipeline_run):
+    """Find all PipelineRuns associated with the source_workflow_pipelines of
+    this WorkflowPipelineRun"""
+    workflow_run = workflow_pipeline_run.workflow_run
+    result = []
+    for dest_wp in workflow_pipeline_run.workflow_pipeline.source_workflow_pipelines:
+        result.extend(
+            [
+                wpr.pipeline_run
+                for wpr in dest_wp.from_workflow_pipeline.workflow_pipeline_runs
+                if wpr.workflow_run == workflow_run
+            ]
+        )
+    return result
 
 
 def pipeline_has_workflow_pipeline(pipeline_id):
