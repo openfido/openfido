@@ -8,6 +8,7 @@ from ..utils import permissions_required, verify_content_type
 from .schemas import WorkflowPipelineSchema
 from .services import (
     create_workflow_pipeline,
+    update_workflow_pipeline,
     delete_workflow_pipeline,
     find_workflow,
     find_workflow_pipeline,
@@ -96,6 +97,100 @@ def create(workflow_uuid):
     """
     try:
         workflow_pipeline = create_workflow_pipeline(workflow_uuid, request.json)
+
+        return jsonify(WorkflowPipelineSchema().dump(workflow_pipeline))
+    except ValidationError as validation_err:
+        logger.warning(validation_err)
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
+    except ValueError as value_err:
+        logger.warning(value_err)
+        return {
+            "message": "Unable to create WorkflowPipeline",
+        }, 400
+
+
+@workflow_pipeline_bp.route(
+    "/<workflow_uuid>/pipelines/<workflow_pipeline_uuid>", methods=["PUT"]
+)
+@verify_content_type()
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def update(workflow_uuid, workflow_pipeline_uuid):
+    """Update a Workflow Pipeline.
+    ---
+
+    tags:
+      - workflow pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
+    requestBody:
+      description: "source and dest pipelines"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              pipeline_uuid:
+                type: string
+                example: abc123
+              source_workflow_pipelines:
+                type: array
+                items:
+                  type: string
+                description: List of incoming Workflow Pipeline UUIDs that feed into this Workflow Pipeline
+              destination_workflow_pipelines:
+                type: array
+                items:
+                  type: string
+                description: List of outgoing Workflow Pipeline UUIDs that this Workflow Pipeline's output will go.
+    responses:
+      "200":
+        description: "Updated"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                pipeline_uuid:
+                  type: string
+                source_workflow_pipelines:
+                  type: array
+                  items:
+                    type: string
+                destination_workflow_pipelines:
+                  type: array
+                  items:
+                    type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                errors:
+                  type: object
+            examples:
+              message_and_error:
+                value: { "message": "An error", "errors": { "pipeline_uuid": "Must be provided" } }
+                summary: An error with validation messages.
+    """
+    try:
+        workflow_pipeline = update_workflow_pipeline(
+            workflow_uuid, workflow_pipeline_uuid, request.json
+        )
 
         return jsonify(WorkflowPipelineSchema().dump(workflow_pipeline))
     except ValidationError as validation_err:

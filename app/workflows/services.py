@@ -4,15 +4,30 @@ from app.model_utils import RunStateEnum
 from app.pipelines.queries import find_pipeline, find_run_state_type
 from app.pipelines.schemas import CreateRunSchema
 from app.pipelines.services import (
-    copy_pipeline_run_artifact, create_pipeline_run, create_pipeline_run_state, start_pipeline_run,
-    update_pipeline_run_state)
+    copy_pipeline_run_artifact,
+    create_pipeline_run,
+    create_pipeline_run_state,
+    start_pipeline_run,
+    update_pipeline_run_state,
+)
 
 from .models import (
-    Workflow, WorkflowPipeline, WorkflowPipelineDependency, WorkflowPipelineRun, WorkflowRun,
-    WorkflowRunState, db)
+    Workflow,
+    WorkflowPipeline,
+    WorkflowPipelineDependency,
+    WorkflowPipelineRun,
+    WorkflowRun,
+    WorkflowRunState,
+    db,
+)
 from .queries import (
-    find_dest_workflow_runs, find_source_workflow_runs, find_workflow, find_workflow_pipeline,
-    is_dag, find_workflow_pipeline_dependency)
+    find_dest_workflow_runs,
+    find_source_workflow_runs,
+    find_workflow,
+    find_workflow_pipeline,
+    is_dag,
+    find_workflow_pipeline_dependency,
+)
 from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
 
 logger = logging.getLogger("workflow-services")
@@ -57,7 +72,9 @@ def delete_workflow(workflow_uuid):
     db.session.commit()
 
 
-def _add_dependency(workflow_pipeline, another_workflow_pipeline_uuid, is_another_source):
+def _add_dependency(
+    workflow_pipeline, another_workflow_pipeline_uuid, is_another_source
+):
     """ Add a WorkflowPipelineDependency to workflow_pipeline as a source or destination. """
     another_workflow_pipeline = find_workflow_pipeline(another_workflow_pipeline_uuid)
 
@@ -66,9 +83,9 @@ def _add_dependency(workflow_pipeline, another_workflow_pipeline_uuid, is_anothe
         raise ValueError(f"WorkflowPipeline {another_workflow_pipeline_uuid} not found")
 
     workflow = another_workflow_pipeline.workflow
-    dag_args = [ workflow, another_workflow_pipeline, workflow_pipeline ]
+    dag_args = [workflow, another_workflow_pipeline, workflow_pipeline]
     if is_another_source:
-        dag_args = [ workflow, workflow_pipeline, another_workflow_pipeline ]
+        dag_args = [workflow, workflow_pipeline, another_workflow_pipeline]
 
     if not is_dag(*dag_args):
         db.session.rollback()
@@ -88,18 +105,14 @@ def _add_dependency(workflow_pipeline, another_workflow_pipeline_uuid, is_anothe
 
     db.session.add(WorkflowPipelineDependency(**wpd_qargs))
 
-def _remove_dependency(workflow_pipeline, another_workflow_pipeline_uuid, is_another_source):
+
+def _remove_dependency(
+    workflow_pipeline, another_workflow_pipeline_uuid, is_another_source
+):
     another_workflow_pipeline = find_workflow_pipeline(another_workflow_pipeline_uuid)
-
-    if another_workflow_pipeline is None:
-        raise ValueError(f"WorkflowPipeline {another_workflow_pipeline_uuid} not found")
-
-    dependency = find_workflow_pipeline_dependency(workflow_pipeline, another_workflow_pipeline, is_another_source)
-
-    if dependency is None:
-        direction = "->" if is_another_source else "<-"
-        raise ValueError(f"No dependency from {another_workflow_pipeline.uuid}->{workflow_pipeline.uuid}")
-
+    dependency = find_workflow_pipeline_dependency(
+        workflow_pipeline, another_workflow_pipeline, is_another_source
+    )
     db.session.delete(dependency)
 
 
@@ -145,14 +158,24 @@ def update_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid, pipeline_jso
         raise ValueError(f"Pipeline {pipeline} not found")
     workflow_pipeline.pipeline = pipeline
 
-    existing_sources = set([wp.from_workflow_pipeline.uuid for wp in workflow_pipeline.source_workflow_pipelines])
+    existing_sources = set(
+        [
+            wp.from_workflow_pipeline.uuid
+            for wp in workflow_pipeline.source_workflow_pipelines
+        ]
+    )
     new_sources = set(data["source_workflow_pipelines"])
     for new_workflow_pipeline_uuid in new_sources - existing_sources:
         _add_dependency(workflow_pipeline, new_workflow_pipeline_uuid, True)
     for new_workflow_pipeline_uuid in existing_sources - new_sources:
         _remove_dependency(workflow_pipeline, new_workflow_pipeline_uuid, True)
 
-    existing_dests = set([wp.to_workflow_pipeline.uuid for wp in workflow_pipeline.dest_workflow_pipelines])
+    existing_dests = set(
+        [
+            wp.to_workflow_pipeline.uuid
+            for wp in workflow_pipeline.dest_workflow_pipelines
+        ]
+    )
     new_dests = set(data["destination_workflow_pipelines"])
     for new_workflow_pipeline_uuid in new_dests - existing_dests:
         _add_dependency(workflow_pipeline, new_workflow_pipeline_uuid, False)

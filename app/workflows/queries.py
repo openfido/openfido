@@ -71,7 +71,9 @@ def find_workflow_pipeline_dependencies(workflow_uuid):
     )
 
 
-def find_workflow_pipeline_dependency(workflow_pipeline, another_pipeline, is_another_source):
+def find_workflow_pipeline_dependency(
+    workflow_pipeline, another_pipeline, is_another_source
+):
     from_wp = workflow_pipeline
     to_wp = another_pipeline
     if is_another_source:

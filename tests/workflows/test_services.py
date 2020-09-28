@@ -4,7 +4,11 @@ import pytest
 from app import db
 from app.model_utils import RunStateEnum
 from app.pipelines.models import PipelineRunArtifact
-from app.pipelines.services import create_pipeline_run, create_pipeline_run_state, create_pipeline
+from app.pipelines.services import (
+    create_pipeline_run,
+    create_pipeline_run_state,
+    create_pipeline,
+)
 from app.workflows import services
 from app.workflows.models import WorkflowPipeline
 from app.workflows.queries import find_workflow, find_workflow_pipeline
@@ -264,14 +268,14 @@ def test_create_workflow_pipeline(app, pipeline, workflow):
 def test_update_workflow_pipeline_bad_id(app, workflow_pipeline):
     with pytest.raises(ValueError):
         services.update_workflow_pipeline(
-            "0"*32,
-            "0"*32,
+            "0" * 32,
+            "0" * 32,
             _create_workflow_pipeline_json(workflow_pipeline.pipeline),
         )
 
     with pytest.raises(ValueError):
         services.update_workflow_pipeline(
-            "0"*32,
+            "0" * 32,
             workflow_pipeline.uuid,
             _create_workflow_pipeline_json(workflow_pipeline.pipeline),
         )
@@ -279,8 +283,35 @@ def test_update_workflow_pipeline_bad_id(app, workflow_pipeline):
     with pytest.raises(ValueError):
         services.update_workflow_pipeline(
             workflow_pipeline.workflow.uuid,
-            "0"*32,
+            "0" * 32,
             _create_workflow_pipeline_json(workflow_pipeline.pipeline),
+        )
+
+
+def test_update_workflow_pipeline_remove_bad_ids(app, pipeline, workflow_pipeline):
+    with pytest.raises(ValueError):
+        workflow_pipeline = services.update_workflow_pipeline(
+            workflow_pipeline.workflow.uuid,
+            workflow_pipeline.uuid,
+            _create_workflow_pipeline_json(workflow_pipeline.pipeline, ["0" * 32]),
+        )
+
+    with pytest.raises(ValueError):
+        workflow_pipeline = services.update_workflow_pipeline(
+            workflow_pipeline.workflow.uuid,
+            workflow_pipeline.uuid,
+            _create_workflow_pipeline_json(workflow_pipeline.pipeline, [], ["0" * 32]),
+        )
+
+    with pytest.raises(ValueError):
+        workflow_pipeline = services.update_workflow_pipeline(
+            workflow_pipeline.workflow.uuid,
+            workflow_pipeline.uuid,
+            {
+                "pipeline_uuid": "0" * 32,
+                "source_workflow_pipelines": [],
+                "destination_workflow_pipelines": [],
+            },
         )
 
 
@@ -296,14 +327,14 @@ def test_update_workflow_pipeline_no_change(app, pipeline, workflow_pipeline):
 
 
 def test_update_workflow_pipeline_update_pipeline(app, pipeline, workflow_pipeline):
-    new_pipeline = create_pipeline('new p', 'dest', 'python', 'https://example.com', 'master')
+    new_pipeline = create_pipeline(
+        "new p", "dest", "python", "https://example.com", "master"
+    )
     db.session.commit()
     new_json = _create_workflow_pipeline_json(workflow_pipeline.pipeline)
     new_json["pipeline_uuid"] = new_pipeline.uuid
     workflow_pipeline = services.update_workflow_pipeline(
-        workflow_pipeline.workflow.uuid,
-        workflow_pipeline.uuid,
-        new_json
+        workflow_pipeline.workflow.uuid, workflow_pipeline.uuid, new_json
     )
     assert workflow_pipeline.pipeline == new_pipeline
     assert workflow_pipeline.source_workflow_pipelines == []
@@ -313,29 +344,42 @@ def test_update_workflow_pipeline_update_pipeline(app, pipeline, workflow_pipeli
 def test_update_workflow_pipeline_add_source(app, pipeline, workflow_pipeline):
     pipeline_with_source = services.create_workflow_pipeline(
         workflow_pipeline.workflow.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [workflow_pipeline.uuid])
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline, [workflow_pipeline.uuid]
+        ),
     )
     new_source = services.create_workflow_pipeline(
         workflow_pipeline.workflow.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline)
+        _create_workflow_pipeline_json(workflow_pipeline.pipeline),
     )
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_source.workflow.uuid,
         pipeline_with_source.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [ workflow_pipeline.uuid, workflow_pipeline.uuid, new_source.uuid ]),
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline,
+            [workflow_pipeline.uuid, workflow_pipeline.uuid, new_source.uuid],
+        ),
     )
     assert updated_pipeline.pipeline == pipeline
-    assert [s.from_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines] == [ workflow_pipeline, new_source ]
-    assert [s.to_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines] == [ updated_pipeline, updated_pipeline ]
+    assert [
+        s.from_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines
+    ] == [workflow_pipeline, new_source]
+    assert [
+        s.to_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines
+    ] == [updated_pipeline, updated_pipeline]
     assert updated_pipeline.dest_workflow_pipelines == []
 
     # removing a source also happens!
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_source.workflow.uuid,
         pipeline_with_source.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [ workflow_pipeline.uuid ]),
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline, [workflow_pipeline.uuid]
+        ),
     )
-    assert [s.from_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines] == [ workflow_pipeline ]
+    assert [
+        s.from_workflow_pipeline for s in updated_pipeline.source_workflow_pipelines
+    ] == [workflow_pipeline]
 
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_source.workflow.uuid,
@@ -349,29 +393,43 @@ def test_update_workflow_pipeline_add_source(app, pipeline, workflow_pipeline):
 def test_update_workflow_pipeline_add_dest(app, pipeline, workflow_pipeline):
     pipeline_with_dest = services.create_workflow_pipeline(
         workflow_pipeline.workflow.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [], [workflow_pipeline.uuid])
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline, [], [workflow_pipeline.uuid]
+        ),
     )
     new_dest = services.create_workflow_pipeline(
         workflow_pipeline.workflow.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline)
+        _create_workflow_pipeline_json(workflow_pipeline.pipeline),
     )
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_dest.workflow.uuid,
         pipeline_with_dest.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [], [ workflow_pipeline.uuid, new_dest.uuid, new_dest.uuid ]),
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline,
+            [],
+            [workflow_pipeline.uuid, new_dest.uuid, new_dest.uuid],
+        ),
     )
     assert updated_pipeline.pipeline == pipeline
-    assert [s.to_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines] == [ workflow_pipeline, new_dest ]
-    assert [s.from_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines] == [ updated_pipeline, updated_pipeline ]
+    assert [
+        s.to_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines
+    ] == [workflow_pipeline, new_dest]
+    assert [
+        s.from_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines
+    ] == [updated_pipeline, updated_pipeline]
     assert updated_pipeline.source_workflow_pipelines == []
 
     # removing a dest also happens!
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_dest.workflow.uuid,
         pipeline_with_dest.uuid,
-        _create_workflow_pipeline_json(workflow_pipeline.pipeline, [], [ workflow_pipeline.uuid ]),
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline, [], [workflow_pipeline.uuid]
+        ),
     )
-    assert [s.to_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines] == [ workflow_pipeline ]
+    assert [
+        s.to_workflow_pipeline for s in updated_pipeline.dest_workflow_pipelines
+    ] == [workflow_pipeline]
 
     updated_pipeline = services.update_workflow_pipeline(
         pipeline_with_dest.workflow.uuid,
