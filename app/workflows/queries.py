@@ -71,6 +71,19 @@ def find_workflow_pipeline_dependencies(workflow_uuid):
     )
 
 
+def find_workflow_pipeline_dependency(workflow_pipeline, another_pipeline, is_another_source):
+    from_wp = workflow_pipeline
+    to_wp = another_pipeline
+    if is_another_source:
+        from_wp = another_pipeline
+        to_wp = workflow_pipeline
+
+    return WorkflowPipelineDependency.query.filter(
+        WorkflowPipelineDependency.from_workflow_pipeline == from_wp,
+        WorkflowPipelineDependency.to_workflow_pipeline == to_wp,
+    ).one_or_none()
+
+
 def is_dag(workflow, from_workflow_pipeline=None, to_workflow_pipeline=None):
     """Returns True if the graph supplied a directed acyclic graph and adding a
     new edge would not introduce a cycle."""

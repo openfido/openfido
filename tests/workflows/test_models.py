@@ -14,7 +14,7 @@ def test_workflow_pipeline(app, workflow):
 def test_workflow_pipeline_dependency_repr(app, workflow_line):
     wp = workflow_line.workflow_pipelines[0]
     a_to_b = wp.dest_workflow_pipelines[0]
-    assert f"{wp.id}->" in str(a_to_b)
+    assert f"{wp.uuid}->" in str(a_to_b)
 
 
 def test_workflow_pipeline(app, workflow_line, pipeline):

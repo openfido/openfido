@@ -62,7 +62,7 @@ class WorkflowPipelineDependency(CommonColumnsMixin, db.Model):
     )
 
     def __repr__(self):
-        return f"{self.from_workflow_pipeline_id}->{self.to_workflow_pipeline_id}"
+        return f"{self.from_workflow_pipeline.uuid}->{self.to_workflow_pipeline.uuid}"
 
 
 class WorkflowRun(CommonColumnsMixin, db.Model):
