@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { loginUser as loginUserAction } from 'actions/user';
+import { loginUser } from 'actions/user';
 import { ROUTE_PIPELINES, ROUTE_FORGOT_PASSWORD } from 'config/routes';
 
 import { StyledButton, StyledText } from 'styles/app';
@@ -76,16 +74,18 @@ const LoginMessage = styled.div`
   margin-bottom: 1.25rem;
 `;
 
-const Login = ({
-  loginUser, isLoggingIn, loginError, userProfile
-}) => {
+const Login = () => {
   const history = useHistory();
+  const profile = useSelector((state) => state.user.profile);
+  const authInProgress = useSelector((state) => state.user.authInProgress);
+  const authError = useSelector((state) => state.user.authError);
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
 
   useEffect(() => {
-    if (userProfile) {
+    if (profile) {
       history.push(ROUTE_PIPELINES);
     }
   });
@@ -101,8 +101,8 @@ const Login = ({
   const onLoginClicked = (e) => {
     e.preventDefault();
 
-    if (!isLoggingIn) {
-      loginUser(email, password);
+    if (!authInProgress) {
+      dispatch(loginUser(email, password));
     }
   };
 
@@ -115,7 +115,7 @@ const Login = ({
       </StyledH1>
       <StyledForm onSubmit={onLoginClicked}>
         <StyledH2>Sign In</StyledH2>
-        <StyledInput placeholder="EMAIL" onChange={onEmailChanged} />
+        <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
         <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
         <LoginMessage>
           <StyledText
@@ -123,7 +123,7 @@ const Login = ({
             color="pink"
             float="left"
           >
-            {loginError && 'Invalid credentials entered'}
+            {authError && 'Invalid credentials entered'}
           </StyledText>
           <StyledText
             size="middle"
@@ -148,27 +148,4 @@ const Login = ({
   );
 };
 
-Login.propTypes = {
-  loginUser: PropTypes.func.isRequired,
-  userProfile: PropTypes.shape({}),
-  isLoggingIn: PropTypes.bool,
-  loginError: PropTypes.node,
-};
-
-Login.defaultProps = {
-  userProfile: undefined,
-  isLoggingIn: false,
-  loginError: undefined,
-};
-
-const mapStateToProps = (state) => ({
-  userProfile: state.user.profile,
-  isLoggingIn: state.user.isLoggingIn,
-  loginError: state.user.loginError,
-});
-
-const mapDispatch = (dispatch) => bindActionCreators({
-  loginUser: loginUserAction,
-}, dispatch);
-
-export default connect(mapStateToProps, mapDispatch)(Login);
+export default Login;

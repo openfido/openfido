@@ -1,55 +1,46 @@
 import {
-  LOGIN_USER_STARTED,
-  LOGIN_USER_COMPLETED,
-  LOGIN_USER_FAILED,
+  LOGIN_USER,
   LOGOUT_USER,
+  REFRESH_JWT,
+  AUTH_FAILED,
+  AUTH_IN_PROGRESS,
 } from 'actions';
-import ApiClient from 'util/api-client';
+import {
+  requestLoginUser, requestRefreshJWT,
+} from 'services';
 
-export function loginUserStarted() {
-  return {
-    type: LOGIN_USER_STARTED,
-  };
-}
+export const loginUser = (email, password) => async (dispatch) => {
+  await dispatch({ type: AUTH_IN_PROGRESS });
+  requestLoginUser(email, password)
+    .then((response) => {
+      dispatch({
+        type: LOGIN_USER,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: AUTH_FAILED,
+        payload: err.message,
+      });
+    });
+};
 
-export function loginUserCompleted(payload) {
-  return {
-    type: LOGIN_USER_COMPLETED,
-    payload,
-  };
-}
+export const refreshUserToken = (token) => (dispatch) => {
+  requestRefreshJWT(token)
+    .then((response) => {
+      dispatch({
+        type: REFRESH_JWT,
+        payload: response.data,
+      });
+    })
+    .catch(() => {
+      // Treat as though we logged out. Very likely the user has reached the max
+      // refresh timeout, and so needs to login again.
+      dispatch({ type: LOGOUT_USER });
+    });
+};
 
-export function loginUserFailed(error) {
-  return {
-    type: LOGIN_USER_FAILED,
-    payload: error,
-  };
-}
-
-export function loginUser(email, password) {
-  return (dispatch) => {
-    dispatch(loginUserStarted());
-    try {
-      ApiClient.post('/users/auth', { email, password })
-        .then((res) => {
-          const user = res.data;
-          if (email === user.email) {
-            dispatch(loginUserCompleted(user));
-          } else {
-            throw Error('Incorrect email and password');
-          }
-        })
-        .catch((err) => {
-          dispatch(loginUserFailed(err));
-        });
-    } catch (err) {
-      dispatch(loginUserFailed(err));
-    }
-  };
-}
-
-export function logoutUser() {
-  return {
-    type: LOGOUT_USER,
-  };
-}
+export const logoutUser = () => ({
+  type: LOGOUT_USER,
+});

@@ -1,37 +1,48 @@
 import {
-  LOGIN_USER_STARTED,
-  LOGIN_USER_COMPLETED,
-  LOGIN_USER_FAILED,
+  LOGIN_USER,
   LOGOUT_USER,
+  REFRESH_JWT,
+  AUTH_FAILED,
+  AUTH_IN_PROGRESS,
 } from 'actions';
 import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
   profile: null,
-  isLoggingIn: false,
-  loginError: null,
+  authInProgress: false,
+  authError: null,
 };
 
 export default (state = DEFAULT_STATE, action) => {
   if (action.error) return state;
 
   switch (action.type) {
-    case LOGIN_USER_STARTED:
-      Auth.logoutUser();
-      return {
-        ...DEFAULT_STATE,
-        isLoggingIn: true,
-      };
-    case LOGIN_USER_COMPLETED:
+    case LOGIN_USER:
       Auth.loginUser(action.payload);
       return {
         ...DEFAULT_STATE,
         profile: Auth.getUser(),
       };
-    case LOGIN_USER_FAILED:
+    case REFRESH_JWT:
       return {
         ...DEFAULT_STATE,
-        loginError: action.payload,
+        profile: {
+          ...state.profile,
+          token: action.payload.token,
+        },
+      };
+    case AUTH_IN_PROGRESS:
+      Auth.logoutUser();
+      return {
+        ...DEFAULT_STATE,
+        authInProgress: true,
+        profile: null,
+      };
+    case AUTH_FAILED:
+      return {
+        ...DEFAULT_STATE,
+        authError: action.payload,
+        profile: null,
       };
     case LOGOUT_USER:
       Auth.logoutUser();
