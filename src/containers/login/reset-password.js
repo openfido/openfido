@@ -67,39 +67,40 @@ const Root = styled.div`
     text-align: center;
 `;
 
-const PasswordReset = () => {
-    return (
-        <Root>
-            <StyledH1>
-                Welcome to
-                <br />
-                OpenFIDO
-            </StyledH1>
-            <StyledForm>
-                <StyledH2>Reset Your Password</StyledH2>
-                <StyledText
-                    size="middle"
-                    color="gray"
-                >
-                    Enter your email address and we will send you a link to reset your password
-                </StyledText>
-                <div>
-                    <StyledInput placeholder="EMAIL" />
-                </div>
-                {/*<ErrorMessage>
+const ResetPassword = () => {
+  const stuff = 'stuff';
+  return (
+    <Root>
+      <StyledH1>
+        Welcome to
+        <br />
+        OpenFIDO
+      </StyledH1>
+      <StyledForm>
+        <StyledH2>Reset Your Password</StyledH2>
+        <StyledText
+          size="middle"
+          color="gray"
+        >
+          Enter your email address and we will send you a link to reset your password
+        </StyledText>
+        <div>
+          <StyledInput placeholder="EMAIL" />
+        </div>
+        {/* <ErrorMessage>
                     Invalid credentials entered.
-                </ErrorMessage>*/}
-                <StyledButton
-                    color="blue"
-                    width="144"
-                    role="button"
-                    tabIndex={0}
-                >
-                    Submit
-                </StyledButton>
-            </StyledForm>
-        </Root>
-    )
-}
+                </ErrorMessage> */}
+        <StyledButton
+          color="blue"
+          width="144"
+          role="button"
+          tabIndex={0}
+        >
+          Submit
+        </StyledButton>
+      </StyledForm>
+    </Root>
+  );
+};
 
-export default PasswordReset;
+export default ResetPassword;

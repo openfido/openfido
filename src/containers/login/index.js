@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { loginUser } from 'actions/user';
-import { ROUTE_PIPELINES, ROUTE_FORGOT_PASSWORD } from 'config/routes';
+import { ROUTE_PIPELINES, ROUTE_RESET_PASSWORD } from 'config/routes';
 
 import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
@@ -129,7 +129,7 @@ const Login = () => {
             size="middle"
             float="right"
           >
-            <Link to={ROUTE_FORGOT_PASSWORD}>Forgot Password</Link>
+            <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
           </StyledText>
         </LoginMessage>
         <StyledButton

@@ -1,11 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 
 import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
-
 
 const StyledH1 = styled.h1`
   font-size: 30px;
@@ -34,6 +32,9 @@ const StyledForm = styled.form`
   margin: 42px auto 0 auto;
   background-color: #fff;
   text-align: left;
+  label {
+    line-height: 1.5rem;
+  } 
 `;
 
 const StyledInput = styled.input`
@@ -54,20 +55,6 @@ const StyledInput = styled.input`
   }
 `;
 
-const ForgotPasswordLink = styled.div`
-  position: relative;
-  a {
-    position: absolute;
-    top: -0.625rem;
-    right: 0;
-    font-size: 14px;
-    font-size: 0.875rem;
-    line-height: 16px;
-    line-height: 1rem;
-    color: ${colors.gray80};
-  }
-`;
-
 const ErrorMessage = styled.div`
   font-size: 14px;
   color: ${colors.pink};
@@ -80,8 +67,8 @@ const Root = styled.div`
     text-align: center;
 `;
 
-const ChangePassword = () => {
-    const stuff = 'stuff';
+const ResetPassword = () => {
+
     return (
         <Root>
             <StyledH1>
@@ -135,4 +122,4 @@ const ChangePassword = () => {
     )
 }
 
-export default ChangePassword;
+export default ResetPassword;
