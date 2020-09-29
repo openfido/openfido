@@ -162,7 +162,7 @@ def test_create_workflow_pipeline_from_cycle(is_dag_mock, app, pipeline, workflo
         },
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         services.create_workflow_pipeline(
             workflow.uuid,
             {
@@ -172,7 +172,7 @@ def test_create_workflow_pipeline_from_cycle(is_dag_mock, app, pipeline, workflo
             },
         )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         services.create_workflow_pipeline(
             workflow.uuid,
             {

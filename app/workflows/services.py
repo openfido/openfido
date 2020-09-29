@@ -10,6 +10,7 @@ from app.pipelines.services import (
     start_pipeline_run,
     update_pipeline_run_state,
 )
+from marshmallow.exceptions import ValidationError
 
 from .models import (
     Workflow,
@@ -25,8 +26,8 @@ from .queries import (
     find_source_workflow_runs,
     find_workflow,
     find_workflow_pipeline,
-    is_dag,
     find_workflow_pipeline_dependency,
+    is_dag,
 )
 from .schemas import CreateWorkflowPipelineSchema, CreateWorkflowSchema
 
@@ -89,8 +90,11 @@ def _add_dependency(
 
     if not is_dag(*dag_args):
         db.session.rollback()
-        raise ValueError(
-            f"Adding source_workflow_pipelines {another_workflow_pipeline_uuid} introduces a cycle."
+        error_key = "source_workflow_pipelines"
+        if is_another_source:
+            error_key = "destination_workflow_pipelines"
+        raise ValidationError(
+            {error_key: f"Adding {another_workflow_pipeline_uuid} introduces a cycle."}
         )
 
     wpd_qargs = {
