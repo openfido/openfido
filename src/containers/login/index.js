@@ -1,17 +1,19 @@
-import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
+import React, { useState, useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { loginUser as loginUserAction } from 'actions/user';
-import PropTypes from 'prop-types';
-
+import { loginUser } from 'actions/user';
 import { ROUTE_PIPELINES, ROUTE_FORGOT_PASSWORD } from 'config/routes';
+
+import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 
-import { StyledButton } from 'styles/app';
+const Root = styled.div`
+  width: 100%;
+  height: 100vh;
+  text-align: center;
+`;
 
 const StyledH1 = styled.h1`
   font-size: 30px;
@@ -40,153 +42,110 @@ const StyledForm = styled.form`
   height: 522px;
   padding: 30px;
   margin: 42px auto 0 auto;
-  background-color: #fff;
+  margin: 2.625rem auto 0 auto;
+  background-color: ${colors.white};
   text-align: left;
+  border-radius: 3px;
 `;
 
 const StyledInput = styled.input`
   width: 330px;
   font-size: 18px;
   font-size: 1.125rem;
-  color: #707070;
-  border: none;
+  color: ${colors.gray};
   padding-bottom: 0.625rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-  border-bottom: 1px solid #D2D2D2;
+  border: none;
+  border-bottom: 1px solid ${colors.lightGray};
   &::placeholder {
-    color: #D2D2D2;
+    color: ${colors.lightGray};
   }
-  &:first-child {
+  &:first-of-type {
     margin-bottom: 20px;
+    margin-bottom: 1.25rem;
   }
 `;
 
-const ForgotPasswordLink = styled.div`
-  position: relative;
-  a {
-    position: absolute;
-    top: -0.625rem;
-    right: 0;
-    font-size: 14px;
-    font-size: 0.875rem;
-    line-height: 16px;
-    line-height: 1rem;
-    color: ${colors.gray80};
-  }
+const LoginMessage = styled.div`
+  padding: 0.75rem 0;
+  height: 2.5rem;
+  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 `;
 
-const ErrorMessage = styled.div`
-  font-size: 14px;
-  color: ${colors.pink};
-`;
+const Login = () => {
+  const history = useHistory();
+  const profile = useSelector((state) => state.user.profile);
+  const authInProgress = useSelector((state) => state.user.authInProgress);
+  const authError = useSelector((state) => state.user.authError);
+  const dispatch = useDispatch();
 
-const Root = styled.div`
-    width: 100%;
-    height: 100vh;
-    text-align: center;
-`;
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
-class Login extends Component {
-  constructor() {
-    super();
-    this.onEmailChanged = this.onEmailChanged.bind(this);
-    this.onPasswordChanged = this.onPasswordChanged.bind(this);
-    this.onLoginClicked = this.onLoginClicked.bind(this);
-    this.state = {
-      email: null,
-      password: null,
-    };
-  }
-
-  componentDidUpdate() {
-    const { userProfile, history } = this.props;
-    if (userProfile) {
+  useEffect(() => {
+    if (profile) {
       history.push(ROUTE_PIPELINES);
     }
-  }
+  });
 
-  onEmailChanged(e) {
-    this.setState({ email: e.target.value });
-  }
+  const onEmailChanged = (e) => {
+    setEmail(e.target.value);
+  };
 
-  onPasswordChanged(e) {
-    this.setState({ password: e.target.value });
-  }
+  const onPasswordChanged = (e) => {
+    setPassword(e.target.value);
+  };
 
-  onLoginClicked() {
-    const { email, password } = this.state;
-    const { loginUser, isLoggingIn } = this.props;
+  const onLoginClicked = (e) => {
+    e.preventDefault();
 
-    if (!isLoggingIn) {
-      loginUser(email, password);
+    if (!authInProgress) {
+      dispatch(loginUser(email, password));
     }
-  }
+  };
 
-  render() {
-    const { loginError } = this.props;
-
-    return (
-      <Root>
-        <StyledH1>
-          Welcome to
-          <br />
-          OpenFIDO
-        </StyledH1>
-        <StyledForm>
-          <StyledH2>Sign In</StyledH2>
-          <div>
-            <StyledInput placeholder="EMAIL" onChange={this.onEmailChanged} />
-          </div>
-          <div>
-            <StyledInput type="password" placeholder="PASSWORD" onChange={this.onPasswordChanged} />
-          </div>
-          <ForgotPasswordLink>
-            <Link to={ROUTE_FORGOT_PASSWORD}>Forgot Password</Link>
-          </ForgotPasswordLink>
-          <ErrorMessage>
-            {loginError && `Invalid credentials entered.`}
-          </ErrorMessage>
-          <StyledButton
-            color="blue"
-            width="108"
-            role="button"
-            tabIndex={0}
-            onClick={this.onLoginClicked}
-            onKeyPress={this.onLoginClicked}
+  return (
+    <Root>
+      <StyledH1>
+        Welcome to
+        <br />
+        OpenFIDO
+      </StyledH1>
+      <StyledForm onSubmit={onLoginClicked}>
+        <StyledH2>Sign In</StyledH2>
+        <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
+        <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
+        <LoginMessage>
+          <StyledText
+            size="middle"
+            color="pink"
+            float="left"
           >
-            Sign In
-          </StyledButton>
-        </StyledForm>
-      </Root>
-    );
-  }
-}
-
-Login.propTypes = {
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired,
-  }).isRequired,
-  loginUser: PropTypes.func.isRequired,
-  userProfile: PropTypes.shape({}),
-  isLoggingIn: PropTypes.bool,
-  loginError: PropTypes.node,
+            {authError && 'Invalid credentials entered'}
+          </StyledText>
+          <StyledText
+            size="middle"
+            float="right"
+          >
+            <Link to={ROUTE_FORGOT_PASSWORD}>Forgot Password</Link>
+          </StyledText>
+        </LoginMessage>
+        <StyledButton
+          htmlType="submit"
+          color="blue"
+          width="108"
+          role="button"
+          tabIndex={0}
+          onClick={onLoginClicked}
+          onKeyPress={onLoginClicked}
+        >
+          Sign In
+        </StyledButton>
+      </StyledForm>
+    </Root>
+  );
 };
 
-Login.defaultProps = {
-  userProfile: undefined,
-  isLoggingIn: false,
-  loginError: undefined,
-};
-
-const mapStateToProps = (state) => ({
-  userProfile: state.user.profile,
-  isLoggingIn: state.user.isLoggingIn,
-  loginError: state.user.loginError,
-});
-
-const mapDispatch = (dispatch) => bindActionCreators({
-  loginUser: loginUserAction,
-}, dispatch);
-
-export default withRouter(connect(mapStateToProps, mapDispatch)(Login));
+export default Login;
