@@ -1,5 +1,4 @@
 import React from 'react';
-
 import styled from 'styled-components';
 
 import { StyledButton, StyledText } from 'styles/app';
@@ -21,6 +20,8 @@ const StyledH2 = styled.h2`
   font-size: 1.25rem;
   line-height: 24px;
   line-height: 1.5rem;
+  margin-bottom: 16px;
+  margin-bottom: 1rem;
   color: ${colors.blue};
   text-transform: uppercase;
 `;
@@ -30,29 +31,35 @@ const StyledForm = styled.form`
   height: 522px;
   padding: 30px;
   margin: 42px auto 0 auto;
-  background-color: #fff;
+  margin: 2.625rem auto 0 auto;
+  background-color: ${colors.white};
   text-align: left;
-  label {
-    line-height: 1.5rem;
-  } 
+  border-radius: 3px;
 `;
 
 const StyledInput = styled.input`
   width: 330px;
   font-size: 18px;
   font-size: 1.125rem;
-  color: #707070;
-  border: none;
+  color: ${colors.gray};
   padding-bottom: 0.625rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-  border-bottom: 1px solid #D2D2D2;
+  border: none;
+  border-bottom: 1px solid ${colors.lightGray};
   &::placeholder {
-    color: #D2D2D2;
+    color: ${colors.lightGray};
   }
-  &:first-child {
-    margin-bottom: 20px;
+  &:first-of-type {
+    margin-bottom: 32px;
+    margin-bottom: 2rem;
   }
+`;
+
+const ResetPasswordText = styled(StyledText)`
+  margin-bottom: 40px;
+  margin-bottom: 2.5rem;
+  display: inline-block;
 `;
 
 const ErrorMessage = styled.div`
@@ -60,47 +67,41 @@ const ErrorMessage = styled.div`
   color: ${colors.pink};
 `;
 
-
 const Root = styled.div`
     width: 100%;
     height: 100vh;
     text-align: center;
 `;
 
-const ResetPassword = () => {
-  const stuff = 'stuff';
-  return (
-    <Root>
-      <StyledH1>
-        Welcome to
-        <br />
-        OpenFIDO
-      </StyledH1>
-      <StyledForm>
-        <StyledH2>Reset Your Password</StyledH2>
-        <StyledText
-          size="middle"
-          color="gray"
-        >
-          Enter your email address and we will send you a link to reset your password
-        </StyledText>
-        <div>
-          <StyledInput placeholder="EMAIL" />
-        </div>
-        {/* <ErrorMessage>
+const ResetPassword = () => (
+  <Root>
+    <StyledH1>
+      Welcome to
+      <br />
+      OpenFIDO
+    </StyledH1>
+    <StyledForm>
+      <StyledH2>Reset Your Password</StyledH2>
+      <ResetPasswordText
+        size="large"
+        color="gray"
+      >
+        Enter your email address and we will send you a link to reset your password
+      </ResetPasswordText>
+      <StyledInput placeholder="EMAIL" />
+      {/* <ErrorMessage>
                     Invalid credentials entered.
                 </ErrorMessage> */}
-        <StyledButton
-          color="blue"
-          width="144"
-          role="button"
-          tabIndex={0}
-        >
-          Submit
-        </StyledButton>
-      </StyledForm>
-    </Root>
-  );
-};
+      <StyledButton
+        color="blue"
+        width="144"
+        role="button"
+        tabIndex={0}
+      >
+        Submit
+      </StyledButton>
+    </StyledForm>
+  </Root>
+);
 
 export default ResetPassword;

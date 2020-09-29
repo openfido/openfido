@@ -88,8 +88,8 @@ export const StyledText = styled.span`
   text-indent: ${indent}px;
   `) : ''}
   ${size === 'large' ? (`
-  font-size: 18px;
-  line-height: 21px;
+  font-size: 16px;
+  line-height: 19px;
   `) : ''}
   ${size === 'middle' ? (`
   font-size: 14px;
