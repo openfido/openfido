@@ -8,7 +8,7 @@ from marshmallow.exceptions import ValidationError
 from ..model_utils import SystemPermissionEnum
 from ..utils import permissions_required, verify_content_type
 from .schemas import WorkflowRunSchema
-from .services import create_workflow_pipeline_run
+from .services import create_workflow_run
 from .queries import find_workflow, find_workflow_run
 
 logger = logging.getLogger("workflow-runs")
@@ -98,7 +98,7 @@ def create_run(workflow_uuid):
         description: "Bad request"
     """
     try:
-        workflow_run = create_workflow_pipeline_run(workflow_uuid, request.json)
+        workflow_run = create_workflow_run(workflow_uuid, request.json)
 
         return jsonify(WorkflowRunSchema().dump(workflow_run))
     except ValidationError as validation_err:

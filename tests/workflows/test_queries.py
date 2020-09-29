@@ -1,7 +1,10 @@
-from app.workflows import queries
+from unittest.mock import patch
+
 from app import db
-from app.workflows.models import Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from app.pipelines.models import Pipeline
+from app.workflows import queries
+from app.workflows.models import Workflow, WorkflowPipeline, WorkflowPipelineDependency
+from app.workflows.services import create_workflow_run, delete_workflow_pipeline
 
 
 def test_find_workflow_bad_id(app):
@@ -70,3 +73,57 @@ def test_pipeline_has_workflow_pipeline(app, workflow, pipeline, workflow_pipeli
     db.session.commit()
 
     assert not queries.pipeline_has_workflow_pipeline(p1.id)
+
+
+@patch("app.pipelines.services.execute_pipeline.delay")
+def test_find_dest_workflow_runs(delay_mock, app, workflow_line):
+    workflow_run = create_workflow_run(
+        workflow_line.uuid,
+        {
+            "callback_url": "http://example.com/cb",
+            "inputs": [],
+        },
+    )
+    assert queries.find_dest_workflow_runs(workflow_run.workflow_pipeline_runs[0]) == [
+        workflow_run.workflow_pipeline_runs[1].pipeline_run
+    ]
+    assert queries.find_dest_workflow_runs(workflow_run.workflow_pipeline_runs[1]) == [
+        workflow_run.workflow_pipeline_runs[2].pipeline_run
+    ]
+    assert queries.find_dest_workflow_runs(workflow_run.workflow_pipeline_runs[2]) == []
+
+    # if a workflow_pipeline is deleted it is not found/included
+    delete_workflow_pipeline(
+        workflow_run.workflow.uuid,
+        workflow_run.workflow_pipeline_runs[1].workflow_pipeline.uuid,
+    )
+    assert queries.find_dest_workflow_runs(workflow_run.workflow_pipeline_runs[0]) == []
+
+
+@patch("app.pipelines.services.execute_pipeline.delay")
+def test_find_source_workflow_runs(delay_mock, app, workflow_line):
+    workflow_run = create_workflow_run(
+        workflow_line.uuid,
+        {
+            "callback_url": "http://example.com/cb",
+            "inputs": [],
+        },
+    )
+    assert (
+        queries.find_source_workflow_runs(workflow_run.workflow_pipeline_runs[0]) == []
+    )
+    assert queries.find_source_workflow_runs(
+        workflow_run.workflow_pipeline_runs[1]
+    ) == [workflow_run.workflow_pipeline_runs[0].pipeline_run]
+    assert queries.find_source_workflow_runs(
+        workflow_run.workflow_pipeline_runs[2]
+    ) == [workflow_run.workflow_pipeline_runs[1].pipeline_run]
+
+    # if a workflow_pipeline is deleted it is not found/included
+    delete_workflow_pipeline(
+        workflow_run.workflow.uuid,
+        workflow_run.workflow_pipeline_runs[1].workflow_pipeline.uuid,
+    )
+    assert (
+        queries.find_source_workflow_runs(workflow_run.workflow_pipeline_runs[2]) == []
+    )

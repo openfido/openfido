@@ -33,6 +33,11 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     # Run database migrations
     flask db upgrade
 
+    # Create worker API token and client API token
+
+    invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
+    invoke create-application-key -n "local worker" -p PIPELINES_CLIENT
+
     # exit the docker instance
     exit
 
@@ -60,9 +65,7 @@ Other tasks are available, in particular the `precommit` task, which mirrors the
 tests performed by CircleCI. See `invoke -l` for a full list of tasks.
 
 The local docker worker will execute jobs, but requires an API key in order to
-update its status. Generate a key and store it in the .worker-env file:
-
-    invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
+update its status (generated in the instructions above).
 
 Endpoints have been documented with [swagger](https://swagger.io/blog/news/whats-new-in-openapi-3-0/), which is configured to be easily explored in the default `run.py` configuration. When the flask server is running visit http://localhost:5000/apidocs to see documentation and interact with the API directly.
 
