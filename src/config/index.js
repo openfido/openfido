@@ -2,9 +2,9 @@ const ENVIRONMENT_DEVELOPMENT = 'DEVELOPMENT';
 const ENVIRONMENT_STAGING = 'STAGING';
 const ENVIRONMENT_PRODUCTION = 'PRODUCTION';
 
-const BASE_URL_DEVELOPMENT = 'http://localhost:5000';
-const BASE_URL_STAGING = 'https://staging.openfido.org';
-const BASE_URL_PRODUCTION = 'https://www.openfido.org';
+const BASE_API_URL_DEVELOPMENT = 'http://localhost:5000';
+const BASE_API_URL_STAGING = 'https://api.staging.openfido.org';
+const BASE_API_URL_PRODUCTION = 'https://api.staging.openfido.org';
 
 const parseEnvironment = () => {
   if (window.location.hostname.includes('localhost')) return ENVIRONMENT_DEVELOPMENT;
@@ -17,14 +17,15 @@ export const isDevelopment = () => (ENVIRONMENT === ENVIRONMENT_DEVELOPMENT);
 export const isStaging = () => (ENVIRONMENT === ENVIRONMENT_STAGING);
 export const isProduction = () => (ENVIRONMENT === ENVIRONMENT_PRODUCTION);
 
-let baseUrl;
-if (isDevelopment()) baseUrl = BASE_URL_DEVELOPMENT;
-else if (isStaging()) baseUrl = BASE_URL_STAGING;
-else if (isProduction()) baseUrl = BASE_URL_PRODUCTION;
+let baseApiUrl;
+if (isDevelopment()) baseApiUrl = BASE_API_URL_DEVELOPMENT;
+else if (isStaging()) baseApiUrl = BASE_API_URL_STAGING;
+else if (isProduction()) baseApiUrl = BASE_API_URL_PRODUCTION;
 
 export default {
   api: {
     defaultTimeout: 10000,
-    baseUrl,
+    baseUrl: baseApiUrl,
+    version: '',
   },
 };

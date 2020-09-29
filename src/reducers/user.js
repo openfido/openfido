@@ -5,7 +5,6 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
 } from 'actions';
-import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
   profile: null,
@@ -18,10 +17,9 @@ export default (state = DEFAULT_STATE, action) => {
 
   switch (action.type) {
     case LOGIN_USER:
-      Auth.loginUser(action.payload);
       return {
         ...DEFAULT_STATE,
-        profile: Auth.getUser(),
+        profile: action.payload,
       };
     case REFRESH_JWT:
       return {
@@ -32,7 +30,6 @@ export default (state = DEFAULT_STATE, action) => {
         },
       };
     case AUTH_IN_PROGRESS:
-      Auth.logoutUser();
       return {
         ...DEFAULT_STATE,
         authInProgress: true,
@@ -45,7 +42,6 @@ export default (state = DEFAULT_STATE, action) => {
         profile: null,
       };
     case LOGOUT_USER:
-      Auth.logoutUser();
       return DEFAULT_STATE;
     default:
       return state;

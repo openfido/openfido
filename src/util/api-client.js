@@ -1,22 +1,20 @@
 import axios from 'axios';
 import config from 'config';
-import Auth from './auth';
 
 export default class ApiClient {
   static get(url, timeout = config.api.defaultTimeout) {
     return this.getInstance(timeout).get(url);
   }
 
-  static post(url, data = {}, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout).post(url, data);
+  static post(url, data = {}, token = null, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, token).post(url, data);
   }
 
   static postForm(url, formFields) {
     const data = new window.FormData();
-    // eslint-disable-next-line guard-for-in,no-restricted-syntax
-    for (const prop in formFields) {
+    Object.keys(formFields).forEach((prop) => {
       data.set(prop, formFields[prop]);
-    }
+    });
 
     return this.getInstance(config.api.defaultTimeout, 'multipart/form-data').post(url, data);
   }
@@ -31,22 +29,21 @@ export default class ApiClient {
 
   static getInstance(
     timeout = config.api.defaultTimeout,
+    token = null,
     contentType = 'application/json',
   ) {
     const headers = {
       'Content-Type': contentType,
     };
 
-    if (Auth.isUserLoggedIn()) {
-      headers.Authorization = `Bearer ${Auth.getAuthToken()}`;
+    if (token !== null) {
+      headers.Authorization = `Bearer ${token}`;
     }
 
-    const apiInstance = axios.create({
-      baseURL: `${config.api.baseUrl}`,
+    return axios.create({
+      baseURL: `${config.api.baseUrl}${config.api.version}`,
       timeout,
       headers,
     });
-
-    return apiInstance;
   }
 }
