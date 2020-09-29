@@ -1,4 +1,5 @@
 import React from 'react';
+
 import styled from 'styled-components';
 
 import { StyledButton, StyledText } from 'styles/app';
@@ -31,41 +32,38 @@ const StyledForm = styled.form`
   height: 522px;
   padding: 30px;
   margin: 42px auto 0 auto;
-  margin: 2.625rem auto 0 auto;
-  background-color: ${colors.white};
+  background-color: #fff;
   text-align: left;
-  border-radius: 3px;
+  label {
+    line-height: 1.5rem;
+  } 
 `;
 
 const StyledInput = styled.input`
   width: 330px;
-  font-size: 18px;
+  font-size: 16px;
   font-size: 1.125rem;
+  font-weight: 400;
   color: ${colors.gray};
   padding-bottom: 0.625rem;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
+  padding-left: 0;
+  padding-right: 0;
   border: none;
   border-bottom: 1px solid ${colors.lightGray};
   &::placeholder {
-    color: ${colors.lightGray};
+    color: ${colors.darkGray};
   }
   &:first-of-type {
-    margin-bottom: 32px;
-    margin-bottom: 2rem;
+    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
   }
-`;
-
-const ResetPasswordText = styled(StyledText)`
-  margin-bottom: 40px;
-  margin-bottom: 2.5rem;
-  display: inline-block;
 `;
 
 const ErrorMessage = styled.div`
   font-size: 14px;
   color: ${colors.pink};
 `;
+
 
 const Root = styled.div`
     width: 100%;
@@ -82,16 +80,31 @@ const ResetPassword = () => (
     </StyledH1>
     <StyledForm>
       <StyledH2>Reset Your Password</StyledH2>
-      <ResetPasswordText
-        size="large"
-        color="gray"
-      >
-        Enter your email address and we will send you a link to reset your password
-      </ResetPasswordText>
-      <StyledInput placeholder="EMAIL" />
-      {/* <ErrorMessage>
-                    Invalid credentials entered.
-                </ErrorMessage> */}
+      <div>
+        <label htmlFor="newPassword">
+          <StyledText
+            size="middle"
+            color="gray"
+          >
+            New Password
+          </StyledText>
+        </label>
+        <StyledInput placeholder="password" />
+      </div>
+      <div>
+        <label htmlFor="confirmPassword">
+          <StyledText
+            size="middle"
+            color="gray"
+          >
+            Re-Enter Password
+          </StyledText>
+        </label>
+        <StyledInput type="password" placeholder="password" />
+      </div>
+      <ErrorMessage>
+        Minimum 10 characters
+      </ErrorMessage>
       <StyledButton
         color="blue"
         width="144"

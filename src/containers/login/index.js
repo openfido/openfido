@@ -67,7 +67,7 @@ const StyledInput = styled.input`
   }
 `;
 
-const LoginMessage = styled.div`
+const FormMessage = styled.div`
   padding: 0.75rem 0;
   height: 2.5rem;
   margin-bottom: 20px;
@@ -117,7 +117,7 @@ const Login = () => {
         <StyledH2>Sign In</StyledH2>
         <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
         <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
-        <LoginMessage>
+        <FormMessage>
           <StyledText
             size="middle"
             color="pink"
@@ -131,7 +131,7 @@ const Login = () => {
           >
             <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
           </StyledText>
-        </LoginMessage>
+        </FormMessage>
         <StyledButton
           htmlType="submit"
           color="blue"

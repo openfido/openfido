@@ -13,8 +13,8 @@ import {
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import Login from 'containers/login';
-import ResetPassword from 'containers/login/reset-password';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
+import ResetPassword from 'containers/login/reset-password';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import { refreshUserToken } from 'actions/user';
@@ -62,8 +62,8 @@ const AppSwitch = () => {
         {redirectToPipelines}
         <Login />
       </Route>
-      <Route exact path={ROUTE_RESET_PASSWORD} render={() => (<ResetPassword />)} />
-      <Route exact path={ROUTE_UPDATE_PASSWORD} render={() => (<ResetPasswordRequest />)} />
+      <Route exact path={ROUTE_RESET_PASSWORD} render={() => (<ResetPasswordRequest />)} />
+      <Route exact path={ROUTE_UPDATE_PASSWORD} render={() => (<ResetPassword />)} />
       <Route exact path={ROUTE_PIPELINES}>
         {redirectToLogin}
         <App><Pipelines /></App>

@@ -1,7 +1,8 @@
-import React from 'react';
-
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import { requestPasswordReset } from 'services';
+import 'actions/user';
 import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 
@@ -21,6 +22,8 @@ const StyledH2 = styled.h2`
   font-size: 1.25rem;
   line-height: 24px;
   line-height: 1.5rem;
+  margin-bottom: 16px;
+  margin-bottom: 1rem;
   color: ${colors.blue};
   text-transform: uppercase;
 `;
@@ -30,96 +33,131 @@ const StyledForm = styled.form`
   height: 522px;
   padding: 30px;
   margin: 42px auto 0 auto;
-  background-color: #fff;
+  margin: 2.625rem auto 0 auto;
+  background-color: ${colors.white};
   text-align: left;
-  label {
-    line-height: 1.5rem;
-  } 
+  border-radius: 3px;
 `;
 
 const StyledInput = styled.input`
   width: 330px;
   font-size: 18px;
   font-size: 1.125rem;
-  color: #707070;
-  border: none;
+  color: ${colors.gray};
   padding-bottom: 0.625rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-  border-bottom: 1px solid #D2D2D2;
+  border: none;
+  border-bottom: 1px solid ${colors.lightGray};
   &::placeholder {
-    color: #D2D2D2;
-  }
-  &:first-child {
-    margin-bottom: 20px;
+    color: ${colors.lightGray};
   }
 `;
 
-const ErrorMessage = styled.div`
-  font-size: 14px;
+const ResetPasswordText = styled(StyledText)`
+  margin-bottom: 40px;
+  margin-bottom: 2.5rem;
+  display: inline-block;
+`;
+
+const ThankYouText = styled(StyledText)`
+  margin-top: 40px;
+  margin-top: 2.5rem;
+  display: inline-block;
+`;
+
+const ErrorText = styled(StyledText)`
   color: ${colors.pink};
+  padding: 0.75rem 0;
+  height: 2.5rem;
+  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
 `;
 
+const FormMessage = styled.div`
+  padding: 0.75rem 0;
+  height: 2.5rem;
+  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
+`;
 
 const Root = styled.div`
-    width: 100%;
-    height: 100vh;
-    text-align: center;
+  width: 100%;
+  height: 100vh;
+  text-align: center;
 `;
 
-const ResetPassword = () => {
+const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) => {
+  const [email, setEmail] = useState();
+  const [thanks, setThanks] = useState(defaultThanks);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(defaultError);
 
-    return (
-        <Root>
-            <StyledH1>
-                Welcome to
-                <br />
-                OpenFIDO
-            </StyledH1>
-            <StyledForm>
-                <StyledH2>Reset Your Password</StyledH2>
-                <StyledText
-                    size="middle"
-                    color="gray"
-                >
-                    Enter your email address and we will send you a link to reset your password
-                </StyledText>
-                <div>
-                    <label htmlFor="newPassword">
-                        <StyledText
-                            size="middle"
-                            color="gray"
-                        >
-                            New Password
-                        </StyledText>
-                    </label>
-                    <StyledInput placeholder="password" />
-                </div>
-                <div>
-                    <label htmlFor="confirmPassword">
-                        <StyledText
-                            size="middle"
-                            color="gray"
-                        >
-                            Re-Enter Password
-                        </StyledText>
-                    </label>
-                    <StyledInput type="password" placeholder="password" />
-                </div>
-                <ErrorMessage>
-                    Minimum 10 characters
-                </ErrorMessage>
-                <StyledButton
-                    color="blue"
-                    width="144"
-                    role="button"
-                    tabIndex={0}
-                >
-                    Submit
-                </StyledButton>
-            </StyledForm>
-        </Root>
-    )
-}
+  const onEmailChanged = (e) => {
+    setEmail(e.target.value);
+  };
 
-export default ResetPassword;
+  const onResetClicked = (e) => {
+    e.preventDefault();
+    requestPasswordReset(email)
+      .then(() => {
+        setThanks(true);
+      })
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
+  };
+
+  return (
+    <Root>
+      <StyledH1>
+        Welcome to
+        <br />
+        OpenFIDO
+      </StyledH1>
+      <StyledForm onSubmit={onResetClicked}>
+        <StyledH2>{!thanks ? 'Reset Your Password' : 'Help is on the Way'}</StyledH2>
+        {!thanks && (
+        <ResetPasswordText
+          size="large"
+          color="gray"
+        >
+          Enter your email address and we will send you a link to reset your password
+        </ResetPasswordText>
+        )}
+        {thanks && (
+        <ThankYouText
+          size="large"
+          color="gray"
+        >
+          Please check your email to reset your password.
+        </ThankYouText>
+        )}
+        {!thanks && <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />}
+        {!thanks && <FormMessage>
+          {error && (
+          <ErrorText
+            size="middle"
+            color="gray"
+          >
+            email address
+          </ErrorText>
+          )}
+        </FormMessage>}
+        {!thanks && <StyledButton
+          color="blue"
+          width="144"
+          role="button"
+          tabIndex={0}
+          onClick={onResetClicked}
+          loading={loading}
+        >
+          Submit
+        </StyledButton>}
+      </StyledForm>
+    </Root>
+  );
+};
+
+export default ResetPasswordRequest;
