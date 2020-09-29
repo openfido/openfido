@@ -53,18 +53,23 @@ const AppSwitch = () => {
     dispatch(refreshUserToken(profile.token));
   }, [dispatch, profile, checkedJWTRefresh]);
 
+  const redirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
+  const redirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
+
   return (
     <Switch>
       <Route exact path={ROUTE_LOGIN}>
-        {hasProfile && <Redirect to={ROUTE_PIPELINES} />}
+        {redirectToPipelines}
         <Login />
       </Route>
       <Route exact path={ROUTE_FORGOT_PASSWORD} render={() => (<ForgotPassword />)} />
       <Route exact path={ROUTE_CHANGE_PASSWORD} render={() => (<ChangePassword />)} />
       <Route exact path={ROUTE_PIPELINES}>
-        {!hasProfile && <Redirect to={ROUTE_LOGIN} />}
+        {redirectToLogin}
         <App><Pipelines /></App>
       </Route>
+      {redirectToPipelines}
+      {redirectToLogin}
     </Switch>
   );
 };
