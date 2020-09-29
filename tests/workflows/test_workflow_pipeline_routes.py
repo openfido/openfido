@@ -5,6 +5,7 @@ from app.workflows.models import db, Workflow
 from app.utils import to_iso8601
 from app.workflows.queries import find_workflow_pipeline
 from app.workflows.services import create_workflow_pipeline
+from marshmallow.exceptions import ValidationError
 
 
 @patch("app.workflows.workflow_pipeline_routes.create_workflow_pipeline")
@@ -65,6 +66,63 @@ def test_create_workflow_pipeline(
         "created_at": to_iso8601(workflow_pipeline.created_at),
         "updated_at": to_iso8601(workflow_pipeline.updated_at),
     }
+
+
+@patch("app.workflows.workflow_pipeline_routes.update_workflow_pipeline")
+def test_update_workflow_pipeline_failed(
+    update_mock, client, client_application, pipeline, workflow, workflow_pipeline
+):
+    update_mock.side_effect = ValueError("an error")
+    params = {
+        "pipeline_uuid": pipeline.uuid,
+        "source_workflow_pipelines": [],
+        "destination_workflow_pipelines": [],
+    }
+    result = client.put(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        json=params,
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+    update_mock.side_effect = ValidationError("an error")
+    result = client.put(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        json=params,
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+
+@patch("app.workflows.workflow_pipeline_routes.update_workflow_pipeline")
+def test_update_workflow_pipeline(
+    update_mock, client, client_application, pipeline, workflow, workflow_pipeline
+):
+    update_mock.return_value = workflow_pipeline
+    params = {
+        "pipeline_uuid": pipeline.uuid,
+        "source_workflow_pipelines": [],
+        "destination_workflow_pipelines": [],
+    }
+    result = client.put(
+        f"/v1/workflows/{workflow.uuid}/pipelines/{workflow_pipeline.uuid}",
+        content_type="application/json",
+        json=params,
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    workflow_pipeline = find_workflow_pipeline(result.json["uuid"])
+    assert result.json == {
+        "uuid": workflow_pipeline.uuid,
+        "pipeline_uuid": pipeline.uuid,
+        "source_workflow_pipelines": [],
+        "destination_workflow_pipelines": [],
+        "created_at": to_iso8601(workflow_pipeline.created_at),
+        "updated_at": to_iso8601(workflow_pipeline.updated_at),
+    }
+    assert update_mock.called
 
 
 def test_get_workflow_pipelines_404(
