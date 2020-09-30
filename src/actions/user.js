@@ -6,7 +6,7 @@ import {
   AUTH_IN_PROGRESS,
 } from 'actions';
 import {
-  requestLoginUser, requestRefreshJWT,
+  requestLoginUser, requestRefreshJWT, requestUpdatePassword,
 } from 'services';
 
 export const loginUser = (email, password) => async (dispatch) => {
@@ -44,3 +44,20 @@ export const refreshUserToken = (token) => (dispatch) => {
 export const logoutUser = () => ({
   type: LOGOUT_USER,
 });
+
+export const updatePassword = (email, reset_token, password) => async (dispatch) => {
+  await dispatch({ type: AUTH_IN_PROGRESS });
+  requestUpdatePassword(email, reset_token, password)
+    .then((response) => {
+      dispatch({
+        type: LOGIN_USER,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: AUTH_FAILED,
+        payload: err.message,
+      });
+    });
+};

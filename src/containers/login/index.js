@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { loginUser } from 'actions/user';
-import { ROUTE_PIPELINES, ROUTE_FORGOT_PASSWORD } from 'config/routes';
+import { ROUTE_PIPELINES, ROUTE_RESET_PASSWORD } from 'config/routes';
 
 import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
@@ -67,7 +67,7 @@ const StyledInput = styled.input`
   }
 `;
 
-const LoginMessage = styled.div`
+const FormMessage = styled.div`
   padding: 0.75rem 0;
   height: 2.5rem;
   margin-bottom: 20px;
@@ -117,7 +117,7 @@ const Login = () => {
         <StyledH2>Sign In</StyledH2>
         <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
         <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
-        <LoginMessage>
+        <FormMessage>
           <StyledText
             size="middle"
             color="pink"
@@ -129,9 +129,9 @@ const Login = () => {
             size="middle"
             float="right"
           >
-            <Link to={ROUTE_FORGOT_PASSWORD}>Forgot Password</Link>
+            <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
           </StyledText>
-        </LoginMessage>
+        </FormMessage>
         <StyledButton
           htmlType="submit"
           color="blue"

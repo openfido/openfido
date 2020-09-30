@@ -13,16 +13,16 @@ import {
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 import Login from 'containers/login';
-import ForgotPassword from 'containers/forgotPassword';
-import ChangePassword from 'containers/changePassword';
+import ResetPasswordRequest from 'containers/login/reset-password-request';
+import ResetPassword from 'containers/login/reset-password';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import { refreshUserToken } from 'actions/user';
 import reducers from 'reducers';
 import {
   ROUTE_LOGIN,
-  ROUTE_FORGOT_PASSWORD,
-  ROUTE_CHANGE_PASSWORD,
+  ROUTE_RESET_PASSWORD,
+  ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
 } from 'config/routes';
 import * as serviceWorker from './serviceWorker';
@@ -62,8 +62,8 @@ const AppSwitch = () => {
         {redirectToPipelines}
         <Login />
       </Route>
-      <Route exact path={ROUTE_FORGOT_PASSWORD} render={() => (<ForgotPassword />)} />
-      <Route exact path={ROUTE_CHANGE_PASSWORD} render={() => (<ChangePassword />)} />
+      <Route exact path={ROUTE_RESET_PASSWORD} render={() => (<ResetPasswordRequest />)} />
+      <Route exact path={ROUTE_UPDATE_PASSWORD} render={() => (<ResetPassword />)} />
       <Route exact path={ROUTE_PIPELINES}>
         {redirectToLogin}
         <App><Pipelines /></App>

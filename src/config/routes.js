@@ -1,6 +1,6 @@
 export const ROUTE_LOGIN = '/login';
-export const ROUTE_FORGOT_PASSWORD = '/forgot';
-export const ROUTE_CHANGE_PASSWORD = '/reset';
+export const ROUTE_RESET_PASSWORD = '/reset-password';
+export const ROUTE_UPDATE_PASSWORD = '/reset-password/:reset_token/:email';
 export const ROUTE_PIPELINES = '/pipelines';
 export const ROUTE_USERS = '/users';
 export const ROUTE_SETTINGS = '/settings';
