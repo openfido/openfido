@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { requestPasswordReset } from 'services';
 import 'actions/user';
+import CloseOutlined from 'icons/CloseOutlined';
 import { StyledButton, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 
@@ -29,14 +32,25 @@ const StyledH2 = styled.h2`
 `;
 
 const StyledForm = styled.form`
+  position: relative;
   width: 390px;
   height: 522px;
-  padding: 30px;
+  padding: 28px 32px;
   margin: 42px auto 0 auto;
   margin: 2.625rem auto 0 auto;
   background-color: ${colors.white};
   text-align: left;
   border-radius: 3px;
+  .anticon {
+    top: 16px;
+    top: 1rem;
+    right: 16px;
+    right: 1rem;
+    cursor: pointer;
+  }
+  &.thanks {
+    height: 300px;
+  }
 `;
 
 const StyledInput = styled.input`
@@ -72,6 +86,7 @@ const ErrorText = styled(StyledText)`
   height: 2.5rem;
   margin-bottom: 20px;
   margin-bottom: 1.25rem;
+  padding-left: 0.25rem;
 `;
 
 const FormMessage = styled.div`
@@ -116,48 +131,63 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onResetClicked}>
-        <StyledH2>{!thanks ? 'Reset Your Password' : 'Help is on the Way'}</StyledH2>
-        {!thanks && (
-        <ResetPasswordText
-          size="large"
-          color="gray"
-        >
-          Enter your email address and we will send you a link to reset your password
-        </ResetPasswordText>
+      <StyledForm className={thanks ? 'thanks' : ''} onSubmit={onResetClicked}>
+        {!thanks ? (
+          <>
+            <StyledH2>Reset Your Password</StyledH2>
+            <ResetPasswordText
+              size="large"
+              color="gray"
+            >
+              Enter your email address and we will send you a link to reset your password
+            </ResetPasswordText>
+            <StyledInput placeholder="EMAIL" onChange={onEmailChanged} />
+            <FormMessage>
+              {error && (
+              <ErrorText
+                size="middle"
+                color="gray"
+              >
+                email address
+              </ErrorText>
+              )}
+            </FormMessage>
+            <StyledButton
+              color="blue"
+              width="144"
+              role="button"
+              tabIndex={0}
+              onClick={onResetClicked}
+              loading={loading}
+            >
+              Submit
+            </StyledButton>
+          </>
+        ) : (
+          <>
+            <Link to="/login"><CloseOutlined /></Link>
+            <StyledH2>Help is on the Way</StyledH2>
+            <ThankYouText
+              size="large"
+              color="gray"
+            >
+              Please check your email to reset your password.
+            </ThankYouText>
+          </>
         )}
-        {thanks && (
-        <ThankYouText
-          size="large"
-          color="gray"
-        >
-          Please check your email to reset your password.
-        </ThankYouText>
-        )}
-        {!thanks && <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />}
-        {!thanks && <FormMessage>
-          {error && (
-          <ErrorText
-            size="middle"
-            color="gray"
-          >
-            email address
-          </ErrorText>
-          )}
-        </FormMessage>}
-        {!thanks && <StyledButton
-          color="blue"
-          width="144"
-          role="button"
-          tabIndex={0}
-          onClick={onResetClicked}
-          loading={loading}
-        >
-          Submit
-        </StyledButton>}
       </StyledForm>
     </Root>
   );
+};
+
+ResetPasswordRequest.propTypes = {
+  error: PropTypes.bool,
+  thanks: PropTypes.bool,
+};
+
+ResetPasswordRequest.defaultProps = {
+  error: false,
+  thanks: false,
 };
 
 export default ResetPasswordRequest;

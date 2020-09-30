@@ -76,7 +76,7 @@ export const StyledTitle = styled.div`
 
 export const StyledText = styled.span`
   ${({
-    color, fontweight, indent, size, bordercolor, padding, margin, align, float, height,
+    color, fontweight, indent, size, bordercolor, padding, margin, align, float,
   }) => (`
   ${color in colors ? (`
   color: ${colors[color]};
@@ -156,6 +156,7 @@ export const StyledButton = styled(Button)`
   height: 50px;
   height: 3.125rem;
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   box-shadow: none;
