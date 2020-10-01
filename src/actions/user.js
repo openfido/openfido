@@ -4,9 +4,13 @@ import {
   REFRESH_JWT,
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
+  GET_USER_PROFILE,
 } from 'actions';
 import {
-  requestLoginUser, requestRefreshJWT, requestUpdatePassword,
+  requestLoginUser,
+  requestRefreshJWT,
+  requestUpdatePassword,
+  requestUserProfile,
 } from 'services';
 
 export const loginUser = (email, password) => async (dispatch) => {
@@ -17,6 +21,15 @@ export const loginUser = (email, password) => async (dispatch) => {
         type: LOGIN_USER,
         payload: response.data,
       });
+
+      const { uuid, token } = response.data;
+      requestUserProfile(uuid, token)
+        .then((response2) => {
+          dispatch({
+            type: GET_USER_PROFILE,
+            payload: response2.data,
+          });
+        });
     })
     .catch((err) => {
       dispatch({
@@ -26,13 +39,21 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
 };
 
-export const refreshUserToken = (token) => (dispatch) => {
+export const refreshUserToken = (user_uuid, token) => (dispatch) => {
   requestRefreshJWT(token)
     .then((response) => {
       dispatch({
         type: REFRESH_JWT,
         payload: response.data,
       });
+
+      requestUserProfile(user_uuid, token)
+        .then((response2) => {
+          dispatch({
+            type: GET_USER_PROFILE,
+            payload: response2.data,
+          });
+        });
     })
     .catch(() => {
       // Treat as though we logged out. Very likely the user has reached the max

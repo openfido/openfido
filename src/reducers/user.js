@@ -4,6 +4,7 @@ import {
   REFRESH_JWT,
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
+  GET_USER_PROFILE,
 } from 'actions';
 import Auth from 'util/auth';
 
@@ -49,6 +50,14 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         profile: null,
+      };
+    case GET_USER_PROFILE:
+      return {
+        ...state,
+        profile: {
+          ...state.profile,
+          ...action.payload,
+        },
       };
     default:
       return state;
