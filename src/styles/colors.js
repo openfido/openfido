@@ -1,5 +1,6 @@
 export default {
   white: '#FFFFFF',
+  lightBorder: '#F1F1F1',
   lightBg: '#F7F7F7',
   lightOverlay: 'rgba(112, 112, 112, 0.1)',
   lightOverlay20: 'rgba(112, 112, 112, 0.2)',

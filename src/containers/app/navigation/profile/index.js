@@ -10,17 +10,10 @@ const StyledProfileContainer = styled.div`
   text-align: center;
   cursor: pointer;
   border-bottom: 1px solid #d2d2d2;
-  padding-bottom: 10px;
-  margin: 34px 20px 0 16px;
-  font-size: 12px;
+  padding-bottom: 16px;
+  margin: 32px 20px 0 16px;
+  font-size: 14px;
   line-height: 14px;
-  .ant-dropdown-trigger {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 16px;
-    color: ${colors.black};
-  }
 `;
 
 const StyledPhotoContainer = styled.div`
@@ -29,7 +22,7 @@ const StyledPhotoContainer = styled.div`
   border-radius: 22px;
   border: 2px solid ${colors.black};
   padding: 1px;
-  margin: 0 auto;
+  margin: -2px auto;
 `;
 
 const StyledPhoto = styled.div`
@@ -44,19 +37,13 @@ const StyledNameAndOrg = styled.div`
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
-  margin-top: 10px;
+  margin-top: 8px;
 `;
 
 const StyledName = styled.div`
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
-  margin-top: 10px;
-`;
-
-const StyledOrganization = styled.div`
-  font-size: 14px;
-  margin-top: 5px;
 `;
 
 const Profile = () => (
@@ -66,7 +53,6 @@ const Profile = () => (
     </StyledPhotoContainer>
     <StyledNameAndOrg>
       <StyledName>Guest</StyledName>
-      <StyledOrganization>Load Insight</StyledOrganization>
     </StyledNameAndOrg>
     <SettingsDropdown />
   </StyledProfileContainer>
