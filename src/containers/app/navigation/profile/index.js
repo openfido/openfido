@@ -1,7 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
+import { logoutUser } from 'actions/user';
 import colors from 'styles/colors';
+
 import SettingsDropdown from './SettingsDropdown';
 import PhotoImg from './images/navigation-profile-avatar.svg';
 
@@ -10,7 +14,6 @@ const StyledProfileContainer = styled.div`
   text-align: center;
   cursor: pointer;
   border-bottom: 1px solid #d2d2d2;
-  padding-bottom: 16px;
   margin: 32px 20px 0 16px;
   font-size: 14px;
   line-height: 14px;
@@ -33,29 +36,48 @@ const StyledPhoto = styled.div`
   border-radius: 20px;
 `;
 
-const StyledNameAndOrg = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 21px;
-  margin-top: 8px;
-`;
-
 const StyledName = styled.div`
   font-size: 18px;
   font-weight: 500;
   line-height: 21px;
+  margin: 8px auto 12px auto;
 `;
 
-const Profile = () => (
-  <StyledProfileContainer>
-    <StyledPhotoContainer>
-      <StyledPhoto />
-    </StyledPhotoContainer>
-    <StyledNameAndOrg>
-      <StyledName>Guest</StyledName>
-    </StyledNameAndOrg>
-    <SettingsDropdown />
-  </StyledProfileContainer>
-);
+const SignOutLink = styled.div`
+  position: absolute;
+  right: 20px;
+  right: 1.25rem;
+  top: 8px;
+  top: 0.5rem;
+`;
+
+const Profile = () => {
+  const profile = useSelector((state) => state.user.profile);
+  const dispatch = useDispatch();
+
+  if (!profile) return null;
+
+  const onSignOutClicked = () => {
+    dispatch(logoutUser());
+  };
+
+  return (
+    <>
+      <SignOutLink>
+        <Link to="/login" onClick={onSignOutClicked}>Sign Out</Link>
+      </SignOutLink>
+      <StyledProfileContainer>
+        <StyledPhotoContainer>
+          <StyledPhoto />
+        </StyledPhotoContainer>
+        <StyledName>
+          {profile.first_name}
+          {profile.last_name && ` ${profile.last_name}`}
+        </StyledName>
+        <SettingsDropdown />
+      </StyledProfileContainer>
+    </>
+  );
+};
 
 export default Profile;

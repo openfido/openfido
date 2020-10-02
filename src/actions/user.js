@@ -5,6 +5,7 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
+  CHANGE_ORGANIZATION,
 } from 'actions';
 import {
   requestLoginUser,
@@ -82,3 +83,8 @@ export const updatePassword = (email, reset_token, password) => async (dispatch)
       });
     });
 };
+
+export const changeOrganization = (org_uuid) => ({
+  type: CHANGE_ORGANIZATION,
+  payload: org_uuid,
+});
