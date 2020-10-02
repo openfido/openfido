@@ -84,7 +84,7 @@ export const updatePassword = (email, reset_token, password) => async (dispatch)
     });
 };
 
-export const changeOrganization = (org_uuid) => ({
+export const changeOrganization = (organization_uuid) => ({
   type: CHANGE_ORGANIZATION,
-  payload: org_uuid,
+  payload: organization_uuid,
 });
