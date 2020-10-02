@@ -18,3 +18,5 @@ export const requestUpdatePassword = (email, reset_token, password) => (
     password,
   })
 );
+
+export const requestUserProfile = (user_uuid, token) => ApiClient.get(`/users/${user_uuid}/profile`, token);

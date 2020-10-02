@@ -19,7 +19,7 @@ export const StyledLayout = styled(Layout)`
   width: 100vw;
   .ant-dropdown-trigger {
     .anticon {
-      margin-left: 8px;
+      margin-left: 6px;
     }
   }
 `;

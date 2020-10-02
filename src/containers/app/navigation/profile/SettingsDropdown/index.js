@@ -1,69 +1,104 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Dropdown, Menu } from 'antd';
 
-import { logoutUser as logoutUserAction } from 'actions/user';
+import { changeOrganization } from 'actions/user';
 import DownOutlined from 'icons/DownOutlined';
+import colors from 'styles/colors';
 
-const { Item } = Menu;
-
-const StyledMenu = styled(Menu)`
-  display: block;
-  min-width: auto;
-  width: 118px;
-  margin: 0 auto;
-  background: #f7f7f7;
-  padding: 18px 0;
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.05);
-  top: 7px;
-`;
-
-const StyledMenuItem = styled(Item)`
-  text-align: center;
-  font-size: 12px;
-  line-height: 14px;
-  font-weight: 500;
-  padding: 0;
-  a {
-    padding: 8px 0;
-    margin: 0;
+const StyledDropdown = styled(Dropdown)`
+  position: relative;
+  background-color: ${colors.white};
+  color: ${colors.black};
+  padding-bottom: 16px;
+  .anticon {
+    position: absolute;
+    top: 4px;
+    top: 0.25rem;
   }
 `;
 
-const SettingsDropdown = ({ logoutUser }) => {
+const StyledMenu = styled(Menu)`
+  top: -4px;
+  display: block;
+  width: 191px;
+  margin: 0 auto;
+  background: ${colors.white};
+  padding: 4px 32px 24px 32px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.03);
+  border: 0.5px solid ${colors.lightGray};
+  font-weight: 500;
+  color: ${colors.gray};
+  li:first-child {
+    font-size: 12px;
+    line-height: 14px;
+    margin-top: 4px;
+    margin-top: 0.25rem;
+    margin-bottom: 16px;
+    margin-bottom: 1rem;
+  }
+`;
+
+const StyledMenuItem = styled(Menu.Item)`
+  color: ${colors.gray};
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: 500;
+  border: 1px solid ${colors.lightBorder};
+  border-radius: 3px;
+  padding: 2px;
+  &:hover {
+    background-color: ${colors.blue};
+    border-color: transparent;
+    color: ${colors.white};
+  }
+  &:first-of-type {
+    margin-top: 16px;
+    margin-top: 1rem;
+  }
+  &:not(:last-child) {
+    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
+   }
+`;
+
+const SettingsDropdown = () => {
+  const profile = useSelector((state) => state.user.profile);
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+  const dispatch = useDispatch();
+
+  if (!profile || !profile.organizations || !profile.organizations.length) return null;
+
+  const onOrgClicked = (organization_uuid) => {
+    dispatch(changeOrganization(organization_uuid));
+  };
+
   const menu = (
     <StyledMenu>
-      <StyledMenuItem>
-        <Link to="/profile">Account Profile</Link>
-      </StyledMenuItem>
-      <StyledMenuItem>
-        <Link to="/login" onClick={logoutUser}>Sign Out</Link>
-      </StyledMenuItem>
+      <li>Change organization</li>
+      {profile.organizations && profile.organizations.map((org) => (
+        <StyledMenuItem key={org.name} onClick={() => onOrgClicked(org.uuid)}>
+          {org.name}
+        </StyledMenuItem>
+      ))}
     </StyledMenu>
   );
 
+  const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
+
   return (
-    <Dropdown overlay={menu}>
+    <StyledDropdown overlay={menu} disabled={profile.organizations.length <= 1}>
       <div>
-        Manage settings
-        <DownOutlined color="gray" />
+        <span>
+          {currentOrgObj ? currentOrgObj.name : 'No organization'}
+          {profile.organizations.length > 1 && <DownOutlined color="lightGray" />}
+        </span>
       </div>
-    </Dropdown>
+    </StyledDropdown>
   );
 };
 
-SettingsDropdown.propTypes = {
-  logoutUser: PropTypes.func.isRequired,
-};
-
-const mapDispatch = (dispatch) => bindActionCreators({
-  logoutUser: logoutUserAction,
-}, dispatch);
-
-export default connect(undefined, mapDispatch)(SettingsDropdown);
+export default SettingsDropdown;

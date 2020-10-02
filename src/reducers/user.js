@@ -4,11 +4,14 @@ import {
   REFRESH_JWT,
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
+  GET_USER_PROFILE,
+  CHANGE_ORGANIZATION,
 } from 'actions';
 import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
   profile: Auth.getUser(),
+  currentOrg: null,
   authInProgress: false,
   authError: null,
 };
@@ -49,6 +52,22 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         profile: null,
+      };
+    case GET_USER_PROFILE: {
+      const { organizations } = action.payload;
+      return {
+        ...state,
+        profile: {
+          ...state.profile,
+          ...action.payload,
+        },
+        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+      };
+    }
+    case CHANGE_ORGANIZATION:
+      return {
+        ...state,
+        currentOrg: action.payload,
       };
     default:
       return state;

@@ -2,8 +2,8 @@ import axios from 'axios';
 import config from 'config';
 
 export default class ApiClient {
-  static get(url, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout).get(url);
+  static get(url, token, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, token).get(url);
   }
 
   static post(url, data = {}, token = null, timeout = config.api.defaultTimeout) {
