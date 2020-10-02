@@ -90,11 +90,11 @@ const SettingsDropdown = () => {
   const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
 
   return (
-    <StyledDropdown overlay={menu}>
+    <StyledDropdown overlay={menu} disabled={profile.organizations.length <= 1}>
       <div>
         <span>
           {currentOrgObj ? currentOrgObj.name : 'No organization'}
-          <DownOutlined color="lightGray" />
+          {profile.organizations.length > 1 && <DownOutlined color="lightGray" />}
         </span>
       </div>
     </StyledDropdown>

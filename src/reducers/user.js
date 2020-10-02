@@ -54,8 +54,7 @@ export default (state = DEFAULT_STATE, action) => {
         profile: null,
       };
     case GET_USER_PROFILE: {
-      const {organizations} = action.payload;
-      //const organizations = [{ name: 'SLAC', uuid: '1234' }, { name: 'Holy Cross Energy', uuid: 'jsadiodj' }]
+      const { organizations } = action.payload;
       return {
         ...state,
         profile: {
