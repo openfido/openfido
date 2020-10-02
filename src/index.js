@@ -15,6 +15,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import Login from 'containers/login';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
+import Users from 'containers/users';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import { refreshUserToken } from 'actions/user';
@@ -24,6 +25,7 @@ import {
   ROUTE_RESET_PASSWORD,
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
+  ROUTE_USERS,
 } from 'config/routes';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
@@ -69,6 +71,10 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_PIPELINES}>
         {redirectToLogin}
         <App><Pipelines /></App>
+      </Route>
+      <Route exact path={ROUTE_USERS}>
+        {redirectToLogin}
+        <App><Users /></App>
       </Route>
       {redirectToPipelines}
       {redirectToLogin}
