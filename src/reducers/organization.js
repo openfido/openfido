@@ -7,7 +7,7 @@ import {
 const DEFAULT_STATE = {
   members: [],
   userRemoved: null,
-  removeError: null,
+  removeMemberError: null,
 };
 
 export default (state = DEFAULT_STATE, action) => {

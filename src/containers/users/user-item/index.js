@@ -104,7 +104,7 @@ const User = ({
   const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userRemoved = useSelector((state) => state.organization.userRemoved);
-  const removeError = useSelector((state) => state.organization.removeError);
+  const removeMemberError = useSelector((state) => state.organization.removeMemberError);
   const dispatch = useDispatch();
 
   const onDeleteUserClicked = () => {
@@ -152,7 +152,7 @@ const User = ({
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
-        {removeError && user_uuid === userRemoved && (
+        {removeMemberError && user_uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
       </DeleteColumn>

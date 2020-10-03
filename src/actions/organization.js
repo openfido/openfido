@@ -32,7 +32,7 @@ export const removeOrganizationMember = (organization_uuid, user_uuid) => async 
         type: REMOVE_ORGANIZATION_MEMBER_FAILED,
         payload: {
           userRemoved: user_uuid,
-          removeError: err.message,
+          removeMemberError: err.message,
         },
       });
     });
