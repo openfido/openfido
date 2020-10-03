@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-import { requestOrganizationMembers } from 'services';
+import { getOrganizationMembers } from 'actions/organization';
 import {
   StyledTitle, StyledButton, StyledGrid, StyledText,
 } from 'styles/app';
@@ -10,15 +10,15 @@ import UserItem from './user-item';
 
 const Users = () => {
   const profile = useSelector((state) => state.user.profile);
+  const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (profile && currentOrg) {
-      requestOrganizationMembers(currentOrg, profile.token)
-        .then((response) => setUsers(response.data));
+    if (profile) {
+      dispatch(getOrganizationMembers(currentOrg, profile.token));
     }
-  }, [requestOrganizationMembers, profile, currentOrg]);
+  }, [getOrganizationMembers, profile, currentOrg]);
 
   if (!profile) return null;
 
@@ -38,9 +38,10 @@ const Users = () => {
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
       </StyledGrid>
       <Space direction="vertical" size={16}>
-        {users.map((item) => (
+        {members.map((item) => (
           <UserItem
             key={item.uuid}
+            uuid={item.uuid}
             first_name={item.first_name}
             last_name={item.last_name}
             is_system_admin={item.is_system_admin}

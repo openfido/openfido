@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 
+import { removeOrganizationMember } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -90,6 +92,11 @@ const User = ({
   first_name, last_name, is_system_admin, last_active_at,
 }) => {
   const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
+  const dispatch = useDispatch();
+
+  const onDeleteUserClicked = (user_uuid) => {
+    dispatch(removeOrganizationMember(user_uuid));
+  }
 
   const menu = (
     <StyledMenu>
@@ -131,7 +138,7 @@ const User = ({
         {moment(last_active_at).fromNow()}
       </StyledText>
       <DeleteColumn>
-        <DeleteOutlined color="gray20" />
+        <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
       </DeleteColumn>
     </StyledGrid>
   );
