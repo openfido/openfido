@@ -1,6 +1,7 @@
 import {
   GET_ORGANIZATION_MEMBERS,
   REMOVE_ORGANIZATION_MEMBER,
+  REMOVE_ORGANIZATION_MEMBER_FAILED,
 } from 'actions';
 import {
   requestOrganizationMembers,
@@ -24,6 +25,12 @@ export const removeOrganizationMember = (organization_uuid, user_uuid, token) =>
       dispatch({
         type: REMOVE_ORGANIZATION_MEMBER,
         payload: user_uuid,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: REMOVE_ORGANIZATION_MEMBER_FAILED,
+        payload: err.message,
       });
     });
 };
