@@ -1,4 +1,5 @@
 import ApiClient from 'util/api-client';
+import organization from "./reducers/organization";
 
 export const requestLoginUser = (email, password) => ApiClient.post('/users/auth', {
   email,
@@ -27,4 +28,8 @@ export const requestOrganizationMembers = (organization_uuid) => (
 
 export const requestRemoveOrganizationMember = (organization_uuid, user_uuid) => (
   ApiClient.delete(`/organizations/${organization_uuid}/members/${user_uuid}`)
+);
+
+export const requestChangeOrganizationMemberRole = (organization_uuid, user_uuid, role) => (
+  ApiClient.post(`/organizations/${organization_uuid}/members/${user_uuid}/role`, { role })
 );

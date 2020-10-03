@@ -4,7 +4,7 @@ import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import { removeOrganizationMember } from 'actions/organization';
+import { removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -16,12 +16,9 @@ import colors from 'styles/colors';
 const StyledDropdown = styled(Dropdown)`
   position: relative;
   &.ant-dropdown-trigger {
-    width: 112px;
+    width: 116px;
     display: inline-flex;
     justify-content: space-between;
-  }
-  .ant-dropdown-menu {
-    left: -20px;
   }
 `;
 
@@ -46,7 +43,7 @@ const ErrorMessage = styled(StyledText)`
 
 const StyledMenu = styled(Menu)`
   display: block;
-  width: 169px;
+  width: 178px;
   margin: 0 auto;
   background: ${colors.white};
   padding: 16px 0;
@@ -111,24 +108,29 @@ const User = ({
     dispatch(removeOrganizationMember(currentOrg, user_uuid));
   }
 
+  const onChangeRoleClicked = (role) => {
+    dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, role))
+      .then(() => setUserRole(role));
+  }
+
   const menu = (
     <StyledMenu>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
-      <StyledMenuItem onClick={() => setUserRole('Administrator')}>
+      <StyledMenuItem onClick={() => onChangeRoleClicked('Administrator')}>
         <span>Administrator</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Users</strong>, <strong>Pipelines</strong>, <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem onClick={() => setUserRole('Engineer')}>
+      <StyledMenuItem onClick={() => onChangeRoleClicked('Engineer')}>
         <span>Engineer</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Pipelines</strong> and <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem onClick={() => setUserRole('Unassigned')}>
+      <StyledMenuItem onClick={() => onChangeRoleClicked('Unassigned')}>
         <span>Unassigned</span>
       </StyledMenuItem>
       <li>View only.</li>
