@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -40,6 +40,9 @@ const StyledMenu = styled(Menu)`
   border: 0.5px solid ${colors.lightGray};
   color: ${colors.gray};
   text-align: center;
+  position: relative;
+  left: -32px;
+  left: -2rem;
   li:first-child {
     font-size: 12px;
     line-height: 14px;
@@ -82,25 +85,26 @@ const StyledMenuItem = styled(Menu.Item)`
 const User = ({
   first_name, last_name, is_system_admin, last_active_at,
 }) => {
-  // const [userRole, setUserRole] = useState(is_system_admin)
+  const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
+
   const menu = (
     <StyledMenu>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
-      <StyledMenuItem>
+      <StyledMenuItem onClick={() => setUserRole('Administrator')}>
         <span>Administrator</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Users</strong>, <strong>Pipelines</strong>, <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem>
+      <StyledMenuItem onClick={() => setUserRole('Engineer')}>
         <span>Engineer</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Pipelines</strong> and <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem hovercolor="orangeRed">
+      <StyledMenuItem onClick={() => setUserRole('Unassigned')}>
         <span>Unassigned</span>
       </StyledMenuItem>
       <li>View only.</li>
@@ -115,7 +119,7 @@ const User = ({
       </StyledText>
       <StyledDropdown overlay={menu} trigger="click">
         <StyledText size="large" color="gray">
-          {is_system_admin ? 'Administrator' : ''}
+          {userRole}
           <DownOutlined color="lightGray" />
         </StyledText>
       </StyledDropdown>
