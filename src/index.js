@@ -79,7 +79,7 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
         {hasProfile && 'is_system_admin' in profile && (
-          !profile.is_system_admin ? (
+          !profile.is_system_admin || !(profile.organizations && profile.organizations.length) ? (
             <Redirect to={ROUTE_PIPELINES} />
           ) : (
             <App><Users /></App>

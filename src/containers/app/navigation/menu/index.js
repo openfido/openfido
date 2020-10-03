@@ -55,10 +55,13 @@ const MainMenu = () => {
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
   if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('jobs');
 
+  const isSystemAdmin = profile.is_system_admin;
+  const hasOrganizations = profile.organizations && profile.organizations.length;
+
   return (
     <StyledMenu selectedKeys={selectedKeys}>
       <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>
-      {profile.is_system_admin && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
+      {isSystemAdmin && hasOrganizations && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
       <StyledMenuItem key="settings" onClick={navigate(ROUTE_SETTINGS)}>Settings</StyledMenuItem>
     </StyledMenu>
   );
