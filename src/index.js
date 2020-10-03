@@ -50,34 +50,44 @@ const AppSwitch = () => {
     if (checkedJWTRefresh) return;
     setCheckedJWTRefresh(true);
 
-    if (!profile) return;
+    if (profile === null) return;
 
     const { uuid: user_uuid, token } = profile;
 
     dispatch(refreshUserToken(user_uuid, token));
   }, [dispatch, profile, checkedJWTRefresh]);
 
-  const redirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
-  const redirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
+  const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
+  const noProfileRedirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
 
   return (
     <Switch>
       <Route exact path={ROUTE_LOGIN}>
-        {redirectToPipelines}
+        {hasProfileRedirectToPipelines}
         <Login />
       </Route>
-      <Route exact path={ROUTE_RESET_PASSWORD} render={() => (<ResetPasswordRequest />)} />
-      <Route exact path={ROUTE_UPDATE_PASSWORD} render={() => (<ResetPassword />)} />
+      <Route exact path={ROUTE_RESET_PASSWORD}>
+        <ResetPasswordRequest />
+      </Route>
+      <Route exact path={ROUTE_UPDATE_PASSWORD}>
+        <ResetPassword />
+      </Route>
       <Route exact path={ROUTE_PIPELINES}>
-        {redirectToLogin}
+        {noProfileRedirectToLogin}
         <App><Pipelines /></App>
       </Route>
       <Route exact path={ROUTE_USERS}>
-        {redirectToLogin}
-        <App><Users /></App>
+        {noProfileRedirectToLogin}
+        {hasProfile && 'is_system_admin' in profile && (
+          !profile.is_system_admin ? (
+            <Redirect to={ROUTE_PIPELINES} />
+          ) : (
+            <App><Users /></App>
+          )
+        )}
       </Route>
-      {redirectToPipelines}
-      {redirectToLogin}
+      {hasProfileRedirectToPipelines}
+      {noProfileRedirectToLogin}
     </Switch>
   );
 };
