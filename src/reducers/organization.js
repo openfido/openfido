@@ -6,6 +6,7 @@ import {
 
 const DEFAULT_STATE = {
   members: [],
+  userRemoved: null,
   removeError: null,
 };
 
@@ -26,7 +27,7 @@ export default (state = DEFAULT_STATE, action) => {
     case REMOVE_ORGANIZATION_MEMBER_FAILED:
       return {
         ...state,
-        removeError: action.payload,
+        ...action.payload,
       };
     default:
       return state;

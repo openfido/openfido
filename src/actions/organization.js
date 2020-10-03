@@ -30,7 +30,10 @@ export const removeOrganizationMember = (organization_uuid, user_uuid, token) =>
     .catch((err) => {
       dispatch({
         type: REMOVE_ORGANIZATION_MEMBER_FAILED,
-        payload: err.message,
+        payload: {
+          userRemoved: user_uuid,
+          removeError: err.message,
+        },
       });
     });
 };
