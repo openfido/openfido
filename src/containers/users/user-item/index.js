@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -89,13 +89,14 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  first_name, last_name, is_system_admin, last_active_at,
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at,
 }) => {
   const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
+  const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
-  const onDeleteUserClicked = (user_uuid) => {
-    dispatch(removeOrganizationMember(user_uuid));
+  const onDeleteUserClicked = () => {
+    dispatch(removeOrganizationMember(currentOrg, user_uuid));
   }
 
   const menu = (

@@ -4,6 +4,7 @@ import {
 } from 'actions';
 import {
   requestOrganizationMembers,
+  requestRemoveOrganizationMember,
 } from 'services';
 
 export const getOrganizationMembers = (organization_uuid, token) => async (dispatch) => {
@@ -16,5 +17,13 @@ export const getOrganizationMembers = (organization_uuid, token) => async (dispa
     });
 };
 
-export const removeOrganizationMember = (organization_uuid, user_uuid) => async (dispatch) => {
+export const removeOrganizationMember = (organization_uuid, user_uuid, token) => async (dispatch) => {
+  // organization_uuid === currentOrg
+  requestRemoveOrganizationMember(organization_uuid, user_uuid, token)
+    .then(() => {
+      dispatch({
+        type: REMOVE_ORGANIZATION_MEMBER,
+        payload: user_uuid,
+      });
+    });
 };

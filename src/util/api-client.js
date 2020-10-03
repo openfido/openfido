@@ -1,13 +1,14 @@
 import axios from 'axios';
 import config from 'config';
+import Auth from 'util/auth';
 
 export default class ApiClient {
-  static get(url, token, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout, token).get(url);
+  static get(url, auth = true, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, auth).get(url);
   }
 
-  static post(url, data = {}, token = null, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout, token).post(url, data);
+  static post(url, data = {}, auth = true, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, auth).post(url, data);
   }
 
   static postForm(url, formFields) {
@@ -19,24 +20,25 @@ export default class ApiClient {
     return this.getInstance(config.api.defaultTimeout, 'multipart/form-data').post(url, data);
   }
 
-  static put(url, data = {}, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout).put(url, data);
+  static put(url, data = {}, auth = true, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, auth).put(url, data);
   }
 
-  static delete(url, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout).delete(url);
+  static delete(url, auth = true, timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, auth).delete(url);
   }
 
   static getInstance(
     timeout = config.api.defaultTimeout,
-    token = null,
+    auth = false,
+    token = Auth.getAuthToken(),
     contentType = 'application/json',
   ) {
     const headers = {
       'Content-Type': contentType,
     };
 
-    if (token !== null) {
+    if (auth && token !== null) {
       headers.Authorization = `Bearer ${token}`;
     }
 

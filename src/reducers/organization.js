@@ -1,7 +1,6 @@
 import {
   GET_ORGANIZATION_MEMBERS,
   REMOVE_ORGANIZATION_MEMBER,
-  REMOVE_ORGANIZATION_MEMBER_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -16,6 +15,11 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         members: action.payload,
+      };
+    case REMOVE_ORGANIZATION_MEMBER:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members.filter((item) => action.payload !== item.uuid),
       };
     default:
       return state;

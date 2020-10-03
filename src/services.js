@@ -19,8 +19,12 @@ export const requestUpdatePassword = (email, reset_token, password) => (
   })
 );
 
-export const requestUserProfile = (user_uuid, token) => ApiClient.get(`/users/${user_uuid}/profile`, token);
+export const requestUserProfile = (user_uuid) => ApiClient.get(`/users/${user_uuid}/profile`);
 
-export const requestOrganizationMembers = (organization_uuid, token) => (
-  ApiClient.get(`/organizations/${organization_uuid}/members`, token)
+export const requestOrganizationMembers = (organization_uuid) => (
+  ApiClient.get(`/organizations/${organization_uuid}/members`)
+);
+
+export const requestRemoveOrganizationMember = (organization_uuid, user_uuid) => (
+  ApiClient.delete(`/organizations/${organization_uuid}/members/${user_uuid}`)
 );
