@@ -32,7 +32,7 @@ const Users = () => {
           </StyledButton>
         </div>
       </StyledTitle>
-      <StyledGrid gridTemplateColumns="3fr 2fr 2fr 1fr">
+      <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
         <StyledText size="large" fontweight={500} color="black">Name</StyledText>
         <StyledText size="large" fontweight={500} color="black">Role</StyledText>
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>

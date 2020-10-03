@@ -27,11 +27,21 @@ const StyledDropdown = styled(Dropdown)`
 
 const DeleteColumn = styled.div`
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   .anticon {
     left: 0;
     top: -14px;
     top: -0.875rem;
   }
+`;
+
+const ErrorMessage = styled(StyledText)`
+  position: absolute;
+  left: 0;
+  right: 0;
 `;
 
 const StyledMenu = styled(Menu)`
@@ -93,6 +103,7 @@ const User = ({
 }) => {
   const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const removeError = useSelector((state) => state.organization.removeError);
   const dispatch = useDispatch();
 
   const onDeleteUserClicked = () => {
@@ -124,7 +135,7 @@ const User = ({
   );
 
   return (
-    <StyledGrid gridTemplateColumns="3fr 2fr 2fr 1fr" bgcolor="white">
+    <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
       <StyledText size="large" color="gray">
         {first_name}
         {last_name && ` ${last_name}`}
@@ -140,6 +151,7 @@ const User = ({
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
+        {removeError && <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>}
       </DeleteColumn>
     </StyledGrid>
   );
