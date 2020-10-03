@@ -13,7 +13,11 @@ import colors from 'styles/colors';
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
-  width: 170px;
+  &.ant-dropdown-trigger {
+    width: 112px;
+    display: inline-flex;
+    justify-content: space-between;
+  }
   .ant-dropdown-menu {
     left: -20px;
   }
