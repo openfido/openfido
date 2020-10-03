@@ -23,8 +23,8 @@ export const loginUser = (email, password) => async (dispatch) => {
         payload: response.data,
       });
 
-      const { uuid, token } = response.data;
-      requestUserProfile(uuid, token)
+      const { uuid } = response.data;
+      requestUserProfile(uuid)
         .then((response2) => {
           dispatch({
             type: GET_USER_PROFILE,
@@ -40,15 +40,15 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
 };
 
-export const refreshUserToken = (user_uuid, token) => (dispatch) => {
-  requestRefreshJWT(token)
+export const refreshUserToken = (user_uuid) => (dispatch) => {
+  requestRefreshJWT()
     .then((response) => {
       dispatch({
         type: REFRESH_JWT,
         payload: response.data,
       });
 
-      requestUserProfile(user_uuid, token)
+      requestUserProfile(user_uuid)
         .then((response2) => {
           dispatch({
             type: GET_USER_PROFILE,

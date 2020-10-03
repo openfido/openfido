@@ -52,9 +52,9 @@ const AppSwitch = () => {
 
     if (profile === null) return;
 
-    const { uuid: user_uuid, token } = profile;
+    const { uuid: user_uuid } = profile;
 
-    dispatch(refreshUserToken(user_uuid, token));
+    dispatch(refreshUserToken(user_uuid));
   }, [dispatch, profile, checkedJWTRefresh]);
 
   const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;

@@ -5,7 +5,7 @@ export const requestLoginUser = (email, password) => ApiClient.post('/users/auth
   password,
 });
 
-export const requestRefreshJWT = (token) => ApiClient.post('/users/auth/refresh', {}, token);
+export const requestRefreshJWT = () => ApiClient.post('/users/auth/refresh');
 
 export const requestPasswordReset = (email) => ApiClient.post('/users/auth/reset', {
   email,

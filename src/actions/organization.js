@@ -8,8 +8,8 @@ import {
   requestRemoveOrganizationMember,
 } from 'services';
 
-export const getOrganizationMembers = (organization_uuid, token) => async (dispatch) => {
-  requestOrganizationMembers(organization_uuid, token)
+export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
+  requestOrganizationMembers(organization_uuid)
     .then((response) => {
       dispatch({
         type: GET_ORGANIZATION_MEMBERS,
@@ -18,9 +18,9 @@ export const getOrganizationMembers = (organization_uuid, token) => async (dispa
     });
 };
 
-export const removeOrganizationMember = (organization_uuid, user_uuid, token) => async (dispatch) => {
+export const removeOrganizationMember = (organization_uuid, user_uuid) => async (dispatch) => {
   // organization_uuid === currentOrg
-  requestRemoveOrganizationMember(organization_uuid, user_uuid, token)
+  requestRemoveOrganizationMember(organization_uuid, user_uuid)
     .then(() => {
       dispatch({
         type: REMOVE_ORGANIZATION_MEMBER,
