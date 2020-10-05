@@ -25,10 +25,10 @@ jobs:
       - run:
           command: |
             mkdir test-results
-            pipenv run invoke test --junit
+            pipenv run invoke test --junit --enforce-percent=52
       - store_test_results:
           path: test-results
       - run:
           command: pipenv run invoke style
       - run:
-          command: pipenv run invoke lint --fail-under=9
+          command: pipenv run invoke lint --fail-under=8
