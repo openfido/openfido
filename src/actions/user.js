@@ -63,6 +63,16 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
     });
 };
 
+export const getUserProfile = (user_uuid) => (dispatch) => {
+  requestUserProfile(user_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
+    });
+};
+
 export const logoutUser = () => ({
   type: LOGOUT_USER,
 });

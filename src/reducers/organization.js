@@ -5,7 +5,7 @@ import {
 } from 'actions';
 
 const DEFAULT_STATE = {
-  members: [],
+  members: null,
   userRemoved: null,
   removeMemberError: null,
 };

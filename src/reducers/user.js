@@ -66,7 +66,7 @@ export default (state = DEFAULT_STATE, action) => {
           ...action.payload,
           is_system_admin: true,
         },
-        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+        currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
       };
     }
     case CHANGE_ORGANIZATION:

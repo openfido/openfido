@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
+import { getUserProfile } from 'actions/user';
 import { getOrganizationMembers } from 'actions/organization';
 import {
   StyledTitle, StyledButton, StyledGrid, StyledText,
 } from 'styles/app';
+import { ROUTE_PIPELINES } from 'config/routes';
 import UserItem from './user-item';
 
 const Users = () => {
+  const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
   const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -19,6 +23,13 @@ const Users = () => {
       dispatch(getOrganizationMembers(currentOrg, profile.token));
     }
   }, [getOrganizationMembers, profile, currentOrg]);
+
+  useEffect(() => {
+    if (members && !members.length) {
+      dispatch(getUserProfile(profile.uuid));
+      history.push(ROUTE_PIPELINES);
+    }
+  });
 
   if (!profile) return null;
 
@@ -38,7 +49,7 @@ const Users = () => {
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
       </StyledGrid>
       <Space direction="vertical" size={16}>
-        {members.map((item) => (
+        {members && members.map((item) => (
           <UserItem
             key={item.uuid}
             uuid={item.uuid}
