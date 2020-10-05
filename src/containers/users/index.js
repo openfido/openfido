@@ -8,17 +8,15 @@ import {
 } from 'styles/app';
 import UserItem from './user-item';
 
-function Users() {
+const Users = () => {
   const profile = useSelector((state) => state.user.profile);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (profile && currentOrg) {
-        requestOrganizationMembers(currentOrg, profile.token)
-            .then((response) => setUsers(response.data))
-            .catch((response) => setError(true));
+      requestOrganizationMembers(currentOrg, profile.token)
+        .then((response) => setUsers(response.data));
     }
   }, [requestOrganizationMembers, profile, currentOrg]);
 
@@ -41,12 +39,17 @@ function Users() {
       </StyledGrid>
       <Space direction="vertical" size={16}>
         {users.map((item) => (
-          <UserItem key={item.uuid} {...item} />
+          <UserItem
+            key={item.uuid}
+            first_name={item.first_name}
+            last_name={item.last_name}
+            is_system_admin={item.is_system_admin}
+            last_active_at={item.last_active_at}
+          />
         ))}
       </Space>
     </>
   );
-}
-
+};
 
 export default Users;
