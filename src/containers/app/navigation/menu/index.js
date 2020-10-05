@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
 
@@ -46,15 +47,21 @@ const MainMenu = () => {
   const location = useLocation();
   const path = location.pathname;
 
+  const profile = useSelector((state) => state.user.profile);
+  if (!profile) return null;
+
   const selectedKeys = [];
   if (path.includes(ROUTE_PIPELINES)) selectedKeys.push('pipelines');
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
   if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('jobs');
 
+  const isSystemAdmin = profile.is_system_admin;
+  const hasOrganizations = profile.organizations && profile.organizations.length;
+
   return (
     <StyledMenu selectedKeys={selectedKeys}>
       <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>
-      <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>
+      {isSystemAdmin && hasOrganizations && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
       <StyledMenuItem key="settings" onClick={navigate(ROUTE_SETTINGS)}>Settings</StyledMenuItem>
     </StyledMenu>
   );

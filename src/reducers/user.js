@@ -60,6 +60,7 @@ export default (state = DEFAULT_STATE, action) => {
         profile: {
           ...state.profile,
           ...action.payload,
+          //is_system_admin: true,
         },
         currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
       };

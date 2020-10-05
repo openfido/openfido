@@ -15,6 +15,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import Login from 'containers/login';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
+import Users from 'containers/users';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import { refreshUserToken } from 'actions/user';
@@ -24,6 +25,7 @@ import {
   ROUTE_RESET_PASSWORD,
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
+  ROUTE_USERS,
 } from 'config/routes';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
@@ -48,30 +50,44 @@ const AppSwitch = () => {
     if (checkedJWTRefresh) return;
     setCheckedJWTRefresh(true);
 
-    if (!profile) return;
+    if (profile === null) return;
 
     const { uuid: user_uuid, token } = profile;
 
     dispatch(refreshUserToken(user_uuid, token));
   }, [dispatch, profile, checkedJWTRefresh]);
 
-  const redirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
-  const redirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
+  const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
+  const noProfileRedirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
 
   return (
     <Switch>
       <Route exact path={ROUTE_LOGIN}>
-        {redirectToPipelines}
+        {hasProfileRedirectToPipelines}
         <Login />
       </Route>
-      <Route exact path={ROUTE_RESET_PASSWORD} render={() => (<ResetPasswordRequest />)} />
-      <Route exact path={ROUTE_UPDATE_PASSWORD} render={() => (<ResetPassword />)} />
+      <Route exact path={ROUTE_RESET_PASSWORD}>
+        <ResetPasswordRequest />
+      </Route>
+      <Route exact path={ROUTE_UPDATE_PASSWORD}>
+        <ResetPassword />
+      </Route>
       <Route exact path={ROUTE_PIPELINES}>
-        {redirectToLogin}
+        {noProfileRedirectToLogin}
         <App><Pipelines /></App>
       </Route>
-      {redirectToPipelines}
-      {redirectToLogin}
+      <Route exact path={ROUTE_USERS}>
+        {noProfileRedirectToLogin}
+        {hasProfile && 'is_system_admin' in profile && (
+          !profile.is_system_admin || !(profile.organizations && profile.organizations.length) ? (
+            <Redirect to={ROUTE_PIPELINES} />
+          ) : (
+            <App><Users /></App>
+          )
+        )}
+      </Route>
+      {hasProfileRedirectToPipelines}
+      {noProfileRedirectToLogin}
     </Switch>
   );
 };

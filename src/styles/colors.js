@@ -10,7 +10,7 @@ export default {
   lightGrey: '#EDEDED',
   lightGray: '#D2D2D2',
   darkGray: '#A9A9A9',
-  gray20: '#AFAFAF',
+  gray20: '#AAAAAA',
   gray40: '#9A99A2',
   gray80: '#7C7C7C',
   gray: '#707070',

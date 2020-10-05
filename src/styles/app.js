@@ -18,6 +18,10 @@ export const StyledLayout = styled(Layout)`
   height: 100vh;
   width: 100vw;
   .ant-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
     .anticon {
       margin-left: 6px;
     }
