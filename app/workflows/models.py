@@ -1,4 +1,6 @@
-from ..model_utils import CommonColumnsMixin, get_db, RunStateEnum
+from application_roles.model_utils import CommonColumnsMixin, get_db
+
+from ..model_utils import RunStateEnum
 
 db = get_db()
 

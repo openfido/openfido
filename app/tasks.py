@@ -11,7 +11,7 @@ from flask import current_app
 
 from app.constants import WORKER_API_TOKEN
 from app.model_utils import RunStateEnum
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request

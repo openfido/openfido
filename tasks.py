@@ -12,7 +12,7 @@ def test(c, cov=False, cov_report=False, junit=False, enforce_percent=0):
     if enforce_percent > 0:
         command += f" --cov-fail-under={enforce_percent}"
     if cov or cov_report or junit or enforce_percent:
-        command += " --cov app --cov roles"
+        command += " --cov app"
     else:
         command += " app tests"
 
@@ -54,7 +54,7 @@ def create_application_key(c, name, permission):
     permission = permission to support.
     """
     from app import create_app
-    from roles.services import create_application
+    from application_roles.services import create_application
     from app.model_utils import SystemPermissionEnum
 
     (app, db, _, _) = create_app()

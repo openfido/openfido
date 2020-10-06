@@ -1,6 +1,6 @@
 from app.pipelines.models import Pipeline, db
 from app.pipelines.queries import find_pipeline
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 
 def test_create_pipeline_wrong_content_type(client):

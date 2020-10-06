@@ -33,7 +33,6 @@ services:
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@db/workflowservice
-      CELERY_RESULT_BACKEND: amqp://rabbit-user:rabbit-password@queue/api-queue
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
@@ -53,7 +52,6 @@ services:
     image: presencepg/presence-workflow-worker
     command: celery -A app.worker worker -l DEBUG
     environment:
-      CELERY_RESULT_BACKEND: amqp://rabbit-user:rabbit-password@queue/api-queue
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
       WORKER_API_SERVER: http://api:5000
       S3_ACCESS_KEY_ID: minio_access_key

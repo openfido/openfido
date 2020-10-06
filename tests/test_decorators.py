@@ -1,5 +1,5 @@
 from app import db
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 
 def test_make_permission_decorator_no_auth(client, pipeline):
