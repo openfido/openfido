@@ -4,11 +4,14 @@ import {
   REMOVE_ORGANIZATION_MEMBER_FAILED,
   CHANGE_ORGANIZATION_MEMBER_ROLE,
   CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
+  INVITE_ORGANIZATION_MEMBER,
+  INVITE_ORGANIZATION_MEMBER_FAILED,
 } from 'actions';
 import {
   requestOrganizationMembers,
   requestRemoveOrganizationMember,
   requestChangeOrganizationMemberRole,
+  requestInviteOrganizationMember,
 } from 'services';
 
 export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
@@ -55,6 +58,25 @@ export const changeOrganizationMemberRole = (organization_uuid, user_uuid, role)
         payload: {
           userRoleChanged: user_uuid,
           changeRoleError: err.message,
+        },
+      });
+    });
+};
+
+export const inviteOrganizationMember = (organization_uuid, email) => async (dispatch) => {
+  requestInviteOrganizationMember(organization_uuid, email)
+    .then(() => {
+      dispatch({
+        type: INVITE_ORGANIZATION_MEMBER,
+        payload: email,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: INVITE_ORGANIZATION_MEMBER_FAILED,
+        payload: {
+          userInvited: email,
+          inviteOrganizationMemberError: err.message,
         },
       });
     });

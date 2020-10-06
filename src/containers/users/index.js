@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
@@ -13,6 +13,7 @@ import {
   StyledText,
 } from 'styles/app';
 import UserItem from './user-item';
+import InviteUserPopup from './invite-user-popup';
 
 const Users = () => {
   const history = useHistory();
@@ -20,6 +21,11 @@ const Users = () => {
   const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
+
+  const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
+
+  const openInviteUserPopup = () => setShowInviteUserPopup(true);
+  const closeInviteUserPopup = () => setShowInviteUserPopup(false);
 
   useEffect(() => {
     if (profile && currentOrg) {
@@ -39,7 +45,7 @@ const Users = () => {
       <StyledTitle>
         <div>
           <h1>Users</h1>
-          <StyledButton size="small">
+          <StyledButton onClick={openInviteUserPopup} size="small">
             + Invite User
           </StyledButton>
         </div>
@@ -61,6 +67,7 @@ const Users = () => {
           />
         ))}
       </Space>
+      {showInviteUserPopup && <InviteUserPopup handleOk={closeInviteUserPopup} handleCancel={closeInviteUserPopup} />}
     </>
   );
 };

@@ -246,14 +246,14 @@ export const StyledButton = styled(Button)`
 export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
-  padding: 10px; // TODO: test this out, it was 9px before
+  padding: 14px; // TODO: test this out, it was 9px before
   background-color: ${colors.darkOverlay};
   &, &:hover:focus {
     color: ${colors.darkText};
   }
   &:hover {
     &, &::placeholder {
-      color: ${colors.lightBlue};
+      color: ${colors.blue};
     }
   }
   &:focus:placeholder-shown::placeholder {
@@ -284,7 +284,7 @@ export const StyledInput = styled(Input)`
     border: 1px solid ${colors.lightBlue};
   }
   &::placeholder {
-    color: ${colors.darkgray};
+    color: ${colors.blue};
   }
   &:focus:placeholder-shown::placeholder {
     font-size: 0;
@@ -408,7 +408,6 @@ export const StyledTable = styled(Table)`
 `;
 
 export const StyledModal = styled(Modal)`
-  min-width: 732px;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   &.ant-modal {
@@ -425,12 +424,17 @@ export const StyledModal = styled(Modal)`
     color: ${colors.darkText};
     margin-bottom: 16px;
   }
+  ${(width) => (`
+  min-width: ${width}px;
+  .ant-modal-body {
+    width: ${width}px;
+  }
+  `)}
   .ant-modal-body {
     display: flex;
     flex-direction: column;
-    width: 732px;
     padding: 20px 36px 36px 36px;
-    background-color: ${colors.lightBg};
+    background-color: ${colors.white};
     font-size: 14px;
     line-height: 16px;
   }

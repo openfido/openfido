@@ -4,6 +4,8 @@ import {
   REMOVE_ORGANIZATION_MEMBER_FAILED,
   CHANGE_ORGANIZATION_MEMBER_ROLE,
   CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
+  INVITE_ORGANIZATION_MEMBER,
+  INVITE_ORGANIZATION_MEMBER_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -12,6 +14,8 @@ const DEFAULT_STATE = {
   removeMemberError: null,
   userRoleChanged: null,
   changeRoleError: null,
+  userInvited: null,
+  inviteOrganizationMemberError: null,
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -50,6 +54,17 @@ export default (state = DEFAULT_STATE, action) => {
       };
     }
     case CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members,
+        ...action.payload,
+      };
+    case INVITE_ORGANIZATION_MEMBER:
+      return {
+        ...DEFAULT_STATE,
+        members: [...state.members, action.payload],
+      };
+    case INVITE_ORGANIZATION_MEMBER_FAILED:
       return {
         ...DEFAULT_STATE,
         members: state.members,
