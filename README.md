@@ -93,10 +93,6 @@ Several environmental variables allow this server to be configured.
  * **SQLALCHEMY_DATABASE_URI** = Database connection string.
  * **CELERY_BROKER_URL** = Location of the [celery broker](https://docs.celeryproject.org/en/stable/userguide/configuration.html#broker-settings).
  * **CELERY_ALWAYS_EAGER** = When True, [execute celery jobs locally](https://docs.celeryproject.org/en/stable/userguide/configuration.html#std:setting-task_always_eager). Useful for development/testing purposes.
- * **BLOB_API_SERVER** = When provided the 'upload artifact' endpoint will store
-     artifacts via this server. Otherwise files are stored locally (only useful
-     for local development and testing).
- * **BLOB_API_TOKEN** = api_token required for calls to `BLOB_API_SERVER`.
  * **MAX_CONTENT_LENGTH** = Configures [maximum upload file byte size](https://flask.palletsprojects.com/en/1.1.x/config/#MAX_CONTENT_LENGTH).
 
 ### Worker Configuration
