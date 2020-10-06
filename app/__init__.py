@@ -19,7 +19,6 @@ db = get_db()
 CONFIG_VARS = (
     constants.SECRET_KEY,
     constants.SQLALCHEMY_DATABASE_URI,
-    constants.CELERY_RESULT_BACKEND,
     constants.CELERY_BROKER_URL,
     constants.CELERY_ALWAYS_EAGER,
     constants.BLOB_API_SERVER,
