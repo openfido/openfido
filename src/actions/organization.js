@@ -53,8 +53,8 @@ export const changeOrganizationMemberRole = (organization_uuid, user_uuid, role)
       dispatch({
         type: CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
         payload: {
-          userRemoved: user_uuid,
-          removeMemberError: err.message,
+          userRoleChanged: user_uuid,
+          changeRoleError: err.message,
         },
       });
     });

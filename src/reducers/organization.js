@@ -10,6 +10,7 @@ const DEFAULT_STATE = {
   members: null,
   userRemoved: null,
   removeMemberError: null,
+  userRoleChanged: null,
   changeRoleError: null,
 };
 
@@ -30,7 +31,8 @@ export default (state = DEFAULT_STATE, action) => {
       };
     case REMOVE_ORGANIZATION_MEMBER_FAILED:
       return {
-        ...state,
+        ...DEFAULT_STATE,
+        members: state.members,
         ...action.payload,
       };
     case CHANGE_ORGANIZATION_MEMBER_ROLE: {
@@ -42,14 +44,15 @@ export default (state = DEFAULT_STATE, action) => {
       }
 
       return {
-        ...state,
+        ...DEFAULT_STATE,
         members,
       };
     }
     case CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED:
       return {
-        ...state,
-        changeRoleError: true,
+        ...DEFAULT_STATE,
+        members: state.members,
+        ...action.payload,
       };
     default:
       return state;

@@ -1,5 +1,4 @@
 import ApiClient from 'util/api-client';
-import organization from "./reducers/organization";
 
 export const requestLoginUser = (email, password) => ApiClient.post('/users/auth', {
   email,

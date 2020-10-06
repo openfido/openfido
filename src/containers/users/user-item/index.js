@@ -24,10 +24,6 @@ const StyledDropdown = styled(Dropdown)`
 
 const DeleteColumn = styled.div`
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   .anticon {
     left: 0;
     top: -14px;
@@ -37,8 +33,8 @@ const DeleteColumn = styled.div`
 
 const ErrorMessage = styled(StyledText)`
   position: absolute;
-  left: 0;
-  right: 0;
+  right: 32px;
+  right: 2rem;
 `;
 
 const StyledMenu = styled(Menu)`
@@ -71,6 +67,10 @@ const StyledMenu = styled(Menu)`
   }
 `;
 
+const NameColumn = styled.div`
+  position: relative;
+`;
+
 const StyledMenuItem = styled(Menu.Item)`
   color: ${colors.gray};
   font-size: 14px;
@@ -80,7 +80,7 @@ const StyledMenuItem = styled(Menu.Item)`
   border-radius: 3px;
   padding: 6px 8px;
   margin: 0 32px;
-  &:hover {
+  &:hover, &.ant-dropdown-menu-item-selected {
     background-color: ${colors.blue};
     border-color: transparent;
     color: ${colors.white};
@@ -96,29 +96,34 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at,
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role={},
 }) => {
-  const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
+  const [userRole, setUserRole] = useState(role.name);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userRemoved = useSelector((state) => state.organization.userRemoved);
   const removeMemberError = useSelector((state) => state.organization.removeMemberError);
+  const userRoleChanged = useSelector((state) => state.organization.userRoleChanged);
+  const changeRoleError = useSelector((state) => state.organization.changeRoleError);
   const dispatch = useDispatch();
 
   const onDeleteUserClicked = () => {
     dispatch(removeOrganizationMember(currentOrg, user_uuid));
   }
 
-  const onChangeRoleClicked = (role) => {
-    dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, role))
-      .then(() => setUserRole(role));
-  }
+  const onChangeRoleClicked = (clickedRole) => {
+    dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
+      .then(() => setUserRole(clickedRole));
+  };
 
   const menu = (
-    <StyledMenu>
+    <StyledMenu selectedKeys={[userRole]}>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
-      <StyledMenuItem onClick={() => onChangeRoleClicked('Administrator')}>
+      <StyledMenuItem
+        onClick={() => onChangeRoleClicked('Administrator')}
+        key="Administrator"
+      >
         <span>Administrator</span>
       </StyledMenuItem>
       <li>
@@ -139,13 +144,24 @@ const User = ({
 
   return (
     <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
-      <StyledText size="large" color="gray">
-        {first_name}
-        {last_name && ` ${last_name}`}
-      </StyledText>
-      <StyledDropdown overlay={menu} trigger="click">
+      <NameColumn>
         <StyledText size="large" color="gray">
-          {userRole}
+          {first_name}
+          {last_name && ` ${last_name}`}
+        </StyledText>
+        {removeMemberError && user_uuid === userRemoved && (
+          <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
+        )}
+        {changeRoleError && user_uuid === userRoleChanged && (
+          <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
+        )}
+      </NameColumn>
+      <StyledDropdown
+        overlay={menu}
+        trigger="click"
+      >
+        <StyledText size="large" color="gray">
+          {changeRoleError && user_uuid === userRoleChanged ? role.name : userRole}
           <DownOutlined color="lightGray" />
         </StyledText>
       </StyledDropdown>
@@ -154,9 +170,6 @@ const User = ({
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
-        {removeMemberError && user_uuid === userRemoved && (
-          <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
-        )}
       </DeleteColumn>
     </StyledGrid>
   );
