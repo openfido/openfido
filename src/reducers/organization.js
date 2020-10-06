@@ -23,6 +23,7 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         members: state.members.filter((item) => action.payload !== item.uuid),
+        ...action.payload,
       };
     case REMOVE_ORGANIZATION_MEMBER_FAILED:
       return {

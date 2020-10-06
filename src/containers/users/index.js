@@ -5,10 +5,13 @@ import { Space } from 'antd';
 
 import { getUserProfile } from 'actions/user';
 import { getOrganizationMembers } from 'actions/organization';
-import {
-  StyledTitle, StyledButton, StyledGrid, StyledText,
-} from 'styles/app';
 import { ROUTE_PIPELINES } from 'config/routes';
+import {
+  StyledTitle,
+  StyledButton,
+  StyledGrid,
+  StyledText,
+} from 'styles/app';
 import UserItem from './user-item';
 
 const Users = () => {
@@ -19,10 +22,10 @@ const Users = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (profile) {
+    if (profile && currentOrg) {
       dispatch(getOrganizationMembers(currentOrg));
     }
-  }, [getOrganizationMembers, profile, currentOrg]);
+  }, [dispatch, profile, currentOrg]);
 
   useEffect(() => {
     if (members && !members.length) {
@@ -30,8 +33,6 @@ const Users = () => {
       history.push(ROUTE_PIPELINES);
     }
   });
-
-  if (!profile) return null;
 
   return (
     <>
