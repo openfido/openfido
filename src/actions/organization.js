@@ -24,9 +24,7 @@ export const removeOrganizationMember = (organization_uuid, user_uuid) => async 
     .then(() => {
       dispatch({
         type: REMOVE_ORGANIZATION_MEMBER,
-        payload: {
-          userRemoved: user_uuid,
-        },
+        payload: user_uuid,
       });
     })
     .catch((err) => {
