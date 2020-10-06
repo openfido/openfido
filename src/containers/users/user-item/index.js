@@ -121,21 +121,27 @@ const User = ({
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
       <StyledMenuItem
-        onClick={() => onChangeRoleClicked('Administrator')}
         key="Administrator"
+        onClick={() => onChangeRoleClicked('Administrator')}
       >
         <span>Administrator</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Users</strong>, <strong>Pipelines</strong>, <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem onClick={() => onChangeRoleClicked('Engineer')}>
+      <StyledMenuItem
+        key="Engineer"
+        onClick={() => onChangeRoleClicked('Engineer')}
+      >
         <span>Engineer</span>
       </StyledMenuItem>
       <li>
         Able to manage <strong>Pipelines</strong> and <strong>Files</strong> for this organization.
       </li>
-      <StyledMenuItem onClick={() => onChangeRoleClicked('Unassigned')}>
+      <StyledMenuItem
+        key="Unassigned"
+        onClick={() => onChangeRoleClicked('Unassigned')}
+      >
         <span>Unassigned</span>
       </StyledMenuItem>
       <li>View only.</li>
