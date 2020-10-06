@@ -75,8 +75,9 @@ const Login = () => {
         </FormMessage>
         <StyledButton
           htmlType="submit"
+          size="middle"
           color="blue"
-          width="108"
+          width={100}
           role="button"
           tabIndex={0}
           onClick={onLoginClicked}

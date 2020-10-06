@@ -90,6 +90,7 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
             </FormMessage>
             <SubmitButton
               htmlType="submit"
+              size="middle"
               color="blue"
               width={144}
               role="button"

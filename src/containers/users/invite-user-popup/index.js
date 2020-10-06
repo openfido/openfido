@@ -104,6 +104,7 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
           htmlType="submit"
           color="blue"
           size="middle"
+          color="blue"
           width={108}
           onClick={onInviteClicked}
         >

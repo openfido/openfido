@@ -10,14 +10,20 @@ import {
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_FAILED,
+  GET_USER_AVATAR,
+  UPDATE_USER_AVATAR,
+  UPDATE_USER_AVATAR_FAILED,
   CHANGE_ORGANIZATION,
 } from 'actions';
 import {
   requestCreateUser,
   requestLoginUser,
   requestRefreshJWT,
-  requestUpdatePassword, requestUpdateUserProfile,
+  requestUpdatePassword,
   requestUserProfile,
+  requestUpdateUserProfile,
+  requestUserAvatar,
+  requestUpdateUserAvatar,
 } from 'services';
 
 export const createUser = (organization_uuid, email, password, first_name, last_name) => async (dispatch) => {
@@ -62,6 +68,15 @@ export const loginUser = (email, password) => async (dispatch) => {
         type: GET_USER_PROFILE,
         payload: response.data,
       });
+
+      const { uuid } = response.data;
+      return requestUserAvatar(uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_AVATAR,
+        payload: response.data,
+      });
     })
     .catch((err) => {
       dispatch({
@@ -86,6 +101,14 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         type: GET_USER_PROFILE,
         payload: response.data,
       });
+
+      return requestUserAvatar(user_uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_AVATAR,
+        payload: response.data,
+      });
     })
     .catch(() => {
       // Treat as though we logged out. Very likely the user has reached the max
@@ -100,6 +123,20 @@ export const getUserProfile = (user_uuid) => (dispatch) => {
       dispatch({
         type: GET_USER_PROFILE,
         payload: response.data,
+      });
+    });
+};
+
+export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
+  requestUpdateUserAvatar(user_uuid, image_content)
+    .then(() => dispatch({
+      type: UPDATE_USER_AVATAR,
+      payload: image_content,
+    }))
+    .catch((err) => {
+      dispatch({
+        type: UPDATE_USER_AVATAR_FAILED,
+        payload: err.message,
       });
     });
 };

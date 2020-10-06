@@ -163,9 +163,6 @@ export const StyledH5 = styled.div`
 
 export const StyledButton = styled(Button)`
   border: 0;
-  padding: 8px 12px;
-  height: 50px;
-  height: 3.125rem;
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -174,11 +171,27 @@ export const StyledButton = styled(Button)`
   .anticon {
     line-height: 0;
   }
+  label {
+    cursor: pointer;
+  }
+  // no size
+  &.ant-btn {
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 500;
+    border-radius: 3px;
+    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
+  }
   &.ant-btn-lg { 
-    border-radius: 2px;
     font-size: 18px;
     line-height: 21px;
     font-weight: 500;
+    border-radius: 2px;
+    padding: 8px 12px;
+    padding: 0.5rem 0.75rem;
+    height: 50px;
+    height: 3.125rem;
   }
   font-size: 16px;
   line-height: 19px;
@@ -190,6 +203,9 @@ export const StyledButton = styled(Button)`
     height: auto;
     font-weight: 400;
     border-radius: 3px;
+    padding: 8px 12px;
+    padding: 0.5rem 0.75rem;
+    padding: 5px 8px;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
@@ -197,8 +213,18 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor,
+    type, color, width, height, hoverbgcolor, size,
   }) => (`
+  ${size === 'middle' ? (`
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 500;
+    border-radius: 2px;
+    padding: 8px 12px;
+    padding: 0.5rem 0.75rem;
+    height: 50px;
+    height: 3.125rem;
+  `) : ''}
   ${type === 'text' ? (`
   color: ${colors.blue};
   &, &.ant-btn-sm, &.ant-btn-lg {
@@ -219,7 +245,7 @@ export const StyledButton = styled(Button)`
   &:hover, &:focus {
     color: ${(color in colors ? colors.lightGrey : colors.blue)};
   }
-  &.ant-btn-sm, &.ant-btn-lg {
+  &.ant-btn {
     color: ${colors.white};
     ${color in colors ? (`
     background-color: ${colors[color]};

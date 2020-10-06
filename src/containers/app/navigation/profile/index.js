@@ -5,9 +5,8 @@ import { Link } from 'react-router-dom';
 
 import { logoutUser } from 'actions/user';
 import colors from 'styles/colors';
-
+import PhotoImg from 'icons/navigation-profile-avatar.svg';
 import SettingsDropdown from './SettingsDropdown';
-import PhotoImg from './images/navigation-profile-avatar.svg';
 
 const StyledProfileContainer = styled.div`
   position: relative;

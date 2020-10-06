@@ -39,6 +39,14 @@ export const requestUpdateUserProfile = (user_uuid, email, first_name, last_name
   })
 );
 
+export const requestUserAvatar = (user_uuid) => (
+  ApiClient.get(`/users/${user_uuid}/avatar`)
+);
+
+export const requestUpdateUserAvatar = (user_uuid, image_content) => (
+  ApiClient.put(`/users/${user_uuid}/avatar`, image_content)
+);
+
 export const requestOrganizationMembers = (organization_uuid) => (
   ApiClient.get(`/organizations/${organization_uuid}/members`)
 );

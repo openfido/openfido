@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
 
-import { updateUserProfile } from 'actions/user';
+import { updateUserProfile, updateUserAvatar } from 'actions/user';
 import {
   StyledTitle, StyledText, StyledInput, StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
+import PhotoImg from 'icons/navigation-profile-avatar.svg';
 
 const Root = styled.div`
   padding: 30px 90px;
@@ -48,12 +49,37 @@ const StyledForm = styled.form`
   display: grid;
   grid-gap: 16px;
   grid-gap: 1rem;
-  button {
+  button[type="submit"] {
     margin-top: 32px;
     margin-top: 2rem;
   }
   input {
     width: 432px;
+  }
+`;
+
+const StyledPhotoContainer = styled.div`
+  width: 126px;
+  height: 126px;
+  border-radius: 60px;
+  border: 2px solid ${colors.black};
+  padding: 1px;
+  margin: -2px auto;
+`;
+
+const StyledPhoto = styled.div`
+  width: 120px;
+  height: 120px;
+  background-image: url(${PhotoImg});
+  background-size: 120px;
+  border-radius: 60px;
+`;
+
+const UserAvatar = styled.div`
+  display: flex;
+  width: 250px;
+  input[type="file"] {
+    display: none;
   }
 `;
 
@@ -63,6 +89,7 @@ const Settings = () => {
   const [lastName, setLastName] = useState('');
 
   const profile = useSelector((state) => state.user.profile);
+  const avatar = useSelector((state) => state.user.avatar);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -87,8 +114,17 @@ const Settings = () => {
   const onFirstNameChanged = (e) => {
     setFirstName(e.target.value);
   };
+
   const onLastNameChanged = (e) => {
     setLastName(e.target.value);
+  };
+
+  const onPhotoChanged = (e) => {
+    const { files = [] } = e.target;
+
+    if (files.length) {
+      dispatch(updateUserAvatar(profile.uuid, files[0]));
+    }
   };
 
   return (
@@ -109,6 +145,27 @@ const Settings = () => {
           </Menu.Item>
         </StyledMenu>
         <StyledForm>
+          <UserAvatar>
+            <StyledPhotoContainer>
+              <StyledPhoto style={avatar && { backgroundImage: `url(${avatar}` }} />
+            </StyledPhotoContainer>
+            <input
+              type="file"
+              id="avatar"
+              name="avatar"
+              accept="image/png, image/jpeg"
+              onChange={onPhotoChanged}
+            />
+            <StyledButton
+              htmlType="button"
+              color="gray80"
+              hoverbgcolor="gray"
+            >
+              <label htmlFor="avatar">
+                Change Photo
+              </label>
+            </StyledButton>
+          </UserAvatar>
           <label htmlFor="first_name">
             <StyledText display="block" color="darkText">First Name</StyledText>
             <StyledInput
@@ -147,6 +204,7 @@ const Settings = () => {
           </label>
           <StyledButton
             htmlType="submit"
+            size="middle"
             color="blue"
             width={128}
             role="button"

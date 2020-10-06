@@ -77,6 +77,7 @@ const CreateNewAccountInvitation = () => {
         </FormMessage>
         <StyledButton
           htmlType="submit"
+          size="middle"
           color="blue"
           width={106}
           role="button"

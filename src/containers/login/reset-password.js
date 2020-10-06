@@ -108,6 +108,7 @@ const ResetPassword = () => {
         </FormMessage>
         <StyledButton
           htmlType="submit"
+          size="middle"
           color="blue"
           width={108}
           role="button"
