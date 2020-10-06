@@ -68,7 +68,7 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         members: state.members,
-        ...action.payload,
+        userInvited: action.payload,
       };
     case INVITE_ORGANIZATION_MEMBER_FAILED:
       return {
@@ -81,13 +81,13 @@ export default (state = DEFAULT_STATE, action) => {
         ...DEFAULT_STATE,
         members: state.members,
         ...action.payload,
-      }
+      };
     case ACCEPT_ORGANIZATION_INVITATION_FAILED:
       return {
         ...DEFAULT_STATE,
         members: state.members,
         ...action.payload,
-      }
+      };
     default:
       return state;
   }

@@ -17,15 +17,12 @@ import InviteUserPopup from './invite-user-popup';
 
 const Users = () => {
   const history = useHistory();
+  const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
+
   const profile = useSelector((state) => state.user.profile);
   const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
-
-  const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
-
-  const openInviteUserPopup = () => setShowInviteUserPopup(true);
-  const closeInviteUserPopup = () => setShowInviteUserPopup(false);
 
   useEffect(() => {
     if (profile && currentOrg) {
@@ -39,6 +36,13 @@ const Users = () => {
       history.push(ROUTE_PIPELINES);
     }
   });
+
+  const openInviteUserPopup = () => setShowInviteUserPopup(true);
+
+  const closeInviteUserPopup = () => {
+    dispatch(getOrganizationMembers(currentOrg));
+    setShowInviteUserPopup(false);
+  };
 
   return (
     <>
@@ -67,7 +71,12 @@ const Users = () => {
           />
         ))}
       </Space>
-      {showInviteUserPopup && <InviteUserPopup handleOk={closeInviteUserPopup} handleCancel={closeInviteUserPopup} />}
+      {showInviteUserPopup && (
+        <InviteUserPopup
+          handleOk={closeInviteUserPopup}
+          handleCancel={closeInviteUserPopup}
+        />
+      )}
     </>
   );
 };

@@ -176,7 +176,7 @@ export const StyledButton = styled(Button)`
   font-size: 16px;
   line-height: 19px;
   font-weight: 500;
-  border-radius: 2px;
+  border-radius: 3px;
   &.ant-btn-sm {
     font-size: 12px;
     line-height: 14px;
@@ -277,13 +277,15 @@ export const StyledInput = styled(Input)`
   ${(shape === 'round' ? (`
   background-color: ${colors.white};
   border: 1px solid ${colors.lightGray};
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
+  height: 42px;
+  height: 2.625rem;
   &:hover, &:focus {
-    border: 1px solid ${colors.lightBlue};
+    border: 1px solid rgba(12, 72, 107, 0.8);
   }
   &::placeholder {
-    color: ${colors.blue};
+    color: rgba(12, 72, 107, 0.8);
   }
   &:focus:placeholder-shown::placeholder {
     font-size: 0;
@@ -423,7 +425,7 @@ export const StyledModal = styled(Modal)`
     color: ${colors.darkText};
     margin-bottom: 16px;
   }
-  ${(width) => (`
+  ${({ width }) => (`
   min-width: ${width}px;
   .ant-modal-body {
     width: ${width}px;
