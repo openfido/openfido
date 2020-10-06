@@ -1,0 +1,30 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+black = "*"
+flasgger = "*"
+pylint-flask-sqlalchemy = "*"
+invoke = "*"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+psycopg2-binary = "*"
+pytest = "*"
+pytest-cov = "*"
+simplejson = "*"
+marshmallow = "*"
+marshmallow_enum = "*"
+boto3 = "*"
+openfido-utils = {editable = true, git = "git@github.com:slacgismo/openfido-utils.git", ref = "opfido-163"}
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
