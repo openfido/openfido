@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 
+import { removeOrganizationMember } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -25,11 +27,21 @@ const StyledDropdown = styled(Dropdown)`
 
 const DeleteColumn = styled.div`
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   .anticon {
     left: 0;
     top: -14px;
     top: -0.875rem;
   }
+`;
+
+const ErrorMessage = styled(StyledText)`
+  position: absolute;
+  left: 0;
+  right: 0;
 `;
 
 const StyledMenu = styled(Menu)`
@@ -87,9 +99,17 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  first_name, last_name, is_system_admin, last_active_at,
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at,
 }) => {
   const [userRole, setUserRole] = useState(is_system_admin ? 'Administrator' : 'Unassigned');
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+  const userRemoved = useSelector((state) => state.organization.userRemoved);
+  const removeMemberError = useSelector((state) => state.organization.removeMemberError);
+  const dispatch = useDispatch();
+
+  const onDeleteUserClicked = () => {
+    dispatch(removeOrganizationMember(currentOrg, user_uuid));
+  }
 
   const menu = (
     <StyledMenu>
@@ -116,7 +136,7 @@ const User = ({
   );
 
   return (
-    <StyledGrid gridTemplateColumns="3fr 2fr 2fr 1fr" bgcolor="white">
+    <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
       <StyledText size="large" color="gray">
         {first_name}
         {last_name && ` ${last_name}`}
@@ -131,7 +151,10 @@ const User = ({
         {moment(last_active_at).fromNow()}
       </StyledText>
       <DeleteColumn>
-        <DeleteOutlined color="gray20" />
+        <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
+        {removeMemberError && user_uuid === userRemoved && (
+          <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
+        )}
       </DeleteColumn>
     </StyledGrid>
   );

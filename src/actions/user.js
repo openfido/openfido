@@ -23,14 +23,14 @@ export const loginUser = (email, password) => async (dispatch) => {
         payload: response.data,
       });
 
-      const { uuid, token } = response.data;
-      requestUserProfile(uuid, token)
-        .then((response2) => {
-          dispatch({
-            type: GET_USER_PROFILE,
-            payload: response2.data,
-          });
-        });
+      const { uuid } = response.data;
+      return requestUserProfile(uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
     })
     .catch((err) => {
       dispatch({
@@ -40,26 +40,36 @@ export const loginUser = (email, password) => async (dispatch) => {
     });
 };
 
-export const refreshUserToken = (user_uuid, token) => (dispatch) => {
-  requestRefreshJWT(token)
+export const refreshUserToken = (user_uuid) => (dispatch) => {
+  requestRefreshJWT()
     .then((response) => {
       dispatch({
         type: REFRESH_JWT,
         payload: response.data,
       });
 
-      requestUserProfile(user_uuid, token)
-        .then((response2) => {
-          dispatch({
-            type: GET_USER_PROFILE,
-            payload: response2.data,
-          });
-        });
+      return requestUserProfile(user_uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
     })
     .catch(() => {
       // Treat as though we logged out. Very likely the user has reached the max
       // refresh timeout, and so needs to login again.
       dispatch({ type: LOGOUT_USER });
+    });
+};
+
+export const getUserProfile = (user_uuid) => (dispatch) => {
+  requestUserProfile(user_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
     });
 };
 

@@ -26,14 +26,18 @@ export default (state = DEFAULT_STATE, action) => {
         ...DEFAULT_STATE,
         profile: Auth.getUser(),
       };
-    case REFRESH_JWT:
+    case REFRESH_JWT: {
+      const profile = {
+        ...state.profile,
+        token: action.payload.token,
+      };
+
+      Auth.loginUser(profile);
       return {
         ...DEFAULT_STATE,
-        profile: {
-          ...state.profile,
-          token: action.payload.token,
-        },
+        profile,
       };
+    }
     case AUTH_IN_PROGRESS:
       Auth.logoutUser();
       return {
@@ -60,9 +64,8 @@ export default (state = DEFAULT_STATE, action) => {
         profile: {
           ...state.profile,
           ...action.payload,
-          //is_system_admin: true,
         },
-        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+        currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
       };
     }
     case CHANGE_ORGANIZATION:

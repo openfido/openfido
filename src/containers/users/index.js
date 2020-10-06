@@ -1,26 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-import { requestOrganizationMembers } from 'services';
+import { getUserProfile } from 'actions/user';
+import { getOrganizationMembers } from 'actions/organization';
+import { ROUTE_PIPELINES } from 'config/routes';
 import {
-  StyledTitle, StyledButton, StyledGrid, StyledText,
+  StyledTitle,
+  StyledButton,
+  StyledGrid,
+  StyledText,
 } from 'styles/app';
 import UserItem from './user-item';
 
 const Users = () => {
+  const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
+  const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (profile && currentOrg) {
-      requestOrganizationMembers(currentOrg, profile.token)
-        .then((response) => setUsers(response.data));
+      dispatch(getOrganizationMembers(currentOrg));
     }
-  }, [requestOrganizationMembers, profile, currentOrg]);
+  }, [dispatch, profile, currentOrg]);
 
-  if (!profile) return null;
+  useEffect(() => {
+    if (members && !members.length) {
+      dispatch(getUserProfile(profile.uuid));
+      history.push(ROUTE_PIPELINES);
+    }
+  });
 
   return (
     <>
@@ -32,15 +44,16 @@ const Users = () => {
           </StyledButton>
         </div>
       </StyledTitle>
-      <StyledGrid gridTemplateColumns="3fr 2fr 2fr 1fr">
+      <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
         <StyledText size="large" fontweight={500} color="black">Name</StyledText>
         <StyledText size="large" fontweight={500} color="black">Role</StyledText>
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
       </StyledGrid>
       <Space direction="vertical" size={16}>
-        {users.map((item) => (
+        {members && members.map((item) => (
           <UserItem
             key={item.uuid}
+            uuid={item.uuid}
             first_name={item.first_name}
             last_name={item.last_name}
             is_system_admin={item.is_system_admin}
