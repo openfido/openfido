@@ -20,7 +20,7 @@ const AcceptOrganizationInvitation = () => {
 
   useEffect(() => {
     dispatch(acceptOrganizationInvitation(organization_uuid, invitation_token));
-  }, []);
+  });
 
   useEffect(() => {
     if (invitationToken && !acceptInvitationError) {
@@ -37,7 +37,7 @@ const AcceptOrganizationInvitation = () => {
         history.push(ROUTE_PIPELINES);
       }
     }
-  }, [invitationToken, acceptInvitationError]);
+  }, [invitationToken, acceptInvitationError, dispatch, history, organization_uuid, profile]);
 
   return null;
 };

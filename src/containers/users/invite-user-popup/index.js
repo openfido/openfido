@@ -63,7 +63,7 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
     if (!inviteOrganizationMemberError && userInvited) {
       handleOk();
     }
-  }, [inviteOrganizationMemberError, userInvited]);
+  }, [inviteOrganizationMemberError, userInvited, handleOk]);
 
   if (!profile || !profile.organizations || !profile.organizations.length) return null;
 
