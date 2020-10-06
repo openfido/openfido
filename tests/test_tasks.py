@@ -5,7 +5,7 @@ import pytest
 
 from app.model_utils import RunStateEnum
 from app.tasks import RunExecutor, execute_pipeline, make_celery
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 
 def test_make_celery(app):

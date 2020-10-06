@@ -1,7 +1,9 @@
 from flask import current_app
 
+from application_roles.model_utils import CommonColumnsMixin, get_db
+
 from ..constants import S3_BUCKET, S3_PRESIGNED_TIMEOUT
-from ..model_utils import CommonColumnsMixin, get_db, RunStateEnum
+from ..model_utils import RunStateEnum
 from ..utils import get_s3
 
 db = get_db()

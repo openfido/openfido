@@ -5,7 +5,7 @@ from flask import request, current_app
 
 import boto3
 from botocore.client import Config
-from roles.decorators import make_permission_decorator
+from application_roles.decorators import make_permission_decorator
 from .model_utils import SystemPermissionEnum
 from .constants import (
     S3_ACCESS_KEY_ID,

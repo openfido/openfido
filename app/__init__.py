@@ -4,10 +4,10 @@ from flask import Flask
 from flask_migrate import Migrate
 
 # not used, just want it included in our app's schema
-from roles.models import db as roles_db
+from application_roles.models import db as roles_db
+from application_roles.model_utils import get_db
 
 from . import constants
-from .model_utils import get_db
 from .pipelines import models as pipeline_models
 from .pipelines import pipeline_bp, run_bp
 from .workflows import workflow_bp, workflow_pipeline_bp, workflow_run_bp

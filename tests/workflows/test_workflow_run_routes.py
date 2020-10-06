@@ -5,7 +5,7 @@ from app.utils import to_iso8601
 from app.workflows.models import Workflow, db
 from app.workflows.queries import find_workflow
 from marshmallow.exceptions import ValidationError
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 
 @patch("app.workflows.workflow_run_routes.create_workflow_run")

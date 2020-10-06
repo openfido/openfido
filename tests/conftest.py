@@ -14,7 +14,7 @@ from app.pipelines.models import Pipeline, db
 from app.pipelines.services import execute_pipeline
 from app.workflows.models import Workflow, WorkflowPipeline, WorkflowPipelineDependency
 from app.workflows.services import create_workflow_pipeline
-from roles.services import create_application
+from application_roles.services import create_application
 
 
 @pytest.fixture

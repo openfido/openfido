@@ -36,3 +36,8 @@ project that can be imported separately from the pipelines API.
 
 Anticipate that importing and using 'application roles' will be trivial to setup
 by itself.
+
+We ended up moving this entire source to slacgismo/openfido-utils to share
+between multiple repositories. Because that repository is private, we needed to
+rework how docker images were built so that they could access the private
+repository.

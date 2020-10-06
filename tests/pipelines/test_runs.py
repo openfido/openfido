@@ -5,7 +5,7 @@ from app.model_utils import RunStateEnum
 from app.utils import to_iso8601
 from app.pipelines.services import create_pipeline_run
 from app.pipelines import run_routes as runs_module
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 
 from .test_services import VALID_CALLBACK_INPUT
 

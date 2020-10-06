@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from roles.decorators import ROLES_KEY
+from application_roles.decorators import ROLES_KEY
 from app.workflows.models import db, Workflow
 from app.utils import to_iso8601
 from app.workflows.queries import find_workflow
