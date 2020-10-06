@@ -108,6 +108,12 @@ const User = ({
   const changeRoleError = useSelector((state) => state.organization.changeRoleError);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (!changeRoleError && userRoleChanged === user_uuid) {
+      setUserRole(userRoleClicked);
+    }
+  }, [changeRoleError, userRoleChanged, user_uuid, userRoleClicked]);
+
   const onDeleteUserClicked = () => {
     dispatch(removeOrganizationMember(currentOrg, user_uuid));
   };
@@ -116,12 +122,6 @@ const User = ({
     dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
       .then(() => setUserRoleClicked(clickedRole));
   };
-
-  useEffect(() => {
-    if (!changeRoleError && userRoleChanged === user_uuid) {
-      setUserRole(userRoleClicked);
-    }
-  });
 
   const menu = (
     <StyledMenu selectedKeys={[userRole]}>
@@ -135,7 +135,17 @@ const User = ({
         <span>Administrator</span>
       </StyledMenuItem>
       <li>
-        Able to manage <strong>Users</strong>, <strong>Pipelines</strong>, <strong>Files</strong> for this organization.
+        Able to manage
+        {' '}
+        <strong>Users</strong>
+        ,
+        {' '}
+        <strong>Pipelines</strong>
+        ,
+        {' '}
+        <strong>Files</strong>
+        {' '}
+        for this organization.
       </li>
       <StyledMenuItem
         key="Engineer"
@@ -144,7 +154,15 @@ const User = ({
         <span>Engineer</span>
       </StyledMenuItem>
       <li>
-        Able to manage <strong>Pipelines</strong> and <strong>Files</strong> for this organization.
+        Able to manage
+        {' '}
+        <strong>Pipelines</strong>
+        {' '}
+        and
+        {' '}
+        <strong>Files</strong>
+        {' '}
+        for this organization.
       </li>
       <StyledMenuItem
         key="Unassigned"
