@@ -24,13 +24,13 @@ export const loginUser = (email, password) => async (dispatch) => {
       });
 
       const { uuid } = response.data;
-      requestUserProfile(uuid)
-        .then((response2) => {
-          dispatch({
-            type: GET_USER_PROFILE,
-            payload: response2.data,
-          });
-        });
+      return requestUserProfile(uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
     })
     .catch((err) => {
       dispatch({
@@ -48,13 +48,13 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         payload: response.data,
       });
 
-      requestUserProfile(user_uuid)
-        .then((response2) => {
-          dispatch({
-            type: GET_USER_PROFILE,
-            payload: response2.data,
-          });
-        });
+      return requestUserProfile(user_uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_PROFILE,
+        payload: response.data,
+      });
     })
     .catch(() => {
       // Treat as though we logged out. Very likely the user has reached the max
