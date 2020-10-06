@@ -166,11 +166,11 @@ const ResetPassword = ({ error: defaultError, thanks: defaultThanks }) => {
                 Minimum 10 characters
               </StyledText>
               )}
-              {passwordMismatch && <StyledText size="middle" color="pink" float="right">Password mismatch</StyledText>}
+              {passwordMismatch && <StyledText size="small" color="pink" float="right">Password mismatch</StyledText>}
             </FormMessage>
             <StyledButton
               color="blue"
-              width="144"
+              width={144}
               role="button"
               tabIndex={0}
               onClick={onChangePasswordClicked}

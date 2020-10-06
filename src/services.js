@@ -1,5 +1,15 @@
 import ApiClient from 'util/api-client';
 
+export const requestCreateUser = (organization_uuid, email, password, first_name, last_name) => (
+  ApiClient.post('/users/create', {
+    organization_uuid,
+    email,
+    password,
+    first_name,
+    last_name,
+  })
+);
+
 export const requestLoginUser = (email, password) => ApiClient.post('/users/auth', {
   email,
   password,
@@ -34,9 +44,9 @@ export const requestChangeOrganizationMemberRole = (organization_uuid, user_uuid
 );
 
 export const requestInviteOrganizationMember = (organization_uuid, email) => (
-  ApiClient.post(`/organizations/${organization_uuid}/inviations`, { email })
+  ApiClient.post(`/organizations/${organization_uuid}/invitations`, { email })
 );
 
 export const requestAcceptOrganizationInvitation = (organization_uuid, invitation_token) => (
-  ApiClient.post(`/organizations/${organization_uuid}/inviations`, { invitation_token })
+  ApiClient.post(`/organizations/${organization_uuid}/invitations`, { invitation_token })
 );

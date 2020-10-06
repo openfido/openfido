@@ -154,7 +154,7 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
             </FormMessage>
             <StyledButton
               color="blue"
-              width="144"
+              width={144}
               role="button"
               tabIndex={0}
               onClick={onResetClicked}

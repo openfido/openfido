@@ -1,4 +1,7 @@
 import {
+  CREATE_USER,
+  CREATE_USER_IN_PROGRESS,
+  CREATE_USER_FAILED,
   LOGIN_USER,
   LOGOUT_USER,
   REFRESH_JWT,
@@ -12,6 +15,8 @@ import Auth from 'util/auth';
 const DEFAULT_STATE = {
   profile: Auth.getUser(),
   currentOrg: null,
+  createUserInProgress: false,
+  createUserError: null,
   authInProgress: false,
   authError: null,
 };
@@ -20,6 +25,22 @@ export default (state = DEFAULT_STATE, action) => {
   if (action.error) return state;
 
   switch (action.type) {
+    case CREATE_USER:
+      Auth.loginUser(action.payload);
+      return {
+        ...DEFAULT_STATE,
+        profile: Auth.getUser(),
+      };
+    case CREATE_USER_IN_PROGRESS:
+      return {
+        ...DEFAULT_STATE,
+        createUserInProgress: true,
+      };
+    case CREATE_USER_FAILED:
+      return {
+        ...DEFAULT_STATE,
+        createUserError: action.payload,
+      };
     case LOGIN_USER:
       Auth.loginUser(action.payload);
       return {
@@ -43,19 +64,16 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         authInProgress: true,
-        profile: null,
       };
     case AUTH_FAILED:
       return {
         ...DEFAULT_STATE,
         authError: action.payload,
-        profile: null,
       };
     case LOGOUT_USER:
       Auth.logoutUser();
       return {
         ...DEFAULT_STATE,
-        profile: null,
       };
     case GET_USER_PROFILE: {
       const { organizations } = action.payload;

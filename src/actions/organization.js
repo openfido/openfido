@@ -90,13 +90,18 @@ export const acceptOrganizationInvitation = (organization_uuid, invitation_token
     .then(() => {
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION,
-        payload: invitation_token,
+        payload: {
+          invitationOrganization: organization_uuid,
+          invitationToken: invitation_token,
+        },
       });
     })
     .catch((err) => {
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION_FAILED,
         payload: {
+          invitationOrganization: organization_uuid,
+          invitationToken: invitation_token,
           acceptInvitationError: err.message,
         },
       });

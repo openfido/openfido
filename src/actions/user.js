@@ -1,4 +1,6 @@
 import {
+  CREATE_USER,
+  CREATE_USER_FAILED,
   LOGIN_USER,
   LOGOUT_USER,
   REFRESH_JWT,
@@ -8,11 +10,28 @@ import {
   CHANGE_ORGANIZATION,
 } from 'actions';
 import {
+  requestCreateUser,
   requestLoginUser,
   requestRefreshJWT,
   requestUpdatePassword,
   requestUserProfile,
 } from 'services';
+
+export const createUser = (organization_uuid, email, password, first_name, last_name) => async (dispatch) => {
+  requestCreateUser(organization_uuid, email, password, first_name, last_name)
+    .then((response) => {
+      dispatch({
+        type: CREATE_USER,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: CREATE_USER_FAILED,
+        payload: err.message,
+      });
+    });
+};
 
 export const loginUser = (email, password) => async (dispatch) => {
   await dispatch({ type: AUTH_IN_PROGRESS });

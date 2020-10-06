@@ -6,6 +6,8 @@ import {
   CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
   INVITE_ORGANIZATION_MEMBER,
   INVITE_ORGANIZATION_MEMBER_FAILED,
+  ACCEPT_ORGANIZATION_INVITATION,
+  ACCEPT_ORGANIZATION_INVITATION_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -15,8 +17,10 @@ const DEFAULT_STATE = {
   userRoleChanged: null,
   changeRoleError: null,
   userInvited: null,
-  invitationToken: null,
   inviteOrganizationMemberError: null,
+  invitationOrganization: null,
+  invitationToken: null,
+  acceptInvitationError: null,
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -64,7 +68,7 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...DEFAULT_STATE,
         members: state.members,
-        invitationToken: action.payload,
+        ...action.payload,
       };
     case INVITE_ORGANIZATION_MEMBER_FAILED:
       return {
@@ -72,6 +76,18 @@ export default (state = DEFAULT_STATE, action) => {
         members: state.members,
         ...action.payload,
       };
+    case ACCEPT_ORGANIZATION_INVITATION:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members,
+        ...action.payload,
+      }
+    case ACCEPT_ORGANIZATION_INVITATION_FAILED:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members,
+        ...action.payload,
+      }
     default:
       return state;
   }

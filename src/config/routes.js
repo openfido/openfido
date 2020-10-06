@@ -4,4 +4,5 @@ export const ROUTE_UPDATE_PASSWORD = '/reset-password/:reset_token/:email';
 export const ROUTE_PIPELINES = '/pipelines';
 export const ROUTE_USERS = '/users';
 export const ROUTE_ACCEPT_ORGANIZATION_INVITATION = '/accept-invitation/:organization_uuid/:invitation_token';
+export const ROUTE_CREATE_NEW_ACCOUNT_INVITATION = '/create-account';
 export const ROUTE_SETTINGS = '/settings';
