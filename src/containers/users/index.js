@@ -20,7 +20,7 @@ const Users = () => {
 
   useEffect(() => {
     if (profile) {
-      dispatch(getOrganizationMembers(currentOrg, profile.token));
+      dispatch(getOrganizationMembers(currentOrg));
     }
   }, [getOrganizationMembers, profile, currentOrg]);
 
