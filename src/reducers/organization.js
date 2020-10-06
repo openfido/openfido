@@ -39,13 +39,14 @@ export default (state = DEFAULT_STATE, action) => {
       const member = state.members.find((item) => action.payload === item.uuid);
       const { members } = state;
 
-      if (member) {
+      if (member && member.role) {
         member.role.name = action.payload;
       }
 
       return {
         ...DEFAULT_STATE,
         members,
+        userRoleChanged: action.payload,
       };
     }
     case CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED:

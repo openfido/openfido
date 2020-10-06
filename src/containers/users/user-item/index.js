@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
@@ -96,9 +96,10 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role={},
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role = {},
 }) => {
   const [userRole, setUserRole] = useState(role.name);
+  const [userRoleClicked, setUserRoleClicked] = useState();
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userRemoved = useSelector((state) => state.organization.userRemoved);
   const removeMemberError = useSelector((state) => state.organization.removeMemberError);
@@ -108,12 +109,18 @@ const User = ({
 
   const onDeleteUserClicked = () => {
     dispatch(removeOrganizationMember(currentOrg, user_uuid));
-  }
+  };
 
   const onChangeRoleClicked = (clickedRole) => {
     dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
-      .then(() => setUserRole(clickedRole));
+      .then(() => setUserRoleClicked(clickedRole));
   };
+
+  useEffect(() => {
+    if (!changeRoleError && userRoleChanged === user_uuid) {
+      setUserRole(userRoleClicked);
+    }
+  });
 
   const menu = (
     <StyledMenu selectedKeys={[userRole]}>
