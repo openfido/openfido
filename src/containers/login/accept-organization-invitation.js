@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ROUTE_PIPELINES, ROUTE_CREATE_NEW_ACCOUNT_INVITATION } from 'config/routes';
 import { changeOrganization } from 'actions/user';
 import { acceptOrganizationInvitation } from 'actions/organization';
-
 
 const AcceptOrganizationInvitation = () => {
   const { organization_uuid, invitation_token } = useParams();

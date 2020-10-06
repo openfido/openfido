@@ -9,9 +9,8 @@ import colors from 'styles/colors';
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
-  background-color: ${colors.white};
-  color: ${colors.black};
   padding-bottom: 16px;
+  padding-bottom: 1rem;
   .anticon {
     position: absolute;
     top: 4px;
@@ -20,10 +19,10 @@ const StyledDropdown = styled(Dropdown)`
 `;
 
 const StyledMenu = styled(Menu)`
-  top: -4px;
   display: block;
-  width: 191px;
   margin: 0 auto;
+  top: -4px;
+  width: 191px;
   background: ${colors.white};
   padding: 4px 32px 24px 32px;
   border-bottom-left-radius: 3px;
@@ -39,6 +38,7 @@ const StyledMenu = styled(Menu)`
     margin-top: 0.25rem;
     margin-bottom: 16px;
     margin-bottom: 1rem;
+    text-align: center;
   }
 `;
 
@@ -54,10 +54,6 @@ const StyledMenuItem = styled(Menu.Item)`
     background-color: ${colors.blue};
     border-color: transparent;
     color: ${colors.white};
-  }
-  &:first-of-type {
-    margin-top: 16px;
-    margin-top: 1rem;
   }
   &:not(:last-child) {
     margin-bottom: 10px;

@@ -29,7 +29,7 @@ export const StyledLayout = styled(Layout)`
 `;
 
 export const StyledSider = styled(Layout.Sider)`
-  border-right: 1px solid ${colors.lightGray};
+  box-shadow: 1px 0px 3px rgba(0, 0, 0, 0.1);
 `;
 
 export const StyledContent = styled(Layout.Content)`
@@ -65,8 +65,8 @@ export const StyledTitle = styled.div`
   width: 100%;
   background-color: ${colors.white};
   border-bottom: 1px solid ${colors.lightGray};
-  padding: 25px 15px 20px 15px;
-  margin-bottom: ${(props) => (props.margin >= 0 ? props.margin : 30)}px;
+  padding: 24px 16px 20px 16px;
+  padding: 1.5rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
     margin-right: 16px;
@@ -183,7 +183,6 @@ export const StyledButton = styled(Button)`
     height: auto;
     font-weight: 400;
     border-radius: 3px;
-    padding: 5px 8px;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
