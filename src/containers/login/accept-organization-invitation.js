@@ -2,7 +2,11 @@ import { useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ROUTE_PIPELINES, ROUTE_CREATE_NEW_ACCOUNT_INVITATION } from 'config/routes';
+import {
+  ROUTE_LOGIN,
+  ROUTE_PIPELINES,
+  ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
+} from 'config/routes';
 import { changeOrganization } from 'actions/user';
 import { acceptOrganizationInvitation } from 'actions/organization';
 
@@ -26,8 +30,14 @@ const AcceptOrganizationInvitation = () => {
         dispatch(changeOrganization(organization_uuid));
         history.push(ROUTE_PIPELINES);
       }
+    } else if (acceptInvitationError) {
+      if (!profile) {
+        history.push(ROUTE_LOGIN);
+      } else {
+        history.push(ROUTE_PIPELINES);
+      }
     }
-  });
+  }, [invitationToken, acceptInvitationError]);
 
   return null;
 };
