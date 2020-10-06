@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
@@ -96,7 +97,7 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role = {},
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role,
 }) => {
   const [userRole, setUserRole] = useState(role.name);
   const [userRoleClicked, setUserRoleClicked] = useState();
@@ -169,10 +170,7 @@ const User = ({
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )}
       </NameColumn>
-      <StyledDropdown
-        overlay={menu}
-        trigger="click"
-      >
+      <StyledDropdown overlay={menu} trigger="click">
         <StyledText size="large" color="gray">
           {changeRoleError && user_uuid === userRoleChanged ? role.name : userRole}
           <DownOutlined color="lightGray" />
@@ -186,6 +184,23 @@ const User = ({
       </DeleteColumn>
     </StyledGrid>
   );
+};
+
+User.propTypes = {
+  uuid: PropTypes.string.isRequired,
+  first_name: PropTypes.string.isRequired,
+  last_name: PropTypes.string.isRequired,
+  is_system_admin: PropTypes.bool.isRequired,
+  last_active_at: PropTypes.string.isRequired,
+  role: PropTypes.shape({
+    uuid: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired,
+  }),
+};
+
+User.defaultProps = {
+  role: {},
 };
 
 export default User;
