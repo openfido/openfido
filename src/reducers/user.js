@@ -8,6 +8,8 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
+  UPDATE_USER_PROFILE,
+  UPDATE_USER_PROFILE_FAILED,
   CHANGE_ORGANIZATION,
 } from 'actions';
 import Auth from 'util/auth';
@@ -20,6 +22,7 @@ const DEFAULT_STATE = {
     createUserError: null,
     authInProgress: false,
     authError: null,
+    updateUserProfileError: null,
   },
 };
 
@@ -104,6 +107,22 @@ export default (state = DEFAULT_STATE, action) => {
           ...action.payload,
         },
         currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+      };
+    }
+    case UPDATE_USER_PROFILE: {
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        profile: action.payload,
+      };
+    }
+    case UPDATE_USER_PROFILE_FAILED: {
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          updateUserProfileError: action.payload,
+        }
       };
     }
     case CHANGE_ORGANIZATION:

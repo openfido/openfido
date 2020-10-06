@@ -20,6 +20,7 @@ import AcceptOrganizationInvitation from 'containers/login/accept-organization-i
 import CreateNewAccountInvitation from 'containers/login/create-new-account-invitation';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
+import Settings from 'containers/settings';
 import { refreshUserToken } from 'actions/user';
 import reducers from 'reducers';
 import {
@@ -29,6 +30,7 @@ import {
   ROUTE_PIPELINES,
   ROUTE_USERS,
   ROUTE_ACCEPT_ORGANIZATION_INVITATION, ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
+  ROUTE_SETTINGS,
 } from 'config/routes';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
@@ -94,6 +96,10 @@ const AppSwitch = () => {
             <App><Users /></App>
           )
         )}
+      </Route>
+      <Route exact path={ROUTE_SETTINGS}>
+        {noProfileRedirectToLogin}
+        <App><Settings /></App>
       </Route>
       {hasProfileRedirectToPipelines}
       {noProfileRedirectToLogin}

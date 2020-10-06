@@ -80,7 +80,7 @@ export const StyledTitle = styled.div`
 
 export const StyledText = styled.span`
   ${({
-    color, fontweight, indent, size, bordercolor, padding, margin, align, float,
+    color, fontweight, indent, size, bordercolor, padding, margin, align, float, display,
   }) => (`
   ${color in colors ? (`
   color: ${colors[color]};
@@ -90,6 +90,10 @@ export const StyledText = styled.span`
   `) : ''}
   ${indent ? (`
   text-indent: ${indent}px;
+  `) : ''}
+  ${size === 'xlarge' ? (`
+  font-size: 18px;
+  line-height: 21px;
   `) : ''}
   ${size === 'large' ? (`
   font-size: 16px;
@@ -120,6 +124,9 @@ export const StyledText = styled.span`
   `) : ''}
   ${float ? (`
   float: ${float};
+  `) : ''}
+  ${display ? (`
+  display: ${display};
   `) : ''}
   `)}
 `;
@@ -245,7 +252,7 @@ export const StyledButton = styled(Button)`
 export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
-  padding: 14px; // TODO: test this out, it was 9px before
+  padding: 16px 12px;
   background-color: ${colors.darkOverlay};
   &, &:hover:focus {
     color: ${colors.darkText};
@@ -267,7 +274,6 @@ export const StyledInput = styled(Input)`
   ${size === 'large' ? (`
   font-size: 18px;
   line-height: 21px;
-  font-weight: 500;
   background-color: ${colors.overlay20};
   width: 100%;
   `) : (`

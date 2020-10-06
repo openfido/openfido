@@ -8,13 +8,15 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
+  UPDATE_USER_PROFILE,
+  UPDATE_USER_PROFILE_FAILED,
   CHANGE_ORGANIZATION,
 } from 'actions';
 import {
   requestCreateUser,
   requestLoginUser,
   requestRefreshJWT,
-  requestUpdatePassword,
+  requestUpdatePassword, requestUpdateUserProfile,
   requestUserProfile,
 } from 'services';
 
@@ -98,6 +100,22 @@ export const getUserProfile = (user_uuid) => (dispatch) => {
       dispatch({
         type: GET_USER_PROFILE,
         payload: response.data,
+      });
+    });
+};
+
+export const updateUserProfile = (user_uuid, email, first_name, last_name) => (dispatch) => {
+  requestUpdateUserProfile(user_uuid, email, first_name, last_name)
+    .then((response) => {
+      dispatch({
+        type: UPDATE_USER_PROFILE,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: UPDATE_USER_PROFILE_FAILED,
+        payload: err.message,
       });
     });
 };
