@@ -15,6 +15,7 @@ const DEFAULT_STATE = {
   userRoleChanged: null,
   changeRoleError: null,
   userInvited: null,
+  invitationToken: null,
   inviteOrganizationMemberError: null,
 };
 
@@ -62,7 +63,8 @@ export default (state = DEFAULT_STATE, action) => {
     case INVITE_ORGANIZATION_MEMBER:
       return {
         ...DEFAULT_STATE,
-        members: [...state.members, action.payload],
+        members: state.members,
+        invitationToken: action.payload,
       };
     case INVITE_ORGANIZATION_MEMBER_FAILED:
       return {

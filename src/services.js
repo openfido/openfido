@@ -36,3 +36,7 @@ export const requestChangeOrganizationMemberRole = (organization_uuid, user_uuid
 export const requestInviteOrganizationMember = (organization_uuid, email) => (
   ApiClient.post(`/organizations/${organization_uuid}/inviations`, { email })
 );
+
+export const requestAcceptOrganizationInvitation = (organization_uuid, invitation_token) => (
+  ApiClient.post(`/organizations/${organization_uuid}/inviations`, { invitation_token })
+);

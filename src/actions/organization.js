@@ -6,12 +6,15 @@ import {
   CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
   INVITE_ORGANIZATION_MEMBER,
   INVITE_ORGANIZATION_MEMBER_FAILED,
+  ACCEPT_ORGANIZATION_INVITATION,
+  ACCEPT_ORGANIZATION_INVITATION_FAILED,
 } from 'actions';
 import {
   requestOrganizationMembers,
   requestRemoveOrganizationMember,
   requestChangeOrganizationMemberRole,
   requestInviteOrganizationMember,
+  requestAcceptOrganizationInvitation,
 } from 'services';
 
 export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
@@ -77,6 +80,24 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
         payload: {
           userInvited: email,
           inviteOrganizationMemberError: err.message,
+        },
+      });
+    });
+};
+
+export const acceptOrganizationInvitation = (organization_uuid, invitation_token) => async (dispatch) => {
+  requestAcceptOrganizationInvitation(organization_uuid, invitation_token)
+    .then(() => {
+      dispatch({
+        type: ACCEPT_ORGANIZATION_INVITATION,
+        payload: invitation_token,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: ACCEPT_ORGANIZATION_INVITATION_FAILED,
+        payload: {
+          acceptInvitationError: err.message,
         },
       });
     });

@@ -16,6 +16,7 @@ import Login from 'containers/login';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
 import Users from 'containers/users';
+import AcceptOrganizationInvitation from 'containers/users/accept-organization-invitation';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import { refreshUserToken } from 'actions/user';
@@ -26,6 +27,7 @@ import {
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
   ROUTE_USERS,
+  ROUTE_ACCEPT_ORGANIZATION_INVITATION,
 } from 'config/routes';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
@@ -85,6 +87,10 @@ const AppSwitch = () => {
             <App><Users /></App>
           )
         )}
+      </Route>
+      <Route exact path={ROUTE_ACCEPT_ORGANIZATION_INVITATION}>
+        {noProfileRedirectToLogin}
+        <AcceptOrganizationInvitation />
       </Route>
       {hasProfileRedirectToPipelines}
       {noProfileRedirectToLogin}

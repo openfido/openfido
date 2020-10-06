@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -34,13 +34,6 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const [email, setEmail] = useState(null);
   const dispatch = useDispatch();
-
-  useEffect(() => { // TODO
-    if (profile) {
-      dispatch(getOrganizationMembers(currentOrg));
-    }
-  }, [getOrganizationMembers, profile, currentOrg]);
-
   if (!profile || !profile.organizations || !profile.organizations.length) return null;
 
   const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
@@ -53,6 +46,7 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
     e.preventDefault();
 
     dispatch(inviteOrganizationMember(currentOrg, email));
+    dispatch(getOrganizationMembers(currentOrg));
   };
 
   return (
