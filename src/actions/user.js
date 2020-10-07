@@ -19,7 +19,7 @@ import {
 } from 'services';
 
 export const createUser = (organization_uuid, email, password, first_name, last_name) => async (dispatch) => {
-  dispatch({ type: CREATE_USER_IN_PROGRESS });
+  await dispatch({ type: CREATE_USER_IN_PROGRESS });
   requestCreateUser(organization_uuid, email, password, first_name, last_name)
     .then((response) => {
       dispatch({
