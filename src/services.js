@@ -27,6 +27,13 @@ export const requestUpdatePassword = (email, reset_token, password) => (
   })
 );
 
+export const requestChangePassword = (user_uuid, old_password, password) => (
+  ApiClient.put('/users/:user_uuid/password', {
+    old_password,
+    password,
+  })
+);
+
 export const requestUserProfile = (user_uuid) => ApiClient.get(`/users/${user_uuid}/profile`);
 
 export const requestUpdateUserProfile = (user_uuid, email, first_name, last_name) => (
