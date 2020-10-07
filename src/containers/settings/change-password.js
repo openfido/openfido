@@ -25,7 +25,6 @@ const FormMessage = styled.div`
   margin-top: 2rem;
 `;
 
-
 const EditProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
