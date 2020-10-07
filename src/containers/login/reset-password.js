@@ -50,9 +50,10 @@ const ResetPassword = () => {
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (!loading) {
+      setLoading(true);
+
       if (password === confirmPassword) {
         requestUpdatePassword(email, resetToken, password)
           .then(() => {

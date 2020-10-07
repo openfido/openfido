@@ -50,9 +50,10 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
 
   const onResetClicked = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (!loading) {
+      setLoading(true);
+
       requestPasswordReset(email)
         .then(() => {
           setThanks(true);
