@@ -20,7 +20,7 @@ const AcceptOrganizationInvitation = () => {
 
   useEffect(() => {
     dispatch(acceptOrganizationInvitation(organization_uuid, invitation_token));
-  }, [dispatch, acceptOrganizationInvitation, organization_uuid, invitation_token]);
+  }, [dispatch, organization_uuid, invitation_token]);
 
   useEffect(() => {
     if (invitationToken && !acceptInvitationError) {
