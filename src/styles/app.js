@@ -171,17 +171,19 @@ export const StyledButton = styled(Button)`
   .anticon {
     line-height: 0;
   }
-  label {
-    cursor: pointer;
-  }
   // no size
   &.ant-btn {
     font-size: 14px;
     line-height: 16px;
     font-weight: 500;
     border-radius: 3px;
-    padding: 4px 8px;
-    padding: 0.25rem 0.5rem;
+    padding: 0;
+    height: auto;
+    label {
+      cursor: pointer;
+      padding: 3px 8px;
+      padding: 0.1875rem 0.5rem;
+    }
   }
   &.ant-btn-lg { 
     font-size: 18px;
@@ -216,6 +218,7 @@ export const StyledButton = styled(Button)`
     type, color, width, height, hoverbgcolor, size,
   }) => (`
   ${size === 'middle' ? (`
+  &.ant-btn {
     font-size: 16px;
     line-height: 19px;
     font-weight: 500;
@@ -224,6 +227,7 @@ export const StyledButton = styled(Button)`
     padding: 0.5rem 0.75rem;
     height: 50px;
     height: 3.125rem;
+  }
   `) : ''}
   ${type === 'text' ? (`
   color: ${colors.blue};

@@ -64,7 +64,8 @@ const StyledPhotoContainer = styled.div`
   border-radius: 60px;
   border: 2px solid ${colors.black};
   padding: 1px;
-  margin: -2px auto;
+  margin: -2px 16px -2px 0;
+  margin: -2px 1rem -2px 0;
 `;
 
 const StyledPhoto = styled.div`
@@ -77,6 +78,7 @@ const StyledPhoto = styled.div`
 
 const UserAvatar = styled.div`
   display: flex;
+  align-items: center;
   width: 250px;
   input[type="file"] {
     display: none;
