@@ -11,6 +11,8 @@ const StyledForm = styled.form`
   grid-gap: 16px;
   grid-gap: 1rem;
   button[type="submit"], button[type="reset"] {
+    margin-top: 32px;
+    margin-top: 2rem;
   }
   input {
     width: 432px;
@@ -19,15 +21,10 @@ const StyledForm = styled.form`
 
 const FormMessage = styled.div`
   width: 432px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 0.25rem;
-  font-size: 12px;
-  line-height: 14px;
-  height: 18px;
-  height: 1.125rem;
+  margin-top: 32px;
+  margin-top: 2rem;
 `;
+
 
 const EditProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -110,11 +107,6 @@ const EditProfile = () => {
           onChange={onConfirmPasswordChanged}
         />
       </label>
-      <FormMessage>
-        <StyledText color="green">{changePasswordSuccess && !changePasswordError && 'Password changed.'}</StyledText>
-        {changePasswordError && 'Password could not be changed.'}
-        <StyledText color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
-      </FormMessage>
       <Space direction="horizontal" size={24}>
         <StyledButton
           htmlType="submit"
@@ -136,6 +128,17 @@ const EditProfile = () => {
         >
           Cancel
         </StyledButton>
+        <FormMessage>
+          {changePasswordSuccess && !changePasswordError && !passwordMismatch && (
+            <StyledText size="middle" color="green">Password changed.</StyledText>
+          )}
+          {changePasswordError && (
+            <StyledText size="middle" color="pink">Password could not be changed.</StyledText>
+          )}
+          {!changePasswordError && passwordMismatch && (
+            <StyledText size="middle" color="pink">Passwords do not match</StyledText>
+          )}
+        </FormMessage>
       </Space>
     </StyledForm>
   );
