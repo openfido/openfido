@@ -3,9 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-import { getUserProfile } from 'actions/user';
+//import { getUserProfile } from 'actions/user';
 import { getOrganizationMembers } from 'actions/organization';
-import { ROUTE_PIPELINES } from 'config/routes';
+//import { ROUTE_PIPELINES } from 'config/routes';
 import {
   StyledTitle,
   StyledButton,
@@ -16,12 +16,13 @@ import UserItem from './user-item';
 import InviteUserPopup from './invite-user-popup';
 
 const Users = () => {
-  const history = useHistory();
+  //const history = useHistory();
   const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
 
   const profile = useSelector((state) => state.user.profile);
-  const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const members = useSelector((state) => state.organization.members);
+  //const userRemoved = useSelector((state) => state.organization.userRemoved);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -30,12 +31,12 @@ const Users = () => {
     }
   }, [dispatch, profile, currentOrg]);
 
-  useEffect(() => {
-    if (members && !members.length) {
+  /*useEffect(() => { // has bug: going back to Users tab calls this again because members is still []
+    if (members && !members.length && userRemoved) {
       dispatch(getUserProfile(profile.uuid));
       history.push(ROUTE_PIPELINES);
     }
-  });
+  });*/
 
   const openInviteUserPopup = () => setShowInviteUserPopup(true);
 
