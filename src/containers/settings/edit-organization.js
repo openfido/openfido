@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { requestUpdateOrganization } from 'services';
+import { requestUpdateOrganization, requestDeleteOrganization } from 'services';
 import { getUserOrganizations } from 'actions/user';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
 import EditOutlined from 'icons/EditOutlined';
@@ -51,6 +51,7 @@ const FormMessage = styled.div`
 const EditOrganization = () => {
   const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
+  const [selectedInput, setSelectedInput] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -59,9 +60,10 @@ const EditOrganization = () => {
 
   if (!profile) return null;
 
-  const onOrganizationClick = (organizationUUID, organizationName) => {
+  const onOrganizationClick = (e, organizationUUID, organizationName) => {
     setSelectedOrganization(organizationUUID);
     setSelectedOrganizationName(organizationName);
+    setSelectedInput(e.target);
   };
 
   const setOrganizationName = (e) => {
@@ -79,6 +81,27 @@ const EditOrganization = () => {
           setSelectedOrganizationName(null);
           setError(false);
           setLoading(false);
+          if (selectedInput) selectedInput.blur();
+          setSelectedInput(null);
+          dispatch(getUserOrganizations(profile.uuid));
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+        });
+    }
+  };
+
+  const onDeleteClicked = () => {
+    if (!loading) {
+      requestDeleteOrganization(selectedOrganization)
+        .then(() => {
+          setSelectedOrganization(null);
+          setSelectedOrganizationName(null);
+          setError(false);
+          setLoading(false);
+          if (selectedInput) selectedInput.blur();
+          setSelectedInput(null);
           dispatch(getUserOrganizations(profile.uuid));
         })
         .catch(() => {
@@ -104,10 +127,10 @@ const EditOrganization = () => {
               value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
               tabIndex={-1}
               onChange={setOrganizationName}
-              onClick={() => onOrganizationClick(org.uuid, org.name)}
+              onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
             />
             {org.uuid !== selectedOrganization && <EditOutlined />}
-            {org.uuid === selectedOrganization && <DeleteOutlined />}
+            {org.uuid === selectedOrganization && <DeleteOutlined onClick={onDeleteClicked} />}
           </label>
           {org.uuid === selectedOrganization && (
           <FormMessage>

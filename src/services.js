@@ -82,6 +82,6 @@ export const requestUpdateOrganization = (organization_uuid, organization_name) 
   ApiClient.put(`/organizations/${organization_uuid}/profile`, { name: organization_name })
 );
 
-export const requestDeleteOrganization = (organization_uuid, organization_name) => (
-  ApiClient.delete(`/organizations/${organization_uuid}/profile`, { name: organization_name })
+export const requestDeleteOrganization = (organization_uuid) => (
+  ApiClient.delete(`/organizations/${organization_uuid}`)
 );
