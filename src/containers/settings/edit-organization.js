@@ -25,6 +25,9 @@ const StyledForm = styled.form`
         fill: ${colors.pink};
       }
     }
+    button {
+      margin-top: 8px;
+      margin-top: 0.5rem;
   }
   .anticon {
     top: auto;
@@ -35,6 +38,8 @@ const StyledForm = styled.form`
     &.anticon-delete-outlined {
       right: -32px;
       right: -2rem;
+      bottom: 48px;
+      bottom: 3rem;
     }
   }
   input {
@@ -68,6 +73,17 @@ const EditOrganization = () => {
 
   const setOrganizationName = (e) => {
     setSelectedOrganizationName(e.target.value);
+  };
+
+  const resetSelection = () => {
+    setTimeout(() => {
+      setSelectedOrganization(null);
+      setSelectedOrganizationName(null);
+      setError(false);
+      setLoading(false);
+      if (selectedInput) selectedInput.blur();
+      setSelectedInput(null);
+    }, 100);
   };
 
   const onSaveClicked = (e) => {
@@ -114,24 +130,26 @@ const EditOrganization = () => {
   return (
     <StyledForm onSubmit={onSaveClicked}>
       {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
-        <React.Fragment key={org.uuid}>
-          <label key={org.uuid} htmlFor={org.uuid}>
-            <StyledText display="block" color="darkText">{org.name}</StyledText>
-            <StyledInput
-              type="text"
-              bgcolor="white"
-              size="large"
-              className={org.uuid === selectedOrganization ? '' : 'unfocusable'}
-              name={org.uuid}
-              id={org.uuid}
-              value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
-              tabIndex={-1}
-              onChange={setOrganizationName}
-              onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
-            />
-            {org.uuid !== selectedOrganization && <EditOutlined />}
-            {org.uuid === selectedOrganization && <DeleteOutlined onClick={onDeleteClicked} />}
-          </label>
+        <label
+          key={org.uuid}
+          htmlFor={org.uuid}
+        >
+          <StyledText display="block" color="darkText">{org.name}</StyledText>
+          <StyledInput
+            type="text"
+            bgcolor="white"
+            size="large"
+            className={org.uuid === selectedOrganization ? '' : 'unfocusable'}
+            name={org.uuid}
+            id={org.uuid}
+            value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
+            tabIndex={-1}
+            onChange={setOrganizationName}
+            onBlur={resetSelection}
+            onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
+          />
+          {org.uuid !== selectedOrganization && <EditOutlined />}
+          {org.uuid === selectedOrganization && <DeleteOutlined onClick={onDeleteClicked} />}
           {org.uuid === selectedOrganization && (
           <FormMessage>
             <StyledButton
@@ -145,7 +163,7 @@ const EditOrganization = () => {
             </StyledButton>
           </FormMessage>
           )}
-        </React.Fragment>
+        </label>
       ))}
     </StyledForm>
   );
