@@ -118,6 +118,15 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
     });
 };
 
+export const logoutUser = () => ({
+  type: LOGOUT_USER,
+});
+
+export const changeOrganization = (organization_uuid) => ({
+  type: CHANGE_ORGANIZATION,
+  payload: organization_uuid,
+});
+
 export const getUserProfile = (user_uuid) => (dispatch) => {
   requestUserProfile(user_uuid)
     .then((response) => {
@@ -167,10 +176,6 @@ export const updateUserProfile = (user_uuid, email, first_name, last_name) => as
     });
 };
 
-export const logoutUser = () => ({
-  type: LOGOUT_USER,
-});
-
 export const updatePassword = (email, reset_token, password) => async (dispatch) => {
   await dispatch({ type: AUTH_IN_PROGRESS });
   requestUpdatePassword(email, reset_token, password)
@@ -187,8 +192,3 @@ export const updatePassword = (email, reset_token, password) => async (dispatch)
       });
     });
 };
-
-export const changeOrganization = (organization_uuid) => ({
-  type: CHANGE_ORGANIZATION,
-  payload: organization_uuid,
-});
