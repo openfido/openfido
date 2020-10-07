@@ -73,6 +73,29 @@ const EditOrganization = () => {
   const profile = useSelector((state) => state.user.profile);
   const dispatch = useDispatch();
 
+  const resetSelection = (e) => {
+    if (e.target.className && e.target.className.match && !e.target.className.match(/organizationClickTarget/)) {
+      setSelectedOrganization(null);
+      setSelectedOrganizationName(null);
+      setAddOrganization(false);
+      setAddOrganizationName(null);
+      setError(null);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profile && profile.organizations) {
+      window.addEventListener('click', resetSelection);
+
+      return () => {
+        window.removeEventListener('click', resetSelection);
+      };
+    }
+
+    return null;
+  }, []);
+
   useEffect(() => {
     if (addOrganization && createOrganizationInput.current) {
       createOrganizationInput.current.focus();
@@ -154,7 +177,7 @@ const EditOrganization = () => {
   };
 
   return (
-    <StyledForm onSubmit={onSaveClicked}>
+    <StyledForm onSubmit={onSaveClicked} autoComplete="off">
       <StyledButton
         color="gray80"
         hoverbgcolor="lightBlue"
@@ -196,13 +219,14 @@ const EditOrganization = () => {
         <label
           key={org.uuid}
           htmlFor={org.uuid}
+          className="organizationClickTarget"
         >
-          <StyledText display="block" color="darkText">{org.name}</StyledText>
+          <StyledText className="organizationClickTarget" display="block" color="darkText">{org.name}</StyledText>
           <StyledInput
             type="text"
             bgcolor="white"
             size="large"
-            className={org.uuid === selectedOrganization ? '' : 'unfocusable'}
+            className={`organizationClickTarget ${org.uuid === selectedOrganization ? '' : ' unfocusable'}`}
             name={org.uuid}
             id={org.uuid}
             value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
@@ -210,11 +234,11 @@ const EditOrganization = () => {
             onChange={setOrganizationName}
             onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
           />
-          {org.uuid !== selectedOrganization && <EditOutlined />}
-          {org.uuid === selectedOrganization && <DeleteOutlined onClick={onDeleteClicked} />}
+          {org.uuid !== selectedOrganization && <EditOutlined className="organizationClickTarget" />}
+          {org.uuid === selectedOrganization && <DeleteOutlined className="organizationClickTarget" onClick={onDeleteClicked} />}
           {org.uuid === selectedOrganization && (
-          <FormMessage>
-            <StyledText color="pink">
+          <FormMessage className="organizationClickTarget">
+            <StyledText className="organizationClickTarget" color="pink">
               {error === 'save' && 'Could not save organization name.'}
               {error === 'delete' && 'Could not delete organization.'}
             </StyledText>
@@ -222,10 +246,11 @@ const EditOrganization = () => {
               htmlType="submit"
               color="lightBlue"
               hoverbgcolor="blue"
+              className="organizationClickTarget"
               width={50}
               onClick={onSaveClicked}
             >
-              <span>Save</span>
+              <span className="organizationClickTarget">Save</span>
             </StyledButton>
           </FormMessage>
           )}
