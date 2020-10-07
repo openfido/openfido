@@ -50,20 +50,23 @@ const ResetPassword = () => {
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      requestUpdatePassword(email, resetToken, password)
-        .then(() => {
-          dispatch(loginUser(email, password));
-        })
-        .catch(() => {
-          setError(true);
-          setLoading(false);
-          setPasswordMismatch(false);
-        });
-    } else {
-      setPasswordMismatch(true);
-      setLoading(false);
-      setError(false);
+
+    if (!loading) {
+      if (password === confirmPassword) {
+        requestUpdatePassword(email, resetToken, password)
+          .then(() => {
+            dispatch(loginUser(email, password));
+          })
+          .catch(() => {
+            setError(true);
+            setLoading(false);
+            setPasswordMismatch(false);
+          });
+      } else {
+        setPasswordMismatch(true);
+        setLoading(false);
+        setError(false);
+      }
     }
   };
 
@@ -108,7 +111,6 @@ const ResetPassword = () => {
           role="button"
           tabIndex={0}
           onClick={onChangePasswordClicked}
-          loading={loading}
         >
           Submit
         </StyledButton>

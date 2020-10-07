@@ -37,11 +37,14 @@ const CreateNewAccountInvitation = () => {
 
   const onSignInClicked = (e) => {
     e.preventDefault();
-    if (password === confirmPassword) {
-      dispatch(createUser(invitationOrganization, email, password));
-      setPasswordMismatch(false);
-    } else {
-      setPasswordMismatch(true);
+
+    if (!createUserInProgress) {
+      if (password === confirmPassword) {
+        dispatch(createUser(invitationOrganization, email, password));
+        setPasswordMismatch(false);
+      } else {
+        setPasswordMismatch(true);
+      }
     }
   };
 
@@ -79,7 +82,6 @@ const CreateNewAccountInvitation = () => {
           role="button"
           tabIndex={0}
           onClick={onSignInClicked}
-          loading={createUserInProgress}
         >
           Sign In
         </StyledButton>

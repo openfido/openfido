@@ -50,14 +50,17 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
 
   const onResetClicked = (e) => {
     e.preventDefault();
-    requestPasswordReset(email)
-      .then(() => {
-        setThanks(true);
-      })
-      .catch(() => {
-        setError(true);
-        setLoading(false);
-      });
+
+    if (!loading) {
+      requestPasswordReset(email)
+        .then(() => {
+          setThanks(true);
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -90,7 +93,6 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
               role="button"
               tabIndex={0}
               onClick={onResetClicked}
-              loading={loading}
             >
               Submit
             </SubmitButton>
