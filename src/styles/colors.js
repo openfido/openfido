@@ -17,7 +17,7 @@ export default {
   darkText: '#595657',
   black: '#404040',
   blue: '#0C486B',
-  lightBlue: '#3595DC',
+  lightBlue: '#2A7AB7',
   green: '#318466',
   oceanGreen: '#3BA889',
   algaeGreen: '#95E1CC',

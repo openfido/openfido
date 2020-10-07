@@ -10,17 +10,14 @@ const StyledForm = styled.form`
   display: grid;
   grid-gap: 16px;
   grid-gap: 1rem;
+  width: 432px;
   button[type="submit"], button[type="reset"] {
     margin-top: 32px;
     margin-top: 2rem;
   }
-  input {
-    width: 432px;
-  }
 `;
 
 const FormMessage = styled.div`
-  width: 432px;
   margin-top: 32px;
   margin-top: 2rem;
 `;

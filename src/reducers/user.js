@@ -11,6 +11,7 @@ import {
   CHANGE_PASSWORD_IN_PROGRESS,
   CHANGE_PASSWORD_FAILED,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
@@ -145,6 +146,16 @@ export default (state = DEFAULT_STATE, action) => {
           ...action.payload,
         },
         currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+      };
+    }
+    case GET_USER_ORGANIZATIONS: {
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        profile: {
+          ...state.profile,
+          organizations: action.payload, // TODO: maybe move this out of profile
+        },
       };
     }
     case UPDATE_USER_PROFILE: {

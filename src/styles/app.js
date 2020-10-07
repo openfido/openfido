@@ -179,7 +179,7 @@ export const StyledButton = styled(Button)`
     border-radius: 3px;
     padding: 0;
     height: auto;
-    label {
+    label, span {
       cursor: pointer;
       padding: 3px 8px;
       padding: 0.1875rem 0.5rem;
@@ -301,6 +301,7 @@ export const StyledInput = styled(Input)`
   line-height: 21px;
   background-color: ${colors.overlay20};
   width: 100%;
+  height: 48px;
   `) : (`
   font-size: 12px;
   line-height: 14px;

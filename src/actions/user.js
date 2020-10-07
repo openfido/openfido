@@ -9,6 +9,7 @@ import {
   AUTH_IN_PROGRESS,
   CHANGE_ORGANIZATION,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
@@ -25,6 +26,7 @@ import {
   requestRefreshJWT,
   requestChangePassword,
   requestUserProfile,
+  requestUserOrganizations,
   requestUpdateUserProfile,
   requestUserAvatar,
   requestUpdateUserAvatar,
@@ -66,6 +68,15 @@ export const loginUser = (email, password) => async (dispatch) => {
       });
 
       const { uuid } = response.data;
+      return requestUserOrganizations(uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: response.data,
+      });
+
+      const { uuid } = response.data;
       return requestUserAvatar(uuid);
     })
     .then((response) => {
@@ -95,6 +106,14 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
     .then((response) => {
       dispatch({
         type: GET_USER_PROFILE,
+        payload: response.data,
+      });
+
+      return requestUserOrganizations(user_uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
         payload: response.data,
       });
 

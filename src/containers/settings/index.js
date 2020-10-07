@@ -6,6 +6,7 @@ import { StyledTitle, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 import EditProfile from './edit-profile';
 import ChangePassword from './change-password';
+import EditOrganization from './edit-organization';
 
 const Root = styled.div`
   padding: 60px 90px;
@@ -54,6 +55,9 @@ const Settings = () => {
     case 'Change Password':
       content = <ChangePassword />;
       break;
+    case 'Edit Organization':
+      content = <EditOrganization />;
+      break;
     default:
       break;
   }
@@ -71,7 +75,7 @@ const Settings = () => {
           <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
-          <Menu.Item key="Edit Organization">
+          <Menu.Item key="Edit Organization" onClick={() => setSelectedKey('Edit Organization')}>
             <StyledText size="xlarge">Edit Organization</StyledText>
           </Menu.Item>
         </StyledMenu>
