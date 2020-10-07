@@ -9,6 +9,7 @@ import {
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
+  UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
   GET_USER_AVATAR,
   UPDATE_USER_AVATAR,
@@ -149,7 +150,8 @@ export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
     });
 };
 
-export const updateUserProfile = (user_uuid, email, first_name, last_name) => (dispatch) => {
+export const updateUserProfile = (user_uuid, email, first_name, last_name) => async (dispatch) => {
+  await dispatch({ type: UPDATE_USER_PROFILE_IN_PROGRESS });
   requestUpdateUserProfile(user_uuid, email, first_name, last_name)
     .then((response) => {
       dispatch({

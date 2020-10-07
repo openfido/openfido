@@ -81,7 +81,10 @@ const EditProfile = () => {
 
   const onUpdateProfileClicked = (e) => {
     e.preventDefault();
-    dispatch(updateUserProfile(profile.uuid, email, firstName, lastName));
+
+    if (!updateUserProfileInProgress) {
+      dispatch(updateUserProfile(profile.uuid, email, firstName, lastName));
+    }
   };
 
   const onEmailChanged = (e) => {
@@ -172,7 +175,6 @@ const EditProfile = () => {
           width={128}
           role="button"
           tabIndex={0}
-          loading={updateUserProfileInProgress}
           onClick={onUpdateProfileClicked}
         >
           Update Profile
