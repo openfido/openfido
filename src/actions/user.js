@@ -129,10 +129,18 @@ export const getUserProfile = (user_uuid) => (dispatch) => {
 
 export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
   requestUpdateUserAvatar(user_uuid, image_content)
-    .then(() => dispatch({
-      type: UPDATE_USER_AVATAR,
-      payload: image_content,
-    }))
+    .then(() => {
+      dispatch({
+        type: UPDATE_USER_AVATAR,
+        payload: image_content,
+      });
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_USER_AVATAR,
+        payload: response.data,
+      });
+    })
     .catch((err) => {
       dispatch({
         type: UPDATE_USER_AVATAR_FAILED,

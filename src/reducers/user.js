@@ -144,7 +144,6 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
-        avatar: action.payload,
       };
     }
     case UPDATE_USER_AVATAR_FAILED: {
