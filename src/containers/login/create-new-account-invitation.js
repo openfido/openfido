@@ -19,6 +19,7 @@ const CreateNewAccountInvitation = () => {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
   const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);
+  const createUserInProgress = useSelector((state) => state.user.createUserInProgress);
   const createUserError = useSelector((state) => state.user.createUserError);
   const dispatch = useDispatch();
 
@@ -60,9 +61,7 @@ const CreateNewAccountInvitation = () => {
         <StyledInput type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
         <StyledInput type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
         <FormMessage>
-          {passwordMismatch && (
-              <StyledText size="small" color="pink">Passwords do not match</StyledText>
-          )}
+          <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
           <StyledText color={createUserError && password.length < 10 ? 'pink' : 'gray80'} float="right">
             Minimum 10 characters
           </StyledText>
@@ -80,6 +79,7 @@ const CreateNewAccountInvitation = () => {
           role="button"
           tabIndex={0}
           onClick={onSignInClicked}
+          loading={createUserInProgress}
         >
           Sign In
         </StyledButton>
