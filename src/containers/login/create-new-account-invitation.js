@@ -19,8 +19,8 @@ const CreateNewAccountInvitation = () => {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
   const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);
-  const createUserInProgress = useSelector((state) => state.user.createUserInProgress);
-  const createUserError = useSelector((state) => state.user.createUserError);
+  const createUserInProgress = useSelector((state) => state.user.messages.createUserInProgress);
+  const createUserError = useSelector((state) => state.user.messages.createUserError);
   const dispatch = useDispatch();
 
   const onEmailChanged = (e) => {

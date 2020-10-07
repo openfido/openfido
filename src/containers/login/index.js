@@ -18,8 +18,8 @@ import { StyledButton, StyledText } from 'styles/app';
 const Login = () => {
   const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
-  const authInProgress = useSelector((state) => state.user.authInProgress);
-  const authError = useSelector((state) => state.user.authError);
+  const authInProgress = useSelector((state) => state.user.messages.authInProgress);
+  const authError = useSelector((state) => state.user.messages.authError);
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState();

@@ -26,6 +26,14 @@ export const createUser = (organization_uuid, email, password, first_name, last_
         type: CREATE_USER,
         payload: response.data,
       });
+
+      return requestLoginUser(email, password);
+    })
+    .then((response) => {
+      dispatch({
+        type: LOGIN_USER,
+        payload: response.data,
+      });
     })
     .catch((err) => {
       dispatch({
