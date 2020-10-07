@@ -1,5 +1,3 @@
-from flask import current_app
-
 from application_roles.model_utils import get_db, CommonColumnsMixin
 
 db = get_db()

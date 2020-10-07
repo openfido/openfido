@@ -1,39 +1,32 @@
 version: '3'
 services:
-  db:
+  app_db:
     image: postgres:11
     environment:
-      POSTGRES_DB: workflowservice
+      POSTGRES_DB: appservice
       POSTGRES_PASSWORD: dev-password
-  storage:
-    image: minio/minio
-    command: server /data
-    environment:
-      MINIO_ACCESS_KEY: minio_access_key
-      MINIO_SECRET_KEY: minio123
-    volumes:
-      - ./uploads:/data:delegated
-    ports:
-      - "9000:9000"
-  api:
-    build: .
-    image: openfido/openfido-app-service
+  app_service:
+    build: ${APP_DIR:-.}
     command: flask run -h 0.0.0.0
     environment:
-      PGDATABASE: workflowservice
+      PGDATABASE: appservice
       PGUSER: postgres
-      PGHOST: db
+      PGHOST: app_db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@db/workflowservice
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app_db/appservice
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
-      S3_ENDPOINT_URL: http://storage:9000
+      S3_ENDPOINT_URL: http://workflow_storage:9000
+      AUTH_HOSTNAME: http://auth_web:5000
+      WORKFLOW_HOSTNAME: http://workflow_service:5000
     volumes:
-      - .:/opt/app:delegated
+      - ${APP_DIR:-.}:/opt/app:delegated
     ports:
-      - "5000:5000"
+      - "${APP_PORT:-5000}:5000"
     depends_on:
-      - db
-      - storage
+      - app_db
+      - workflow_storage
+      - auth_web
+      - workflow_service

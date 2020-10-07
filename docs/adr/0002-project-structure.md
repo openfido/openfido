@@ -32,6 +32,9 @@ Additional libraries we anticipate using:
  * [marshmallow](https://marshmallow.readthedocs.io/en/stable/) will be used since there are many rest api endpoints that will take nested bodies.
  * [alembic](https://alembic.sqlalchemy.org/en/latest/) to manage database schema migrations.
 
+Other thoughts on design:
+ * Because HTTP errors are intended for human use via the OpenFIDO client, messages should be verbose - showing both a generic message and specific field validation messages where appropriate.
+
 Use the structure of the [openfido-workflow-service](https://github.com/slacgismo/openfido-workflow-service) project as a reference.
 
 ## Consequences

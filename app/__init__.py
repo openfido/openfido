@@ -8,6 +8,8 @@ from application_roles.model_utils import get_db
 from .pipelines import models as pipeline_models
 from . import constants
 
+from .pipelines.routes import organization_pipeline_bp
+
 db = get_db()
 
 # Allow a specific set of environmental variables to be configurable:
@@ -19,6 +21,9 @@ CONFIG_VARS = (
     constants.S3_ENDPOINT_URL,
     constants.S3_REGION_NAME,
     constants.S3_BUCKET,
+    constants.AUTH_HOSTNAME,
+    constants.WORKFLOW_HOSTNAME,
+    constants.WORKFLOW_API_TOKEN,
 )
 
 
@@ -44,6 +49,6 @@ def create_app(config=None):
     db.init_app(app)
     migrate = Migrate(app, db)
 
-    # app.register_blueprint(pipeline_bp, url_prefix="/v1/organizations")
+    app.register_blueprint(organization_pipeline_bp, url_prefix="/v1/organizations")
 
     return (app, db, migrate)
