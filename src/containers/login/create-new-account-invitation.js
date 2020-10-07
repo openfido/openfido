@@ -10,10 +10,7 @@ import {
   StyledInput,
   FormMessage,
 } from 'styles/login';
-import {
-  StyledButton,
-  StyledText,
-} from 'styles/app';
+import { StyledButton, StyledText } from 'styles/app';
 
 const CreateNewAccountInvitation = () => {
   const [email, setEmail] = useState('');
