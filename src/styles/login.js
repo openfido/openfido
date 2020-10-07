@@ -25,6 +25,8 @@ export const StyledH2 = styled.h2`
   font-size: 1.25rem;
   line-height: 24px;
   line-height: 1.5rem;
+  height: 48px;
+  height: 3rem;
   color: ${colors.blue};
 `;
 
@@ -62,10 +64,6 @@ export const StyledForm = styled.form`
   &.thanks {
     height: 300px;
   }
-  button {
-    margin-top: 32px;
-    margin-top: 2rem;
-  }
 `;
 
 export const StyledInput = styled.input`
@@ -76,11 +74,12 @@ export const StyledInput = styled.input`
   line-height: 1.3125rem;
   font-weight: 400;
   color: ${colors.gray};
-  padding: 12px 0;
+  padding: 10px 0;
   padding-left: 0;
   padding-right: 0;
   border: none;
   border-bottom: 1px solid ${colors.lightGray};
+  border-radius: 0;
   &::placeholder {
     color: ${colors.lightGray};
   }
@@ -96,8 +95,10 @@ export const StyledInput = styled.input`
 
 export const FormMessage = styled.div`
   ${({ size }) => size === 'large' ? (`
-  padding: 0.75rem 0;
+  padding: 0.75rem 0 2.25rem 0;
   height: 2.5rem;
+  font-size: 14px;
+  line-height: 16px;
   `) : (`
   padding-top: 0.25rem;
   font-size: 12px;

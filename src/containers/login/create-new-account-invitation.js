@@ -71,7 +71,7 @@ const CreateNewAccountInvitation = () => {
           </StyledText>
         </FormMessage>
         <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
-        <FormMessage>
+        <FormMessage size="large">
           {createUserError && !passwordMismatch && (
             <StyledText size="small" color="pink">Could not create account.</StyledText>
           )}
