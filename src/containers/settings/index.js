@@ -7,7 +7,7 @@ import colors from 'styles/colors';
 import EditProfile from './edit-profile';
 
 const Root = styled.div`
-  padding: 30px 90px;
+  padding: 60px 90px;
   display: grid;
   grid-template-columns: 250px 1fr;
 `;

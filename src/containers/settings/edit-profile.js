@@ -114,6 +114,7 @@ const EditProfile = () => {
           </label>
         </StyledButton>
       </UserAvatar>
+      <div></div>
       <label htmlFor="first_name">
         <StyledText display="block" color="darkText">First Name</StyledText>
         <StyledInput
