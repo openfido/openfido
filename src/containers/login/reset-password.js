@@ -50,6 +50,7 @@ const ResetPassword = () => {
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!loading) {
       if (password === confirmPassword) {
