@@ -52,12 +52,15 @@ const EditOrganization = () => {
   const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
   const profile = useSelector((state) => state.user.profile);
+  const dispatch = useDispatch();
 
   if (!profile) return null;
 
-  const onOrganizationClick = (organizationUUID) => {
+  const onOrganizationClick = (organizationUUID, organizationName) => {
     setSelectedOrganization(organizationUUID);
+    setSelectedOrganizationName(organizationName);
   };
 
   const setOrganizationName = (e) => {
@@ -86,7 +89,7 @@ const EditOrganization = () => {
   return (
     <StyledForm onSubmit={onSaveClicked}>
       {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
-        <>
+        <React.Fragment key={org.uuid}>
           <label key={org.uuid} htmlFor={org.uuid}>
             <StyledText display="block" color="darkText">{org.name}</StyledText>
             <StyledInput
@@ -96,10 +99,10 @@ const EditOrganization = () => {
               className={org.uuid === selectedOrganization ? '' : 'unfocusable'}
               name={org.uuid}
               id={org.uuid}
-              value={org.name}
+              value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
               tabIndex={-1}
               onChange={setOrganizationName}
-              onClick={() => onOrganizationClick(org.uuid)}
+              onClick={() => onOrganizationClick(org.uuid, org.name)}
             />
             {org.uuid !== selectedOrganization && <EditOutlined />}
             {org.uuid === selectedOrganization && <DeleteOutlined />}
@@ -117,7 +120,7 @@ const EditOrganization = () => {
             </StyledButton>
           </FormMessage>
           )}
-        </>
+        </React.Fragment>
       ))}
     </StyledForm>
   );
