@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Space } from 'antd';
 import styled from 'styled-components';
 
 import { updateUserProfile, updateUserAvatar } from 'actions/user';
@@ -47,6 +48,15 @@ const UserAvatar = styled.div`
   }
 `;
 
+const FormMessage = styled.div`
+  width: 432px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  margin-top: 2rem;
+`;
+
 const EditProfile = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -54,6 +64,9 @@ const EditProfile = () => {
 
   const profile = useSelector((state) => state.user.profile);
   const avatar = useSelector((state) => state.user.avatar);
+  const updateUserProfileSuccess = useSelector((state) => state.user.messages.updateUserProfileSuccess);
+  const updateUserProfileInProgress = useSelector((state) => state.user.messages.updateUserProfileInProgress);
+  const updateUserProfileError = useSelector((state) => state.user.messages.updateUserProfileError);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -114,7 +127,7 @@ const EditProfile = () => {
           </label>
         </StyledButton>
       </UserAvatar>
-      <div></div>
+      <div />
       <label htmlFor="first_name">
         <StyledText display="block" color="darkText">First Name</StyledText>
         <StyledInput
@@ -151,17 +164,24 @@ const EditProfile = () => {
           onChange={onEmailChanged}
         />
       </label>
-      <StyledButton
-        htmlType="submit"
-        size="middle"
-        color="blue"
-        width={128}
-        role="button"
-        tabIndex={0}
-        onClick={onUpdateProfileClicked}
-      >
-        Update Profile
-      </StyledButton>
+      <Space direction="horizontal" size={24}>
+        <StyledButton
+          htmlType="submit"
+          size="middle"
+          color="blue"
+          width={128}
+          role="button"
+          tabIndex={0}
+          loading={updateUserProfileInProgress}
+          onClick={onUpdateProfileClicked}
+        >
+          Update Profile
+        </StyledButton>
+        <FormMessage>
+          {updateUserProfileSuccess && !updateUserProfileError && <StyledText size="middle" color="green">Profile updated.</StyledText>}
+          {updateUserProfileError && <StyledText size="middle" color="pink">Profile could not be updated.</StyledText>}
+        </FormMessage>
+      </Space>
     </StyledForm>
   );
 };

@@ -9,6 +9,7 @@ import {
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
+  UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
   GET_USER_AVATAR,
   UPDATE_USER_AVATAR,
@@ -26,6 +27,8 @@ const DEFAULT_STATE = {
     createUserError: null,
     authInProgress: false,
     authError: null,
+    updateProfileSuccess: false,
+    updateProfileInProgress: false,
     updateUserProfileError: null,
     updateUserAvatarError: null,
   },
@@ -117,10 +120,22 @@ export default (state = DEFAULT_STATE, action) => {
     case UPDATE_USER_PROFILE: {
       return {
         ...state,
-        messages: DEFAULT_STATE.messages,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          updateUserProfileSuccess: true,
+        },
         profile: {
           ...state.profile,
           ...action.payload,
+        },
+      };
+    }
+    case UPDATE_USER_PROFILE_IN_PROGRESS: {
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          updateUserProfileInProgress: true,
         },
       };
     }

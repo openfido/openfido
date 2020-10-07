@@ -14,6 +14,7 @@ const Root = styled.div`
 
 const StyledMenu = styled(Menu)`
   background-color: transparent;
+  border-right: 0;
   &.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
     border-color: ${colors.blue};
     background-color: transparent;
