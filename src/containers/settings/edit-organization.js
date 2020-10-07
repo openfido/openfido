@@ -50,7 +50,9 @@ const StyledForm = styled.form`
 `;
 
 const FormMessage = styled.div`
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const EditOrganization = () => {
@@ -58,7 +60,7 @@ const EditOrganization = () => {
   const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
   const [selectedInput, setSelectedInput] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
   const profile = useSelector((state) => state.user.profile);
   const dispatch = useDispatch();
@@ -75,34 +77,23 @@ const EditOrganization = () => {
     setSelectedOrganizationName(e.target.value);
   };
 
-  const resetSelection = () => {
-    setTimeout(() => {
-      setSelectedOrganization(null);
-      setSelectedOrganizationName(null);
-      setError(false);
-      setLoading(false);
-      if (selectedInput) selectedInput.blur();
-      setSelectedInput(null);
-    }, 100);
-  };
-
   const onSaveClicked = (e) => {
     e.preventDefault();
-    setLoading(true);
 
     if (!loading) {
+      setLoading(true);
       requestUpdateOrganization(selectedOrganization, selectedOrganizationName)
         .then(() => {
           setSelectedOrganization(null);
           setSelectedOrganizationName(null);
-          setError(false);
+          setError(null);
           setLoading(false);
           if (selectedInput) selectedInput.blur();
           setSelectedInput(null);
           dispatch(getUserOrganizations(profile.uuid));
         })
         .catch(() => {
-          setError(true);
+          setError('save');
           setLoading(false);
         });
     }
@@ -110,18 +101,19 @@ const EditOrganization = () => {
 
   const onDeleteClicked = () => {
     if (!loading) {
+      setLoading(true);
       requestDeleteOrganization(selectedOrganization)
         .then(() => {
           setSelectedOrganization(null);
           setSelectedOrganizationName(null);
-          setError(false);
+          setError(null);
           setLoading(false);
           if (selectedInput) selectedInput.blur();
           setSelectedInput(null);
           dispatch(getUserOrganizations(profile.uuid));
         })
         .catch(() => {
-          setError(true);
+          setError('delete');
           setLoading(false);
         });
     }
@@ -145,13 +137,16 @@ const EditOrganization = () => {
             value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
             tabIndex={-1}
             onChange={setOrganizationName}
-            onBlur={resetSelection}
             onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
           />
           {org.uuid !== selectedOrganization && <EditOutlined />}
           {org.uuid === selectedOrganization && <DeleteOutlined onClick={onDeleteClicked} />}
           {org.uuid === selectedOrganization && (
           <FormMessage>
+            <StyledText color="pink">
+              {error === 'save' && 'Could not save organization name.'}
+              {error === 'delete' && 'Could not delete organization.'}
+            </StyledText>
             <StyledButton
               htmlType="submit"
               color="lightBlue"
