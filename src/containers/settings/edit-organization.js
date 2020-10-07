@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Space } from 'antd';
 import styled from 'styled-components';
 
-import { requestUserOrganizations } from 'services';
-import { updateUserProfile, updateUserAvatar } from 'actions/user';
+import { requestUpdateOrganization } from 'services';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
-import EditOutlined from 'icons/EditOutlined.js';
-import DeleteOutlined from 'icons/DeleteOutlined.js';
+import EditOutlined from 'icons/EditOutlined';
+import DeleteOutlined from 'icons/DeleteOutlined';
 import colors from 'styles/colors';
 
 const StyledForm = styled.form`
@@ -51,46 +49,62 @@ const FormMessage = styled.div`
 
 const EditOrganization = () => {
   const [selectedOrganization, setSelectedOrganization] = useState(null);
-  const [selectedOrganizationName, setSelectedOrganizationName] = useState('');
+  const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const profile = useSelector((state) => state.user.profile);
-  const dispatch = useDispatch();
 
   if (!profile) return null;
 
-  const onOrganizationClick = (organizationName) => {
-    setSelectedOrganization(organizationName);
+  const onOrganizationClick = (organizationUUID) => {
+    setSelectedOrganization(organizationUUID);
   };
 
   const setOrganizationName = (e) => {
     setSelectedOrganizationName(e.target.value);
   };
 
-  const onSaveClicked = () => {
+  const onSaveClicked = (e) => {
+    e.preventDefault();
+    setLoading(true);
 
+    if (!loading) {
+      requestUpdateOrganization(selectedOrganization, selectedOrganizationName)
+        .then(() => {
+          setSelectedOrganization(null);
+          setSelectedOrganizationName(null);
+          setError(false);
+          setLoading(false);
+        })
+        .catch(() => {
+          setError(true);
+          setLoading(false);
+        });
+    }
   };
 
   return (
     <StyledForm onSubmit={onSaveClicked}>
       {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
         <>
-          <label key={org.name} htmlFor={org.name}>
+          <label key={org.uuid} htmlFor={org.uuid}>
             <StyledText display="block" color="darkText">{org.name}</StyledText>
             <StyledInput
               type="text"
               bgcolor="white"
               size="large"
-              className={org.name === selectedOrganization ? '' : 'unfocusable'}
-              name={org.name}
-              id={org.name}
+              className={org.uuid === selectedOrganization ? '' : 'unfocusable'}
+              name={org.uuid}
+              id={org.uuid}
               value={org.name}
               tabIndex={-1}
               onChange={setOrganizationName}
-              onClick={() => onOrganizationClick(org.name)}
+              onClick={() => onOrganizationClick(org.uuid)}
             />
-            {org.name !== selectedOrganization && <EditOutlined />}
-            {org.name === selectedOrganization && <DeleteOutlined />}
+            {org.uuid !== selectedOrganization && <EditOutlined />}
+            {org.uuid === selectedOrganization && <DeleteOutlined />}
           </label>
-          {org.name === selectedOrganization && (
+          {org.uuid === selectedOrganization && (
           <FormMessage>
             <StyledButton
               htmlType="submit"
