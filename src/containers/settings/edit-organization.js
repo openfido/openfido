@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { requestUpdateOrganization } from 'services';
+import { getUserOrganizations } from 'actions/user';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
 import EditOutlined from 'icons/EditOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
@@ -78,6 +79,7 @@ const EditOrganization = () => {
           setSelectedOrganizationName(null);
           setError(false);
           setLoading(false);
+          dispatch(getUserOrganizations(profile.uuid));
         })
         .catch(() => {
           setError(true);

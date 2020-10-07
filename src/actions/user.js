@@ -206,3 +206,13 @@ export const changePassword = (user_uuid, old_password, password) => async (disp
       });
     });
 };
+
+export const getUserOrganizations = (user_uuid) => (dispatch) => {
+  requestUserOrganizations(user_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: response.data,
+      });
+    });
+};
