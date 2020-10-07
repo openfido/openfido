@@ -54,7 +54,7 @@ const MainMenu = () => {
   const selectedKeys = [];
   if (path.includes(ROUTE_PIPELINES)) selectedKeys.push('pipelines');
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
-  if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('jobs');
+  if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('settings');
 
   const isSystemAdmin = profile.is_system_admin;
   const hasOrganizations = profile.organizations && profile.organizations.length;

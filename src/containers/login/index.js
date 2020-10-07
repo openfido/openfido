@@ -77,7 +77,7 @@ const Login = () => {
           htmlType="submit"
           size="middle"
           color="blue"
-          width={100}
+          width={108}
           role="button"
           tabIndex={0}
           onClick={onLoginClicked}

@@ -205,9 +205,8 @@ export const StyledButton = styled(Button)`
     height: auto;
     font-weight: 400;
     border-radius: 3px;
-    padding: 8px 12px;
-    padding: 0.5rem 0.75rem;
-    padding: 5px 8px;
+    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
@@ -238,10 +237,6 @@ export const StyledButton = styled(Button)`
     background-color: transparent;
   }
   `) : (`
-  padding: 8px 12px;
-  &.ant-btn-sm {
-    padding: 5px 8px;
-  }
   &, &:hover, &:focus {
     background-color: ${(color in colors ? colors[color] : 'transparent')};
     color: ${(color in colors ? colors.lightGrey : colors.blue)};

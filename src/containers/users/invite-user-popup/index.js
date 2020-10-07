@@ -102,7 +102,6 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
         </FormMessage>
         <StyledButton
           htmlType="submit"
-          color="blue"
           size="middle"
           color="blue"
           width={108}
