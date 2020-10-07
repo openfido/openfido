@@ -141,7 +141,7 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
             >
               Enter your email address and we will send you a link to reset your password
             </ResetPasswordText>
-            <StyledInput placeholder="EMAIL" onChange={onEmailChanged} />
+            <StyledInput placeholder="email" onChange={onEmailChanged} />
             <FormMessage>
               {error && (
               <ErrorText

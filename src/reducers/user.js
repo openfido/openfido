@@ -63,17 +63,20 @@ export default (state = DEFAULT_STATE, action) => {
       Auth.logoutUser();
       return {
         ...DEFAULT_STATE,
+        profile: null,
         authInProgress: true,
       };
     case AUTH_FAILED:
       return {
         ...DEFAULT_STATE,
+        profile: null,
         authError: action.payload,
       };
     case LOGOUT_USER:
       Auth.logoutUser();
       return {
         ...DEFAULT_STATE,
+        profile: null,
       };
     case GET_USER_PROFILE: {
       const { organizations } = action.payload;

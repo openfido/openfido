@@ -55,10 +55,10 @@ const Login = () => {
         OpenFIDO
       </StyledH1>
       <StyledForm onSubmit={onLoginClicked}>
-        <StyledH2>Sign In</StyledH2>
-        <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
-        <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
-        <FormMessage>
+        <StyledH2>SIGN IN</StyledH2>
+        <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
+        <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
+        <FormMessage size="large">
           <StyledText
             size="middle"
             color="pink"
