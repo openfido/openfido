@@ -30,17 +30,6 @@ export const StyledH2 = styled.h2`
   color: ${colors.blue};
 `;
 
-/*const StyledH2 = styled.h2`
-  font-size: 20px;
-  font-size: 1.25rem;
-  line-height: 24px;
-  line-height: 1.5rem;
-  color: ${colors.blue};
-  text-transform: uppercase;
-  margin-bottom: 40px;
-  margin-bottom: 2.5rem;
-`;*/
-
 export const StyledForm = styled.form`
   position: relative;
   width: 390px;
@@ -51,8 +40,22 @@ export const StyledForm = styled.form`
   background-color: ${colors.white};
   text-align: left;
   border-radius: 3px;
-  label span {
-    line-height: 2.5rem;
+  label {
+    display: inline-block;
+    margin-top: 16px;
+    margin-top: 1rem;
+    &:not(:last-of-type) {
+      margin-bottom: 16px;
+      margin-bottom: 16px;
+    }
+    input {
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+    span {
+      line-height: 2.5rem;
+    }
   }
   .anticon {
     top: 16px;
@@ -91,10 +94,16 @@ export const StyledInput = styled.input`
     margin-bottom: 16px;
     margin-bottom: 16px;
   }
+  &:last-of-type {
+    margin-bottom: 0;
+  }
 `;
 
 export const FormMessage = styled.div`
-  ${({ size }) => size === 'large' ? (`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  ${({ size }) => (size === 'large' ? (`
   padding: 0.75rem 0 2.25rem 0;
   height: 2.5rem;
   font-size: 14px;
@@ -105,5 +114,5 @@ export const FormMessage = styled.div`
   line-height: 14px;
   height: 18px;
   height: 1.125rem;
-  `)}
+  `))}
 `;
