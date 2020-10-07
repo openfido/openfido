@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { requestUpdateOrganization, requestDeleteOrganization } from 'services';
+import {
+  requestCreateOrganization,
+  requestUpdateOrganization,
+  requestDeleteOrganization,
+} from 'services';
 import { getUserOrganizations } from 'actions/user';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
 import EditOutlined from 'icons/EditOutlined';
@@ -56,14 +60,24 @@ const FormMessage = styled.div`
 `;
 
 const EditOrganization = () => {
+  const createOrganizationInput = useRef();
+
   const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
   const [selectedInput, setSelectedInput] = useState(null);
+  const [addOrganization, setAddOrganization] = useState(false);
+  const [addOrganizationName, setAddOrganizationName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const profile = useSelector((state) => state.user.profile);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (addOrganization && createOrganizationInput.current) {
+      createOrganizationInput.current.focus();
+    }
+  }, [createOrganizationInput, addOrganization]);
 
   if (!profile) return null;
 
@@ -77,25 +91,45 @@ const EditOrganization = () => {
     setSelectedOrganizationName(e.target.value);
   };
 
+  const onAddOrganizationClicked = () => {
+    setAddOrganization(true);
+  };
+
   const onSaveClicked = (e) => {
     e.preventDefault();
 
     if (!loading) {
       setLoading(true);
-      requestUpdateOrganization(selectedOrganization, selectedOrganizationName)
-        .then(() => {
-          setSelectedOrganization(null);
-          setSelectedOrganizationName(null);
-          setError(null);
-          setLoading(false);
-          if (selectedInput) selectedInput.blur();
-          setSelectedInput(null);
-          dispatch(getUserOrganizations(profile.uuid));
-        })
-        .catch(() => {
-          setError('save');
-          setLoading(false);
-        });
+
+      if (addOrganization) {
+        requestCreateOrganization(addOrganizationName)
+          .then(() => {
+            setError(null);
+            setLoading(false);
+            setAddOrganization(false);
+            setAddOrganizationName(null);
+            dispatch(getUserOrganizations(profile.uuid));
+          })
+          .catch(() => {
+            setError('add');
+            setLoading(false);
+          });
+      } else {
+        requestUpdateOrganization(selectedOrganization, selectedOrganizationName)
+          .then(() => {
+            setSelectedOrganization(null);
+            setSelectedOrganizationName(null);
+            setError(null);
+            setLoading(false);
+            if (selectedInput) selectedInput.blur();
+            setSelectedInput(null);
+            dispatch(getUserOrganizations(profile.uuid));
+          })
+          .catch(() => {
+            setError('save');
+            setLoading(false);
+          });
+      }
     }
   };
 
@@ -121,6 +155,43 @@ const EditOrganization = () => {
 
   return (
     <StyledForm onSubmit={onSaveClicked}>
+      <StyledButton
+        color="gray80"
+        hoverbgcolor="lightBlue"
+        onClick={onAddOrganizationClicked}
+        width={136}
+      >
+        + Add Organization
+      </StyledButton>
+      {addOrganization && (
+      <label htmlFor="organization_name">
+        <StyledText display="block" color="darkText">Create Organization</StyledText>
+        <StyledInput
+          ref={createOrganizationInput}
+          type="text"
+          bgcolor="white"
+          size="large"
+          name="organization_name"
+          id="organization_name"
+          value={addOrganizationName}
+          onChange={(e) => setAddOrganizationName(e.target.value)}
+        />
+        <FormMessage>
+          <StyledText color="pink">
+            {error === 'add' && 'Could add organization.'}
+          </StyledText>
+          <StyledButton
+            htmlType="submit"
+            color="lightBlue"
+            hoverbgcolor="blue"
+            width={50}
+            onClick={onSaveClicked}
+          >
+            <span>Save</span>
+          </StyledButton>
+        </FormMessage>
+      </label>
+      )}
       {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
         <label
           key={org.uuid}
