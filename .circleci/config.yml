@@ -25,7 +25,7 @@ jobs:
       - run:
           command: |
             mkdir test-results
-            pipenv run invoke test --junit
+            pipenv run invoke test --junit --enforce-percent 100
       - store_test_results:
           path: test-results
       - run:
