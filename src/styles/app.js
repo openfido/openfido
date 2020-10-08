@@ -222,8 +222,6 @@ export const StyledButton = styled(Button)`
     line-height: 19px;
     font-weight: 500;
     border-radius: 2px;
-    padding: 8px 12px;
-    padding: 0.5rem 0.75rem;
     height: 50px;
     height: 3.125rem;
   }

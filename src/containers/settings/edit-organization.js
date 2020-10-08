@@ -5,13 +5,13 @@ import styled from 'styled-components';
 import {
   requestCreateOrganization,
   requestUpdateOrganization,
-  requestDeleteOrganization,
 } from 'services';
 import { getUserOrganizations } from 'actions/user';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
 import EditOutlined from 'icons/EditOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import colors from 'styles/colors';
+import DeleteOrganizationPopup from './delete-organization-popup';
 
 const StyledForm = styled.form`
   display: grid;
@@ -67,21 +67,20 @@ const EditOrganization = () => {
   const [selectedInput, setSelectedInput] = useState(null);
   const [addOrganization, setAddOrganization] = useState(false);
   const [addOrganizationName, setAddOrganizationName] = useState(null);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const profile = useSelector((state) => state.user.profile);
   const dispatch = useDispatch();
 
-  const resetSelection = (e) => {
-    if (e.target.className && e.target.className.match && !e.target.className.match(/organizationClickTarget/)) {
-      setSelectedOrganization(null);
-      setSelectedOrganizationName(null);
-      setAddOrganization(false);
-      setAddOrganizationName(null);
-      setError(null);
-      setLoading(false);
-    }
+  const resetSelection = () => {
+    setSelectedOrganization(null);
+    setSelectedOrganizationName(null);
+    setAddOrganization(false);
+    setAddOrganizationName(null);
+    setError(null);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -105,6 +104,9 @@ const EditOrganization = () => {
   if (!profile) return null;
 
   const onOrganizationClick = (e, organizationUUID, organizationName) => {
+    setError(null);
+    setLoading(false);
+    setAddOrganization(false);
     setSelectedOrganization(organizationUUID);
     setSelectedOrganizationName(organizationName);
     setSelectedInput(e.target);
@@ -115,7 +117,11 @@ const EditOrganization = () => {
   };
 
   const onAddOrganizationClicked = () => {
+    setError(null);
+    setLoading(false);
     setAddOrganization(true);
+    setSelectedOrganization(null);
+    setSelectedOrganizationName(null);
   };
 
   const onSaveClicked = (e) => {
@@ -156,107 +162,106 @@ const EditOrganization = () => {
     }
   };
 
-  const onDeleteClicked = () => {
-    if (!loading) {
-      setLoading(true);
-      requestDeleteOrganization(selectedOrganization)
-        .then(() => {
-          setSelectedOrganization(null);
-          setSelectedOrganizationName(null);
-          setError(null);
-          setLoading(false);
-          if (selectedInput) selectedInput.blur();
-          setSelectedInput(null);
-          dispatch(getUserOrganizations(profile.uuid));
-        })
-        .catch(() => {
-          setError('delete');
-          setLoading(false);
-        });
-    }
+  const onPermanentlyDeleteClicked = () => {
+    setSelectedOrganization(null);
+    setSelectedOrganizationName(null);
+    setError(null);
+    setLoading(false);
+    setSelectedInput(null);
+    dispatch(getUserOrganizations(profile.uuid));
   };
 
+  const closeDeletePopup = () => setShowDeletePopup(false);
+
   return (
-    <StyledForm onSubmit={onSaveClicked} autoComplete="off">
-      <StyledButton
-        color="gray80"
-        hoverbgcolor="lightBlue"
-        onClick={onAddOrganizationClicked}
-        width={136}
-      >
-        + Add Organization
-      </StyledButton>
-      {addOrganization && (
-      <label htmlFor="organization_name">
-        <StyledText display="block" color="darkText">Create Organization</StyledText>
-        <StyledInput
-          ref={createOrganizationInput}
-          type="text"
-          bgcolor="white"
-          size="large"
-          name="organization_name"
-          id="organization_name"
-          value={addOrganizationName}
-          onChange={(e) => setAddOrganizationName(e.target.value)}
-        />
-        <FormMessage>
-          <StyledText color="pink">
-            {error === 'add' && 'Could add organization.'}
-          </StyledText>
-          <StyledButton
-            htmlType="submit"
-            color="lightBlue"
-            hoverbgcolor="blue"
-            width={50}
-            onClick={onSaveClicked}
-          >
-            <span>Save</span>
-          </StyledButton>
-        </FormMessage>
-      </label>
-      )}
-      {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
-        <label
-          key={org.uuid}
-          htmlFor={org.uuid}
-          className="organizationClickTarget"
+    <>
+      <StyledForm onSubmit={onSaveClicked} autoComplete="off" onClick={(e) => e.stopPropagation()}>
+        <StyledButton
+          color="gray80"
+          hoverbgcolor="lightBlue"
+          onClick={onAddOrganizationClicked}
+          width={136}
         >
-          <StyledText className="organizationClickTarget" display="block" color="darkText">{org.name}</StyledText>
+          + Add Organization
+        </StyledButton>
+        {addOrganization && (
+        <label htmlFor="organization_name">
+          <StyledText display="block" color="darkText">Create Organization</StyledText>
           <StyledInput
+            ref={createOrganizationInput}
             type="text"
             bgcolor="white"
             size="large"
-            className={`organizationClickTarget ${org.uuid === selectedOrganization ? '' : ' unfocusable'}`}
-            name={org.uuid}
-            id={org.uuid}
-            value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
-            tabIndex={-1}
-            onChange={setOrganizationName}
-            onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
+            name="organization_name"
+            id="organization_name"
+            value={addOrganizationName}
+            onChange={(e) => setAddOrganizationName(e.target.value)}
           />
-          {org.uuid !== selectedOrganization && <EditOutlined className="organizationClickTarget" />}
-          {org.uuid === selectedOrganization && <DeleteOutlined className="organizationClickTarget" onClick={onDeleteClicked} />}
-          {org.uuid === selectedOrganization && (
-          <FormMessage className="organizationClickTarget">
-            <StyledText className="organizationClickTarget" color="pink">
-              {error === 'save' && 'Could not save organization name.'}
-              {error === 'delete' && 'Could not delete organization.'}
+          <FormMessage>
+            <StyledText color="pink">
+              {error === 'add' && 'Could add organization.'}
             </StyledText>
             <StyledButton
               htmlType="submit"
               color="lightBlue"
               hoverbgcolor="blue"
-              className="organizationClickTarget"
               width={50}
               onClick={onSaveClicked}
             >
-              <span className="organizationClickTarget">Save</span>
+              <span>Save</span>
             </StyledButton>
           </FormMessage>
-          )}
         </label>
-      ))}
-    </StyledForm>
+        )}
+        {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
+          <label
+            key={org.uuid}
+            htmlFor={org.uuid}
+          >
+            <StyledText display="block" color="darkText">{org.name}</StyledText>
+            <StyledInput
+              type="text"
+              bgcolor="white"
+              size="large"
+              className={org.uuid === selectedOrganization ? '' : ' unfocusable'}
+              name={org.uuid}
+              id={org.uuid}
+              value={org.uuid === selectedOrganization ? selectedOrganizationName : org.name}
+              tabIndex={-1}
+              onChange={setOrganizationName}
+              onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
+            />
+            {org.uuid !== selectedOrganization && <EditOutlined />}
+            {org.uuid === selectedOrganization && <DeleteOutlined onClick={() => setShowDeletePopup(true)} />}
+            {org.uuid === selectedOrganization && (
+            <FormMessage>
+              <StyledText color="pink">
+                {error === 'save' && 'Could not save organization name.'}
+                {error === 'delete' && 'Could not delete organization.'}
+              </StyledText>
+              <StyledButton
+                htmlType="submit"
+                color="lightBlue"
+                hoverbgcolor="blue"
+                width={50}
+                onClick={onSaveClicked}
+              >
+                <span>Save</span>
+              </StyledButton>
+            </FormMessage>
+            )}
+          </label>
+        ))}
+      </StyledForm>
+      {showDeletePopup && (
+      <DeleteOrganizationPopup
+        handleOk={onPermanentlyDeleteClicked}
+        handleCancel={closeDeletePopup}
+        organizationUUID={selectedOrganization}
+        organizationName={selectedOrganizationName}
+      />
+      )}
+    </>
   );
 };
 
