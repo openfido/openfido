@@ -183,7 +183,7 @@ const EditOrganization = () => {
           onClick={onAddOrganizationClicked}
           width={136}
         >
-          + Add Organization
+          <label htmlFor="organization_name">+ Add Organization</label>
         </StyledButton>
         {addOrganization && (
         <label htmlFor="organization_name">

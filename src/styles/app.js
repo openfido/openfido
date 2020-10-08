@@ -179,7 +179,11 @@ export const StyledButton = styled(Button)`
     border-radius: 3px;
     padding: 0;
     height: auto;
-    label, span {
+    span {
+      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
+    }
+    label {
       cursor: pointer;
       padding: 3px 8px;
       padding: 0.1875rem 0.5rem;
@@ -205,8 +209,6 @@ export const StyledButton = styled(Button)`
     height: auto;
     font-weight: 400;
     border-radius: 3px;
-    padding: 4px 8px;
-    padding: 0.25rem 0.5rem;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
