@@ -1,5 +1,6 @@
 import flask
 from unittest.mock import patch
+from requests import HTTPError
 
 from app.utils import validate_organization
 from .conftest import JWT_TOKEN, USER_UUID
@@ -58,3 +59,12 @@ def test_validate_organization(in_org_mock, app):
         assert flask.g.organization_uuid == 12
         assert flask.g.user_uuid == USER_UUID
         assert flask.g.jwt_token == JWT_TOKEN
+
+    in_org_mock.reset_mock()
+    in_org_mock.side_effect = HTTPError()
+    headers["Authorization"] = f"Bearer {JWT_TOKEN}"
+    # If the auth server is failing, return a 503
+    with app.test_request_context("/a/view", headers=headers):
+        message, status = a_view(organization_uuid=12)
+        assert status == 503
+        assert in_org_mock.called

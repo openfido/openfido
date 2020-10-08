@@ -2,11 +2,12 @@ import logging
 import re
 from enum import IntEnum, unique
 from functools import wraps
-from jwt.exceptions import DecodeError
 
 import jwt
 from application_roles.decorators import make_permission_decorator
 from flask import g, request
+from jwt.exceptions import DecodeError
+from requests import HTTPError
 
 from .services import fetch_is_user_in_org
 
@@ -68,6 +69,9 @@ def validate_organization():
                     }, 404
 
                 return view(*args, **kwargs)
+            except HTTPError:
+                logger.warning("Failing to access auth server")
+                return {}, 503
             except DecodeError:
                 logger.warning("unable to decode JWT")
                 return {}, 401

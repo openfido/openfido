@@ -37,11 +37,14 @@ docker-compose which files to use, and where each project is:
     # Initialize all the databases for all the services:
     docker-compose run --rm auth_service flask db upgrade
     docker-compose run --rm workflow_service flask db upgrade 
-    docker-compose run --rm app_service flask db
+    docker-compose run --rm app_service flask db upgrade
 
     # Configure the workflow service access tokens:
     docker-compose run --rm workflow_service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > $WORKFLOW_DIR/.worker-env
     docker-compose run --rm workflow_service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .env
+
+    # Configure an application key to use this service!
+    docker-compose run --rm app_service invoke create-application-key -n "react client" -p REACT_CLIENT
 
     # bring up all the services!
     docker-compose up

@@ -54,11 +54,11 @@ def create_application_key(c, name, permission):
     permission = permission to support.
     """
     from app import create_app
-    from roles.services import create_application
-    from app.model_utils import SystemPermissionEnum
+    from application_roles.services import create_application
+    from app.utils import ApplicationsEnum
 
-    (app, db, _, _) = create_app()
+    (app, db, _) = create_app()
     with app.app_context():
-        application = create_application(name, SystemPermissionEnum[permission])
+        application = create_application(name, ApplicationsEnum[permission])
         db.session.commit()
         print(f"API_TOKEN={application.api_key}")

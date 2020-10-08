@@ -8,6 +8,23 @@ from application_roles.decorators import ROLES_KEY
 from ..conftest import JWT_TOKEN, ORGANIZATION_UUID, USER_UUID
 
 
+def test_pipelines_no_roles_provided(app, client, client_application):
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines",
+        content_type="application/json",
+    )
+    assert result.status_code == 401
+
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+        },
+    )
+    assert result.status_code == 401
+
+
 @responses.activate
 def test_pipelines_backing_error(app, client, client_application):
     responses.add(

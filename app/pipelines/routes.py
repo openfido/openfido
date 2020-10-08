@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, jsonify
 from requests import HTTPError
 
-from app.utils import validate_organization
+from app.utils import validate_organization, any_application_required
 
 from .services import fetch_pipelines
 
@@ -13,6 +13,7 @@ organization_pipeline_bp = Blueprint("organization-pipelines", __name__)
 
 
 @organization_pipeline_bp.route("/<organization_uuid>/pipelines", methods=["GET"])
+@any_application_required
 @validate_organization()
 def pipelines(organization_uuid):
     """List all Organization Pipelines.
