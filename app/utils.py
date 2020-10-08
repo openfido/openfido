@@ -63,13 +63,14 @@ def validate_organization():
                     kwargs["organization_uuid"], g.jwt_token, g.user_uuid
                 ):
                     logger.warning("Could not find organization")
-                    return {"message": "Unable to find organization by uuid provided"}, 404
+                    return {
+                        "message": "Unable to find organization by uuid provided"
+                    }, 404
 
                 return view(*args, **kwargs)
             except DecodeError:
                 logger.warning("unable to decode JWT")
                 return {}, 401
-
 
         return wrapper
 

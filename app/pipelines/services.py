@@ -21,7 +21,7 @@ def fetch_pipelines(organization_uuid):
 
     organization_pipelines = find_organization_pipelines(organization_uuid)
 
-    # TODO timeouts
+    # TODO timeouts - enforce a strict timeout.
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/search",
         headers={
@@ -36,7 +36,7 @@ def fetch_pipelines(organization_uuid):
         response.raise_for_status()
 
         return json_value
-    except ValueError:
-        raise HTTPError("Non JSON payload returned")
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(json_value)
+        raise ValueError(json_value) from http_error

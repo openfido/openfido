@@ -1,13 +1,10 @@
 import logging
-import json
 
-from flask import Blueprint, g, jsonify, request
-from marshmallow.exceptions import ValidationError
+from flask import Blueprint, jsonify
 from requests import HTTPError
 
 from app.utils import validate_organization
 
-from .models import db
 from .services import fetch_pipelines
 
 logger = logging.getLogger("organization-pipelines")
