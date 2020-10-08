@@ -107,7 +107,7 @@ const DeleteOrganizationPopup = ({
   };
 
   const onPermanentlyDeleteClicked = () => {
-    if (deleteName === organizationName && !loading) {
+    if (deleteName === organizationName && confirmDelete && !loading) {
       setLoading(true);
       requestDeleteOrganization(organizationUUID)
         .then(() => {
