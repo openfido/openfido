@@ -169,6 +169,7 @@ const EditOrganization = () => {
     setLoading(false);
     setSelectedInput(null);
     dispatch(getUserOrganizations(profile.uuid));
+    setShowDeletePopup(false);
   };
 
   const closeDeletePopup = () => setShowDeletePopup(false);

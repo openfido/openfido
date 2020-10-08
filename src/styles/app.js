@@ -214,7 +214,7 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor, size,
+    type, color, width, height, hoverbgcolor, size, textColor,
   }) => (`
   ${size === 'middle' ? (`
   &.ant-btn {
@@ -269,16 +269,19 @@ export const StyledButton = styled(Button)`
   ${height ? (`
   height: ${height}px;
   `) : ''}
+  ${textColor in colors ? (`
+  color: ${colors[textColor]};
+  `) : ''}
   `)}
 `;
 
 export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
-  padding: 16px 12px;
-  background-color: ${colors.darkOverlay};
+  padding: 12px;
+  background-color: ${colors.lightBg};
   &, &:hover:focus {
-    color: ${colors.darkText};
+    color: ${colors.gray};
   }
   &:hover {
     &, &::placeholder {

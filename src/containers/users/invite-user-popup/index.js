@@ -23,7 +23,7 @@ const Modal = styled(StyledModal)`
     line-height: 2rem;
     margin-bottom: 32px;
   }
-  .anticon {
+  .anticon-close-outlined {
     top: 18px;
     right: 18px;
   }

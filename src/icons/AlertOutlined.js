@@ -12,7 +12,7 @@ const AlertOutlined = ({ color, onClick }) => {
   );
 
   return (
-    <StyledIcon component={AlertOutlinedSVG} onClick={onClick} className="anticon-delete-outlined" />
+    <StyledIcon component={AlertOutlinedSVG} onClick={onClick} />
   );
 };
 
