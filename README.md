@@ -35,7 +35,7 @@ docker-compose which files to use, and where each project is:
     vi $AUTH_DIR/.env
 
     # Initialize all the databases for all the services:
-    docker-compose run --rm auth_web flask db upgrade
+    docker-compose run --rm auth_service flask db upgrade
     docker-compose run --rm workflow_service flask db upgrade 
     docker-compose run --rm app_service flask db
 

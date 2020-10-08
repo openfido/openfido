@@ -19,7 +19,7 @@ services:
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://workflow_storage:9000
-      AUTH_HOSTNAME: http://auth_web:5000
+      AUTH_HOSTNAME: http://auth_service:5000
       WORKFLOW_HOSTNAME: http://workflow_service:5000
     volumes:
       - ${APP_DIR:-.}:/opt/app:delegated
@@ -28,5 +28,5 @@ services:
     depends_on:
       - app_db
       - workflow_storage
-      - auth_web
+      - auth_service
       - workflow_service
