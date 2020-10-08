@@ -58,31 +58,28 @@ export const loginUser = (email, password) => async (dispatch) => {
         payload: response.data,
       });
 
-      const { uuid } = response.data;
-      return requestUserProfile(uuid);
+      const { uuid: user_uuid } = response.data;
+
+      return Promise.all([
+        requestUserProfile(user_uuid),
+        requestUserOrganizations(user_uuid),
+        requestUserAvatar(user_uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
       });
 
-      const { uuid } = response.data;
-      return requestUserOrganizations(uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_ORGANIZATIONS,
-        payload: response.data,
+        payload: organizationsResponse.data,
       });
 
-      const { uuid } = response.data;
-      return requestUserAvatar(uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_AVATAR,
-        payload: response.data,
+        payload: avatarResponse.data,
       });
     })
     .catch((err) => {
@@ -101,28 +98,26 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         payload: response.data,
       });
 
-      return requestUserProfile(user_uuid);
+      return Promise.all([
+        requestUserProfile(user_uuid),
+        requestUserOrganizations(user_uuid),
+        requestUserAvatar(user_uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
       });
 
-      return requestUserOrganizations(user_uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_ORGANIZATIONS,
-        payload: response.data,
+        payload: organizationsResponse.data,
       });
 
-      return requestUserAvatar(user_uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_AVATAR,
-        payload: response.data,
+        payload: avatarResponse.data,
       });
     })
     .catch(() => {
