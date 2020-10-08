@@ -1,66 +1,66 @@
 version: '3'
 services:
-  queue:
+  workflow_queue:
     image: rabbitmq:3
     environment:
       RABBITMQ_DEFAULT_USER: rabbit-user
       RABBITMQ_DEFAULT_PASS: rabbit-password
       RABBITMQ_DEFAULT_VHOST: api-queue
-  db:
+  workflow_db:
     image: postgres:11
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
-  storage:
+  workflow_storage:
     image: minio/minio
     command: server /data
     environment:
       MINIO_ACCESS_KEY: minio_access_key
       MINIO_SECRET_KEY: minio123
     volumes:
-      - ./uploads:/data:delegated
+      - ${WORKFLOW_DIR:-.}/uploads:/data:delegated
     ports:
       - "9000:9000"
-  api:
-    build: .
+  workflow_service:
+    build: ${WORKFLOW_DIR:-.}
     image: presencepg/presence-workflow
     command: flask run -h 0.0.0.0
     environment:
       PGDATABASE: workflowservice
       PGUSER: postgres
-      PGHOST: db
+      PGHOST: workflow_db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@db/workflowservice
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
-      S3_ENDPOINT_URL: http://storage:9000
+      S3_ENDPOINT_URL: http://workflow_storage:9000
     volumes:
-      - .:/opt/app:delegated
+      - ${WORKFLOW_DIR:-.}:/opt/app:delegated
     ports:
-      - "5000:5000"
+      - "${WORKFLOW_PORT:-5000}:5000"
     depends_on:
-      - db
-      - queue
-      - storage
-  worker:
+      - workflow_db
+      - workflow_queue
+      - workflow_storage
+  workflow_worker:
     build:
-      context: .
+      context: ${WORKFLOW_DIR:-.}
       dockerfile: Dockerfile.worker
     image: presencepg/presence-workflow-worker
     command: celery -A app.worker worker -l DEBUG
     environment:
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@queue/api-queue
-      WORKER_API_SERVER: http://api:5000
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      WORKER_API_SERVER: http://workflow_service:${WORKFLOW_PORT:-5000}
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
-      S3_ENDPOINT_URL: http://storage:9000
+      S3_ENDPOINT_URL: http://workflow_storage:9000
     env_file:
-      - .worker-env
+      - ${WORKFLOW_DIR:-.}/.worker-env
     volumes:
-      - .:/opt/app:delegated
+      - ${WORKFLOW_DIR:-.}:/opt/app:delegated
       - /var/run/docker.sock:/var/run/docker.sock
       # The 'docker in docker' nature of this local configuration means that
       # bind mounts happen on the 'host docker' not the first docker container.
@@ -68,6 +68,6 @@ services:
       # found).
       - /tmp:/tmp
     depends_on:
-      - queue
-      - api
-      - storage
+      - workflow_queue
+      - workflow_service
+      - workflow_storage
