@@ -12,7 +12,7 @@ const StyledForm = styled.form`
   display: grid;
   grid-gap: 16px;
   grid-gap: 1rem;
-  width: 432px;
+  max-width: 432px;
   button[type="submit"] {
     margin-top: 32px;
     margin-top: 2rem;

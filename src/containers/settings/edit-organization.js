@@ -17,7 +17,7 @@ const StyledForm = styled.form`
   display: grid;
   grid-gap: 16px;
   grid-gap: 1rem;
-  width: 432px;
+  max-width: 432px;
   label {
     position: relative;
     cursor: pointer;
