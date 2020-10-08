@@ -232,12 +232,3 @@ DeleteOrganizationPopup.propTypes = {
 };
 
 export default DeleteOrganizationPopup;
-
-/*
-<form onSubmit={onInviteClicked}>
-<StyledInput shape="round" placeholder="email address" onChange={onEmailChanged} />
-<FormMessage>
-<StyledText color="pink">
-{inviteOrganizationMemberError && 'Invitation could not be sent.'}
-</StyledText>
-</FormMessage> */
