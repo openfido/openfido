@@ -41,11 +41,13 @@ const EditProfile = () => {
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
-    if (newPassword === confirmPassword) {
-      dispatch(changePassword(profile.uuid, oldPassword, newPassword));
-      setPasswordMismatch(false);
-    } else {
-      setPasswordMismatch(true);
+    if (!changePasswordInProgress) {
+      if (newPassword === confirmPassword) {
+        dispatch(changePassword(profile.uuid, oldPassword, newPassword));
+        setPasswordMismatch(false);
+      } else {
+        setPasswordMismatch(true);
+      }
     }
   };
 
@@ -114,7 +116,6 @@ const EditProfile = () => {
           width={128}
           role="button"
           tabIndex={0}
-          loading={changePasswordInProgress}
           onClick={onChangePasswordClicked}
         >
           Update Profile
