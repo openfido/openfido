@@ -8,10 +8,11 @@ def fetch_is_user_in_org(organization_uuid, jwt_token, user_uuid):
     # TODO exception?
     response = requests.get(
         f"{current_app.config[AUTH_HOSTNAME]}/users/{user_uuid}/organizations",
-        headers={"Content-Type": "application/json",
-                 "Authorization": f"Bearer {jwt_token}"
-                 },
-        json={"uuid": user_uuid}
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {jwt_token}",
+        },
+        json={"uuid": user_uuid},
     )
     response.raise_for_status()
 

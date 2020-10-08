@@ -2,6 +2,7 @@ import logging
 import re
 from enum import IntEnum, unique
 from functools import wraps
+from jwt.exceptions import DecodeError
 
 import jwt
 from application_roles.decorators import make_permission_decorator
@@ -30,6 +31,7 @@ def validate_organization():
     Note: assumes that the method called has <organization_uuid> as the first
     argument in its route pattern, and is the first parameter.
 
+    Assigns g.organization_uuid to the organization uuid
     Assigns g.jwt_token on success to JWT token.
     Assigns g.user_uuid on success to user's uuid decoded from JWT token.
     """
@@ -41,24 +43,33 @@ def validate_organization():
                 logger.warning("invalid content type")
                 return {"message": "application/json content-type is required."}, 400
 
+            if "Authorization" not in request.headers:
+                logger.warning("No Authorization header supplied")
+                return {}, 401
+
             matches = re.match(r"^Bearer (\S+)$", request.headers["Authorization"])
             if not matches:
                 logger.warning("invalid bearer token format")
                 return {}, 401
 
             g.jwt_token = matches.group(1)
-            decoded_token = jwt.decode(g.jwt_token, verify=False)
-            if not decoded_token:
+            try:
+                decoded_token = jwt.decode(g.jwt_token, verify=False)
+
+                g.user_uuid = decoded_token["uuid"]
+                g.organization_uuid = kwargs["organization_uuid"]
+
+                if not fetch_is_user_in_org(
+                    kwargs["organization_uuid"], g.jwt_token, g.user_uuid
+                ):
+                    logger.warning("Could not find organization")
+                    return {"message": "Unable to find organization by uuid provided"}, 404
+
+                return view(*args, **kwargs)
+            except DecodeError:
                 logger.warning("unable to decode JWT")
                 return {}, 401
 
-            g.user_uuid = decoded_token["uuid"]
-
-            if not fetch_is_user_in_org(kwargs["organization_uuid"], g.jwt_token, g.user_uuid):
-                logger.warning("Could not find organization")
-                return {"message": "Unable to find organization by uuid provided"}, 404
-
-            return view(*args, **kwargs)
 
         return wrapper
 

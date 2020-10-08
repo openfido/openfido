@@ -1,10 +1,10 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 from app.pipelines.services import fetch_pipelines
 from application_roles.decorators import ROLES_KEY
 
-from ..conftest import JWT_TOKEN, ORGANIZATION_UUID, USER_UUID
+from ..conftest import ORGANIZATION_UUID
 
 
 @patch("app.pipelines.services.requests.post")

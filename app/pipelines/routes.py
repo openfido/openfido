@@ -1,8 +1,11 @@
 import logging
+import json
 
-from app.utils import validate_organization
 from flask import Blueprint, g, jsonify, request
 from marshmallow.exceptions import ValidationError
+from requests import HTTPError
+
+from app.utils import validate_organization
 
 from .models import db
 from .services import fetch_pipelines
@@ -74,5 +77,7 @@ def pipelines(organization_uuid):
     """
     try:
         return jsonify(fetch_pipelines(organization_uuid))
-    except ValueError:
-        return {"message": "Unable to list pipeline"}, 400
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
