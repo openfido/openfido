@@ -27,8 +27,8 @@ const DeleteColumn = styled.div`
   position: relative;
   .anticon {
     left: 0;
-    top: -14px;
-    top: -0.875rem;
+    top: -10px;
+    top: -0.625rem;
   }
 `;
 
