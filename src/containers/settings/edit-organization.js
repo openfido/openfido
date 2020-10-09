@@ -66,6 +66,7 @@ const EditOrganization = () => {
   const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [selectedOrganizationName, setSelectedOrganizationName] = useState(null);
   const [selectedInput, setSelectedInput] = useState(null);
+  const [originalOrganizationName, setOriginalOrganizationName] = useState(null);
   const [addOrganization, setAddOrganization] = useState(false);
   const [addOrganizationName, setAddOrganizationName] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -173,7 +174,16 @@ const EditOrganization = () => {
     setShowDeletePopup(false);
   };
 
-  const closeDeletePopup = () => setShowDeletePopup(false);
+  const openDeletePopup = (e, originalName) => {
+    e.preventDefault();
+    setOriginalOrganizationName(originalName);
+    setShowDeletePopup(true);
+  };
+
+  const closeDeletePopup = () => {
+    setOriginalOrganizationName(null);
+    setShowDeletePopup(false);
+  };
 
   return (
     <>
@@ -235,7 +245,7 @@ const EditOrganization = () => {
               onClick={(e) => onOrganizationClick(e, org.uuid, org.name)}
             />
             {org.uuid !== selectedOrganization && <EditOutlined />}
-            {org.uuid === selectedOrganization && <DeleteOutlined onClick={() => setShowDeletePopup(true)} />}
+            {org.uuid === selectedOrganization && <DeleteOutlined onClick={(e) => openDeletePopup(e, org.name)} />}
             {org.uuid === selectedOrganization && (
             <FormMessage>
               <StyledText color="pink">
@@ -261,7 +271,7 @@ const EditOrganization = () => {
         handleOk={onPermanentlyDeleteClicked}
         handleCancel={closeDeletePopup}
         organizationUUID={selectedOrganization}
-        organizationName={selectedOrganizationName}
+        organizationName={originalOrganizationName}
       />
       )}
     </>
