@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { requestUpdatePassword } from 'services';
-import { loginUser } from 'actions/user';
-import { ROUTE_PIPELINES } from 'config/routes';
+import { ROUTE_PIPELINES, ROUTE_LOGIN } from 'config/routes';
 import {
   Root,
   StyledH1,
@@ -32,7 +31,6 @@ const ResetPassword = () => {
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
   const profile = useSelector((state) => state.user.profile);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (profile) {
@@ -57,7 +55,7 @@ const ResetPassword = () => {
       if (password === confirmPassword) {
         requestUpdatePassword(email, resetToken, password)
           .then(() => {
-            dispatch(loginUser(email, password));
+            history.push(ROUTE_LOGIN);
           })
           .catch(() => {
             setError(true);
@@ -99,12 +97,11 @@ const ResetPassword = () => {
           </StyledText>
           <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
         </label>
-        <FormMessage size="large">
+        <FormMessage>
           <StyledText size="small" color="pink">
             {passwordMismatch && 'Passwords do not match.'}
-            {error && !passwordMismatch && 'Could not reset password.'}
           </StyledText>
-          <StyledText size="small" color="gray">Minimum 10 characters</StyledText>
+          <StyledText size="small" color={error && !passwordMismatch ? 'pink' : 'gray'}>Minimum 10 characters</StyledText>
         </FormMessage>
         <StyledButton
           htmlType="submit"

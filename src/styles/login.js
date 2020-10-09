@@ -104,8 +104,8 @@ export const FormMessage = styled.div`
   align-items: center;
   justify-content: space-between;
   ${({ size }) => (size === 'large' ? (`
-  padding: 0.75rem 0 2.25rem 0;
-  height: 2.5rem;
+  padding: 0.75rem 0 1.75rem 0;
+  height: 3.5rem;
   font-size: 14px;
   line-height: 16px;
   `) : (`
