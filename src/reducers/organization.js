@@ -8,6 +8,7 @@ import {
   INVITE_ORGANIZATION_MEMBER_FAILED,
   ACCEPT_ORGANIZATION_INVITATION,
   ACCEPT_ORGANIZATION_INVITATION_FAILED,
+  GET_ORGANIZATION_INVITATIONS,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -87,6 +88,12 @@ export default (state = DEFAULT_STATE, action) => {
         ...DEFAULT_STATE,
         members: state.members,
         ...action.payload,
+      };
+    case GET_ORGANIZATION_INVITATIONS:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members,
+        invitations: action.payload,
       };
     default:
       return state;

@@ -66,3 +66,7 @@ export const requestInviteOrganizationMember = (organization_uuid, email) => (
 export const requestAcceptOrganizationInvitation = (organization_uuid, invitation_token) => (
   ApiClient.post(`/organizations/${organization_uuid}/invitations`, { invitation_token })
 );
+
+export const requestOrganizationInvitations = (organization_uuid) => (
+  ApiClient.get(`/organizations/${organization_uuid}/invitations`)
+);
