@@ -101,6 +101,7 @@ const EditProfile = () => {
 
     if (files.length) {
       dispatch(updateUserAvatar(profile.uuid, files[0]));
+      e.target.value = '';
     }
   };
 
@@ -114,7 +115,7 @@ const EditProfile = () => {
           type="file"
           id="avatar"
           name="avatar"
-          accept="image/png, image/jpeg"
+          accept="image/png, image/jpeg, image/gif"
           onChange={onPhotoChanged}
         />
         <StyledButton

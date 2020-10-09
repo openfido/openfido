@@ -153,6 +153,8 @@ export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
         type: UPDATE_USER_AVATAR,
         payload: image_content,
       });
+
+      return requestUserAvatar(user_uuid);
     })
     .then((response) => {
       dispatch({
