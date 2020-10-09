@@ -84,7 +84,7 @@ const CreateNewAccountInvitation = () => {
           tabIndex={0}
           onClick={onSignInClicked}
         >
-          Sign In
+          Create Account
         </StyledButton>
       </StyledForm>
     </Root>
