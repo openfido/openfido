@@ -171,3 +171,76 @@ def test_create_pipeline(app, client, client_application):
     ).first()
     json_response["uuid"] = pipeline.uuid
     assert result.json == json_response
+
+
+@patch("app.pipelines.routes.update_pipeline")
+@responses.activate
+def test_update_pipeline_backend_500(
+    update_pipeline_mock, app, client, client_application
+):
+    update_pipeline_mock.side_effect = HTTPError("something is wrong")
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/" + "0" * 32,
+        content_type="application/json",
+        json=PIPELINE_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.pipelines.routes.update_pipeline")
+@responses.activate
+def test_update_pipeline_backend_error(
+    update_pipeline_mock, app, client, client_application
+):
+    message = {"message": "error"}
+    update_pipeline_mock.side_effect = ValueError(message)
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/" + "0" * 32,
+        content_type="application/json",
+        json=PIPELINE_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_update_pipeline(app, client, client_application, pipeline):
+    json_response = dict(PIPELINE_JSON)
+    json_response.update(
+        {
+            "updated_at": "2020-10-08T12:20:36.564095",
+            "updated_at": "2020-10-08T12:20:36.564100",
+            "uuid": "daf6febec1714ac79a73327760c89f15",
+        }
+    )
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        json=json_response,
+    )
+
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        content_type="application/json",
+        json=PIPELINE_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 200
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    json_response["uuid"] = pipeline.uuid
+    assert result.json == json_response

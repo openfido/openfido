@@ -3,12 +3,13 @@ from unittest.mock import patch
 import pytest
 import responses
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
-from app.pipelines.models import OrganizationPipeline, db
-from app.pipelines.services import create_pipeline, fetch_pipelines
+from app.pipelines.models import OrganizationPipeline
+from app.pipelines.services import (create_pipeline, fetch_pipelines,
+                                    update_pipeline)
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
-from ..conftest import ORGANIZATION_UUID
+from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID
 
 PIPELINE_JSON = {
     "description": "a pipeline",
@@ -76,3 +77,54 @@ def test_fetch_pipelines(post_mock, app):
 
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
+
+
+@responses.activate
+def test_update_pipeline_bad_response(app, pipeline):
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        json=PIPELINE_JSON,
+        status=500,
+    )
+    with pytest.raises(ValueError):
+        update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
+
+
+def test_update_pipeline_no_pipeline(app):
+    with pytest.raises(ValueError):
+        update_pipeline(ORGANIZATION_UUID, PIPELINE_UUID, PIPELINE_JSON)
+
+
+@responses.activate
+def test_update_pipeline_bad_json(app, pipeline):
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        body="notjson",
+    )
+    with pytest.raises(HTTPError):
+        update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
+
+
+@responses.activate
+def test_update_pipeline(app, pipeline):
+    json_response = dict(PIPELINE_JSON)
+    json_response.update(
+        {
+            "updated_at": "2020-10-08T14:22:26.276242",
+            "updated_at": "2020-10-08T14:22:26.276278",
+            "uuid": "83ac3b4e9433431fbd6d21e7a56b6f0a",
+        }
+    )
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        json=json_response,
+    )
+    updated_pipeline = update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    json_response["uuid"] = pipeline.uuid
+    assert updated_pipeline == json_response

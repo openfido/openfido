@@ -5,7 +5,7 @@ from flask import current_app
 from requests import HTTPError
 
 from .models import OrganizationPipeline, db
-from .queries import find_organization_pipelines
+from .queries import find_organization_pipeline, find_organization_pipelines
 
 
 def create_pipeline(organization_uuid, request_json):
@@ -31,6 +31,33 @@ def create_pipeline(organization_uuid, request_json):
         db.session.commit()
 
         json_value["uuid"] = pipeline.uuid
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
+
+
+def update_pipeline(organization_uuid, pipeline_uuid, request_json):
+    """ Update a pipeline associated with an organization. """
+    organization_pipeline = find_organization_pipeline(organization_uuid, pipeline_uuid)
+    if not organization_pipeline:
+        raise ValueError({"message": "pipeline_uuid not found"})
+
+    response = requests.put(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json=request_json,
+    )
+
+    try:
+        json_value = response.json()
+        response.raise_for_status()
+
+        json_value["uuid"] = organization_pipeline.uuid
         return json_value
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
