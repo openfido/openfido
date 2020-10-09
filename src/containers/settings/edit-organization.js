@@ -95,7 +95,7 @@ const EditOrganization = () => {
     }
 
     return null;
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     if (addOrganization && createOrganizationInput.current) {
