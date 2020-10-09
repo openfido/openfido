@@ -32,6 +32,7 @@ const StyledForm = styled.form`
     button {
       margin-top: 8px;
       margin-top: 0.5rem;
+    }
   }
   .anticon {
     top: auto;
@@ -182,6 +183,7 @@ const EditOrganization = () => {
           hoverbgcolor="lightBlue"
           onClick={onAddOrganizationClicked}
           width={136}
+          style={{ height: '22px' }}
         >
           <label htmlFor="organization_name">+ Add Organization</label>
         </StyledButton>
