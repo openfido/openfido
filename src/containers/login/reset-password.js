@@ -97,7 +97,7 @@ const ResetPassword = () => {
           </StyledText>
           <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
         </label>
-        <FormMessage>
+        <FormMessage size="large">
           <StyledText size="small" color="pink">
             {passwordMismatch && 'Passwords do not match.'}
           </StyledText>

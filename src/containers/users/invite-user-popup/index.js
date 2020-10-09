@@ -44,11 +44,11 @@ const Modal = styled(StyledModal)`
 `;
 
 const FormMessage = styled.div`
-  padding-top: 0.25rem;
+  padding-top: 0.5rem;
   font-size: 12px;
   line-height: 14px;
-  height: 18px;
-  height: 1.125rem;
+  height: 16px;
+  height: 1rem;
 `;
 
 const InviteUserPopup = ({ handleOk, handleCancel }) => {
