@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { createUser } from 'actions/user';
+import { ROUTE_LOGIN } from 'config/routes';
 import {
   Root,
   StyledH1,
@@ -13,15 +15,28 @@ import {
 import { StyledButton, StyledText } from 'styles/app';
 
 const CreateNewAccountInvitation = () => {
+  const history = useHistory();
+
+  let invitation_token = null;
+  if (history.location.state && 'invitation_token' in history.location.state) {
+    invitation_token = history.location.state.invitation_token;
+  }
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);
   const createUserInProgress = useSelector((state) => state.user.messages.createUserInProgress);
   const createUserError = useSelector((state) => state.user.messages.createUserError);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!createUserInProgress && !createUserError && formSubmitted) {
+      history.push(ROUTE_LOGIN, { invitation_token });
+    }
+  }, [createUserInProgress, createUserError, formSubmitted, history]);
 
   const onEmailChanged = (e) => {
     setEmail(e.target.value);
@@ -35,12 +50,13 @@ const CreateNewAccountInvitation = () => {
     setConfirmPassword(e.target.value);
   };
 
-  const onSignInClicked = (e) => {
+  const onCreateAccountClicked = (e) => {
     e.preventDefault();
 
     if (!createUserInProgress) {
       if (password === confirmPassword) {
-        dispatch(createUser(invitationOrganization, email, password));
+        dispatch(createUser(email, password, invitation_token));
+        setFormSubmitted(true);
         setPasswordMismatch(false);
       } else {
         setPasswordMismatch(true);
@@ -55,13 +71,19 @@ const CreateNewAccountInvitation = () => {
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onSignInClicked}>
+      <StyledForm onSubmit={onCreateAccountClicked}>
         <StyledH2>
           Welcome to OpenFIDO.
           <br />
           Please create an account
         </StyledH2>
         <StyledInput type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
+        <FormMessage>
+          <div />
+          <StyledText color="pink">
+            {createUserError && password.length < 10 && 'Invalid email'}
+          </StyledText>
+        </FormMessage>
         <StyledInput type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
         <FormMessage>
           <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
@@ -70,11 +92,7 @@ const CreateNewAccountInvitation = () => {
           </StyledText>
         </FormMessage>
         <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
-        <FormMessage size="large">
-          {createUserError && !passwordMismatch && (
-            <StyledText size="small" color="pink">Could not create account.</StyledText>
-          )}
-        </FormMessage>
+        <FormMessage size="large" />
         <StyledButton
           htmlType="submit"
           size="middle"
@@ -82,10 +100,34 @@ const CreateNewAccountInvitation = () => {
           width={106}
           role="button"
           tabIndex={0}
-          onClick={onSignInClicked}
+          onClick={onCreateAccountClicked}
+          style={{ padding: 0 }}
         >
-          Create Account
+          <label>
+            Create
+            <br />
+            Account
+          </label>
         </StyledButton>
+        <FormMessage size="large">
+          <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
+            <StyledButton
+              htmlType="button"
+              size="small"
+              type="text"
+            >
+              Already have an account?
+            </StyledButton>
+          </Link>
+        </FormMessage>
+        <br />
+        <FormMessage size="large">
+          {createUserError && !passwordMismatch && (
+          <StyledText size="small" color="pink">
+            Please be sure to use the email address invitation was sent to
+          </StyledText>
+          )}
+        </FormMessage>
       </StyledForm>
     </Root>
   );

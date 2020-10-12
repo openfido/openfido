@@ -1,12 +1,10 @@
 import ApiClient from 'util/api-client';
 
-export const requestCreateUser = (organization_uuid, email, password, first_name, last_name) => (
+export const requestCreateUser = (email, password, invitation_token) => (
   ApiClient.post('/users/create', {
-    organization_uuid,
     email,
     password,
-    first_name,
-    last_name,
+    invitation_token,
   })
 );
 

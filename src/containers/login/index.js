@@ -3,6 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { loginUser } from 'actions/user';
+import { acceptOrganizationInvitation } from 'actions/organization';
 import { ROUTE_PIPELINES, ROUTE_RESET_PASSWORD } from 'config/routes';
 
 import {
@@ -17,6 +18,12 @@ import { StyledButton, StyledText } from 'styles/app';
 
 const Login = () => {
   const history = useHistory();
+
+  let invitation_token = null;
+  if (history.location.state && 'invitation_token' in history.location.state) {
+    invitation_token = history.location.state.invitation_token;
+  }
+
   const profile = useSelector((state) => state.user.profile);
   const authInProgress = useSelector((state) => state.user.messages.authInProgress);
   const authError = useSelector((state) => state.user.messages.authError);
@@ -27,6 +34,12 @@ const Login = () => {
 
   useEffect(() => {
     if (profile) {
+      if (invitation_token) {
+        dispatch(acceptOrganizationInvitation(invitation_token));
+      }
+
+      // TODO: can check for acceptInvitationError, if there is a rejected screen
+      // can happen if user email does not match token
       history.push(ROUTE_PIPELINES);
     }
   });

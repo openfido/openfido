@@ -95,13 +95,13 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
     });
 };
 
-export const acceptOrganizationInvitation = (organization_uuid, invitation_token) => async (dispatch) => {
-  requestAcceptOrganizationInvitation(organization_uuid, invitation_token)
-    .then(() => {
+export const acceptOrganizationInvitation = (invitation_token) => async (dispatch) => {
+  requestAcceptOrganizationInvitation(invitation_token)
+    .then((response) => {
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION,
         payload: {
-          invitationOrganization: organization_uuid,
+          invitationOrganization: response.data, // TODO: replace with organization uuid from response
           invitationToken: invitation_token,
         },
       });
@@ -110,7 +110,6 @@ export const acceptOrganizationInvitation = (organization_uuid, invitation_token
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION_FAILED,
         payload: {
-          invitationOrganization: organization_uuid,
           invitationToken: invitation_token,
           acceptInvitationError: err.message,
         },

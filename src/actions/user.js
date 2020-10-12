@@ -27,20 +27,12 @@ import {
   requestUpdateUserAvatar,
 } from 'services';
 
-export const createUser = (organization_uuid, email, password, first_name, last_name) => async (dispatch) => {
+export const createUser = (email, password, invitation_token) => async (dispatch) => {
   await dispatch({ type: CREATE_USER_IN_PROGRESS });
-  requestCreateUser(organization_uuid, email, password, first_name, last_name)
+  requestCreateUser(email, password, invitation_token)
     .then((response) => {
       dispatch({
         type: CREATE_USER,
-        payload: response.data,
-      });
-
-      return requestLoginUser(email, password);
-    })
-    .then((response) => {
-      dispatch({
-        type: LOGIN_USER,
         payload: response.data,
       });
     })

@@ -3,7 +3,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  ROUTE_LOGIN,
   ROUTE_PIPELINES,
   ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
 } from 'config/routes';
@@ -11,33 +10,31 @@ import { changeOrganization } from 'actions/user';
 import { acceptOrganizationInvitation } from 'actions/organization';
 
 const AcceptOrganizationInvitation = () => {
-  const { organization_uuid, invitation_token } = useParams();
+  const { invitation_token } = useParams();
   const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
+  const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);
   const invitationToken = useSelector((state) => state.organization.invitationToken);
   const acceptInvitationError = useSelector((state) => state.organization.acceptInvitationError);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(acceptOrganizationInvitation(organization_uuid, invitation_token));
-  }, [dispatch, organization_uuid, invitation_token]);
+    if (profile) {
+      dispatch(acceptOrganizationInvitation(invitation_token));
+    }
+  }, [dispatch, profile, invitation_token]);
 
   useEffect(() => {
-    if (invitationToken && !acceptInvitationError) {
-      if (!profile) {
-        history.push(ROUTE_CREATE_NEW_ACCOUNT_INVITATION);
-      } else {
-        dispatch(changeOrganization(organization_uuid));
-        history.push(ROUTE_PIPELINES);
+    if (profile) {
+      if (!acceptInvitationError && invitationToken && invitationOrganization) {
+        dispatch(changeOrganization(invitationOrganization));
       }
-    } else if (acceptInvitationError) {
-      if (!profile) {
-        history.push(ROUTE_LOGIN);
-      } else {
-        history.push(ROUTE_PIPELINES);
-      }
+
+      history.push(ROUTE_PIPELINES);
+    } else {
+      history.push(ROUTE_CREATE_NEW_ACCOUNT_INVITATION, { invitation_token });
     }
-  }, [invitationToken, acceptInvitationError, dispatch, history, organization_uuid, profile]);
+  }, [dispatch, history, profile, invitationOrganization, acceptInvitationError, invitation_token, invitationToken]);
 
   return null;
 };

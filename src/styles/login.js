@@ -34,13 +34,13 @@ export const StyledForm = styled.form`
   position: relative;
   width: 390px;
   height: 522px;
-  padding: 28px 32px;
+  padding: 28px 32px 28px 30px;
   margin: 42px auto 0 auto;
   margin: 2.625rem auto 0 auto;
   background-color: ${colors.white};
   text-align: left;
   border-radius: 3px;
-  label {
+  > label {
     display: inline-block;
     margin-top: 16px;
     margin-top: 1rem;
@@ -78,8 +78,12 @@ export const StyledInput = styled.input`
   font-weight: 400;
   color: ${colors.gray};
   padding: 10px 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 0.625rem 0;
+  padding-left: 2px;
+  padding-left: 0.125rem;
+  padding-right: 2px;
+  padding-right: 0.125rem;
+  margin: 0 -2px;
   border: none;
   border-bottom: 1px solid ${colors.lightGray};
   border-radius: 0;
@@ -91,8 +95,12 @@ export const StyledInput = styled.input`
   &:first-of-type {
     margin-top: 16px;
     margin-top: 1rem;
-    margin-bottom: 16px;
-    margin-bottom: 16px;
+  }
+  margin-bottom: 16px;
+  margin-bottom: 1rem;
+  &:not(:last-of-type) + div {
+    margin-top: -16px;
+    margin-top -1rem;
   }
   &:last-of-type {
     margin-bottom: 0;
@@ -115,4 +123,8 @@ export const FormMessage = styled.div`
   height: 18px;
   height: 1.125rem;
   `))}
+  & + button {
+    margin-top: -16px;
+    margin-top: -1rem;
+  }
 `;
