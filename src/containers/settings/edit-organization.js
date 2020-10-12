@@ -86,6 +86,12 @@ const EditOrganization = () => {
   };
 
   useEffect(() => {
+    if (profile) {
+      dispatch(getUserOrganizations(profile.uuid));
+    }
+  }, [dispatch, profile]);
+
+  useEffect(() => {
     if (profile && profile.organizations) {
       window.addEventListener('click', resetSelection);
 

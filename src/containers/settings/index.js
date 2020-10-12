@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
 
@@ -45,7 +46,10 @@ const StyledMenu = styled(Menu)`
 `;
 
 const Settings = () => {
+  const profile = useSelector((state) => state.user.profile);
   const [selectedKey, setSelectedKey] = useState('Edit Profile');
+
+  if (!profile) return null;
 
   let content = null;
   switch (selectedKey) {
@@ -75,9 +79,11 @@ const Settings = () => {
           <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
+          {profile.is_system_admin && (
           <Menu.Item key="Edit Organization" onClick={() => setSelectedKey('Edit Organization')}>
             <StyledText size="xlarge">Edit Organization</StyledText>
           </Menu.Item>
+          )}
         </StyledMenu>
         {content}
       </Root>

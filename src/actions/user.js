@@ -62,19 +62,13 @@ export const loginUser = (email, password) => async (dispatch) => {
 
       return Promise.all([
         requestUserProfile(user_uuid),
-        requestUserOrganizations(user_uuid),
         requestUserAvatar(user_uuid),
       ]);
     })
-    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
+    .then(([profileResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
         payload: profileResponse.data,
-      });
-
-      dispatch({
-        type: GET_USER_ORGANIZATIONS,
-        payload: organizationsResponse.data,
       });
 
       dispatch({
@@ -100,19 +94,13 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
 
       return Promise.all([
         requestUserProfile(user_uuid),
-        requestUserOrganizations(user_uuid),
         requestUserAvatar(user_uuid),
       ]);
     })
-    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
+    .then(([profileResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
         payload: profileResponse.data,
-      });
-
-      dispatch({
-        type: GET_USER_ORGANIZATIONS,
-        payload: organizationsResponse.data,
       });
 
       dispatch({
@@ -204,7 +192,7 @@ export const changePassword = (user_uuid, old_password, password) => async (disp
     });
 };
 
-export const getUserOrganizations = (user_uuid) => (dispatch) => {
+export const getUserOrganizations = (user_uuid) => (dispatch) => { // is_system_admin only
   requestUserOrganizations(user_uuid)
     .then((response) => {
       dispatch({
