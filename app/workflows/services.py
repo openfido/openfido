@@ -202,7 +202,7 @@ def create_workflow_run_state(run_state_enum):
 def update_workflow_run_state(workflow_run, run_state_enum):
     """Change the run state of a WorkflowRun.
 
-    If the state is terminal (FAILED, ABORTED, COMPLETED) underlying
+    If the state is terminal (FAILED, CANCELLED, COMPLETED) underlying
     WorkflowPipelineRun instances will be updated appropriately as well.
     """
     if workflow_run.run_state_enum() == run_state_enum:
@@ -291,11 +291,11 @@ def update_workflow_run(pipeline_run):
 
             update_pipeline_run_state(
                 wpr.pipeline_run.uuid,
-                {"state": RunStateEnum.ABORTED.name},
+                {"state": RunStateEnum.CANCELLED.name},
                 apply_to_workflow_run=False,
             )
 
-        return update_workflow_run_state(workflow_run, RunStateEnum.ABORTED)
+        return update_workflow_run_state(workflow_run, RunStateEnum.CANCELLED)
 
     if pipeline_run.run_state_enum() != RunStateEnum.COMPLETED:
         error = f"Unexpected state encountered: {pipeline_run.run_state_enum()}"

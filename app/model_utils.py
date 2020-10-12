@@ -32,20 +32,20 @@ class RunStateEnum(IntEnum):
     FAILED = 4
     # Pipeline successfully completed.
     COMPLETED = 5
-    # Pipeline ABORTED from QUEUED state (its inputs were never satisfied)
-    ABORTED = 6
+    # Pipeline CANCELLED from QUEUED state (its inputs were never satisfied)
+    CANCELLED = 6
 
     def is_valid_transition(self, next_enum):
         """ Return True when the current transition is valid. """
         if self == RunStateEnum.QUEUED:
-            return next_enum in [RunStateEnum.NOT_STARTED, RunStateEnum.ABORTED]
+            return next_enum in [RunStateEnum.NOT_STARTED, RunStateEnum.CANCELLED]
         if self == RunStateEnum.NOT_STARTED:
-            return next_enum in [RunStateEnum.RUNNING, RunStateEnum.ABORTED]
+            return next_enum in [RunStateEnum.RUNNING, RunStateEnum.CANCELLED]
         if self == RunStateEnum.RUNNING:
             return next_enum in [
                 RunStateEnum.FAILED,
                 RunStateEnum.COMPLETED,
-                RunStateEnum.ABORTED,
+                RunStateEnum.CANCELLED,
             ]
 
         return False
@@ -55,5 +55,5 @@ class RunStateEnum(IntEnum):
         return self in [
             RunStateEnum.FAILED,
             RunStateEnum.COMPLETED,
-            RunStateEnum.ABORTED,
+            RunStateEnum.CANCELLED,
         ]
