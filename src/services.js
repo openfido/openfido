@@ -79,7 +79,7 @@ export const requestOrganizationInvitations = (organization_uuid) => (
 );
 
 export const requestCreateOrganization = (organization_name) => (
-  ApiClient.post('/organizations/create', { name: organization_name })
+  ApiClient.post('/organizations', { name: organization_name })
 );
 
 export const requestUpdateOrganization = (organization_uuid, organization_name) => (
