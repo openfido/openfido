@@ -7,6 +7,7 @@ import {
   REFRESH_JWT,
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
+  CHANGE_ORGANIZATION,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
@@ -14,13 +15,16 @@ import {
   GET_USER_AVATAR,
   UPDATE_USER_AVATAR,
   UPDATE_USER_AVATAR_FAILED,
-  CHANGE_ORGANIZATION,
+  CHANGE_PASSWORD_IN_PROGRESS,
+  CHANGE_PASSWORD,
+  CHANGE_PASSWORD_FAILED,
+  CHANGE_PASSWORD_CONFIRMED,
 } from 'actions';
 import {
   requestCreateUser,
   requestLoginUser,
   requestRefreshJWT,
-  requestUpdatePassword,
+  requestChangePassword,
   requestUserProfile,
   requestUpdateUserProfile,
   requestUserAvatar,
@@ -168,19 +172,23 @@ export const updateUserProfile = (user_uuid, email, first_name, last_name) => as
     });
 };
 
-export const updatePassword = (email, reset_token, password) => async (dispatch) => {
-  await dispatch({ type: AUTH_IN_PROGRESS });
-  requestUpdatePassword(email, reset_token, password)
+export const changePassword = (old_password, new_password) => async (dispatch) => {
+  await dispatch({ type: CHANGE_PASSWORD_IN_PROGRESS });
+  requestChangePassword(old_password, new_password)
     .then((response) => {
       dispatch({
-        type: LOGIN_USER,
+        type: CHANGE_PASSWORD,
         payload: response.data,
       });
     })
     .catch((err) => {
       dispatch({
-        type: AUTH_FAILED,
+        type: CHANGE_PASSWORD_FAILED,
         payload: err.message,
       });
     });
 };
+
+export const changePasswordConfirmed = () => ({
+  type: CHANGE_PASSWORD_CONFIRMED,
+});

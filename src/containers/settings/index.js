@@ -5,6 +5,7 @@ import { Menu } from 'antd';
 import { StyledTitle, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 import EditProfile from './edit-profile';
+import ChangePassword from './change-password';
 
 const Root = styled.div`
   padding: 60px 90px;
@@ -50,6 +51,9 @@ const Settings = () => {
     case 'Edit Profile':
       content = <EditProfile />;
       break;
+    case 'Change Password':
+      content = <ChangePassword />;
+      break;
     default:
       break;
   }
@@ -64,7 +68,7 @@ const Settings = () => {
           <Menu.Item key="Edit Profile" onClick={() => setSelectedKey('Edit Profile')}>
             <StyledText size="xlarge">Edit Profile</StyledText>
           </Menu.Item>
-          <Menu.Item key="Change Password">
+          <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
           <Menu.Item key="Edit Organization">

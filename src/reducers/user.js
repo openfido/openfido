@@ -7,6 +7,10 @@ import {
   REFRESH_JWT,
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
+  CHANGE_PASSWORD,
+  CHANGE_PASSWORD_IN_PROGRESS,
+  CHANGE_PASSWORD_FAILED,
+  CHANGE_PASSWORD_CONFIRMED,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
@@ -29,6 +33,9 @@ const DEFAULT_STATE = {
     authError: null,
     updateProfileSuccess: false,
     updateProfileInProgress: false,
+    changePasswordSuccess: false,
+    changePasswordInProgress: false,
+    changePasswordError: null,
     updateUserProfileError: null,
     updateUserAvatarError: null,
   },
@@ -104,6 +111,35 @@ export default (state = DEFAULT_STATE, action) => {
         ...state,
         messages: DEFAULT_STATE.messages,
         profile: null,
+      };
+    case CHANGE_PASSWORD:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          changePasswordSuccess: true,
+        },
+      };
+    case CHANGE_PASSWORD_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          changePasswordInProgress: true,
+        },
+      };
+    case CHANGE_PASSWORD_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          changePasswordError: action.payload,
+        },
+      };
+    case CHANGE_PASSWORD_CONFIRMED:
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
       };
     case GET_USER_PROFILE: {
       const { organizations } = action.payload;
