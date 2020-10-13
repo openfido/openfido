@@ -102,7 +102,7 @@ const ResetPassword = () => {
             Minimum 10 characters
           </StyledText>
         </FormMessage>
-        <FormMessage size="large">
+        <FormMessage size="middle">
           <StyledText color="pink">
             {passwordMismatch && 'Passwords do not match.'}
           </StyledText>

@@ -18,6 +18,7 @@ import {
   CHANGE_PASSWORD_IN_PROGRESS,
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILED,
+  CHANGE_PASSWORD_CONFIRMED,
 } from 'actions';
 import {
   requestCreateUser,
@@ -187,3 +188,7 @@ export const changePassword = (old_password, new_password) => async (dispatch) =
       });
     });
 };
+
+export const changePasswordConfirmed = () => ({
+  type: CHANGE_PASSWORD_CONFIRMED,
+});

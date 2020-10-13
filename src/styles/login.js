@@ -105,7 +105,13 @@ export const FormMessage = styled.div`
   justify-content: space-between;
   ${({ size, float }) => (`
   ${size === 'large' ? (`
-  padding: 0 0 1.75rem 0;
+  padding: 0.75rem 0 1.75rem 0;
+  height: 3.5rem;
+  font-size: 14px;
+  line-height: 16px;
+  `) : (`
+  ${size === 'middle' ? (`
+  padding: 0.75rem 0 1.75rem 0;
   height: 3.5rem;
   font-size: 14px;
   line-height: 16px;
@@ -115,6 +121,7 @@ export const FormMessage = styled.div`
   line-height: 14px;
   height: 18px;
   height: 1.125rem;
+  `)}
   `)}
   ${float ? (`
   float: ${float};
