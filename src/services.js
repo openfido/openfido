@@ -15,12 +15,12 @@ export const requestLoginUser = (email, password) => ApiClient.post('/users/auth
 
 export const requestRefreshJWT = () => ApiClient.post('/users/auth/refresh');
 
-export const requestPasswordReset = (email) => ApiClient.post('/users/auth/reset', {
+export const requestPasswordReset = (email) => ApiClient.post('/users/request_password_reset', {
   email,
 });
 
 export const requestUpdatePassword = (email, reset_token, password) => (
-  ApiClient.put('/users/auth/update-password', {
+  ApiClient.put('/users/reset_password', {
     email,
     reset_token,
     password,
