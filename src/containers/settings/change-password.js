@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Space } from 'antd';
 import styled from 'styled-components';
@@ -38,6 +38,8 @@ const FormMessage = styled.div`
 `;
 
 const EditProfile = () => {
+  const oldPasswordInput = useRef();
+
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -61,6 +63,7 @@ const EditProfile = () => {
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
+        if (oldPasswordInput.current) oldPasswordInput.current.focus();
       }
     } else {
       setPasswordMismatch(true);
@@ -96,6 +99,7 @@ const EditProfile = () => {
         <label htmlFor="old_password">
           <StyledText display="block" color="darkText">Old Password</StyledText>
           <StyledInput
+            ref={oldPasswordInput}
             type="password"
             bgcolor="white"
             size="large"
