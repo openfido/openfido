@@ -19,9 +19,8 @@ export const requestPasswordReset = (email) => ApiClient.post('/users/request_pa
   email,
 });
 
-export const requestUpdatePassword = (email, reset_token, password) => (
+export const requestUpdatePassword = (reset_token, password) => (
   ApiClient.put('/users/reset_password', {
-    email,
     reset_token,
     password,
   })
