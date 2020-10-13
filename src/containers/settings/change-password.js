@@ -17,12 +17,20 @@ const StyledForm = styled.form`
   input {
     width: 432px;
   }
+  label {
+    position: relative;
+  }
 `;
 
 const FormMessage = styled.div`
-  width: 432px;
+  ${({ size }) => (size === 'small' ? (`
+  width: 100%;
+  position: absolute;
+  text-align: right;
+  `) : (`
   margin-top: 32px;
   margin-top: 2rem;
+  `))}
 `;
 
 const EditProfile = () => {
@@ -43,7 +51,7 @@ const EditProfile = () => {
     e.preventDefault();
     if (!changePasswordInProgress) {
       if (newPassword === confirmPassword) {
-        dispatch(changePassword(profile.uuid, oldPassword, newPassword));
+        dispatch(changePassword(newPassword));
         setPasswordMismatch(false);
       } else {
         setPasswordMismatch(true);
@@ -95,6 +103,11 @@ const EditProfile = () => {
           value={newPassword}
           onChange={onNewPasswordChanged}
         />
+        <FormMessage size="small">
+          <StyledText size="small" color={changePasswordError && newPassword.length < 10 ? 'pink' : 'gray80'}>
+            minimum 10 characters
+          </StyledText>
+        </FormMessage>
       </label>
       <label htmlFor="email">
         <StyledText display="block" color="darkText">Confirm Password</StyledText>
@@ -130,13 +143,13 @@ const EditProfile = () => {
         </StyledButton>
         <FormMessage>
           {changePasswordSuccess && !changePasswordError && !passwordMismatch && (
-            <StyledText size="middle" color="green">Password changed.</StyledText>
+            <StyledText size="small" color="green">Password changed.</StyledText>
           )}
           {changePasswordError && (
-            <StyledText size="middle" color="pink">Password could not be changed.</StyledText>
+            <StyledText size="small" color="pink">Password could not be changed.</StyledText>
           )}
           {!changePasswordError && passwordMismatch && (
-            <StyledText size="middle" color="pink">Passwords do not match</StyledText>
+            <StyledText size="small" color="pink">Passwords do not match</StyledText>
           )}
         </FormMessage>
       </Space>
