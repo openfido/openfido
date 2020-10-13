@@ -24,6 +24,7 @@ import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
   profile: Auth.getUser(),
+  organizations: null,
   avatar: null,
   currentOrg: null,
   messages: {
@@ -152,10 +153,7 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
-        profile: {
-          ...state.profile,
-          organizations: action.payload, // TODO: maybe move this out of profile
-        },
+        organizations: action.payload,
       };
     }
     case UPDATE_USER_PROFILE: {

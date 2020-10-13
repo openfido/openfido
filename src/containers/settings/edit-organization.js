@@ -74,6 +74,7 @@ const EditOrganization = () => {
   const [error, setError] = useState(null);
 
   const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
   const dispatch = useDispatch();
 
   const resetSelection = () => {
@@ -92,7 +93,7 @@ const EditOrganization = () => {
   }, [dispatch, profile]);
 
   useEffect(() => {
-    if (profile && profile.organizations) {
+    if (profile && organizations) {
       window.addEventListener('click', resetSelection);
 
       return () => {
@@ -232,7 +233,7 @@ const EditOrganization = () => {
           </FormMessage>
         </label>
         )}
-        {profile.organizations.map((org) => ( // TODO: org.role.name === ROLE_ADMINISTRATOR
+        {organizations && organizations.map((org) => (
           <label
             key={org.uuid}
             htmlFor={org.uuid}
