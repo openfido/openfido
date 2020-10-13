@@ -601,14 +601,14 @@ def test_update_workflow_run_FAILED(
     execute_pipeline_mock, app, pipeline, workflow_line
 ):
     # when a PipelineRun fails, then all the remaining PRs should be marked as
-    # ABORTED -- and the WorkflowRun itself should be ABORTED.
+    # CANCELLED -- and the WorkflowRun itself should be CANCELLED.
     (workflow_run, pipeline_runs) = _configure_run_state(
         workflow_line, RunStateEnum.FAILED, execute_pipeline_mock
     )
 
-    assert workflow_run.run_state_enum() == RunStateEnum.ABORTED
-    assert pipeline_runs[1].run_state_enum() == RunStateEnum.ABORTED
-    assert pipeline_runs[2].run_state_enum() == RunStateEnum.ABORTED
+    assert workflow_run.run_state_enum() == RunStateEnum.CANCELLED
+    assert pipeline_runs[1].run_state_enum() == RunStateEnum.CANCELLED
+    assert pipeline_runs[2].run_state_enum() == RunStateEnum.CANCELLED
     assert not execute_pipeline_mock.called
 
 
