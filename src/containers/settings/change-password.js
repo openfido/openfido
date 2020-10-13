@@ -124,12 +124,12 @@ const EditProfile = () => {
           htmlType="submit"
           size="middle"
           color="blue"
-          width={128}
+          width={152}
           role="button"
           tabIndex={0}
           onClick={onChangePasswordClicked}
         >
-          Update Profile
+          Change Password
         </StyledButton>
         <StyledButton
           htmlType="reset"
