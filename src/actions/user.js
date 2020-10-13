@@ -171,9 +171,9 @@ export const updateUserProfile = (user_uuid, email, first_name, last_name) => as
     });
 };
 
-export const changePassword = (user_uuid, old_password, password) => async (dispatch) => {
+export const changePassword = (old_password, new_password) => async (dispatch) => {
   await dispatch({ type: CHANGE_PASSWORD_IN_PROGRESS });
-  requestChangePassword(user_uuid, old_password, password)
+  requestChangePassword(old_password, new_password)
     .then((response) => {
       dispatch({
         type: CHANGE_PASSWORD,

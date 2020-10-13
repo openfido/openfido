@@ -21,39 +21,45 @@ const StyledForm = styled.form`
 `;
 
 const FormMessage = styled.div`
-  ${({ size }) => (size === 'small' ? (`
+  ${({ size, align }) => (`
+  ${size === 'small' ? (`
   width: 100%;
   position: absolute;
   text-align: right;
   `) : (`
   margin-top: 32px;
   margin-top: 2rem;
-  `))}
+  `)}
+  ${align ? (`
+  text-align: ${align};
+  `) : ''}
+  `)}
 `;
 
 const EditProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
 
   const profile = useSelector((state) => state.user.profile);
   const changePasswordSuccess = useSelector((state) => state.user.messages.changePasswordSuccess);
   const changePasswordInProgress = useSelector((state) => state.user.messages.changePasswordInProgress);
   const changePasswordError = useSelector((state) => state.user.messages.changePasswordError);
-  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const dispatch = useDispatch();
 
   if (!profile) return null;
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
-    if (!changePasswordInProgress) {
-      if (newPassword === confirmPassword) {
-        dispatch(changePassword(newPassword));
+
+    if (newPassword === confirmPassword) {
+      if (!changePasswordInProgress) {
+        dispatch(changePassword(oldPassword, newPassword));
         setPasswordMismatch(false);
-      } else {
-        setPasswordMismatch(true);
       }
+    } else {
+      setPasswordMismatch(true);
     }
   };
 
@@ -118,6 +124,11 @@ const EditProfile = () => {
           value={confirmPassword}
           onChange={onConfirmPasswordChanged}
         />
+        <FormMessage size="small" align="left">
+          <StyledText size="small" color="pink">
+            {passwordMismatch && 'Passwords do not match'}
+          </StyledText>
+        </FormMessage>
       </label>
       <Space direction="horizontal" size={24}>
         <StyledButton
@@ -139,15 +150,12 @@ const EditProfile = () => {
         >
           Cancel
         </StyledButton>
-        <FormMessage>
+        <FormMessage size="large">
           {changePasswordSuccess && !changePasswordError && !passwordMismatch && (
             <StyledText size="small" color="green">Password changed.</StyledText>
           )}
           {changePasswordError && (
             <StyledText size="small" color="pink">Password could not be changed.</StyledText>
-          )}
-          {!changePasswordError && passwordMismatch && (
-            <StyledText size="small" color="pink">Passwords do not match</StyledText>
           )}
         </FormMessage>
       </Space>

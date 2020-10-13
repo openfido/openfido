@@ -26,9 +26,10 @@ export const requestUpdatePassword = (reset_token, password) => (
   })
 );
 
-export const requestChangePassword = (password) => (
+export const requestChangePassword = (old_password, new_password) => (
   ApiClient.put('/users/password', {
-    password,
+    old_password,
+    new_password,
   })
 );
 
