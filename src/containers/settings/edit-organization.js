@@ -87,7 +87,7 @@ const EditOrganization = () => {
   };
 
   useEffect(() => {
-    if (profile) {
+    if (profile && !organizations) {
       dispatch(getUserOrganizations(profile.uuid));
     }
   }, [dispatch, profile, organizations]);
@@ -95,14 +95,12 @@ const EditOrganization = () => {
   useEffect(() => {
     if (profile && organizations) {
       window.addEventListener('click', resetSelection);
-
-      return () => {
-        window.removeEventListener('click', resetSelection);
-      };
     }
 
-    return null;
-  }, [profile]);
+    return () => {
+      window.removeEventListener('click', resetSelection);
+    };
+  }, [profile, organizations]);
 
   useEffect(() => {
     if (addOrganization && createOrganizationInput.current) {
