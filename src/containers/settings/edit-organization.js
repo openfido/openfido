@@ -90,7 +90,7 @@ const EditOrganization = () => {
     if (profile) {
       dispatch(getUserOrganizations(profile.uuid));
     }
-  }, [dispatch, profile]);
+  }, [dispatch, profile, organizations]);
 
   useEffect(() => {
     if (profile && organizations) {
