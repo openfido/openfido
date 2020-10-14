@@ -10,7 +10,6 @@ import {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_IN_PROGRESS,
   CHANGE_PASSWORD_FAILED,
-  CHANGE_PASSWORD_CONFIRMED,
   GET_USER_PROFILE,
   GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
@@ -20,6 +19,7 @@ import {
   UPDATE_USER_AVATAR,
   UPDATE_USER_AVATAR_FAILED,
   CHANGE_ORGANIZATION,
+  RETURN_TO_SETTINGS_CONFIRMED,
 } from 'actions';
 import Auth from 'util/auth';
 
@@ -138,11 +138,6 @@ export default (state = DEFAULT_STATE, action) => {
           changePasswordError: action.payload,
         },
       };
-    case CHANGE_PASSWORD_CONFIRMED:
-      return {
-        ...state,
-        messages: DEFAULT_STATE.messages,
-      };
     case GET_USER_PROFILE: {
       return {
         ...state,
@@ -221,6 +216,12 @@ export default (state = DEFAULT_STATE, action) => {
         ...state,
         messages: DEFAULT_STATE.messages,
         currentOrg: action.payload,
+      };
+
+    case RETURN_TO_SETTINGS_CONFIRMED:
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
       };
     default:
       return state;

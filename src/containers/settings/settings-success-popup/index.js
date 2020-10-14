@@ -30,32 +30,33 @@ const Modal = styled(StyledModal)`
     }
   }
   .ant-modal-body {
-    padding: 28px 32px 48px 32px;
+    padding: 28px 56px 48px 32px;
     border-radius: 3px;
-  }
-  .ant-modal-content {
-    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.05);
   }
   button {
     margin: 0 auto;
   }
 `;
 
-const ChangePasswordSuccessPopup = ({ handleOk, handleCancel }) => (
+const SettingsSuccessPopup = ({
+  handleOk, handleCancel, message, top,
+}) => (
   <Modal
     visible
     footer={null}
+    mask={false}
     onOk={handleOk}
     onCancel={handleCancel}
     closeIcon={<CloseOutlined />}
     width={390}
+    style={{ top }}
   >
     <StyledH2>
       SUCCESS!
     </StyledH2>
     <Space direction="vertical" size={56} align="center">
       <StyledText size="large" color="gray">
-        You have successfully changed your password.
+        {message}
       </StyledText>
       <StyledButton
         size="middle"
@@ -65,18 +66,24 @@ const ChangePasswordSuccessPopup = ({ handleOk, handleCancel }) => (
         style={{ padding: 0 }}
       >
         <label>
-          RETURN TO
+          Return to
           <br />
-          SETTINGS
+          Settings
         </label>
       </StyledButton>
     </Space>
   </Modal>
 );
 
-ChangePasswordSuccessPopup.propTypes = {
+SettingsSuccessPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  message: PropTypes.string.isRequired,
+  top: PropTypes.string,
 };
 
-export default ChangePasswordSuccessPopup;
+SettingsSuccessPopup.defaultProps = {
+  top: '224px',
+};
+
+export default SettingsSuccessPopup;

@@ -14,6 +14,11 @@ import {
 } from 'styles/app';
 import colors from 'styles/colors';
 
+const UserItem = styled(StyledGrid)`
+  padding: 16px;
+  padding: 1rem;
+`;
+
 const StyledDropdown = styled(Dropdown)`
   position: relative;
   &.ant-dropdown-trigger {
@@ -175,7 +180,7 @@ const User = ({
   );
 
   return (
-    <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
+    <UserItem gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
       <NameColumn>
         <StyledText size="large" color="gray">
           {first_name}
@@ -200,7 +205,7 @@ const User = ({
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
       </DeleteColumn>
-    </StyledGrid>
+    </UserItem>
   );
 };
 

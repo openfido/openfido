@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 //import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
@@ -14,6 +15,11 @@ import {
 } from 'styles/app';
 import UserItem from './user-item';
 import InviteUserPopup from './invite-user-popup';
+
+const HeaderRow = styled(StyledGrid)`
+  padding: 12px 16px 20px 16px;
+  padding: 0.75rem 1rem 1.25rem; 1rem;
+`;
 
 const Users = () => {
   //const history = useHistory();
@@ -55,11 +61,11 @@ const Users = () => {
           </StyledButton>
         </div>
       </StyledTitle>
-      <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
+      <HeaderRow gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
         <StyledText size="large" fontweight={500} color="black">Name</StyledText>
         <StyledText size="large" fontweight={500} color="black">Role</StyledText>
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
-      </StyledGrid>
+      </HeaderRow>
       <Space direction="vertical" size={16}>
         {members && members.map((item) => (
           <UserItem

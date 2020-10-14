@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Space } from 'antd';
 import styled from 'styled-components';
 
-import { changePassword, changePasswordConfirmed } from 'actions/user';
+import { changePassword, returnToSettingsConfirmed } from 'actions/user';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
-import ChangePasswordSuccessPopup from './change-password-success-popup';
+import SettingsSuccessPopup from './settings-success-popup';
 
 const StyledForm = styled.form`
   display: grid;
@@ -89,7 +89,7 @@ const EditProfile = () => {
   };
 
   const onReturnToSettingsClicked = () => {
-    dispatch(changePasswordConfirmed());
+    dispatch(returnToSettingsConfirmed());
   };
 
   return (
@@ -170,9 +170,10 @@ const EditProfile = () => {
         </Space>
       </StyledForm>
       {changePasswordSuccess && !changePasswordError && !passwordMismatch && (
-        <ChangePasswordSuccessPopup
+        <SettingsSuccessPopup
           handleOk={onReturnToSettingsClicked}
           handleCancel={onReturnToSettingsClicked}
+          message="You have successfully changed your password."
         />
       )}
     </>

@@ -448,6 +448,7 @@ export const StyledModal = styled(Modal)`
   border-radius: 2px;
   &.ant-modal {
     color: ${colors.darkText};
+    padding-bottom: 0;
   }
   .ant-modal-header {
     padding: 16px 36px;
@@ -473,6 +474,9 @@ export const StyledModal = styled(Modal)`
     background-color: ${colors.white};
     font-size: 14px;
     line-height: 16px;
+  }
+  .ant-modal-content {
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.01);
   }
 `;
 
@@ -568,7 +572,7 @@ export const StyledGrid = styled.div`
   ${gridgap ? (`
   grid-gap: ${gridgap}px;
   `) : ''} 
-  padding: ${padding || '16px 25px'};
+  padding: ${padding || '12px 16px'};
   margin: ${margin || 0};
   `)}
 `;

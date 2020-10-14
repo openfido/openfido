@@ -19,7 +19,7 @@ import {
   CHANGE_PASSWORD_IN_PROGRESS,
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_FAILED,
-  CHANGE_PASSWORD_CONFIRMED,
+  RETURN_TO_SETTINGS_CONFIRMED,
 } from 'actions';
 import {
   requestCreateUser,
@@ -215,6 +215,6 @@ export const getUserOrganizations = (user_uuid) => (dispatch) => {
     });
 };
 
-export const changePasswordConfirmed = () => ({
-  type: CHANGE_PASSWORD_CONFIRMED,
+export const returnToSettingsConfirmed = () => ({
+  type: RETURN_TO_SETTINGS_CONFIRMED,
 });

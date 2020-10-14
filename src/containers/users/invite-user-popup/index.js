@@ -31,9 +31,6 @@ const Modal = styled(StyledModal)`
     padding: 92px 45px 198px 45px;
     border-radius: 3px;
   }
-  .ant-modal-content {
-    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.05);
-  }
   form {
     text-align: center;
     button[type="submit"] {
@@ -84,10 +81,12 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
     <Modal
       visible
       footer={null}
+      mask={false}
       onOk={handleOk}
       onCancel={handleCancel}
       closeIcon={<CloseOutlined />}
       width={390}
+      style={{ top: '92px' }}
     >
       <StyledH2>
         INVITE A USER TO JOIN

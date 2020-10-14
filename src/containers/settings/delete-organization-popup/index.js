@@ -44,9 +44,6 @@ const Modal = styled(StyledModal)`
     padding: 24px 48px 48px 36px;
     border-radius: 3px;
   }
-  .ant-modal-content {
-    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.05);
-  }
 `;
 
 const StyledForm = styled.div`
@@ -124,6 +121,7 @@ const DeleteOrganizationPopup = ({
       <Modal
         visible
         footer={null}
+        mask={false}
         onOk={handleOk}
         onCancel={handleCancel}
         closeIcon={<CloseOutlined />}
