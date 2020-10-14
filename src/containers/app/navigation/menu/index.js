@@ -9,6 +9,7 @@ import {
   ROUTE_USERS,
   ROUTE_SETTINGS,
 } from 'config/routes';
+import { ROLE_ADMINISTRATOR } from 'config/roles';
 import colors from 'styles/colors';
 
 const StyledMenu = styled(Menu)`
@@ -49,21 +50,21 @@ const MainMenu = () => {
   const path = location.pathname;
 
   const profile = useSelector((state) => state.user.profile);
-  const organizationMembers = useSelector((state) => state.organization.members);
+  const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   if (!profile) return null;
+
+  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR);
 
   const selectedKeys = [];
   if (path.includes(ROUTE_PIPELINES)) selectedKeys.push('pipelines');
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
   if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('settings');
 
-  const hasOrganizations = currentOrg && organizationMembers && organizationMembers.length;
-
   return (
     <StyledMenu selectedKeys={selectedKeys}>
       <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>
-      {hasOrganizations && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
+      {isOrganizationAdmin && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
       <StyledMenuItem key="settings" onClick={navigate(ROUTE_SETTINGS)}>Settings</StyledMenuItem>
     </StyledMenu>
   );
