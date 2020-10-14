@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-//import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-//import { getUserProfile } from 'actions/user';
+// import { getUserProfile } from 'actions/user';
 import { getOrganizationMembers } from 'actions/organization';
-//import { ROUTE_PIPELINES } from 'config/routes';
+// import { ROUTE_PIPELINES } from 'config/routes';
 import {
   StyledTitle,
   StyledButton,
@@ -22,13 +22,14 @@ const HeaderRow = styled(StyledGrid)`
 `;
 
 const Users = () => {
-  //const history = useHistory();
+  // const history = useHistory();
   const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
 
   const profile = useSelector((state) => state.user.profile);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const members = useSelector((state) => state.organization.members);
-  //const userRemoved = useSelector((state) => state.organization.userRemoved);
+  const invitations = useSelector((state) => state.organization.invitations);
+  // const userRemoved = useSelector((state) => state.organization.userRemoved);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -37,12 +38,12 @@ const Users = () => {
     }
   }, [dispatch, profile, currentOrg]);
 
-  /*useEffect(() => { // has bug: going back to Users tab calls this again because members is still []
+  /* useEffect(() => { // has bug: going back to Users tab calls this again because members is still []
     if (members && !members.length && userRemoved) {
       dispatch(getUserProfile(profile.uuid));
       history.push(ROUTE_PIPELINES);
     }
-  });*/
+  }); */
 
   const openInviteUserPopup = () => setShowInviteUserPopup(true);
 
@@ -67,14 +68,23 @@ const Users = () => {
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
       </HeaderRow>
       <Space direction="vertical" size={16}>
-        {members && members.map((item) => (
+        {members && members.map(({
+          uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at,
+        }) => (
           <UserItem
-            key={item.uuid}
-            uuid={item.uuid}
-            first_name={item.first_name}
-            last_name={item.last_name}
-            is_system_admin={item.is_system_admin}
-            last_active_at={item.last_active_at}
+            key={user_uuid}
+            uuid={user_uuid}
+            first_name={first_name}
+            last_name={last_name}
+            is_system_admin={is_system_admin}
+            last_active_at={last_active_at}
+          />
+        ))}
+        {invitations && invitations.map(({ uuid: invitation_uuid, email_address }) => (
+          <UserItem
+            key={invitation_uuid}
+            uuid={invitation_uuid}
+            first_name={email_address}
           />
         ))}
       </Space>

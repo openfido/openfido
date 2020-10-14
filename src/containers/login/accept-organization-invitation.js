@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import queryString from 'query-string';
 
 import {
   ROUTE_PIPELINES,
@@ -10,7 +11,9 @@ import { changeOrganization } from 'actions/user';
 import { acceptOrganizationInvitation } from 'actions/organization';
 
 const AcceptOrganizationInvitation = () => {
-  const { invitation_token } = useParams();
+  const { search } = useLocation();
+  const { invitation_token } = queryString.parse(search);
+
   const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
   const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);

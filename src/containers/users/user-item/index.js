@@ -5,7 +5,8 @@ import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import { removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
+import { requestCancelOrganizationInvitation } from 'services';
+import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -102,10 +103,12 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role,
+  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role, invitation_token,
 }) => {
   const [userRole, setUserRole] = useState(role.name);
   const [userRoleClicked, setUserRoleClicked] = useState();
+  const [invitationCanceled, setInvitationCanceled] = useState(false);
+
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userRemoved = useSelector((state) => state.organization.userRemoved);
   const removeMemberError = useSelector((state) => state.organization.removeMemberError);
@@ -113,19 +116,33 @@ const User = ({
   const changeRoleError = useSelector((state) => state.organization.changeRoleError);
   const dispatch = useDispatch();
 
+
   useEffect(() => {
     if (!changeRoleError && userRoleChanged === user_uuid) {
       setUserRole(userRoleClicked);
     }
   }, [changeRoleError, userRoleChanged, user_uuid, userRoleClicked]);
 
+  if (invitationCanceled) return null;
+
   const onDeleteUserClicked = () => {
     dispatch(removeOrganizationMember(currentOrg, user_uuid));
   };
 
   const onChangeRoleClicked = (clickedRole) => {
-    dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
-      .then(() => setUserRoleClicked(clickedRole));
+    if (invitation_token) {
+      requestCancelOrganizationInvitation(invitation_token)
+        .then(() => {
+          dispatch(getOrganizationMembers(currentOrg));
+          setInvitationCanceled(true);
+        })
+        .catch(() => {
+          setInvitationCanceled(false);
+        });
+    } else {
+      dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
+        .then(() => setUserRoleClicked(clickedRole));
+    }
   };
 
   const menu = (
@@ -200,6 +217,7 @@ const User = ({
         </StyledText>
       </StyledDropdown>
       <StyledText size="large" color="gray">
+        {invitation_token ? 'Invitation sent' : ''}
         {moment(last_active_at).fromNow()}
       </StyledText>
       <DeleteColumn>
@@ -220,10 +238,12 @@ User.propTypes = {
     name: PropTypes.string.isRequired,
     code: PropTypes.string.isRequired,
   }),
+  invitation_token: PropTypes.string,
 };
 
 User.defaultProps = {
   role: {},
+  invitation_token: null,
 };
 
 export default User;
