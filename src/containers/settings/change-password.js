@@ -55,7 +55,6 @@ const EditProfile = () => {
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();
-
     if (newPassword === confirmPassword) {
       if (!changePasswordInProgress) {
         dispatch(changePassword(oldPassword, newPassword));

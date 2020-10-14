@@ -13,7 +13,7 @@ const CloseOutlined = ({ color, onClick }) => {
   );
 
   return (
-    <StyledIcon component={CloseOutlinedSVG} onClick={onClick} />
+    <StyledIcon component={CloseOutlinedSVG} onClick={onClick} className="anticon-close-outlined" />
   );
 };
 

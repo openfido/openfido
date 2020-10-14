@@ -179,6 +179,10 @@ export const StyledButton = styled(Button)`
     border-radius: 3px;
     padding: 0;
     height: auto;
+    span {
+      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
+    }
     label {
       cursor: pointer;
       padding: 3px 8px;
@@ -205,8 +209,6 @@ export const StyledButton = styled(Button)`
     height: auto;
     font-weight: 400;
     border-radius: 3px;
-    padding: 4px 8px;
-    padding: 0.25rem 0.5rem;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
@@ -214,7 +216,7 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor, size,
+    type, color, width, height, hoverbgcolor, size, textColor,
   }) => (`
   ${size === 'middle' ? (`
   &.ant-btn {
@@ -222,8 +224,6 @@ export const StyledButton = styled(Button)`
     line-height: 19px;
     font-weight: 500;
     border-radius: 3px;
-    padding: 8px 12px;
-    padding: 0.5rem 0.75rem;
     height: 50px;
     height: 3.125rem;
   }
@@ -271,16 +271,19 @@ export const StyledButton = styled(Button)`
   ${height ? (`
   height: ${height}px;
   `) : ''}
+  ${textColor in colors ? (`
+  color: ${colors[textColor]};
+  `) : ''}
   `)}
 `;
 
 export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
-  padding: 16px 12px;
-  background-color: ${colors.darkOverlay};
+  padding: 12px;
+  background-color: ${colors.lightBg};
   &, &:hover:focus {
-    color: ${colors.darkText};
+    color: ${colors.gray};
   }
   &:hover {
     &, &::placeholder {
@@ -301,6 +304,7 @@ export const StyledInput = styled(Input)`
   line-height: 21px;
   background-color: ${colors.overlay20};
   width: 100%;
+  height: 48px;
   `) : (`
   font-size: 12px;
   line-height: 14px;

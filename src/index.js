@@ -46,6 +46,7 @@ const store = composeWithDevTools(applyMiddleware(...middlewares))(createStore)(
 
 const AppSwitch = () => {
   const profile = useSelector((state) => state.user.profile);
+  const currentOrg = useSelector((state) => state.user.currentOrg);
   const hasProfile = profile !== null;
   const dispatch = useDispatch();
 
@@ -90,7 +91,7 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
         {hasProfile && 'is_system_admin' in profile && (
-          !profile.is_system_admin || !(profile.organizations && profile.organizations.length) ? (
+          !profile.is_system_admin || !(currentOrg && profile.organizations && profile.organizations.length) ? (
             <Redirect to={ROUTE_PIPELINES} />
           ) : (
             <App><Users /></App>

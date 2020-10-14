@@ -9,6 +9,7 @@ import {
   AUTH_IN_PROGRESS,
   CHANGE_ORGANIZATION,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
@@ -26,6 +27,7 @@ import {
   requestRefreshJWT,
   requestChangePassword,
   requestUserProfile,
+  requestUserOrganizations,
   requestUpdateUserProfile,
   requestUserAvatar,
   requestUpdateUserAvatar,
@@ -57,22 +59,22 @@ export const loginUser = (email, password) => async (dispatch) => {
         payload: response.data,
       });
 
-      const { uuid } = response.data;
-      return requestUserProfile(uuid);
+      const { uuid: user_uuid } = response.data;
+
+      return Promise.all([
+        requestUserProfile(user_uuid),
+        requestUserAvatar(user_uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
       });
 
-      const { uuid } = response.data;
-      return requestUserAvatar(uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_AVATAR,
-        payload: response.data,
+        payload: avatarResponse.data,
       });
     })
     .catch((err) => {
@@ -91,20 +93,20 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         payload: response.data,
       });
 
-      return requestUserProfile(user_uuid);
+      return Promise.all([
+        requestUserProfile(user_uuid),
+        requestUserAvatar(user_uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, avatarResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
       });
 
-      return requestUserAvatar(user_uuid);
-    })
-    .then((response) => {
       dispatch({
         type: GET_USER_AVATAR,
-        payload: response.data,
+        payload: avatarResponse.data,
       });
     })
     .catch(() => {
@@ -140,6 +142,8 @@ export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
         type: UPDATE_USER_AVATAR,
         payload: image_content,
       });
+
+      return requestUserAvatar(user_uuid);
     })
     .then((response) => {
       dispatch({
@@ -185,6 +189,16 @@ export const changePassword = (old_password, new_password) => async (dispatch) =
       dispatch({
         type: CHANGE_PASSWORD_FAILED,
         payload: err.message,
+      });
+    });
+};
+
+export const getUserOrganizations = (user_uuid) => (dispatch) => { // is_system_admin only
+  requestUserOrganizations(user_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: response.data,
       });
     });
 };

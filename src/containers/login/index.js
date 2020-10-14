@@ -31,6 +31,7 @@ const Login = () => {
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -57,6 +58,7 @@ const Login = () => {
 
     if (!authInProgress) {
       dispatch(loginUser(email, password));
+      setFormSubmitted(true);
     }
   };
 
@@ -77,7 +79,7 @@ const Login = () => {
             color="pink"
             float="left"
           >
-            {authError && 'Invalid credentials entered'}
+            {authError && formSubmitted && 'Invalid credentials entered'}
           </StyledText>
           <StyledText
             size="middle"

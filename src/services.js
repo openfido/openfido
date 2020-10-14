@@ -35,6 +35,8 @@ export const requestChangePassword = (old_password, new_password) => (
 
 export const requestUserProfile = (user_uuid) => ApiClient.get(`/users/${user_uuid}/profile`);
 
+export const requestUserOrganizations = (user_uuid) => ApiClient.get(`/users/${user_uuid}/organizations`);
+
 export const requestUpdateUserProfile = (user_uuid, email, first_name, last_name) => (
   ApiClient.put(`/users/${user_uuid}/profile`, {
     email,
@@ -73,4 +75,16 @@ export const requestAcceptOrganizationInvitation = (organization_uuid, invitatio
 
 export const requestOrganizationInvitations = (organization_uuid) => (
   ApiClient.get(`/organizations/${organization_uuid}/invitations`)
+);
+
+export const requestCreateOrganization = (organization_name) => (
+  ApiClient.post('/organizations', { name: organization_name })
+);
+
+export const requestUpdateOrganization = (organization_uuid, organization_name) => (
+  ApiClient.put(`/organizations/${organization_uuid}/profile`, { name: organization_name })
+);
+
+export const requestDeleteOrganization = (organization_uuid) => (
+  ApiClient.delete(`/organizations/${organization_uuid}`)
 );

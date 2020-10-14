@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
 
@@ -6,6 +7,7 @@ import { StyledTitle, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 import EditProfile from './edit-profile';
 import ChangePassword from './change-password';
+import EditOrganization from './edit-organization';
 
 const Root = styled.div`
   padding: 60px 90px;
@@ -44,7 +46,10 @@ const StyledMenu = styled(Menu)`
 `;
 
 const Settings = () => {
+  const profile = useSelector((state) => state.user.profile);
   const [selectedKey, setSelectedKey] = useState('Edit Profile');
+
+  if (!profile) return null;
 
   let content = null;
   switch (selectedKey) {
@@ -53,6 +58,9 @@ const Settings = () => {
       break;
     case 'Change Password':
       content = <ChangePassword />;
+      break;
+    case 'Edit Organization':
+      content = <EditOrganization />;
       break;
     default:
       break;
@@ -71,9 +79,11 @@ const Settings = () => {
           <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
-          <Menu.Item key="Edit Organization">
+          {profile.is_system_admin && (
+          <Menu.Item key="Edit Organization" onClick={() => setSelectedKey('Edit Organization')}>
             <StyledText size="xlarge">Edit Organization</StyledText>
           </Menu.Item>
+          )}
         </StyledMenu>
         {content}
       </Root>

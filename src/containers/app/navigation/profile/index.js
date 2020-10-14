@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { logoutUser } from 'actions/user';
 import colors from 'styles/colors';
+import PhotoImg from 'icons/navigation-profile-avatar.svg';
 import SettingsDropdown from './SettingsDropdown';
 
 const StyledProfileContainer = styled.div`
@@ -55,7 +56,7 @@ const Profile = () => {
   const StyledPhoto = styled.div`
     width: 40px;
     height: 40px;
-    background-image: url(${avatar});
+    background-image: url(${avatar || PhotoImg});
     background-size: 40px;
     border-radius: 20px;
   `;

@@ -12,6 +12,7 @@ import {
   CHANGE_PASSWORD_FAILED,
   CHANGE_PASSWORD_CONFIRMED,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
@@ -24,6 +25,7 @@ import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
   profile: Auth.getUser(),
+  organizations: null,
   avatar: null,
   currentOrg: null,
   messages: {
@@ -151,6 +153,13 @@ export default (state = DEFAULT_STATE, action) => {
           ...action.payload,
         },
         currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+      };
+    }
+    case GET_USER_ORGANIZATIONS: {
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        organizations: action.payload,
       };
     }
     case UPDATE_USER_PROFILE: {

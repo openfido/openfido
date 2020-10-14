@@ -12,12 +12,10 @@ const StyledForm = styled.form`
   display: grid;
   grid-gap: 16px;
   grid-gap: 1rem;
+  max-width: 432px;
   button[type="submit"] {
     margin-top: 32px;
     margin-top: 2rem;
-  }
-  input {
-    width: 432px;
   }
 `;
 
@@ -49,7 +47,6 @@ const UserAvatar = styled.div`
 `;
 
 const FormMessage = styled.div`
-  width: 432px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -104,6 +101,7 @@ const EditProfile = () => {
 
     if (files.length) {
       dispatch(updateUserAvatar(profile.uuid, files[0]));
+      e.target.value = '';
     }
   };
 
@@ -117,7 +115,7 @@ const EditProfile = () => {
           type="file"
           id="avatar"
           name="avatar"
-          accept="image/png, image/jpeg"
+          accept="image/png, image/jpeg, image/gif"
           onChange={onPhotoChanged}
         />
         <StyledButton
