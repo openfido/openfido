@@ -49,7 +49,7 @@ const MainMenu = () => {
   const path = location.pathname;
 
   const profile = useSelector((state) => state.user.profile);
-  const organizations = useSelector((state) => state.user.organizations);
+  const organizationMembers = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   if (!profile) return null;
 
@@ -58,7 +58,7 @@ const MainMenu = () => {
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
   if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('settings');
 
-  const hasOrganizations = currentOrg && organizations && organizations.length;
+  const hasOrganizations = currentOrg && organizationMembers && organizationMembers.length;
 
   return (
     <StyledMenu selectedKeys={selectedKeys}>
