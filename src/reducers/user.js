@@ -10,6 +10,7 @@ import {
   CHANGE_PASSWORD,
   CHANGE_PASSWORD_IN_PROGRESS,
   CHANGE_PASSWORD_FAILED,
+  CHANGE_PASSWORD_CONFIRMED,
   GET_USER_PROFILE,
   GET_USER_ORGANIZATIONS,
   UPDATE_USER_PROFILE,
@@ -136,6 +137,11 @@ export default (state = DEFAULT_STATE, action) => {
           ...DEFAULT_STATE.messages,
           changePasswordError: action.payload,
         },
+      };
+    case CHANGE_PASSWORD_CONFIRMED:
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
       };
     case GET_USER_PROFILE: {
       const { organizations } = action.payload;

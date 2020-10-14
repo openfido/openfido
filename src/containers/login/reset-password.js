@@ -22,7 +22,7 @@ const HeaderText = styled(StyledH2)`
 
 const ResetPassword = () => {
   const history = useHistory();
-  const { reset_token: resetToken, email } = useParams();
+  const { reset_token: resetToken } = useParams();
 
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
@@ -53,7 +53,7 @@ const ResetPassword = () => {
       setLoading(true);
 
       if (password === confirmPassword) {
-        requestUpdatePassword(email, resetToken, password)
+        requestUpdatePassword(resetToken, password)
           .then(() => {
             history.push(ROUTE_LOGIN);
           })
@@ -97,11 +97,15 @@ const ResetPassword = () => {
           </StyledText>
           <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
         </label>
-        <FormMessage size="large">
-          <StyledText size="small" color="pink">
+        <FormMessage float="right">
+          <StyledText size="small" color={error && !passwordMismatch ? 'pink' : 'gray'}>
+            Minimum 10 characters
+          </StyledText>
+        </FormMessage>
+        <FormMessage size="middle">
+          <StyledText color="pink">
             {passwordMismatch && 'Passwords do not match.'}
           </StyledText>
-          <StyledText size="small" color={error && !passwordMismatch ? 'pink' : 'gray'}>Minimum 10 characters</StyledText>
         </FormMessage>
         <StyledButton
           htmlType="submit"

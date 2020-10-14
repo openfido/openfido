@@ -223,7 +223,7 @@ export const StyledButton = styled(Button)`
     font-size: 16px;
     line-height: 19px;
     font-weight: 500;
-    border-radius: 2px;
+    border-radius: 3px;
     height: 50px;
     height: 3.125rem;
   }
