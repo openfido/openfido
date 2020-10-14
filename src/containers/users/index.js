@@ -29,7 +29,7 @@ const Users = () => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const members = useSelector((state) => state.organization.members);
   const invitations = useSelector((state) => state.organization.invitations);
-  // const userRemoved = useSelector((state) => state.organization.userRemoved);
+  // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -85,6 +85,7 @@ const Users = () => {
             key={invitation_uuid}
             uuid={invitation_uuid}
             first_name={email_address}
+            isInvited
           />
         ))}
       </Space>

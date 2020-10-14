@@ -52,8 +52,8 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
   const profile = useSelector((state) => state.user.profile);
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const userInvited = useSelector((state) => state.organization.userInvited);
-  const inviteOrganizationMemberError = useSelector((state) => state.organization.inviteOrganizationMemberError);
+  const userInvited = useSelector((state) => state.organization.messages.userInvited);
+  const inviteOrganizationMemberError = useSelector((state) => state.organization.messages.inviteOrganizationMemberError);
   const [email, setEmail] = useState(null);
   const dispatch = useDispatch();
 

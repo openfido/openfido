@@ -16,9 +16,9 @@ const AcceptOrganizationInvitation = () => {
 
   const history = useHistory();
   const profile = useSelector((state) => state.user.profile);
-  const invitationOrganization = useSelector((state) => state.organization.invitationOrganization);
-  const invitationToken = useSelector((state) => state.organization.invitationToken);
-  const acceptInvitationError = useSelector((state) => state.organization.acceptInvitationError);
+  const invitationOrganization = useSelector((state) => state.organization.messages.invitationOrganization);
+  const invitationToken = useSelector((state) => state.organization.messages.invitationToken);
+  const acceptInvitationError = useSelector((state) => state.organization.messages.acceptInvitationError);
   const dispatch = useDispatch();
 
   useEffect(() => {

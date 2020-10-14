@@ -103,35 +103,31 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role, invitation_token,
+  uuid, first_name, last_name, is_system_admin, last_active_at, role, isInvited,
 }) => {
   const [userRole, setUserRole] = useState(role.name);
   const [userRoleClicked, setUserRoleClicked] = useState();
   const [invitationCanceled, setInvitationCanceled] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const userRemoved = useSelector((state) => state.organization.userRemoved);
-  const removeMemberError = useSelector((state) => state.organization.removeMemberError);
-  const userRoleChanged = useSelector((state) => state.organization.userRoleChanged);
-  const changeRoleError = useSelector((state) => state.organization.changeRoleError);
+  const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
+  const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
+  const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
+  const changeRoleError = useSelector((state) => state.organization.messages.changeRoleError);
   const dispatch = useDispatch();
 
 
   useEffect(() => {
-    if (!changeRoleError && userRoleChanged === user_uuid) {
+    if (!changeRoleError && userRoleChanged === uuid) {
       setUserRole(userRoleClicked);
     }
-  }, [changeRoleError, userRoleChanged, user_uuid, userRoleClicked]);
+  }, [changeRoleError, userRoleChanged, uuid, userRoleClicked]);
 
   if (invitationCanceled) return null;
 
   const onDeleteUserClicked = () => {
-    dispatch(removeOrganizationMember(currentOrg, user_uuid));
-  };
-
-  const onChangeRoleClicked = (clickedRole) => {
-    if (invitation_token) {
-      requestCancelOrganizationInvitation(invitation_token)
+    if (isInvited && uuid) {
+      requestCancelOrganizationInvitation(uuid)
         .then(() => {
           dispatch(getOrganizationMembers(currentOrg));
           setInvitationCanceled(true);
@@ -140,9 +136,13 @@ const User = ({
           setInvitationCanceled(false);
         });
     } else {
-      dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
-        .then(() => setUserRoleClicked(clickedRole));
+      dispatch(removeOrganizationMember(currentOrg, uuid));
     }
+  };
+
+  const onChangeRoleClicked = (clickedRole) => {
+    dispatch(changeOrganizationMemberRole(currentOrg, uuid, clickedRole))
+      .then(() => setUserRoleClicked(clickedRole));
   };
 
   const menu = (
@@ -203,22 +203,25 @@ const User = ({
           {first_name}
           {last_name && ` ${last_name}`}
         </StyledText>
-        {removeMemberError && user_uuid === userRemoved && (
+        {removeMemberError && uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
-        {changeRoleError && user_uuid === userRoleChanged && (
+        {changeRoleError && uuid === userRoleChanged && (
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )}
       </NameColumn>
       <StyledDropdown overlay={menu} trigger="click">
         <StyledText size="large" color="gray">
-          {changeRoleError && user_uuid === userRoleChanged ? role.name : userRole}
+          {changeRoleError && uuid === userRoleChanged ? role.name : userRole}
           <DownOutlined color="lightGray" />
         </StyledText>
       </StyledDropdown>
       <StyledText size="large" color="gray">
-        {invitation_token ? 'Invitation sent' : ''}
-        {moment(last_active_at).fromNow()}
+        {isInvited ? (
+          <StyledText color="blue">Invitation sent</StyledText>
+        ) : (
+          moment(last_active_at).fromNow()
+        )}
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
@@ -230,20 +233,23 @@ const User = ({
 User.propTypes = {
   uuid: PropTypes.string.isRequired,
   first_name: PropTypes.string.isRequired,
-  last_name: PropTypes.string.isRequired,
-  is_system_admin: PropTypes.bool.isRequired,
-  last_active_at: PropTypes.string.isRequired,
+  last_name: PropTypes.string,
+  is_system_admin: PropTypes.bool,
+  last_active_at: PropTypes.string,
   role: PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     code: PropTypes.string.isRequired,
   }),
-  invitation_token: PropTypes.string,
+  isInvited: PropTypes.bool,
 };
 
 User.defaultProps = {
+  last_name: '',
+  is_system_admin: false,
+  last_active_at: undefined,
   role: {},
-  invitation_token: null,
+  isInvited: false,
 };
 
 export default User;

@@ -75,8 +75,8 @@ export const requestAcceptOrganizationInvitation = (invitation_token) => (
   ApiClient.post('/organizations/invitations/accept', { invitation_token })
 );
 
-export const requestCancelOrganizationInvitation = (invitation_token) => (
-  ApiClient.post('/organizations/invitations/cancel', { invitation_token })
+export const requestCancelOrganizationInvitation = (invitation_uuid) => (
+  ApiClient.post('/organizations/invitations/cancel', { invitation_uuid })
 );
 
 export const requestOrganizationInvitations = (organization_uuid) => (
