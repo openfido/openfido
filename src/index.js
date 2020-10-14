@@ -83,6 +83,7 @@ const AppSwitch = () => {
         <AcceptOrganizationInvitation />
       </Route>
       <Route exact path={ROUTE_CREATE_NEW_ACCOUNT_INVITATION}>
+        {hasProfileRedirectToPipelines}
         <CreateNewAccountInvitation />
       </Route>
       <Route exact path={ROUTE_PIPELINES}>
