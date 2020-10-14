@@ -53,6 +53,7 @@ const FormMessage = styled.div`
 
 const InviteUserPopup = ({ handleOk, handleCancel }) => {
   const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userInvited = useSelector((state) => state.organization.userInvited);
   const inviteOrganizationMemberError = useSelector((state) => state.organization.inviteOrganizationMemberError);
@@ -65,9 +66,9 @@ const InviteUserPopup = ({ handleOk, handleCancel }) => {
     }
   }, [inviteOrganizationMemberError, userInvited, handleOk]);
 
-  if (!profile || !profile.organizations || !profile.organizations.length) return null;
+  if (!profile || !organizations || !organizations.length) return null;
 
-  const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
+  const currentOrgObj = organizations.find((org) => org.uuid === currentOrg);
 
   const onEmailChanged = (e) => {
     setEmail(e.target.value);

@@ -63,10 +63,11 @@ const StyledMenuItem = styled(Menu.Item)`
 
 const SettingsDropdown = () => {
   const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
-  if (!profile || !profile.organizations || !profile.organizations.length) return null;
+  if (!profile || !organizations || !organizations.length) return null;
 
   const onOrgClicked = (organization_uuid) => {
     dispatch(changeOrganization(organization_uuid));
@@ -75,7 +76,7 @@ const SettingsDropdown = () => {
   const menu = (
     <StyledMenu>
       <li>Change organization</li>
-      {profile.organizations && profile.organizations.map((org) => (
+      {organizations.map((org) => (
         <StyledMenuItem key={org.name} onClick={() => onOrgClicked(org.uuid)}>
           {org.name}
         </StyledMenuItem>
@@ -83,8 +84,8 @@ const SettingsDropdown = () => {
     </StyledMenu>
   );
 
-  const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
-  const dropdownDisabled = currentOrgObj && profile.organizations.length <= 1;
+  const currentOrgObj = organizations.find((org) => org.uuid === currentOrg);
+  const dropdownDisabled = currentOrgObj && organizations.length <= 1;
 
   return (
     <StyledDropdown overlay={menu} disabled={dropdownDisabled}>
