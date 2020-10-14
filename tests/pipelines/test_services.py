@@ -4,8 +4,12 @@ import pytest
 import responses
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 from app.pipelines.models import OrganizationPipeline
-from app.pipelines.services import (create_pipeline, fetch_pipelines,
-                                    update_pipeline)
+from app.pipelines.services import (
+    create_pipeline,
+    fetch_pipelines,
+    update_pipeline,
+    delete_pipeline,
+)
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
@@ -128,3 +132,21 @@ def test_update_pipeline(app, pipeline):
     ).first()
     json_response["uuid"] = pipeline.uuid
     assert updated_pipeline == json_response
+
+
+@responses.activate
+def test_delete_pipeline_no_pipeline(app, pipeline):
+    with pytest.raises(ValueError):
+        delete_pipeline(ORGANIZATION_UUID, "badid")
+    pipeline = set(OrganizationPipeline.query.all()) == set([pipeline])
+
+
+@responses.activate
+def test_delete_pipeline(app, pipeline):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+    )
+    delete_pipeline(ORGANIZATION_UUID, pipeline.uuid)
+
+    assert pipeline.is_deleted

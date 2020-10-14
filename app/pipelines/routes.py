@@ -5,7 +5,7 @@ from requests import HTTPError
 
 from app.utils import validate_organization, any_application_required
 
-from .services import fetch_pipelines, create_pipeline, update_pipeline
+from .services import fetch_pipelines, create_pipeline, update_pipeline, delete_pipeline
 
 logger = logging.getLogger("organization-pipelines")
 
@@ -79,10 +79,12 @@ def create(organization_uuid):
         return {"message": http_error.args[0]}, 503
 
 
-@organization_pipeline_bp.route("/<organization_uuid>/pipelines/<pipeline_uuid>", methods=["PUT"])
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>", methods=["PUT"]
+)
 @any_application_required
 @validate_organization()
-def update(organization_uuid, pipeline_uuid):
+def update(organization_uuid, organization_pipeline_uuid):
     """Update Organization Pipeline.
     ---
     tags:
@@ -94,7 +96,7 @@ def update(organization_uuid, pipeline_uuid):
         schema:
           type: string
     requestBody:
-      description: "Pipeline description and configuration."
+      description: "Pipeline description and corganization_pipeline_uuid"
       required: true
       content:
         application/json:
@@ -139,7 +141,40 @@ def update(organization_uuid, pipeline_uuid):
         description: "Bad request"
     """
     try:
-        return jsonify(update_pipeline(organization_uuid, pipeline_uuid, request.json))
+        return jsonify(
+            update_pipeline(organization_uuid, organization_pipeline_uuid, request.json)
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>", methods=["DELETE"]
+)
+@any_application_required
+@validate_organization()
+def remove(organization_uuid, organization_pipeline_uuid):
+    """Delete a Organization Pipeline.
+    ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Deleted OrganizationPipeline"
+      "400":
+        description: "Bad request"
+    """
+    try:
+        delete_pipeline(organization_uuid, organization_pipeline_uuid)
+        return {}, 200
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
