@@ -34,13 +34,13 @@ export const StyledForm = styled.form`
   position: relative;
   width: 390px;
   height: 522px;
-  padding: 28px 32px;
+  padding: 28px 30px 28px 32px;
   margin: 42px auto 0 auto;
   margin: 2.625rem auto 0 auto;
   background-color: ${colors.white};
   text-align: left;
   border-radius: 3px;
-  label {
+  > label {
     display: inline-block;
     margin-top: 16px;
     margin-top: 1rem;
@@ -77,9 +77,8 @@ export const StyledInput = styled.input`
   line-height: 1.3125rem;
   font-weight: 400;
   color: ${colors.gray};
-  padding: 10px 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 10px 2px;
+  margin: 0 -2px;
   border: none;
   border-bottom: 1px solid ${colors.lightGray};
   border-radius: 0;
@@ -88,11 +87,11 @@ export const StyledInput = styled.input`
   }
   margin-top: 16px;
   margin-top: 1rem;
-  &:first-of-type {
-    margin-top: 16px;
-    margin-top: 1rem;
-    margin-bottom: 16px;
-    margin-bottom: 16px;
+  margin-bottom: 16px;
+  margin-bottom: 16px;
+  & + div { 
+    margin-top: -16px;
+    margin-top: -16px;
   }
   &:last-of-type {
     margin-bottom: 0;
@@ -105,8 +104,8 @@ export const FormMessage = styled.div`
   justify-content: space-between;
   ${({ size, float }) => (`
   ${size === 'large' ? (`
-  padding: 0.75rem 0 1.75rem 0;
-  height: 3.5rem;
+  padding: 1.75rem 0 1.75rem 0;
+  height: 4.5rem;
   font-size: 14px;
   line-height: 16px;
   `) : (`

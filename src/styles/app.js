@@ -179,7 +179,7 @@ export const StyledButton = styled(Button)`
     border-radius: 3px;
     padding: 0;
     height: auto;
-    span {
+    &:not(.ant-btn-text) span {
       padding: 4px 8px;
       padding: 0.25rem 0.5rem;
     }

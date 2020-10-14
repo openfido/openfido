@@ -101,7 +101,6 @@ const CreateNewAccountInvitation = () => {
           role="button"
           tabIndex={0}
           onClick={onCreateAccountClicked}
-          style={{ padding: 0 }}
         >
           <label>
             Create
@@ -109,7 +108,7 @@ const CreateNewAccountInvitation = () => {
             Account
           </label>
         </StyledButton>
-        <FormMessage size="large">
+        <FormMessage size="middle">
           <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
             <StyledButton
               htmlType="button"
@@ -121,7 +120,7 @@ const CreateNewAccountInvitation = () => {
           </Link>
         </FormMessage>
         <br />
-        <FormMessage size="large">
+        <FormMessage size="small">
           {createUserError && !passwordMismatch && (
           <StyledText size="small" color="pink">
             Please be sure to use the email address invitation was sent to
