@@ -9,6 +9,7 @@ import {
   ACCEPT_ORGANIZATION_INVITATION,
   ACCEPT_ORGANIZATION_INVITATION_FAILED,
   GET_ORGANIZATION_INVITATIONS,
+  GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
 } from 'actions';
 import {
   requestOrganizationMembers,
@@ -33,6 +34,12 @@ export const getOrganizationMembers = (organization_uuid) => async (dispatch) =>
       dispatch({
         type: GET_ORGANIZATION_INVITATIONS,
         payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
+        payload: err.message,
       });
     });
 };
