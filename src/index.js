@@ -91,7 +91,7 @@ const AppSwitch = () => {
       </Route>
       <Route exact path={ROUTE_PIPELINES}>
         {noProfileRedirectToLogin}
-        <App><Pipelines /></App>
+        {hasProfile && organizations && <App><Pipelines /></App>}
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
@@ -105,7 +105,7 @@ const AppSwitch = () => {
       </Route>
       <Route exact path={ROUTE_SETTINGS}>
         {noProfileRedirectToLogin}
-        <App><Settings /></App>
+        {hasProfile && organizations && <App><Settings /></App>}
       </Route>
       {hasProfileRedirectToPipelines}
       {noProfileRedirectToLogin}

@@ -25,6 +25,7 @@ const Login = () => {
   }
 
   const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
   const authInProgress = useSelector((state) => state.user.messages.authInProgress);
   const authError = useSelector((state) => state.user.messages.authError);
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const Login = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
-    if (profile) {
+    if (profile && organizations) {
       if (invitation_token) {
         dispatch(acceptOrganizationInvitation(invitation_token));
       }

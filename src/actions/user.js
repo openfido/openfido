@@ -9,11 +9,14 @@ import {
   AUTH_IN_PROGRESS,
   CHANGE_ORGANIZATION,
   GET_USER_PROFILE,
+  GET_USER_PROFILE_FAILED,
   GET_USER_ORGANIZATIONS,
+  GET_USER_ORGANIZATIONS_FAILED,
   UPDATE_USER_PROFILE,
   UPDATE_USER_PROFILE_IN_PROGRESS,
   UPDATE_USER_PROFILE_FAILED,
   GET_USER_AVATAR,
+  GET_USER_AVATAR_FAILED,
   UPDATE_USER_AVATAR,
   UPDATE_USER_AVATAR_FAILED,
   CHANGE_PASSWORD_IN_PROGRESS,
@@ -61,27 +64,44 @@ export const loginUser = (email, password) => async (dispatch) => {
 
       const { uuid: user_uuid } = response.data;
 
-      return Promise.all([
-        requestUserProfile(user_uuid),
-        requestUserOrganizations(user_uuid),
-        requestUserAvatar(user_uuid),
-      ]);
-    })
-    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
-      dispatch({
-        type: GET_USER_PROFILE,
-        payload: profileResponse.data,
-      });
+      requestUserProfile(user_uuid)
+        .then((profileResponse) => {
+          dispatch({
+            type: GET_USER_PROFILE,
+            payload: profileResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_PROFILE_FAILED,
+          });
+        });
 
-      dispatch({
-        type: GET_USER_ORGANIZATIONS,
-        payload: organizationsResponse.data,
-      });
+      requestUserOrganizations(user_uuid)
+        .then((organizationsResponse) => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS,
+            payload: organizationsResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS_FAILED,
+          });
+        });
 
-      dispatch({
-        type: GET_USER_AVATAR,
-        payload: avatarResponse.data,
-      });
+      requestUserAvatar(user_uuid)
+        .then((avatarResponse) => {
+          dispatch({
+            type: GET_USER_AVATAR,
+            payload: avatarResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_AVATAR_FAILED,
+          });
+        });
     })
     .catch((err) => {
       dispatch({
@@ -99,27 +119,44 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         payload: response.data,
       });
 
-      return Promise.all([
-        requestUserProfile(user_uuid),
-        requestUserOrganizations(user_uuid),
-        requestUserAvatar(user_uuid),
-      ]);
-    })
-    .then(([profileResponse, organizationsResponse, avatarResponse]) => {
-      dispatch({
-        type: GET_USER_PROFILE,
-        payload: profileResponse.data,
-      });
+      requestUserProfile(user_uuid)
+        .then((profileResponse) => {
+          dispatch({
+            type: GET_USER_PROFILE,
+            payload: profileResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_PROFILE_FAILED,
+          });
+        });
 
-      dispatch({
-        type: GET_USER_ORGANIZATIONS,
-        payload: organizationsResponse.data,
-      });
+      requestUserOrganizations(user_uuid)
+        .then((organizationsResponse) => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS,
+            payload: organizationsResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS_FAILED,
+          });
+        });
 
-      dispatch({
-        type: GET_USER_AVATAR,
-        payload: avatarResponse.data,
-      });
+      requestUserAvatar(user_uuid)
+        .then((avatarResponse) => {
+          dispatch({
+            type: GET_USER_AVATAR,
+            payload: avatarResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_AVATAR_FAILED,
+          });
+        });
     })
     .catch(() => {
       // Treat as though we logged out. Very likely the user has reached the max

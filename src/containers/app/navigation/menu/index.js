@@ -49,10 +49,8 @@ const MainMenu = () => {
   const location = useLocation();
   const path = location.pathname;
 
-  const profile = useSelector((state) => state.user.profile);
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  if (!profile) return null;
 
   const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR);
 

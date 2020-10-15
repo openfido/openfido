@@ -45,13 +45,10 @@ const EditProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMismatch, setPasswordMismatch] = useState(false);
 
-  const profile = useSelector((state) => state.user.profile);
   const changePasswordSuccess = useSelector((state) => state.user.messages.changePasswordSuccess);
   const changePasswordInProgress = useSelector((state) => state.user.messages.changePasswordInProgress);
   const changePasswordError = useSelector((state) => state.user.messages.changePasswordError);
   const dispatch = useDispatch();
-
-  if (!profile) return null;
 
   const onChangePasswordClicked = (e) => {
     e.preventDefault();

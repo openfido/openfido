@@ -75,12 +75,10 @@ const EditProfile = () => {
     }
   }, [profile]);
 
-  if (!profile) return null;
-
   const onUpdateProfileClicked = (e) => {
     e.preventDefault();
 
-    if (!updateUserProfileInProgress) {
+    if (profile && !updateUserProfileInProgress) {
       dispatch(updateUserProfile(profile.uuid, email, firstName, lastName));
     }
   };
@@ -100,7 +98,7 @@ const EditProfile = () => {
   const onPhotoChanged = (e) => {
     const { files = [] } = e.target;
 
-    if (files.length) {
+    if (profile && files.length) {
       dispatch(updateUserAvatar(profile.uuid, files[0]));
       e.target.value = '';
     }

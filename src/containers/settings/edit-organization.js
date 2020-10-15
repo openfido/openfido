@@ -102,8 +102,6 @@ const EditOrganization = () => {
     }
   }, [createOrganizationInput, addOrganization]);
 
-  if (!profile) return null;
-
   const onOrganizationClick = (e, organizationUUID, organizationName) => {
     setError(null);
     setLoading(false);
@@ -131,7 +129,7 @@ const EditOrganization = () => {
     if (!loading) {
       setLoading(true);
 
-      if (addOrganization) {
+      if (profile && addOrganization) {
         requestCreateOrganization(addOrganizationName)
           .then(() => {
             setError(null);
@@ -169,7 +167,11 @@ const EditOrganization = () => {
     setError(null);
     setLoading(false);
     setSelectedInput(null);
-    dispatch(getUserOrganizations(profile.uuid));
+
+    if (profile) {
+      dispatch(getUserOrganizations(profile.uuid));
+    }
+
     setShowDeletePopup(false);
   };
 

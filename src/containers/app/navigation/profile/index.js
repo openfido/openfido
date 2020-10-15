@@ -47,8 +47,6 @@ const Profile = () => {
   const avatar = useSelector((state) => state.user.avatar);
   const dispatch = useDispatch();
 
-  if (!profile) return null;
-
   const onSignOutClicked = () => {
     dispatch(logoutUser());
   };
@@ -70,10 +68,12 @@ const Profile = () => {
         <StyledPhotoContainer>
           <StyledPhoto />
         </StyledPhotoContainer>
-        <StyledName>
-          {profile.first_name}
-          {profile.last_name && ` ${profile.last_name}`}
-        </StyledName>
+        {profile && (
+          <StyledName>
+            {profile.first_name}
+            {profile.last_name && ` ${profile.last_name}`}
+          </StyledName>
+        )}
         <SettingsDropdown />
       </StyledProfileContainer>
     </>
