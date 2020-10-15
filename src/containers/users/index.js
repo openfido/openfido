@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-// import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-// import { getUserProfile } from 'actions/user';
 import { getOrganizationMembers } from 'actions/organization';
-// import { ROUTE_PIPELINES } from 'config/routes';
 import {
   StyledTitle,
   StyledButton,
@@ -22,14 +19,12 @@ const HeaderRow = styled(StyledGrid)`
 `;
 
 const Users = () => {
-  // const history = useHistory();
   const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
 
   const profile = useSelector((state) => state.user.profile);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const members = useSelector((state) => state.organization.members);
   const invitations = useSelector((state) => state.organization.invitations);
-  // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -37,13 +32,6 @@ const Users = () => {
       dispatch(getOrganizationMembers(currentOrg));
     }
   }, [dispatch, profile, currentOrg]);
-
-  /* useEffect(() => { // has bug: going back to Users tab calls this again because members is still []
-    if (members && !members.length && userRemoved) {
-      dispatch(getUserProfile(profile.uuid));
-      history.push(ROUTE_PIPELINES);
-    }
-  }); */
 
   const openInviteUserPopup = () => setShowInviteUserPopup(true);
 
@@ -69,13 +57,14 @@ const Users = () => {
       </HeaderRow>
       <Space direction="vertical" size={16}>
         {members && members.map(({
-          uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at,
+          uuid: user_uuid, first_name, last_name, role, is_system_admin, last_active_at,
         }) => (
           <UserItem
             key={user_uuid}
             uuid={user_uuid}
             first_name={first_name}
             last_name={last_name}
+            role={role}
             is_system_admin={is_system_admin}
             last_active_at={last_active_at}
           />

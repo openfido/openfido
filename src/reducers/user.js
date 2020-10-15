@@ -217,7 +217,6 @@ export default (state = DEFAULT_STATE, action) => {
         messages: DEFAULT_STATE.messages,
         currentOrg: action.payload,
       };
-
     case RETURN_TO_SETTINGS_CONFIRMED:
       return {
         ...state,

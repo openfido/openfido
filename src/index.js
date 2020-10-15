@@ -29,13 +29,14 @@ import {
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
   ROUTE_USERS,
-  ROUTE_ACCEPT_ORGANIZATION_INVITATION, ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
+  ROUTE_ACCEPT_ORGANIZATION_INVITATION,
+  ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
   ROUTE_SETTINGS,
 } from 'config/routes';
+import { ROLE_ADMINISTRATOR } from 'config/roles';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
 import 'index.css';
-import { ROLE_ADMINISTRATOR } from './config/roles';
 
 const middlewares = [];
 middlewares.push(thunk);
@@ -68,7 +69,7 @@ const AppSwitch = () => {
   const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
   const noProfileRedirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
 
-  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR);
+  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
 
   return (
     <Switch>

@@ -52,7 +52,7 @@ const MainMenu = () => {
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
-  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR);
+  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
 
   const selectedKeys = [];
   if (path.includes(ROUTE_PIPELINES)) selectedKeys.push('pipelines');
