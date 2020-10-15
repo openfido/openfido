@@ -13,19 +13,20 @@ import { ROLE_ADMINISTRATOR } from 'config/roles';
 import colors from 'styles/colors';
 
 const StyledMenu = styled(Menu)`
-  padding: 23px 9px 0 0;
+  padding: 16px 10px 0 0;
+  padding: 1rem 0.625rem 0 0;
   &.ant-menu-vertical {
     border-right: 0;
     .ant-menu-item-selected {
-      background-color: ${colors.black};
+      background-color: ${colors.blue};
       color: ${colors.white};
       cursor: default;
     }
-     > .ant-menu-item {
-    margin: 0;
-    height: auto;
-    line-height: 47px;
-  }
+    > .ant-menu-item {
+      margin: 0;
+      height: auto;
+      line-height: 47px;
+    }
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
@@ -48,17 +49,15 @@ const MainMenu = () => {
   const location = useLocation();
   const path = location.pathname;
 
-  const profile = useSelector((state) => state.user.profile);
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  if (!profile) return null;
 
   const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
 
   const selectedKeys = [];
   if (path.includes(ROUTE_PIPELINES)) selectedKeys.push('pipelines');
   if (path.includes(ROUTE_USERS)) selectedKeys.push('users');
-  if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('jobs');
+  if (path.includes(ROUTE_SETTINGS)) selectedKeys.push('settings');
 
   return (
     <StyledMenu selectedKeys={selectedKeys}>

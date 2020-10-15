@@ -16,8 +16,11 @@ import Login from 'containers/login';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
 import Users from 'containers/users';
+import AcceptOrganizationInvitation from 'containers/login/accept-organization-invitation';
+import CreateNewAccountInvitation from 'containers/login/create-new-account-invitation';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
+import Settings from 'containers/settings';
 import { refreshUserToken } from 'actions/user';
 import reducers from 'reducers';
 import {
@@ -26,6 +29,9 @@ import {
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
   ROUTE_USERS,
+  ROUTE_ACCEPT_ORGANIZATION_INVITATION,
+  ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
+  ROUTE_SETTINGS,
 } from 'config/routes';
 import { ROLE_ADMINISTRATOR } from 'config/roles';
 import * as serviceWorker from './serviceWorker';
@@ -77,9 +83,16 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_UPDATE_PASSWORD}>
         <ResetPassword />
       </Route>
+      <Route exact path={ROUTE_ACCEPT_ORGANIZATION_INVITATION}>
+        <AcceptOrganizationInvitation />
+      </Route>
+      <Route exact path={ROUTE_CREATE_NEW_ACCOUNT_INVITATION}>
+        {hasProfileRedirectToPipelines}
+        <CreateNewAccountInvitation />
+      </Route>
       <Route exact path={ROUTE_PIPELINES}>
         {noProfileRedirectToLogin}
-        <App><Pipelines /></App>
+        {hasProfile && organizations && <App><Pipelines /></App>}
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
@@ -90,6 +103,10 @@ const AppSwitch = () => {
             <App><Users /></App>
           )
         )}
+      </Route>
+      <Route exact path={ROUTE_SETTINGS}>
+        {noProfileRedirectToLogin}
+        {hasProfile && organizations && <App><Settings /></App>}
       </Route>
       {hasProfileRedirectToPipelines}
       {noProfileRedirectToLogin}

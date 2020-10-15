@@ -5,9 +5,8 @@ import { Link } from 'react-router-dom';
 
 import { logoutUser } from 'actions/user';
 import colors from 'styles/colors';
-
+import PhotoImg from 'icons/navigation-profile-avatar.svg';
 import SettingsDropdown from './SettingsDropdown';
-import PhotoImg from './images/navigation-profile-avatar.svg';
 
 const StyledProfileContainer = styled.div`
   position: relative;
@@ -28,14 +27,6 @@ const StyledPhotoContainer = styled.div`
   margin: -2px auto;
 `;
 
-const StyledPhoto = styled.div`
-  width: 40px;
-  height: 40px;
-  background-image: url(${PhotoImg});
-  background-size: 40px;
-  border-radius: 20px;
-`;
-
 const StyledName = styled.div`
   font-size: 18px;
   font-weight: 500;
@@ -53,13 +44,20 @@ const SignOutLink = styled.div`
 
 const Profile = () => {
   const profile = useSelector((state) => state.user.profile);
+  const avatar = useSelector((state) => state.user.avatar);
   const dispatch = useDispatch();
-
-  if (!profile) return null;
 
   const onSignOutClicked = () => {
     dispatch(logoutUser());
   };
+
+  const StyledPhoto = styled.div`
+    width: 40px;
+    height: 40px;
+    background-image: url(${avatar || PhotoImg});
+    background-size: 40px;
+    border-radius: 20px;
+  `;
 
   return (
     <>
@@ -70,10 +68,12 @@ const Profile = () => {
         <StyledPhotoContainer>
           <StyledPhoto />
         </StyledPhotoContainer>
-        <StyledName>
-          {profile.first_name}
-          {profile.last_name && ` ${profile.last_name}`}
-        </StyledName>
+        {profile && (
+          <StyledName>
+            {profile.first_name}
+            {profile.last_name && ` ${profile.last_name}`}
+          </StyledName>
+        )}
         <SettingsDropdown />
       </StyledProfileContainer>
     </>
