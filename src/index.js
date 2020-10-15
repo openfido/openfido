@@ -27,6 +27,7 @@ import {
   ROUTE_PIPELINES,
   ROUTE_USERS,
 } from 'config/routes';
+import { ROLE_ADMINISTRATOR } from 'config/roles';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
 import 'index.css';
@@ -41,6 +42,8 @@ const store = composeWithDevTools(applyMiddleware(...middlewares))(createStore)(
 
 const AppSwitch = () => {
   const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
+  const currentOrg = useSelector((state) => state.user.currentOrg);
   const hasProfile = profile !== null;
   const dispatch = useDispatch();
 
@@ -60,6 +63,8 @@ const AppSwitch = () => {
   const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
   const noProfileRedirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
 
+  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
+
   return (
     <Switch>
       <Route exact path={ROUTE_LOGIN}>
@@ -78,8 +83,8 @@ const AppSwitch = () => {
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
-        {hasProfile && 'is_system_admin' in profile && (
-          !profile.is_system_admin || !(profile.organizations && profile.organizations.length) ? (
+        {hasProfile && organizations && (
+          !isOrganizationAdmin ? (
             <Redirect to={ROUTE_PIPELINES} />
           ) : (
             <App><Users /></App>

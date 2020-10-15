@@ -6,6 +6,11 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import { removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
+import {
+  ROLE_ADMINISTRATOR,
+  ROLE_USER,
+  ROLE_UNASSIGNED,
+} from 'config/roles';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -99,7 +104,7 @@ const StyledMenuItem = styled(Menu.Item)`
 const User = ({
   uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role,
 }) => {
-  const [userRole, setUserRole] = useState(role.name);
+  const [userRole, setUserRole] = useState(role || ROLE_UNASSIGNED);
   const [userRoleClicked, setUserRoleClicked] = useState();
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const userRemoved = useSelector((state) => state.organization.userRemoved);
@@ -124,13 +129,14 @@ const User = ({
   };
 
   const menu = (
-    <StyledMenu selectedKeys={[userRole]}>
+    <StyledMenu selectedKeys={[userRole.name]}>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
       <StyledMenuItem
-        key="Administrator"
-        onClick={() => onChangeRoleClicked('Administrator')}
+        key={ROLE_ADMINISTRATOR.name}
+        title={ROLE_ADMINISTRATOR.name}
+        onClick={() => onChangeRoleClicked(ROLE_ADMINISTRATOR)}
       >
         <span>Administrator</span>
       </StyledMenuItem>
@@ -148,8 +154,9 @@ const User = ({
         for this organization.
       </li>
       <StyledMenuItem
-        key="Engineer"
-        onClick={() => onChangeRoleClicked('Engineer')}
+        key={ROLE_USER.name}
+        title={ROLE_USER.name}
+        onClick={() => onChangeRoleClicked(ROLE_USER)}
       >
         <span>Engineer</span>
       </StyledMenuItem>
@@ -165,8 +172,9 @@ const User = ({
         for this organization.
       </li>
       <StyledMenuItem
-        key="Unassigned"
-        onClick={() => onChangeRoleClicked('Unassigned')}
+        key={ROLE_UNASSIGNED.name}
+        title={ROLE_UNASSIGNED.name}
+        onClick={() => onChangeRoleClicked(ROLE_UNASSIGNED)}
       >
         <span>Unassigned</span>
       </StyledMenuItem>
@@ -190,7 +198,7 @@ const User = ({
       </NameColumn>
       <StyledDropdown overlay={menu} trigger="click">
         <StyledText size="large" color="gray">
-          {changeRoleError && user_uuid === userRoleChanged ? role.name : userRole}
+          {userRole && userRole.name}
           <DownOutlined color="lightGray" />
         </StyledText>
       </StyledDropdown>
@@ -214,11 +222,7 @@ User.propTypes = {
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     code: PropTypes.string.isRequired,
-  }),
-};
-
-User.defaultProps = {
-  role: {},
+  }).isRequired,
 };
 
 export default User;
