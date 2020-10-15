@@ -35,6 +35,7 @@ import {
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
 import 'index.css';
+import { ROLE_ADMINISTRATOR } from './config/roles';
 
 const middlewares = [];
 middlewares.push(thunk);
@@ -67,6 +68,8 @@ const AppSwitch = () => {
   const hasProfileRedirectToPipelines = hasProfile && <Redirect to={ROUTE_PIPELINES} />;
   const noProfileRedirectToLogin = !hasProfile && <Redirect to={ROUTE_LOGIN} />;
 
+  const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR);
+
   return (
     <Switch>
       <Route exact path={ROUTE_LOGIN}>
@@ -92,12 +95,10 @@ const AppSwitch = () => {
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
-        {hasProfile && 'is_system_admin' in profile && (
-          !currentOrg || !organizations || !organizations.length ? (
-            <Redirect to={ROUTE_PIPELINES} />
-          ) : (
-            <App><Users /></App>
-          )
+        {!isOrganizationAdmin ? (
+          <Redirect to={ROUTE_PIPELINES} />
+        ) : (
+          <App><Users /></App>
         )}
       </Route>
       <Route exact path={ROUTE_SETTINGS}>

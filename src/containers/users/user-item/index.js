@@ -231,20 +231,21 @@ const User = ({
 };
 
 User.propTypes = {
-  uuid: PropTypes.string.isRequired,
+  uuid: PropTypes.string,
   first_name: PropTypes.string.isRequired,
   last_name: PropTypes.string,
   is_system_admin: PropTypes.bool,
   last_active_at: PropTypes.string,
   role: PropTypes.shape({
-    uuid: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    code: PropTypes.string.isRequired,
+    uuid: PropTypes.string,
+    name: PropTypes.string,
+    code: PropTypes.string,
   }),
   isInvited: PropTypes.bool,
 };
 
 User.defaultProps = {
+  uuid: null,
   last_name: '',
   is_system_admin: false,
   last_active_at: undefined,

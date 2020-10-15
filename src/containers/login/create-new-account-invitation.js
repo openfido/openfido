@@ -36,7 +36,7 @@ const CreateNewAccountInvitation = () => {
     if (!createUserInProgress && !createUserError && formSubmitted) {
       history.push(ROUTE_LOGIN, { invitation_token });
     }
-  }, [createUserInProgress, createUserError, formSubmitted, history]);
+  }, [createUserInProgress, createUserError, formSubmitted, history, invitation_token]);
 
   const onEmailChanged = (e) => {
     setEmail(e.target.value);
