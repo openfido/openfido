@@ -249,6 +249,11 @@ export const getUserOrganizations = (user_uuid) => (dispatch) => {
         type: GET_USER_ORGANIZATIONS,
         payload: response.data,
       });
+    })
+    .catch(() => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS_FAILED,
+      });
     });
 };
 
