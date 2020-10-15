@@ -105,10 +105,12 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
 export const acceptOrganizationInvitation = (invitation_token) => async (dispatch) => {
   requestAcceptOrganizationInvitation(invitation_token)
     .then((response) => {
+      const { organization_uuid } = response.data;
+
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION,
         payload: {
-          invitationOrganization: response.data, // TODO: replace with organization uuid from response
+          invitationOrganization: organization_uuid,
           invitationToken: invitation_token,
         },
       });
