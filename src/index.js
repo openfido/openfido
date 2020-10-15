@@ -95,10 +95,12 @@ const AppSwitch = () => {
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}
-        {!isOrganizationAdmin ? (
-          <Redirect to={ROUTE_PIPELINES} />
-        ) : (
-          <App><Users /></App>
+        {hasProfile && organizations && (
+          !isOrganizationAdmin ? (
+            <Redirect to={ROUTE_PIPELINES} />
+          ) : (
+            <App><Users /></App>
+          )
         )}
       </Route>
       <Route exact path={ROUTE_SETTINGS}>
