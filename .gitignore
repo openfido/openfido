@@ -317,3 +317,7 @@ sketch
 .history
 
 # End of https://www.gitignore.io/api/react,macos,django,python,pycharm,database,visualstudiocode
+
+.idea/
+.terraform/
+.terragrunt-cache/
