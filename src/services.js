@@ -21,10 +21,16 @@ export const requestUpdatePassword = (email, reset_token, password) => (
 
 export const requestUserProfile = (user_uuid) => ApiClient.get(`/users/${user_uuid}/profile`);
 
+export const requestUserOrganizations = (user_uuid) => ApiClient.get(`/users/${user_uuid}/organizations`);
+
 export const requestOrganizationMembers = (organization_uuid) => (
   ApiClient.get(`/organizations/${organization_uuid}/members`)
 );
 
 export const requestRemoveOrganizationMember = (organization_uuid, user_uuid) => (
   ApiClient.delete(`/organizations/${organization_uuid}/members/${user_uuid}`)
+);
+
+export const requestChangeOrganizationMemberRole = (organization_uuid, user_uuid, role) => (
+  ApiClient.post(`/organizations/${organization_uuid}/members/${user_uuid}/role`, { role })
 );

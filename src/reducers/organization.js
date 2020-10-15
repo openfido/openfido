@@ -2,12 +2,16 @@ import {
   GET_ORGANIZATION_MEMBERS,
   REMOVE_ORGANIZATION_MEMBER,
   REMOVE_ORGANIZATION_MEMBER_FAILED,
+  CHANGE_ORGANIZATION_MEMBER_ROLE,
+  CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
   members: null,
   userRemoved: null,
   removeMemberError: null,
+  userRoleChanged: null,
+  changeRoleError: null,
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -27,7 +31,28 @@ export default (state = DEFAULT_STATE, action) => {
       };
     case REMOVE_ORGANIZATION_MEMBER_FAILED:
       return {
-        ...state,
+        ...DEFAULT_STATE,
+        members: state.members,
+        ...action.payload,
+      };
+    case CHANGE_ORGANIZATION_MEMBER_ROLE: {
+      const member = state.members.find((item) => action.payload === item.uuid);
+      const { members } = state;
+
+      if (member && member.role) {
+        member.role.name = action.payload;
+      }
+
+      return {
+        ...DEFAULT_STATE,
+        members,
+        userRoleChanged: action.payload,
+      };
+    }
+    case CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED:
+      return {
+        ...DEFAULT_STATE,
+        members: state.members,
         ...action.payload,
       };
     default:

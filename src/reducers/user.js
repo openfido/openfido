@@ -5,6 +5,7 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   CHANGE_ORGANIZATION,
 } from 'actions';
 import Auth from 'util/auth';
@@ -65,6 +66,16 @@ export default (state = DEFAULT_STATE, action) => {
           ...state.profile,
           ...action.payload,
         },
+        currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+      };
+    }
+    case GET_USER_ORGANIZATIONS: {
+      const organizations = action.payload;
+
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        organizations,
         currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
       };
     }

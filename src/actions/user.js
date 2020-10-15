@@ -5,6 +5,7 @@ import {
   AUTH_FAILED,
   AUTH_IN_PROGRESS,
   GET_USER_PROFILE,
+  GET_USER_ORGANIZATIONS,
   CHANGE_ORGANIZATION,
 } from 'actions';
 import {
@@ -12,6 +13,7 @@ import {
   requestRefreshJWT,
   requestUpdatePassword,
   requestUserProfile,
+  requestUserOrganizations,
 } from 'services';
 
 export const loginUser = (email, password) => async (dispatch) => {
@@ -24,12 +26,20 @@ export const loginUser = (email, password) => async (dispatch) => {
       });
 
       const { uuid } = response.data;
-      return requestUserProfile(uuid);
+      return Promise.all([
+        requestUserProfile(uuid),
+        requestUserOrganizations(uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, organizationsResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
+      });
+
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: organizationsResponse.data,
       });
     })
     .catch((err) => {
@@ -48,12 +58,20 @@ export const refreshUserToken = (user_uuid) => (dispatch) => {
         payload: response.data,
       });
 
-      return requestUserProfile(user_uuid);
+      return Promise.all([
+        requestUserProfile(user_uuid),
+        requestUserOrganizations(user_uuid),
+      ]);
     })
-    .then((response) => {
+    .then(([profileResponse, organizationsResponse]) => {
       dispatch({
         type: GET_USER_PROFILE,
-        payload: response.data,
+        payload: profileResponse.data,
+      });
+
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: organizationsResponse.data,
       });
     })
     .catch(() => {
@@ -98,3 +116,13 @@ export const changeOrganization = (organization_uuid) => ({
   type: CHANGE_ORGANIZATION,
   payload: organization_uuid,
 });
+
+export const getUserOrganizations = (user_uuid) => (dispatch) => {
+  requestUserOrganizations(user_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_USER_ORGANIZATIONS,
+        payload: response.data,
+      });
+    });
+};
