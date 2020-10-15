@@ -29,7 +29,7 @@ export const StyledLayout = styled(Layout)`
 `;
 
 export const StyledSider = styled(Layout.Sider)`
-  border-right: 1px solid ${colors.lightGray};
+  box-shadow: 1px 0px 3px rgba(0, 0, 0, 0.1);
 `;
 
 export const StyledContent = styled(Layout.Content)`
@@ -65,8 +65,8 @@ export const StyledTitle = styled.div`
   width: 100%;
   background-color: ${colors.white};
   border-bottom: 1px solid ${colors.lightGray};
-  padding: 25px 15px 20px 15px;
-  margin-bottom: ${(props) => (props.margin >= 0 ? props.margin : 30)}px;
+  padding: 24px 16px 20px 16px;
+  padding: 1.5rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
     margin-right: 16px;
@@ -80,7 +80,7 @@ export const StyledTitle = styled.div`
 
 export const StyledText = styled.span`
   ${({
-    color, fontweight, indent, size, bordercolor, padding, margin, align, float,
+    color, fontweight, indent, size, bordercolor, padding, margin, align, float, display,
   }) => (`
   ${color in colors ? (`
   color: ${colors[color]};
@@ -90,6 +90,10 @@ export const StyledText = styled.span`
   `) : ''}
   ${indent ? (`
   text-indent: ${indent}px;
+  `) : ''}
+  ${size === 'xlarge' ? (`
+  font-size: 18px;
+  line-height: 21px;
   `) : ''}
   ${size === 'large' ? (`
   font-size: 16px;
@@ -120,6 +124,9 @@ export const StyledText = styled.span`
   `) : ''}
   ${float ? (`
   float: ${float};
+  `) : ''}
+  ${display ? (`
+  display: ${display};
   `) : ''}
   `)}
 `;
@@ -156,9 +163,6 @@ export const StyledH5 = styled.div`
 
 export const StyledButton = styled(Button)`
   border: 0;
-  padding: 8px 12px;
-  height: 50px;
-  height: 3.125rem;
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -167,23 +171,44 @@ export const StyledButton = styled(Button)`
   .anticon {
     line-height: 0;
   }
+  // no size
+  &.ant-btn {
+    font-size: 14px;
+    line-height: 16px;
+    font-weight: 500;
+    border-radius: 3px;
+    padding: 0;
+    height: auto;
+    &:not(.ant-btn-text) span {
+      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
+    }
+    label {
+      cursor: pointer;
+      padding: 3px 8px;
+      padding: 0.1875rem 0.5rem;
+    }
+  }
   &.ant-btn-lg { 
-    border-radius: 2px;
     font-size: 18px;
     line-height: 21px;
     font-weight: 500;
+    border-radius: 2px;
+    padding: 8px 12px;
+    padding: 0.5rem 0.75rem;
+    height: 50px;
+    height: 3.125rem;
   }
   font-size: 16px;
   line-height: 19px;
   font-weight: 500;
-  border-radius: 2px;
+  border-radius: 3px;
   &.ant-btn-sm {
     font-size: 12px;
     line-height: 14px;
     height: auto;
     font-weight: 400;
     border-radius: 3px;
-    padding: 5px 8px;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
@@ -191,8 +216,18 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor,
+    type, color, width, height, hoverbgcolor, size, textColor,
   }) => (`
+  ${size === 'middle' ? (`
+  &.ant-btn {
+    font-size: 16px;
+    line-height: 19px;
+    font-weight: 500;
+    border-radius: 3px;
+    height: 50px;
+    height: 3.125rem;
+  }
+  `) : ''}
   ${type === 'text' ? (`
   color: ${colors.blue};
   &, &.ant-btn-sm, &.ant-btn-lg {
@@ -202,10 +237,6 @@ export const StyledButton = styled(Button)`
     background-color: transparent;
   }
   `) : (`
-  padding: 8px 12px;
-  &.ant-btn-sm {
-    padding: 5px 8px;
-  }
   &, &:hover, &:focus {
     background-color: ${(color in colors ? colors[color] : 'transparent')};
     color: ${(color in colors ? colors.lightGrey : colors.blue)};
@@ -213,7 +244,7 @@ export const StyledButton = styled(Button)`
   &:hover, &:focus {
     color: ${(color in colors ? colors.lightGrey : colors.blue)};
   }
-  &.ant-btn-sm, &.ant-btn-lg {
+  &.ant-btn {
     color: ${colors.white};
     ${color in colors ? (`
     background-color: ${colors[color]};
@@ -240,20 +271,23 @@ export const StyledButton = styled(Button)`
   ${height ? (`
   height: ${height}px;
   `) : ''}
+  ${textColor in colors ? (`
+  color: ${colors[textColor]};
+  `) : ''}
   `)}
 `;
 
 export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
-  padding: 10px; // TODO: test this out, it was 9px before
-  background-color: ${colors.darkOverlay};
+  padding: 12px;
+  background-color: ${colors.lightBg};
   &, &:hover:focus {
-    color: ${colors.darkText};
+    color: ${colors.gray};
   }
   &:hover {
     &, &::placeholder {
-      color: ${colors.lightBlue};
+      color: ${colors.blue};
     }
   }
   &:focus:placeholder-shown::placeholder {
@@ -268,9 +302,9 @@ export const StyledInput = styled(Input)`
   ${size === 'large' ? (`
   font-size: 18px;
   line-height: 21px;
-  font-weight: 500;
   background-color: ${colors.overlay20};
   width: 100%;
+  height: 48px;
   `) : (`
   font-size: 12px;
   line-height: 14px;
@@ -278,13 +312,15 @@ export const StyledInput = styled(Input)`
   ${(shape === 'round' ? (`
   background-color: ${colors.white};
   border: 1px solid ${colors.lightGray};
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
+  height: 42px;
+  height: 2.625rem;
   &:hover, &:focus {
-    border: 1px solid ${colors.lightBlue};
+    border: 1px solid rgba(12, 72, 107, 0.8);
   }
   &::placeholder {
-    color: ${colors.darkgray};
+    color: rgba(12, 72, 107, 0.8);
   }
   &:focus:placeholder-shown::placeholder {
     font-size: 0;
@@ -408,11 +444,11 @@ export const StyledTable = styled(Table)`
 `;
 
 export const StyledModal = styled(Modal)`
-  min-width: 732px;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   &.ant-modal {
     color: ${colors.darkText};
+    padding-bottom: 0;
   }
   .ant-modal-header {
     padding: 16px 36px;
@@ -425,14 +461,22 @@ export const StyledModal = styled(Modal)`
     color: ${colors.darkText};
     margin-bottom: 16px;
   }
+  ${({ width }) => (`
+  min-width: ${width}px;
+  .ant-modal-body {
+    width: ${width}px;
+  }
+  `)}
   .ant-modal-body {
     display: flex;
     flex-direction: column;
-    width: 732px;
     padding: 20px 36px 36px 36px;
-    background-color: ${colors.lightBg};
+    background-color: ${colors.white};
     font-size: 14px;
     line-height: 16px;
+  }
+  .ant-modal-content {
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.01);
   }
 `;
 
@@ -528,7 +572,7 @@ export const StyledGrid = styled.div`
   ${gridgap ? (`
   grid-gap: ${gridgap}px;
   `) : ''} 
-  padding: ${padding || '16px 25px'};
+  padding: ${padding || '12px 16px'};
   margin: ${margin || 0};
   `)}
 `;

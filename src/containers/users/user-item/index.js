@@ -5,12 +5,13 @@ import { Dropdown, Menu } from 'antd';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import { removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import {
   ROLE_ADMINISTRATOR,
   ROLE_USER,
   ROLE_UNASSIGNED,
 } from 'config/roles';
+import { requestCancelOrganizationInvitation } from 'services';
+import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import {
@@ -18,6 +19,11 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
+
+const UserItem = styled(StyledGrid)`
+  padding: 16px;
+  padding: 1rem;
+`;
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
@@ -32,8 +38,8 @@ const DeleteColumn = styled.div`
   position: relative;
   .anticon {
     left: 0;
-    top: -14px;
-    top: -0.875rem;
+    top: -10px;
+    top: -0.625rem;
   }
 `;
 
@@ -102,29 +108,44 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const User = ({
-  uuid: user_uuid, first_name, last_name, is_system_admin, last_active_at, role,
+  uuid, first_name, last_name, is_system_admin, last_active_at, role, isInvited,
 }) => {
   const [userRole, setUserRole] = useState(role || ROLE_UNASSIGNED);
   const [userRoleClicked, setUserRoleClicked] = useState();
+  const [invitationCanceled, setInvitationCanceled] = useState(false);
+
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const userRemoved = useSelector((state) => state.organization.userRemoved);
-  const removeMemberError = useSelector((state) => state.organization.removeMemberError);
-  const userRoleChanged = useSelector((state) => state.organization.userRoleChanged);
-  const changeRoleError = useSelector((state) => state.organization.changeRoleError);
+  const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
+  const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
+  const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
+  const changeRoleError = useSelector((state) => state.organization.messages.changeRoleError);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!changeRoleError && userRoleChanged === user_uuid) {
+    if (!changeRoleError && userRoleChanged === uuid) {
       setUserRole(userRoleClicked);
     }
-  }, [changeRoleError, userRoleChanged, user_uuid, userRoleClicked]);
+  }, [changeRoleError, userRoleChanged, uuid, userRoleClicked]);
+
+  if (invitationCanceled) return null;
 
   const onDeleteUserClicked = () => {
-    dispatch(removeOrganizationMember(currentOrg, user_uuid));
+    if (isInvited && uuid) {
+      requestCancelOrganizationInvitation(uuid)
+        .then(() => {
+          dispatch(getOrganizationMembers(currentOrg));
+          setInvitationCanceled(true);
+        })
+        .catch(() => {
+          setInvitationCanceled(false);
+        });
+    } else {
+      dispatch(removeOrganizationMember(currentOrg, uuid));
+    }
   };
 
   const onChangeRoleClicked = (clickedRole) => {
-    dispatch(changeOrganizationMemberRole(currentOrg, user_uuid, clickedRole))
+    dispatch(changeOrganizationMemberRole(currentOrg, uuid, clickedRole))
       .then(() => setUserRoleClicked(clickedRole));
   };
 
@@ -183,16 +204,16 @@ const User = ({
   );
 
   return (
-    <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
+    <UserItem gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
       <NameColumn>
         <StyledText size="large" color="gray">
           {first_name}
           {last_name && ` ${last_name}`}
         </StyledText>
-        {removeMemberError && user_uuid === userRemoved && (
+        {removeMemberError && uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
-        {changeRoleError && user_uuid === userRoleChanged && (
+        {changeRoleError && uuid === userRoleChanged && (
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )}
       </NameColumn>
@@ -203,26 +224,39 @@ const User = ({
         </StyledText>
       </StyledDropdown>
       <StyledText size="large" color="gray">
-        {moment(last_active_at).fromNow()}
+        {isInvited ? (
+          <StyledText color="blue">Invitation sent</StyledText>
+        ) : (
+          moment(last_active_at).fromNow()
+        )}
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
       </DeleteColumn>
-    </StyledGrid>
+    </UserItem>
   );
 };
 
 User.propTypes = {
-  uuid: PropTypes.string.isRequired,
+  uuid: PropTypes.string,
   first_name: PropTypes.string.isRequired,
-  last_name: PropTypes.string.isRequired,
-  is_system_admin: PropTypes.bool.isRequired,
-  last_active_at: PropTypes.string.isRequired,
+  last_name: PropTypes.string,
+  is_system_admin: PropTypes.bool,
+  last_active_at: PropTypes.string,
   role: PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     code: PropTypes.string.isRequired,
   }).isRequired,
+  isInvited: PropTypes.bool,
+};
+
+User.defaultProps = {
+  uuid: null,
+  last_name: '',
+  is_system_admin: false,
+  last_active_at: undefined,
+  isInvited: false,
 };
 
 export default User;

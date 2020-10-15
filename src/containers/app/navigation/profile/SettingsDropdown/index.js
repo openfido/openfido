@@ -9,9 +9,8 @@ import colors from 'styles/colors';
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
-  background-color: ${colors.white};
-  color: ${colors.black};
   padding-bottom: 16px;
+  padding-bottom: 1rem;
   .anticon {
     position: absolute;
     top: 4px;
@@ -20,10 +19,10 @@ const StyledDropdown = styled(Dropdown)`
 `;
 
 const StyledMenu = styled(Menu)`
-  top: -4px;
   display: block;
-  width: 191px;
   margin: 0 auto;
+  top: -4px;
+  width: 191px;
   background: ${colors.white};
   padding: 4px 32px 24px 32px;
   border-bottom-left-radius: 3px;
@@ -39,6 +38,7 @@ const StyledMenu = styled(Menu)`
     margin-top: 0.25rem;
     margin-bottom: 16px;
     margin-bottom: 1rem;
+    text-align: center;
   }
 `;
 
@@ -55,10 +55,6 @@ const StyledMenuItem = styled(Menu.Item)`
     border-color: transparent;
     color: ${colors.white};
   }
-  &:first-of-type {
-    margin-top: 16px;
-    margin-top: 1rem;
-  }
   &:not(:last-child) {
     margin-bottom: 10px;
     margin-bottom: 0.625rem;
@@ -66,11 +62,9 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const SettingsDropdown = () => {
-  const profile = useSelector((state) => state.user.profile);
+  const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
-
-  if (!profile || !profile.organizations || !profile.organizations.length) return null;
 
   const onOrgClicked = (organization_uuid) => {
     dispatch(changeOrganization(organization_uuid));
@@ -79,7 +73,7 @@ const SettingsDropdown = () => {
   const menu = (
     <StyledMenu>
       <li>Change organization</li>
-      {profile.organizations && profile.organizations.map((org) => (
+      {organizations && organizations.map((org) => (
         <StyledMenuItem key={org.name} onClick={() => onOrgClicked(org.uuid)}>
           {org.name}
         </StyledMenuItem>
@@ -87,14 +81,15 @@ const SettingsDropdown = () => {
     </StyledMenu>
   );
 
-  const currentOrgObj = profile.organizations.find((org) => org.uuid === currentOrg);
+  const currentOrgObj = organizations && organizations.find((org) => org.uuid === currentOrg);
+  const dropdownDisabled = currentOrgObj && organizations && organizations.length <= 1;
 
   return (
-    <StyledDropdown overlay={menu} disabled={profile.organizations.length <= 1}>
+    <StyledDropdown overlay={menu} disabled={dropdownDisabled}>
       <div>
         <span>
           {currentOrgObj ? currentOrgObj.name : 'No organization'}
-          {profile.organizations.length > 1 && <DownOutlined color="lightGray" />}
+          {!dropdownDisabled && <DownOutlined color="lightGray" />}
         </span>
       </div>
     </StyledDropdown>

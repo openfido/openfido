@@ -1,91 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
 
 import { loginUser } from 'actions/user';
+import { acceptOrganizationInvitation } from 'actions/organization';
 import { ROUTE_PIPELINES, ROUTE_RESET_PASSWORD } from 'config/routes';
 
+import {
+  Root,
+  StyledH1,
+  StyledH2,
+  StyledForm,
+  StyledInput,
+  FormMessage,
+} from 'styles/login';
 import { StyledButton, StyledText } from 'styles/app';
-import colors from 'styles/colors';
-
-const Root = styled.div`
-  width: 100%;
-  height: 100vh;
-  text-align: center;
-`;
-
-const StyledH1 = styled.h1`
-  font-size: 30px;
-  font-size: 1.875rem;
-  line-height: 36px;
-  line-height: 2.25rem;
-  font-weight: 400;
-  padding-top: 100px;
-  padding-top: 6.25rem;
-  color: ${colors.white};
-`;
-
-const StyledH2 = styled.h2`
-  font-size: 20px;
-  font-size: 1.25rem;
-  line-height: 24px;
-  line-height: 1.5rem;
-  color: ${colors.blue};
-  text-transform: uppercase;
-  margin-bottom: 40px;
-  margin-bottom: 2.5rem;
-`;
-
-const StyledForm = styled.form`
-  width: 390px;
-  height: 522px;
-  padding: 30px;
-  margin: 42px auto 0 auto;
-  margin: 2.625rem auto 0 auto;
-  background-color: ${colors.white};
-  text-align: left;
-  border-radius: 3px;
-`;
-
-const StyledInput = styled.input`
-  width: 330px;
-  font-size: 18px;
-  font-size: 1.125rem;
-  color: ${colors.gray};
-  padding-bottom: 0.625rem;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-  border: none;
-  border-bottom: 1px solid ${colors.lightGray};
-  &::placeholder {
-    color: ${colors.lightGray};
-  }
-  &:first-of-type {
-    margin-bottom: 20px;
-    margin-bottom: 1.25rem;
-  }
-`;
-
-const FormMessage = styled.div`
-  padding: 0.75rem 0;
-  height: 2.5rem;
-  margin-bottom: 20px;
-  margin-bottom: 1.25rem;
-`;
 
 const Login = () => {
   const history = useHistory();
+
+  let invitation_token = null;
+  if (history.location.state && 'invitation_token' in history.location.state) {
+    invitation_token = history.location.state.invitation_token;
+  }
+
   const profile = useSelector((state) => state.user.profile);
-  const authInProgress = useSelector((state) => state.user.authInProgress);
-  const authError = useSelector((state) => state.user.authError);
+  const organizations = useSelector((state) => state.user.organizations);
+  const authInProgress = useSelector((state) => state.user.messages.authInProgress);
+  const authError = useSelector((state) => state.user.messages.authError);
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
-    if (profile) {
+    if (profile && organizations) {
+      if (invitation_token) {
+        dispatch(acceptOrganizationInvitation(invitation_token));
+      }
+
+      // TODO: can check for acceptInvitationError, if there is a rejected screen
+      // can happen if user email does not match token
       history.push(ROUTE_PIPELINES);
     }
   });
@@ -103,6 +59,7 @@ const Login = () => {
 
     if (!authInProgress) {
       dispatch(loginUser(email, password));
+      setFormSubmitted(true);
     }
   };
 
@@ -114,16 +71,16 @@ const Login = () => {
         OpenFIDO
       </StyledH1>
       <StyledForm onSubmit={onLoginClicked}>
-        <StyledH2>Sign In</StyledH2>
-        <StyledInput type="email" placeholder="EMAIL" onChange={onEmailChanged} />
-        <StyledInput type="password" placeholder="PASSWORD" onChange={onPasswordChanged} />
-        <FormMessage>
+        <StyledH2>SIGN IN</StyledH2>
+        <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
+        <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
+        <FormMessage size="large">
           <StyledText
             size="middle"
             color="pink"
             float="left"
           >
-            {authError && 'Invalid credentials entered'}
+            {authError && formSubmitted && 'Invalid credentials entered'}
           </StyledText>
           <StyledText
             size="middle"
@@ -134,8 +91,9 @@ const Login = () => {
         </FormMessage>
         <StyledButton
           htmlType="submit"
+          size="middle"
           color="blue"
-          width="108"
+          width={108}
           role="button"
           tabIndex={0}
           onClick={onLoginClicked}

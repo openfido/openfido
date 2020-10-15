@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
@@ -11,11 +11,20 @@ import {
   StyledText,
 } from 'styles/app';
 import UserItem from './user-item';
+import InviteUserPopup from './invite-user-popup';
+
+const HeaderRow = styled(StyledGrid)`
+  padding: 12px 16px 20px 16px;
+  padding: 0.75rem 1rem 1.25rem; 1rem;
+`;
 
 const Users = () => {
+  const [showInviteUserPopup, setShowInviteUserPopup] = useState(false);
+
   const profile = useSelector((state) => state.user.profile);
-  const members = useSelector((state) => state.organization.members);
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const members = useSelector((state) => state.organization.members);
+  const invitations = useSelector((state) => state.organization.invitations);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -24,34 +33,57 @@ const Users = () => {
     }
   }, [dispatch, profile, currentOrg]);
 
+  const openInviteUserPopup = () => setShowInviteUserPopup(true);
+
+  const closeInviteUserPopup = () => {
+    dispatch(getOrganizationMembers(currentOrg));
+    setShowInviteUserPopup(false);
+  };
+
   return (
     <>
       <StyledTitle>
         <div>
           <h1>Users</h1>
-          <StyledButton size="small">
+          <StyledButton onClick={openInviteUserPopup} size="small">
             + Invite User
           </StyledButton>
         </div>
       </StyledTitle>
-      <StyledGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
+      <HeaderRow gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">
         <StyledText size="large" fontweight={500} color="black">Name</StyledText>
         <StyledText size="large" fontweight={500} color="black">Role</StyledText>
         <StyledText size="large" fontweight={500} color="black">Last Activity</StyledText>
-      </StyledGrid>
+      </HeaderRow>
       <Space direction="vertical" size={16}>
-        {members && members.map((item) => (
+        {members && members.map(({
+          uuid: user_uuid, first_name, last_name, role, is_system_admin, last_active_at,
+        }) => (
           <UserItem
-            key={item.uuid}
-            uuid={item.uuid}
-            first_name={item.first_name}
-            last_name={item.last_name}
-            role={item.role}
-            is_system_admin={item.is_system_admin}
-            last_active_at={item.last_active_at}
+            key={user_uuid}
+            uuid={user_uuid}
+            first_name={first_name}
+            last_name={last_name}
+            role={role}
+            is_system_admin={is_system_admin}
+            last_active_at={last_active_at}
+          />
+        ))}
+        {invitations && invitations.map(({ uuid: invitation_uuid, email_address }) => (
+          <UserItem
+            key={invitation_uuid}
+            uuid={invitation_uuid}
+            first_name={email_address}
+            isInvited
           />
         ))}
       </Space>
+      {showInviteUserPopup && (
+        <InviteUserPopup
+          handleOk={closeInviteUserPopup}
+          handleCancel={closeInviteUserPopup}
+        />
+      )}
     </>
   );
 };
