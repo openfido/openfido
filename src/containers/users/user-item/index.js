@@ -159,7 +159,7 @@ const User = ({
         title={ROLE_ADMINISTRATOR.name}
         onClick={() => onChangeRoleClicked(ROLE_ADMINISTRATOR)}
       >
-        <span>Administrator</span>
+        <span>{ROLE_ADMINISTRATOR.name}</span>
       </StyledMenuItem>
       <li>
         Able to manage
@@ -179,7 +179,7 @@ const User = ({
         title={ROLE_USER.name}
         onClick={() => onChangeRoleClicked(ROLE_USER)}
       >
-        <span>Engineer</span>
+        <span>{ROLE_USER.name}</span>
       </StyledMenuItem>
       <li>
         Able to manage
@@ -197,7 +197,7 @@ const User = ({
         title={ROLE_UNASSIGNED.name}
         onClick={() => onChangeRoleClicked(ROLE_UNASSIGNED)}
       >
-        <span>Unassigned</span>
+        <span>{ROLE_UNASSIGNED.name}</span>
       </StyledMenuItem>
       <li>View only.</li>
     </StyledMenu>

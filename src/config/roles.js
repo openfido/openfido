@@ -1,14 +1,14 @@
 export const ROLE_ADMINISTRATOR = {
-  code: 1,
+  code: 'ADMINISTRATOR',
   name: 'Administrator',
 };
 
 export const ROLE_USER = {
-  code: 2,
+  code: 'USER',
   name: 'User',
 };
 
 export const ROLE_UNASSIGNED = {
-  code: 100,
+  code: 'UNASSIGNED',
   name: 'Unassigned',
 };
