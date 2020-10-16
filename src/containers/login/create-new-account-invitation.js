@@ -88,7 +88,7 @@ const CreateNewAccountInvitation = () => {
           <br />
           Please create an account
         </StyledH2>
-        <Space direction="vertical" size={28}>
+        <Space direction="vertical" size={20}>
           <div>
             <StyledInput size="small" type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
             <FormMessage>
@@ -120,7 +120,7 @@ const CreateNewAccountInvitation = () => {
             </FormMessage>
             <StyledInput size="small" type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
           </div>
-          <Space direction="vertical" size={4}>
+          <Space direction="vertical" size={12}>
             <StyledButton
               htmlType="submit"
               size="middle"
@@ -136,13 +136,15 @@ const CreateNewAccountInvitation = () => {
                 Account
               </label>
             </StyledButton>
-            <Space direction="vertical" size={8}>
-            <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
-              <StyledText color="blue">Already have an account?</StyledText>
-            </Link>
-            <StyledText size="small" color="pink" align="left">
-              {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}
-            </StyledText>
+            <Space direction="vertical" size={8} align="center">
+              <FormMessage>
+                <StyledText size="small" color="pink" align="left">
+                  {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}
+                </StyledText>
+              </FormMessage>
+              <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
+                <StyledText color="blue" fontweight={500}>Already a member? Login in</StyledText>
+              </Link>
             </Space>
           </Space>
         </Space>
