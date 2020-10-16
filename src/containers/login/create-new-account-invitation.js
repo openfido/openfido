@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Space } from 'antd';
 
 import { createUser } from 'actions/user';
 import { ROUTE_LOGIN } from 'config/routes';
@@ -23,6 +24,8 @@ const CreateNewAccountInvitation = () => {
   }
 
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMismatch, setPasswordMismatch] = useState(false);
@@ -42,6 +45,14 @@ const CreateNewAccountInvitation = () => {
     setEmail(e.target.value);
   };
 
+  const onFirstNameChanged = (e) => {
+    setFirstName(e.target.value);
+  };
+
+  const onLastNameChanged = (e) => {
+    setLastName(e.target.value);
+  };
+
   const onPasswordChanged = (e) => {
     setPassword(e.target.value);
   };
@@ -55,7 +66,7 @@ const CreateNewAccountInvitation = () => {
 
     if (!createUserInProgress) {
       if (password === confirmPassword) {
-        dispatch(createUser(email, password, invitation_token));
+        dispatch(createUser(email, firstName, lastName, password, invitation_token));
         setFormSubmitted(true);
         setPasswordMismatch(false);
       } else {
@@ -77,56 +88,64 @@ const CreateNewAccountInvitation = () => {
           <br />
           Please create an account
         </StyledH2>
-        <StyledInput type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
-        <FormMessage>
-          <div />
-          <StyledText color="pink">
-            {createUserError && password.length < 10 && 'Invalid email'}
-          </StyledText>
-        </FormMessage>
-        <StyledInput type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
-        <FormMessage>
-          <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
-          <StyledText color={createUserError && password.length < 10 ? 'pink' : 'gray80'} float="right">
-            Minimum 10 characters
-          </StyledText>
-        </FormMessage>
-        <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
-        <FormMessage size="large" />
-        <StyledButton
-          htmlType="submit"
-          size="middle"
-          color="blue"
-          width={106}
-          role="button"
-          tabIndex={0}
-          onClick={onCreateAccountClicked}
-        >
-          <label>
-            Create
-            <br />
-            Account
-          </label>
-        </StyledButton>
-        <FormMessage size="middle">
-          <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
+        <Space direction="vertical" size={28}>
+          <div>
+            <StyledInput size="small" type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
+            <FormMessage>
+              <div />
+              <StyledText color="pink">
+                {createUserError && password.length < 10 && 'Invalid email'}
+              </StyledText>
+            </FormMessage>
+            <StyledInput size="small" type="text" name="first_name" id="first_name" placeholder="first name" onChange={onFirstNameChanged} />
+            <FormMessage>
+              <div />
+              <StyledText color={createUserError && !firstName.length ? 'pink' : 'gray80'}>
+                Required
+              </StyledText>
+            </FormMessage>
+            <StyledInput size="small" type="text" name="last_name" id="last_name" placeholder="last name" onChange={onLastNameChanged} />
+            <FormMessage>
+              <div />
+              <StyledText color={createUserError && !lastName.length ? 'pink' : 'gray80'}>
+                Required
+              </StyledText>
+            </FormMessage>
+            <StyledInput size="small" type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
+            <FormMessage>
+              <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
+              <StyledText color={createUserError && password.length < 10 ? 'pink' : 'gray80'} float="right">
+                Minimum 10 characters
+              </StyledText>
+            </FormMessage>
+            <StyledInput size="small" type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
+          </div>
+          <Space direction="vertical" size={4}>
             <StyledButton
-              htmlType="button"
-              size="small"
-              type="text"
+              htmlType="submit"
+              size="middle"
+              color="blue"
+              width={106}
+              role="button"
+              tabIndex={0}
+              onClick={onCreateAccountClicked}
             >
-              Already have an account?
+              <label>
+                Create
+                <br />
+                Account
+              </label>
             </StyledButton>
-          </Link>
-        </FormMessage>
-        <br />
-        <FormMessage size="small">
-          {createUserError && !passwordMismatch && (
-          <StyledText size="small" color="pink">
-            Please be sure to use the email address invitation was sent to
-          </StyledText>
-          )}
-        </FormMessage>
+            <Space direction="vertical" size={8}>
+            <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
+              <StyledText color="blue">Already have an account?</StyledText>
+            </Link>
+            <StyledText size="small" color="pink" align="left">
+              {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}
+            </StyledText>
+            </Space>
+          </Space>
+        </Space>
       </StyledForm>
     </Root>
   );

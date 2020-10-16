@@ -97,14 +97,17 @@ const ResetPassword = () => {
           </StyledText>
           <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
         </label>
-        <FormMessage size="middle">
+        <FormMessage float="left">
           <StyledText size="middle" color="pink">
             {passwordMismatch && 'Passwords do not match.'}
           </StyledText>
+        </FormMessage>
+        <FormMessage float="right">
           <StyledText size="small" color={error && !passwordMismatch && password.length < 10 ? 'pink' : 'gray'} float="right">
             Minimum 10 characters
           </StyledText>
         </FormMessage>
+        <FormMessage size="middle" />
         <StyledButton
           htmlType="submit"
           size="middle"

@@ -36,9 +36,9 @@ import {
   requestUpdateUserAvatar,
 } from 'services';
 
-export const createUser = (email, password, invitation_token) => async (dispatch) => {
+export const createUser = (email, firstName, lastName, password, invitation_token) => async (dispatch) => {
   await dispatch({ type: CREATE_USER_IN_PROGRESS });
-  requestCreateUser(email, password, invitation_token)
+  requestCreateUser(email, firstName, lastName, password, invitation_token)
     .then((response) => {
       dispatch({
         type: CREATE_USER,
