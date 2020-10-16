@@ -110,8 +110,7 @@ export default (state = DEFAULT_STATE, action) => {
     case LOGOUT_USER:
       Auth.logoutUser();
       return {
-        ...state,
-        messages: DEFAULT_STATE.messages,
+        ...DEFAULT_STATE,
         profile: null,
       };
     case CHANGE_PASSWORD:

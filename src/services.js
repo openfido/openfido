@@ -64,7 +64,7 @@ export const requestRemoveOrganizationMember = (organization_uuid, user_uuid) =>
 );
 
 export const requestChangeOrganizationMemberRole = (organization_uuid, user_uuid, role) => (
-  ApiClient.post(`/organizations/${organization_uuid}/members/${user_uuid}/role`, { role })
+  ApiClient.put(`/organizations/${organization_uuid}/members/${user_uuid}/role`, { role })
 );
 
 export const requestInviteOrganizationMember = (organization_uuid, email) => (

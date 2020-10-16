@@ -73,7 +73,18 @@ export const changeOrganizationMemberRole = (organization_uuid, user_uuid, role)
     .then(() => {
       dispatch({
         type: CHANGE_ORGANIZATION_MEMBER_ROLE,
-        payload: user_uuid,
+        payload: {
+          user_uuid,
+          role,
+        },
+      });
+
+      return requestOrganizationMembers(organization_uuid);
+    })
+    .then((response) => {
+      dispatch({
+        type: GET_ORGANIZATION_MEMBERS,
+        payload: response.data,
       });
     })
     .catch((err) => {
