@@ -74,7 +74,7 @@ const SettingsDropdown = () => {
     <StyledMenu>
       <li>Change organization</li>
       {organizations && organizations.map((org) => (
-        <StyledMenuItem key={org.name} onClick={() => onOrgClicked(org.uuid)}>
+        <StyledMenuItem key={org.uuid} onClick={() => onOrgClicked(org.uuid)}>
           {org.name}
         </StyledMenuItem>
       ))}
@@ -85,14 +85,18 @@ const SettingsDropdown = () => {
   const dropdownDisabled = currentOrgObj && organizations && organizations.length <= 1;
 
   return (
-    <StyledDropdown overlay={menu} disabled={dropdownDisabled}>
-      <div>
-        <span>
-          {currentOrgObj ? currentOrgObj.name : 'No organization'}
-          {!dropdownDisabled && <DownOutlined color="lightGray" />}
-        </span>
-      </div>
-    </StyledDropdown>
+    <>
+      {organizations && !!organizations.length && (
+        <StyledDropdown overlay={menu} disabled={dropdownDisabled}>
+          <div>
+            <span>
+              {currentOrgObj ? currentOrgObj.name : 'No organization'}
+              {!dropdownDisabled && <DownOutlined color="lightGray" />}
+            </span>
+          </div>
+        </StyledDropdown>
+      )}
+    </>
   );
 };
 

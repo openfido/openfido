@@ -10,6 +10,9 @@ import {
   ACCEPT_ORGANIZATION_INVITATION_FAILED,
   GET_ORGANIZATION_INVITATIONS,
   GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
+  GET_USER_ORGANIZATIONS,
+  GET_USER_ORGANIZATIONS_FAILED,
+  CHANGE_ORGANIZATION,
 } from 'actions';
 import {
   requestOrganizationMembers,
@@ -18,6 +21,7 @@ import {
   requestChangeOrganizationMemberRole,
   requestInviteOrganizationMember,
   requestAcceptOrganizationInvitation,
+  requestUserOrganizations,
 } from 'services';
 
 export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
@@ -102,7 +106,7 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
     });
 };
 
-export const acceptOrganizationInvitation = (invitation_token) => async (dispatch) => {
+export const acceptOrganizationInvitation = (user_uuid, invitation_token) => async (dispatch) => {
   requestAcceptOrganizationInvitation(invitation_token)
     .then((response) => {
       const { organization_uuid } = response.data;
@@ -114,6 +118,24 @@ export const acceptOrganizationInvitation = (invitation_token) => async (dispatc
           invitationToken: invitation_token,
         },
       });
+
+      dispatch({
+        type: CHANGE_ORGANIZATION,
+        payload: organization_uuid,
+      });
+
+      requestUserOrganizations(user_uuid)
+        .then((organizationsResponse) => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS,
+            payload: organizationsResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_USER_ORGANIZATIONS_FAILED,
+          });
+        });
     })
     .catch((err) => {
       dispatch({
