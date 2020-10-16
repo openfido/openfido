@@ -43,11 +43,11 @@ const DeleteColumn = styled.div`
   }
 `;
 
-const ErrorMessage = styled(StyledText)`
+/*const ErrorMessage = styled(StyledText)`
   position: absolute;
   right: 32px;
   right: 2rem;
-`;
+`;*/
 
 const StyledMenu = styled(Menu)`
   display: block;
@@ -210,12 +210,12 @@ const User = ({
           {first_name}
           {last_name && ` ${last_name}`}
         </StyledText>
-        {removeMemberError && uuid === userRemoved && (
+        {/*{removeMemberError && uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
         {changeRoleError && uuid === userRoleChanged && (
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
-        )}
+        )}*/}
       </NameColumn>
       <StyledDropdown overlay={menu} trigger="click">
         <StyledText size="large" color="gray">
