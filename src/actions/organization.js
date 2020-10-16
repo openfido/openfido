@@ -1,5 +1,6 @@
 import {
   GET_ORGANIZATION_MEMBERS,
+  GET_ORGANIZATION_MEMBERS_FAILED,
   REMOVE_ORGANIZATION_MEMBER,
   REMOVE_ORGANIZATION_MEMBER_FAILED,
   CHANGE_ORGANIZATION_MEMBER_ROLE,
@@ -26,23 +27,29 @@ import {
 
 export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
   requestOrganizationMembers(organization_uuid)
-    .then((response) => {
+    .then((membersResponse) => {
       dispatch({
         type: GET_ORGANIZATION_MEMBERS,
-        payload: response.data,
+        payload: membersResponse.data,
       });
 
-      return requestOrganizationInvitations(organization_uuid);
-    })
-    .then((response) => {
-      dispatch({
-        type: GET_ORGANIZATION_INVITATIONS,
-        payload: response.data,
-      });
+      requestOrganizationInvitations(organization_uuid)
+        .then((invitationsResponse) => {
+          dispatch({
+            type: GET_ORGANIZATION_INVITATIONS,
+            payload: invitationsResponse.data,
+          });
+        })
+        .catch((err) => {
+          dispatch({
+            type: GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
+            payload: err.message,
+          });
+        });
     })
     .catch((err) => {
       dispatch({
-        type: GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
+        type: GET_ORGANIZATION_MEMBERS_FAILED,
         payload: err.message,
       });
     });
@@ -79,13 +86,18 @@ export const changeOrganizationMemberRole = (organization_uuid, user_uuid, role)
         },
       });
 
-      return requestOrganizationMembers(organization_uuid);
-    })
-    .then((response) => {
-      dispatch({
-        type: GET_ORGANIZATION_MEMBERS,
-        payload: response.data,
-      });
+      requestOrganizationMembers(organization_uuid)
+        .then((membersResponse) => {
+          dispatch({
+            type: GET_ORGANIZATION_MEMBERS,
+            payload: membersResponse.data,
+          });
+        })
+        .catch(() => {
+          dispatch({
+            type: GET_ORGANIZATION_MEMBERS_FAILED,
+          });
+        });
     })
     .catch((err) => {
       dispatch({
@@ -119,8 +131,8 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
 
 export const acceptOrganizationInvitation = (user_uuid, invitation_token) => async (dispatch) => {
   requestAcceptOrganizationInvitation(invitation_token)
-    .then((response) => {
-      const { organization_uuid } = response.data;
+    .then((invitationsResponse) => {
+      const { organization_uuid } = invitationsResponse.data;
 
       dispatch({
         type: ACCEPT_ORGANIZATION_INVITATION,
