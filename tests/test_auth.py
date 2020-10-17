@@ -531,6 +531,16 @@ def test_reset_password(client, user):
     )
     assert result.status_code == 200
 
+    result = client.put(
+        "/users/reset_password",
+        content_type="application/json",
+        json={
+            "password": "another_password!",
+            "reset_token": "foo",
+        },
+    )
+    assert result.status_code == 400
+
 
 def test_change_password(client, user, user_auth_token):
     NEW_PASSWORD = "thisisanewpassword"
