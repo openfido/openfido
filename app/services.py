@@ -86,17 +86,20 @@ def create_invitation(organization, email):
     if not isinstance(organization, Organization):
         raise BadRequestError("Invalid organization")
 
-    if find_invitation_by_email_and_organization(email, organization):
-        raise BadRequestError("email address already invited!")
+    invitation = find_invitation_by_email_and_organization(email, organization)
+    if not invitation:
+        invitation = OrganizationInvitation(
+            uuid=uuid.uuid4().hex,
+            invitation_token=uuid.uuid4().hex,
+            email_address=email,
+            organization_id=organization.id,
+        )
+        db.session.add(invitation)
+        db.session.commit()
 
-    invitation = OrganizationInvitation(
-        uuid=uuid.uuid4().hex,
-        invitation_token=uuid.uuid4().hex,
-        email_address=email,
-        organization_id=organization.id,
-    )
-    db.session.add(invitation)
-    db.session.commit()
+    if not mail.make_driver().send_organization_invitation_email(organization, email, invitation):
+        raise BadRequestError("Unable to send invitation email")
+
     return invitation
 
 

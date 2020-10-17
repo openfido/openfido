@@ -306,24 +306,29 @@ def test_reset_password(app, user):
     assert user.reset_token == ""
 
 
-def test_create_invitation(app, user, admin, organization):
+def test_create_invitation(app, user, organization, monkeypatch):
+    driver_mock = Mock()
+    driver_mock.send_organization_invitation_email.return_value = True
+    monkeypatch.setattr(services.mail, "make_driver", lambda: driver_mock)
+
     invitation = services.create_invitation(organization, user.email)
 
     assert invitation.email_address == user.email
     assert invitation.accepted == False
     assert organization == invitation.organization
+    driver_mock.send_organization_invitation_email.assert_called_once()
 
+def test_create_invitation_email_down(app, user, organization, monkeypatch):
+    driver_mock = Mock()
+    driver_mock.send_organization_invitation_email.return_value = False
+    monkeypatch.setattr(services.mail, "make_driver", lambda: driver_mock)
 
-def test_create_invitation_validate_organization(app, user, admin, organization):
+    with pytest.raises(utils.BadRequestError):
+        invitation = services.create_invitation(organization, user.email)
+
+def test_create_invitation_validate_organization(app, user, organization):
     with pytest.raises(utils.BadRequestError):
         invitation = services.create_invitation("", user.email)
-
-
-def test_create_invitation_validate_already_invited(app, user, admin, organization):
-    services.create_invitation(organization, user.email)
-    with pytest.raises(utils.BadRequestError):
-        services.create_invitation(organization, user.email)
-
 
 def test_change_password_bad_password(app, user):
     with pytest.raises(ValueError):
