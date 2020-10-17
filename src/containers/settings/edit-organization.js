@@ -267,7 +267,7 @@ const EditOrganization = () => {
           </label>
         ))}
       </StyledForm>
-      {showDeletePopup && (
+      {showDeletePopup && selectedOrganization && (
       <DeleteOrganizationPopup
         handleOk={onPermanentlyDeleteClicked}
         handleCancel={closeDeletePopup}

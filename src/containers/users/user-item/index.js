@@ -8,7 +8,6 @@ import moment from 'moment';
 import {
   ROLE_ADMINISTRATOR,
   ROLE_USER,
-  ROLE_UNASSIGNED,
 } from 'config/roles';
 import { requestCancelOrganizationInvitation } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
@@ -110,7 +109,7 @@ const StyledMenuItem = styled(Menu.Item)`
 const UserItem = ({
   uuid, first_name, last_name, is_system_admin, last_active_at, role, isInvited,
 }) => {
-  const [userRole, setUserRole] = useState(role || ROLE_UNASSIGNED);
+  const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
   const [invitationCanceled, setInvitationCanceled] = useState(false);
 
@@ -193,15 +192,14 @@ const UserItem = ({
         {' '}
         for this organization.
       </li>
-      <StyledMenuItem
-        key={ROLE_UNASSIGNED.name}
-        title={ROLE_UNASSIGNED.name}
-        onClick={() => onChangeRoleClicked(ROLE_UNASSIGNED)}
-      >
-        <span>{ROLE_UNASSIGNED.name}</span>
-      </StyledMenuItem>
-      <li>View only.</li>
     </StyledMenu>
+  );
+
+  const roleText = (
+    <StyledText size="large" color="gray">
+      {userRole && userRole.name}
+      {!isInvited && <DownOutlined color="lightGray" />}
+    </StyledText>
   );
 
   return (
@@ -218,12 +216,11 @@ const UserItem = ({
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )}*/}
       </NameColumn>
-      <StyledDropdown overlay={menu} trigger="click">
-        <StyledText size="large" color="gray">
-          {userRole && userRole.name}
-          <DownOutlined color="lightGray" />
-        </StyledText>
-      </StyledDropdown>
+      {isInvited ? roleText : (
+          <StyledDropdown overlay={menu} trigger="click">
+            {roleText}
+          </StyledDropdown>
+      )}
       <StyledText size="large" color="gray">
         {isInvited ? (
           <StyledText color="blue">Invitation sent</StyledText>
