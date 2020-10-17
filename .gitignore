@@ -5,3 +5,7 @@ htmlcov
 .DS_Store
 test-results
 .env
+.env.dev
+.env.staging
+.env.prod
+.env.test
