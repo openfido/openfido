@@ -225,7 +225,7 @@ const UserItem = ({
         {isInvited ? (
           <StyledText color="blue">Invitation sent</StyledText>
         ) : (
-          moment(last_active_at).fromNow()
+          moment.utc(last_active_at).fromNow()
         )}
       </StyledText>
       <DeleteColumn>
