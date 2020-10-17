@@ -1,0 +1,7 @@
+__pycache__
+.vim
+htmlcov
+.coverage
+.DS_Store
+test-results
+.env

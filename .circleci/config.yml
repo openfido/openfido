@@ -1,0 +1,40 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: python:3.7
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+      DEV_ADMIN_EMAIL: "admin@email.com"
+      DEV_ADMIN_PASSWORD: "123456aoeu7890"
+      DEV_ADMIN_FIRST_NAME: "John"
+      DEV_ADMIN_LAST_NAME: "Smith"
+    working_directory: ~/my-project
+    steps:
+      - checkout
+      - run:
+          command: |
+            apt-get update -qq
+            apt-get install -y pipenv
+            pip install virtualenv
+      - restore_cache:
+          keys:
+            - project-pipfile-{{ checksum "Pipfile.lock" }}
+      - run:
+          command: pipenv install --dev
+      - save_cache:
+          key: project-pipfile-{{ checksum "Pipfile.lock" }}
+          paths:
+            - .venv
+      - run:
+          command: |
+            mkdir test-results
+            pipenv run invoke test --junit
+      - store_test_results:
+          path: test-results
+      - run:
+          command: pipenv run invoke style
+      - run:
+          command: pipenv run invoke lint --fail-under=9
+      - run:
+          command: pipenv run invoke test --junit --enforce-percent 94
