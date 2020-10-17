@@ -61,7 +61,7 @@ const Users = () => {
           uuid: user_uuid, first_name, last_name, role, is_system_admin, last_active_at,
         }) => (
           <UserItem
-            key={user_uuid}
+            key={`${user_uuid}${role && role.code}`}
             uuid={user_uuid}
             first_name={first_name}
             last_name={last_name}

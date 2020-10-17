@@ -33,9 +33,9 @@ export const StyledH2 = styled.h2`
 export const StyledForm = styled.form`
   position: relative;
   width: 390px;
-  height: 542px;
-  padding: 28px 30px 8px 32px;
-  padding: 1.75rem 1.875rem 0.5rem 2rem;
+  height: 548px;
+  padding: 24px 30px;
+  padding: 1.5rem 1.875rem;
   margin: 42px auto 0 auto;
   margin: 2.625rem auto 0 auto;
   background-color: ${colors.white};
