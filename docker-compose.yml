@@ -18,10 +18,6 @@ services:
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
-      EMAIL_DRIVER: sendgrid
-      SYSTEM_EMAIL: 
-      SENDGRID_API_KEY: 
-      SENDGRID_PASSWORD_RESET_TEMPLATE_ID: 
     volumes:
       - ${AUTH_DIR:-.}:/opt/app:delegated
     ports:

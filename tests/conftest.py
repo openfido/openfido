@@ -20,10 +20,10 @@ from flask_migrate import upgrade
 
 USER_PASSWORD = "atestpass"
 USER_TWO_PASSWORD = "betestpass"
-ADMIN_EMAIL = os.getenv("DEV_ADMIN_EMAIL")
+ADMIN_EMAIL = "admin@email.com"
 ADMIN_PASSWORD = "123456aoeu7890"
-ADMIN_FIRST_NAME = os.getenv("DEV_ADMIN_FIRST_NAME")
-ADMIN_LAST_NAME = os.getenv("DEV_ADMIN_LAST_NAME")
+ADMIN_FIRST_NAME = "John"
+ADMIN_LAST_NAME = "Smith"
 ORG_NAME = "Org1"
 TOMORROW = datetime.utcnow() + timedelta(days=1)
 

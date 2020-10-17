@@ -5,10 +5,6 @@ jobs:
       - image: python:3.7
     environment:
       PIPENV_VENV_IN_PROJECT: true
-      DEV_ADMIN_EMAIL: "admin@email.com"
-      DEV_ADMIN_PASSWORD: "123456aoeu7890"
-      DEV_ADMIN_FIRST_NAME: "John"
-      DEV_ADMIN_LAST_NAME: "Smith"
     working_directory: ~/my-project
     steps:
       - checkout

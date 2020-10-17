@@ -243,12 +243,12 @@ def test_request_password_reset_email_down(app, organization, monkeypatch):
     db.session.add(user)
     db.session.commit()
     driver_mock = Mock()
-    driver_mock.send_reset_email.return_value = False
+    driver_mock.send_password_reset_email.return_value = False
     monkeypatch.setattr(services.mail, "make_driver", lambda: driver_mock)
 
     # Then: the user's reset_token is updated, and an email is sent.
     assert not services.request_password_reset(user)
-    driver_mock.send_reset_email.assert_called_once()
+    driver_mock.send_password_reset_email.assert_called_once()
 
 
 def test_request_password_reset(app, organization, monkeypatch):
@@ -262,7 +262,7 @@ def test_request_password_reset(app, organization, monkeypatch):
     # Then: the user's reset_token is updated, and an email is sent.
     original_reset_token = user.reset_token
     assert services.request_password_reset(user)
-    driver_mock.send_reset_email.assert_called_once()
+    driver_mock.send_password_reset_email.assert_called_once()
     assert driver_mock.mock_calls[0][1][0].id == user.id
     assert user.reset_token != original_reset_token
     assert user.reset_token_expires_at < datetime.utcnow()
