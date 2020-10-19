@@ -145,7 +145,7 @@ const CreateNewAccountInvitation = () => {
                   </StyledText>
                 </FormMessage>
                 <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
-                  <StyledText color="blue" fontweight={500}>Already a member? Login in</StyledText>
+                  <StyledText color="blue" fontweight={500}>Already a member? Log in</StyledText>
                 </Link>
               </Space>
             </Space>
