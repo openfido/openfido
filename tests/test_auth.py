@@ -345,6 +345,63 @@ def test_update_user_401(client, user_auth_token, user_two):
 
     assert response.status_code == 401
 
+def test_update_user_avatar_200(client, user, user_auth_token):
+    response = client.put(
+        "/users/" + user.uuid + "/avatar",
+        headers={"Content-Type": "image/png", "Authorization": user_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 200
+
+def test_update_user_avatar_401(client, admin, user_auth_token):
+    response = client.put(
+        "/users/" + admin.uuid + "/avatar",
+        headers={"Content-Type": "image/png", "Authorization": user_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 401
+
+    response = client.put(
+        "/users/invaliduuid/avatar",
+        headers={"Content-Type": "image/png", "Authorization": user_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 401
+
+def test_get_user_avatar_200(client, user, admin, user_auth_token):
+    response = client.get(
+        "/users/" + user.uuid + "/avatar",
+        headers={"Authorization": user_auth_token},
+    )
+
+    assert response.status_code == 200
+
+    response = client.get(
+        "/users/" + admin.uuid + "/avatar",
+        headers={"Authorization": user_auth_token},
+    )
+
+    assert response.status_code == 200
+
+def test_get_user_avatar_401(client, user, admin, user_auth_token):
+    response = client.get(
+        "/users/" + user.uuid + "/avatar",
+    )
+
+    assert response.status_code == 401
+
+    response = client.get(
+        "/users/invaliduuid/avatar",
+        headers={"Authorization": user_auth_token},
+    )
+
+    assert response.status_code == 401
+
+
+
 
 def test_jwt_required(client, user):
     # No authorization header returns a 401

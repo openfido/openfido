@@ -203,6 +203,65 @@ def test_update_organization_invalid_name_param(
 
     assert response.status_code == 400
 
+def test_update_organization_logo_200(client, organization, organization_admin_auth_token):
+    response = client.put(
+        "/organizations/" + organization.uuid + "/logo",
+        headers={"Content-Type": "image/png", "Authorization": organization_admin_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 200
+
+def test_update_organization_logo_401(client, organization, user_auth_token, organization_admin_auth_token):
+    #user is not an organization administrator
+    response = client.put(
+        "/organizations/" + organization.uuid + "/logo",
+        headers={"Content-Type": "image/png", "Authorization": user_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 401
+
+    #no auth provided
+    response = client.put(
+        "/organizations/" + organization.uuid + "/logo",
+        headers={"Content-Type": "image/png"},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 401
+
+    #invalid organization uuid
+    response = client.put(
+        "/organizations/invaliduuid/logo",
+        headers={"Content-Type": "image/png", "Authorization": organization_admin_auth_token},
+        data="fakeimagedata",
+    )
+
+    assert response.status_code == 401
+
+def test_get_organization_logo_200(client, organization, user_auth_token):
+    response = client.get(
+        "/organizations/" + organization.uuid + "/logo",
+        headers={"Authorization": user_auth_token},
+    )
+
+    assert response.status_code == 200
+
+def test_get_organization_logo_401(client, organization, user_auth_token):
+    response = client.get(
+        "/organizations/" + organization.uuid + "/logo",
+    )
+
+    assert response.status_code == 401
+
+    response = client.get(
+        "/organizations/invaliduuid/logo",
+        headers={"Authorization": user_auth_token},
+    )
+
+    assert response.status_code == 401
+
 
 def test_user_has_organization_200(client, admin, admin_auth_token):
     """/organzations HTTP 200 organization has admin user"""

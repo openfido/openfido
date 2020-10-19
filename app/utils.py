@@ -6,6 +6,9 @@ from calendar import timegm
 from typing import Tuple
 
 import jwt
+import os
+import boto3
+from botocore.client import Config
 from flask import current_app, has_request_context, request, g
 from jwt.exceptions import PyJWTError
 
@@ -19,6 +22,19 @@ logger = logging.getLogger("auth")
 class BadRequestError(ValueError):
     pass
 
+def get_s3():
+    """ Get access to the Boto s3 service. """
+
+    params = {
+        "endpoint_url": os.environ.get("S3_ENDPOINT_URL"),
+        "config": Config(signature_version="s3v4"),
+        "region_name": os.environ.get("S3_REGION_NAME"),
+    }
+    if os.environ.get("S3_ACCESS_KEY_ID"):
+        params["aws_access_key_id"] = os.environ.get("S3_ACCESS_KEY_ID")
+        params["aws_secret_access_key"] = os.environ.get("S3_SECRET_ACCESS_KEY")
+
+    return boto3.client("s3", **params)
 
 def _s_since_epoch(var_date_time):
     """ Convert datetime to seconds since the Unix epoch """

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import jwt
 from freezegun import freeze_time
-
+from unittest.mock import patch
 from app import utils
 
 A_PASSWORD = "apassword!"
@@ -90,3 +90,8 @@ def test_time_conversion(app):
     assert datetime.utcnow().replace(tzinfo=timezone.utc) == utils.to_datetime(
         unix_time
     )
+
+@patch("app.utils.boto3.client")
+def test_get_s3(client_mock, app):
+    assert utils.get_s3() is not None
+    client_mock.assert_called()

@@ -5,7 +5,7 @@ from email.utils import parseaddr
 from flanker.addresslib import address
 
 from . import mail, utils
-from .utils import BadRequestError, to_iso8601
+from .utils import BadRequestError, to_iso8601, get_s3
 from .models import (
     ROLE_ADMINISTRATOR_CODE,
     ROLE_USER_CODE,
@@ -247,6 +247,63 @@ def update_user_last_active_at(user):
     db.session.commit()
     return user
 
+def update_user_avatar(user, stream):
+    if not isinstance(user, User):
+        raise BadRequestError("Invalid user")
+
+    s3 = get_s3()
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+    s3.upload_fileobj(
+        stream,
+        bucket,
+        f"avatars/{user.uuid}",
+    )
+
+def get_user_avatar(user):
+    if not isinstance(user, User):
+        raise BadRequestError("Invalid user")
+    
+    s3 = get_s3()
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+
+    string_io = StringIO.StringIO()
+    filename = f"avatars/{user.uuid}"
+    s3.download_file(bucket, filename, string_io)
+
+    return string_io
+
+def update_organization_logo(organization, stream):
+    if not isinstance(organization, Organization):
+        raise BadRequestError("Invalid organization")
+
+    s3 = get_s3()
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+    s3.upload_fileobj(
+        stream,
+        bucket,
+        f"logos/{user.uuid}",
+    )
+
+def get_organization_logo(organization):
+    if not isinstance(organization, Organization):
+        raise BadRequestError("Invalid organization")
+    
+    s3 = get_s3()
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+
+    string_io = StringIO.StringIO()
+    filename = f"logos/{user.uuid}"
+    s3.download_file(bucket, filename, string_io)
+
+    return string_io
 
 def change_password(user, old_password, new_password):
     if user is None or not isinstance(user, User):
