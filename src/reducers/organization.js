@@ -57,20 +57,9 @@ export default (state = DEFAULT_STATE, action) => {
         members: state.members,
       };
     case CHANGE_ORGANIZATION_MEMBER_ROLE: {
-      const member = state.members.find((item) => action.payload === item.uuid);
-      const { members } = state;
-
-      if (member && member.role) {
-        member.role.name = action.payload;
-      }
-
       return {
         ...state,
-        messages: {
-          ...DEFAULT_STATE.messages,
-          userRoleChanged: action.payload,
-        },
-        members,
+        messages: DEFAULT_STATE.messages,
       };
     }
     case CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED:

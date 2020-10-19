@@ -8,7 +8,6 @@ import moment from 'moment';
 import {
   ROLE_ADMINISTRATOR,
   ROLE_USER,
-  ROLE_UNASSIGNED,
 } from 'config/roles';
 import { requestCancelOrganizationInvitation } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
@@ -20,7 +19,7 @@ import {
 } from 'styles/app';
 import colors from 'styles/colors';
 
-const UserItem = styled(StyledGrid)`
+const UserItemGrid = styled(StyledGrid)`
   padding: 16px;
   padding: 1rem;
 `;
@@ -43,11 +42,11 @@ const DeleteColumn = styled.div`
   }
 `;
 
-const ErrorMessage = styled(StyledText)`
+/*const ErrorMessage = styled(StyledText)`
   position: absolute;
   right: 32px;
   right: 2rem;
-`;
+`;*/
 
 const StyledMenu = styled(Menu)`
   display: block;
@@ -107,11 +106,11 @@ const StyledMenuItem = styled(Menu.Item)`
    }
 `;
 
-const User = ({
+const UserItem = ({
   uuid, first_name, last_name, is_system_admin, last_active_at, role, isInvited,
 }) => {
-  const [userRole, setUserRole] = useState(role || ROLE_UNASSIGNED);
-  const [userRoleClicked, setUserRoleClicked] = useState();
+  const [userRole, setUserRole] = useState(role || ROLE_USER);
+  const [userRoleClicked, setUserRoleClicked] = useState(null);
   const [invitationCanceled, setInvitationCanceled] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -122,8 +121,9 @@ const User = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!changeRoleError && userRoleChanged === uuid) {
+    if (!changeRoleError && userRoleChanged === uuid && userRoleClicked) {
       setUserRole(userRoleClicked);
+      setUserRoleClicked(null);
     }
   }, [changeRoleError, userRoleChanged, uuid, userRoleClicked]);
 
@@ -145,12 +145,12 @@ const User = ({
   };
 
   const onChangeRoleClicked = (clickedRole) => {
-    dispatch(changeOrganizationMemberRole(currentOrg, uuid, clickedRole))
+    dispatch(changeOrganizationMemberRole(currentOrg, uuid, clickedRole.code))
       .then(() => setUserRoleClicked(clickedRole));
   };
 
   const menu = (
-    <StyledMenu selectedKeys={[userRole.name]}>
+    <StyledMenu selectedKeys={[userRole && userRole.name]}>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
@@ -159,7 +159,7 @@ const User = ({
         title={ROLE_ADMINISTRATOR.name}
         onClick={() => onChangeRoleClicked(ROLE_ADMINISTRATOR)}
       >
-        <span>Administrator</span>
+        <span>{ROLE_ADMINISTRATOR.name}</span>
       </StyledMenuItem>
       <li>
         Able to manage
@@ -179,7 +179,7 @@ const User = ({
         title={ROLE_USER.name}
         onClick={() => onChangeRoleClicked(ROLE_USER)}
       >
-        <span>Engineer</span>
+        <span>{ROLE_USER.name}</span>
       </StyledMenuItem>
       <li>
         Able to manage
@@ -192,66 +192,64 @@ const User = ({
         {' '}
         for this organization.
       </li>
-      <StyledMenuItem
-        key={ROLE_UNASSIGNED.name}
-        title={ROLE_UNASSIGNED.name}
-        onClick={() => onChangeRoleClicked(ROLE_UNASSIGNED)}
-      >
-        <span>Unassigned</span>
-      </StyledMenuItem>
-      <li>View only.</li>
     </StyledMenu>
   );
 
+  const roleText = (
+    <StyledText size="large" color="gray">
+      {userRole && userRole.name}
+      {!isInvited && <DownOutlined color="lightGray" />}
+    </StyledText>
+  );
+
   return (
-    <UserItem gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
+    <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
       <NameColumn>
         <StyledText size="large" color="gray">
           {first_name}
           {last_name && ` ${last_name}`}
         </StyledText>
-        {removeMemberError && uuid === userRemoved && (
+        {/*{removeMemberError && uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
         {changeRoleError && uuid === userRoleChanged && (
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
-        )}
+        )}*/}
       </NameColumn>
-      <StyledDropdown overlay={menu} trigger="click">
-        <StyledText size="large" color="gray">
-          {userRole && userRole.name}
-          <DownOutlined color="lightGray" />
-        </StyledText>
-      </StyledDropdown>
+      {isInvited ? roleText : (
+          <StyledDropdown overlay={menu} trigger="click">
+            {roleText}
+          </StyledDropdown>
+      )}
       <StyledText size="large" color="gray">
         {isInvited ? (
           <StyledText color="blue">Invitation sent</StyledText>
         ) : (
-          moment(last_active_at).fromNow()
+          moment.utc(last_active_at).fromNow()
         )}
       </StyledText>
       <DeleteColumn>
         <DeleteOutlined color="gray20" onClick={onDeleteUserClicked} />
       </DeleteColumn>
-    </UserItem>
+    </UserItemGrid>
   );
 };
 
-User.propTypes = {
+UserItem.propTypes = {
   uuid: PropTypes.string,
   first_name: PropTypes.string.isRequired,
   last_name: PropTypes.string,
   is_system_admin: PropTypes.bool,
   last_active_at: PropTypes.string,
   role: PropTypes.shape({
-    uuid: PropTypes.string.isRequired,
+    uuid: PropTypes.string,
     name: PropTypes.string.isRequired,
     code: PropTypes.string.isRequired,
   }).isRequired,
   isInvited: PropTypes.bool,
 };
 
-User.defaultProps = {
+UserItem.defaultProps = {
   uuid: null,
   last_name: '',
   is_system_admin: false,
@@ -259,4 +257,4 @@ User.defaultProps = {
   isInvited: false,
 };
 
-export default User;
+export default UserItem;

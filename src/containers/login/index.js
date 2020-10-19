@@ -10,6 +10,7 @@ import {
   Root,
   StyledH1,
   StyledH2,
+  FormWrapper,
   StyledForm,
   StyledInput,
   FormMessage,
@@ -25,7 +26,6 @@ const Login = () => {
   }
 
   const profile = useSelector((state) => state.user.profile);
-  const organizations = useSelector((state) => state.user.organizations);
   const authInProgress = useSelector((state) => state.user.messages.authInProgress);
   const authError = useSelector((state) => state.user.messages.authError);
   const dispatch = useDispatch();
@@ -35,13 +35,11 @@ const Login = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   useEffect(() => {
-    if (profile && organizations) {
+    if (profile) {
       if (invitation_token) {
-        dispatch(acceptOrganizationInvitation(invitation_token));
+        dispatch(acceptOrganizationInvitation(profile.uuid, invitation_token));
       }
 
-      // TODO: can check for acceptInvitationError, if there is a rejected screen
-      // can happen if user email does not match token
       history.push(ROUTE_PIPELINES);
     }
   });
@@ -70,38 +68,40 @@ const Login = () => {
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onLoginClicked}>
-        <StyledH2>SIGN IN</StyledH2>
-        <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
-        <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
-        <FormMessage size="large">
-          <StyledText
+      <FormWrapper>
+        <StyledForm onSubmit={onLoginClicked}>
+          <StyledH2>SIGN IN</StyledH2>
+          <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
+          <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
+          <FormMessage size="large">
+            <StyledText
+              size="middle"
+              color="pink"
+              float="left"
+            >
+              {authError && formSubmitted && 'Invalid credentials entered'}
+            </StyledText>
+            <StyledText
+              size="middle"
+              float="right"
+            >
+              <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
+            </StyledText>
+          </FormMessage>
+          <StyledButton
+            htmlType="submit"
             size="middle"
-            color="pink"
-            float="left"
+            color="blue"
+            width={108}
+            role="button"
+            tabIndex={0}
+            onClick={onLoginClicked}
+            onKeyPress={onLoginClicked}
           >
-            {authError && formSubmitted && 'Invalid credentials entered'}
-          </StyledText>
-          <StyledText
-            size="middle"
-            float="right"
-          >
-            <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
-          </StyledText>
-        </FormMessage>
-        <StyledButton
-          htmlType="submit"
-          size="middle"
-          color="blue"
-          width={108}
-          role="button"
-          tabIndex={0}
-          onClick={onLoginClicked}
-          onKeyPress={onLoginClicked}
-        >
-          Sign In
-        </StyledButton>
-      </StyledForm>
+            Sign In
+          </StyledButton>
+        </StyledForm>
+      </FormWrapper>
     </Root>
   );
 };

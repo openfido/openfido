@@ -7,7 +7,6 @@ import {
   ROUTE_PIPELINES,
   ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
 } from 'config/routes';
-import { changeOrganization } from 'actions/user';
 import { acceptOrganizationInvitation } from 'actions/organization';
 
 const AcceptOrganizationInvitation = () => {
@@ -23,16 +22,12 @@ const AcceptOrganizationInvitation = () => {
 
   useEffect(() => {
     if (profile) {
-      dispatch(acceptOrganizationInvitation(invitation_token));
+      dispatch(acceptOrganizationInvitation(profile.uuid, invitation_token));
     }
   }, [dispatch, profile, invitation_token]);
 
   useEffect(() => {
     if (profile) {
-      if (!acceptInvitationError && invitationToken && invitationOrganization) {
-        dispatch(changeOrganization(invitationOrganization));
-      }
-
       history.push(ROUTE_PIPELINES);
     } else {
       history.push(ROUTE_CREATE_NEW_ACCOUNT_INVITATION, { invitation_token });

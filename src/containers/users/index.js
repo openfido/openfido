@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
+import { ROLE_USER } from 'config/roles';
 import { getOrganizationMembers } from 'actions/organization';
 import {
   StyledTitle,
@@ -60,7 +61,7 @@ const Users = () => {
           uuid: user_uuid, first_name, last_name, role, is_system_admin, last_active_at,
         }) => (
           <UserItem
-            key={user_uuid}
+            key={`${user_uuid}${role && role.code}`}
             uuid={user_uuid}
             first_name={first_name}
             last_name={last_name}
@@ -73,6 +74,7 @@ const Users = () => {
           <UserItem
             key={invitation_uuid}
             uuid={invitation_uuid}
+            role={ROLE_USER}
             first_name={email_address}
             isInvited
           />

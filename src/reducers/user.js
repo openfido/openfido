@@ -110,8 +110,7 @@ export default (state = DEFAULT_STATE, action) => {
     case LOGOUT_USER:
       Auth.logoutUser();
       return {
-        ...state,
-        messages: DEFAULT_STATE.messages,
+        ...DEFAULT_STATE,
         profile: null,
       };
     case CHANGE_PASSWORD:
@@ -155,7 +154,7 @@ export default (state = DEFAULT_STATE, action) => {
         ...state,
         messages: DEFAULT_STATE.messages,
         organizations,
-        currentOrg: organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
       };
     }
     case UPDATE_USER_PROFILE: {
