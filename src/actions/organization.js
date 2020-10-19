@@ -43,14 +43,14 @@ export const getOrganizationMembers = (organization_uuid) => async (dispatch) =>
         .catch((err) => {
           dispatch({
             type: GET_ORGANIZATION_MEMBERS_INVITATIONS_FAILED,
-            payload: err.response.data,
+            payload: err.response && err.response.data,
           });
         });
     })
     .catch((err) => {
       dispatch({
         type: GET_ORGANIZATION_MEMBERS_FAILED,
-        payload: err.response.data,
+        payload: err.response && err.response.data,
       });
     });
 };
@@ -69,7 +69,7 @@ export const removeOrganizationMember = (organization_uuid, user_uuid) => async 
         type: REMOVE_ORGANIZATION_MEMBER_FAILED,
         payload: {
           userRemoved: user_uuid,
-          removeMemberError: err.response.data,
+          removeMemberError: err.response && err.response.data,
         },
       });
     });
@@ -104,7 +104,7 @@ export const changeOrganizationMemberRole = (organization_uuid, user_uuid, role)
         type: CHANGE_ORGANIZATION_MEMBER_ROLE_FAILED,
         payload: {
           userRoleChanged: user_uuid,
-          changeRoleError: err.response.data,
+          changeRoleError: err.response && err.response.data,
         },
       });
     });
@@ -123,7 +123,7 @@ export const inviteOrganizationMember = (organization_uuid, email) => async (dis
         type: INVITE_ORGANIZATION_MEMBER_FAILED,
         payload: {
           userInvited: email,
-          inviteOrganizationMemberError: err.response.data,
+          inviteOrganizationMemberError: err.response && err.response.data,
         },
       });
     });
@@ -165,7 +165,7 @@ export const acceptOrganizationInvitation = (user_uuid, invitation_token) => asy
         type: ACCEPT_ORGANIZATION_INVITATION_FAILED,
         payload: {
           invitationToken: invitation_token,
-          acceptInvitationError: err.response.data,
+          acceptInvitationError: err.response && err.response.data,
         },
       });
     });
