@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { Space } from 'antd';
 
-import { ROLE_UNASSIGNED } from 'config/roles';
+import { ROLE_USER } from 'config/roles';
 import { getOrganizationMembers } from 'actions/organization';
 import {
   StyledTitle,
@@ -74,7 +74,7 @@ const Users = () => {
           <UserItem
             key={invitation_uuid}
             uuid={invitation_uuid}
-            role={ROLE_UNASSIGNED}
+            role={ROLE_USER}
             first_name={email_address}
             isInvited
           />

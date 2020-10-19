@@ -191,7 +191,6 @@ const EditProfile = () => {
           handleOk={onReturnToSettingsClicked}
           handleCancel={onReturnToSettingsClicked}
           message="You have successfully updated your profile."
-          top="378px"
         />
       )}
     </>

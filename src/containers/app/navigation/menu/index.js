@@ -61,7 +61,7 @@ const MainMenu = () => {
 
   return (
     <StyledMenu selectedKeys={selectedKeys}>
-      <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>
+      {currentOrg && <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>}
       {isOrganizationAdmin && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
       <StyledMenuItem key="settings" onClick={navigate(ROUTE_SETTINGS)}>Settings</StyledMenuItem>
     </StyledMenu>
