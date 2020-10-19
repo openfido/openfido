@@ -167,6 +167,7 @@ def update_organization_profile(organization_uuid):
         utils.log(f"could not update organization: {bad_request_error}", logging.WARN)
         return {"message": str(bad_request_error)}, 400
 
+
 @org_bp.route("/<organization_uuid>/logo", methods=["PUT"])
 @jwt_required
 def update_organization_logo(organization_uuid):
@@ -197,7 +198,9 @@ def update_organization_logo(organization_uuid):
         services.update_organization_logo(organization, request.stream)
         return {}, 200
     except BadRequestError as bad_request_error:
-        utils.log(f"could not update organization logo: {bad_request_error}", logging.WARN)
+        utils.log(
+            f"could not update organization logo: {bad_request_error}", logging.WARN
+        )
         return {"message": str(bad_request_error)}, 400
 
 

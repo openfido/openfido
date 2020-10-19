@@ -332,6 +332,7 @@ def get_user_profile(user_uuid):
 
     return g.user.serialize()
 
+
 @auth_bp.route("/<user_uuid>/avatar", methods=["PUT"])
 @jwt_required
 def update_user_avatar(user_uuid):
@@ -391,6 +392,7 @@ def get_user_avatar(user_uuid):
     except BadRequestError as bad_request_error:
         utils.log(f"could not get user avatar: {bad_request_error}", logging.WARN)
         return {"message": str(bad_request_error)}, 400
+
 
 @auth_bp.route("/<user_uuid>/organizations", methods=["GET"])
 @jwt_required

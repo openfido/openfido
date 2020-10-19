@@ -91,6 +91,7 @@ def test_time_conversion(app):
         unix_time
     )
 
+
 @patch("app.utils.boto3.client")
 def test_get_s3(client_mock, app):
     assert utils.get_s3() is not None

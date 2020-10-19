@@ -97,7 +97,9 @@ def create_invitation(organization, email):
         db.session.add(invitation)
         db.session.commit()
 
-    if not mail.make_driver().send_organization_invitation_email(organization, email, invitation):
+    if not mail.make_driver().send_organization_invitation_email(
+        organization, email, invitation
+    ):
         raise BadRequestError("Unable to send invitation email")
 
     return invitation
@@ -247,6 +249,7 @@ def update_user_last_active_at(user):
     db.session.commit()
     return user
 
+
 def update_user_avatar(user, stream):
     if not isinstance(user, User):
         raise BadRequestError("Invalid user")
@@ -261,10 +264,11 @@ def update_user_avatar(user, stream):
         f"avatars/{user.uuid}",
     )
 
+
 def get_user_avatar(user):
     if not isinstance(user, User):
         raise BadRequestError("Invalid user")
-    
+
     s3 = get_s3()
     bucket = current_app.config[S3_BUCKET]
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
@@ -275,6 +279,7 @@ def get_user_avatar(user):
     s3.download_file(bucket, filename, string_io)
 
     return string_io
+
 
 def update_organization_logo(organization, stream):
     if not isinstance(organization, Organization):
@@ -290,10 +295,11 @@ def update_organization_logo(organization, stream):
         f"logos/{user.uuid}",
     )
 
+
 def get_organization_logo(organization):
     if not isinstance(organization, Organization):
         raise BadRequestError("Invalid organization")
-    
+
     s3 = get_s3()
     bucket = current_app.config[S3_BUCKET]
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
@@ -304,6 +310,7 @@ def get_organization_logo(organization):
     s3.download_file(bucket, filename, string_io)
 
     return string_io
+
 
 def change_password(user, old_password, new_password):
     if user is None or not isinstance(user, User):

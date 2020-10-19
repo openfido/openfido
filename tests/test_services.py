@@ -318,6 +318,7 @@ def test_create_invitation(app, user, organization, monkeypatch):
     assert organization == invitation.organization
     driver_mock.send_organization_invitation_email.assert_called_once()
 
+
 def test_create_invitation_email_down(app, user, organization, monkeypatch):
     driver_mock = Mock()
     driver_mock.send_organization_invitation_email.return_value = False
@@ -326,9 +327,11 @@ def test_create_invitation_email_down(app, user, organization, monkeypatch):
     with pytest.raises(utils.BadRequestError):
         invitation = services.create_invitation(organization, user.email)
 
+
 def test_create_invitation_validate_organization(app, user, organization):
     with pytest.raises(utils.BadRequestError):
         invitation = services.create_invitation("", user.email)
+
 
 def test_change_password_bad_password(app, user):
     with pytest.raises(ValueError):

@@ -22,6 +22,7 @@ logger = logging.getLogger("auth")
 class BadRequestError(ValueError):
     pass
 
+
 def get_s3():
     """ Get access to the Boto s3 service. """
 
@@ -35,6 +36,7 @@ def get_s3():
         params["aws_secret_access_key"] = os.environ.get("S3_SECRET_ACCESS_KEY")
 
     return boto3.client("s3", **params)
+
 
 def _s_since_epoch(var_date_time):
     """ Convert datetime to seconds since the Unix epoch """
