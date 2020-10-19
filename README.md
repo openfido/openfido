@@ -20,19 +20,18 @@ A convenient way to do this is by setting environmental variables telling
 docker-compose which files to use, and where each project is:
 
     export AUTH_PORT=5002
-    # TODO update this when the openfido-auth-service is set up.
-    export AUTH_DIR=../loadinsight/presence-account-service
+    export AUTH_DIR=../openfido-auth-service
     export WORKFLOW_PORT=5001
     export WORKFLOW_DIR=../openfido-workflow-service
     export COMPOSE_FILE=docker-compose.yml:$WORKFLOW_DIR/docker-compose.yml:$AUTH_DIR/docker-compose.yml
 
-    # Because these repositories make use of private github repositories, they
-    # need access to an SSH key that you have configured for github access:
-    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
-
     # Configure the auth service admin account
     cp $AUTH_DIR/.env.example $AUTH_DIR/.env
     vi $AUTH_DIR/.env
+
+    # Because these repositories make use of private github repositories, they
+    # need access to an SSH key that you have configured for github access:
+    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
 
     # Initialize all the databases for all the services:
     docker-compose run --rm auth_service flask db upgrade
