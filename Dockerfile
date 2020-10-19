@@ -1,5 +1,10 @@
 FROM python:3.8-slim as base
 
+ENV PORT 5000
+ENV FLASK_APP run.py
+ENV FLASK_ENV production
+EXPOSE 5000
+
 FROM base as python-deps
 
 RUN apt-get update -qq && apt-get install -y ssh git
@@ -33,3 +38,5 @@ COPY --from=python-deps /.venv /.venv
 ENV PATH="/.venv/bin:$PATH"
 
 COPY . .
+
+CMD "flask" "run"
