@@ -10,6 +10,7 @@ import {
   Root,
   StyledH1,
   StyledH2,
+  FormWrapper,
   StyledForm,
   StyledInput,
   FormMessage,
@@ -67,38 +68,40 @@ const Login = () => {
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onLoginClicked}>
-        <StyledH2>SIGN IN</StyledH2>
-        <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
-        <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
-        <FormMessage size="large">
-          <StyledText
+      <FormWrapper>
+        <StyledForm onSubmit={onLoginClicked}>
+          <StyledH2>SIGN IN</StyledH2>
+          <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
+          <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
+          <FormMessage size="large">
+            <StyledText
+              size="middle"
+              color="pink"
+              float="left"
+            >
+              {authError && formSubmitted && 'Invalid credentials entered'}
+            </StyledText>
+            <StyledText
+              size="middle"
+              float="right"
+            >
+              <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
+            </StyledText>
+          </FormMessage>
+          <StyledButton
+            htmlType="submit"
             size="middle"
-            color="pink"
-            float="left"
+            color="blue"
+            width={108}
+            role="button"
+            tabIndex={0}
+            onClick={onLoginClicked}
+            onKeyPress={onLoginClicked}
           >
-            {authError && formSubmitted && 'Invalid credentials entered'}
-          </StyledText>
-          <StyledText
-            size="middle"
-            float="right"
-          >
-            <Link to={ROUTE_RESET_PASSWORD}>Forgot Password</Link>
-          </StyledText>
-        </FormMessage>
-        <StyledButton
-          htmlType="submit"
-          size="middle"
-          color="blue"
-          width={108}
-          role="button"
-          tabIndex={0}
-          onClick={onLoginClicked}
-          onKeyPress={onLoginClicked}
-        >
-          Sign In
-        </StyledButton>
-      </StyledForm>
+            Sign In
+          </StyledButton>
+        </StyledForm>
+      </FormWrapper>
     </Root>
   );
 };

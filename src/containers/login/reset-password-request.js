@@ -9,6 +9,7 @@ import {
   Root,
   StyledH1,
   StyledH2,
+  FormWrapper,
   StyledForm,
   StyledInput,
   FormMessage,
@@ -72,45 +73,47 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm className={thanks ? 'thanks' : ''} onSubmit={onResetClicked}>
-        {!thanks ? (
-          <>
-            <HeaderText>RESET YOUR PASSWORD</HeaderText>
-            <ResetPasswordText
-              size="large"
-              color="gray"
-            >
-              Enter your email address and we will
-              <br />
-              send you a link to reset your password
-            </ResetPasswordText>
-            <StyledInput placeholder="email" onChange={onEmailChanged} />
-            <FormMessage size="large" />
-            <SubmitButton
-              htmlType="submit"
-              size="middle"
-              color="blue"
-              width={144}
-              role="button"
-              tabIndex={0}
-              onClick={onResetClicked}
-            >
-              Submit
-            </SubmitButton>
-          </>
-        ) : (
-          <>
-            <Link to="/login"><CloseOutlined color="gray" /></Link>
-            <StyledH2>HELP IS ON THE WAY</StyledH2>
-            <ThankYouText
-              size="large"
-              color="gray"
-            >
-              Please check your email to reset your password.
-            </ThankYouText>
-          </>
-        )}
-      </StyledForm>
+      <FormWrapper>
+        <StyledForm className={thanks ? 'thanks' : ''} onSubmit={onResetClicked}>
+          {!thanks ? (
+            <>
+              <HeaderText>RESET YOUR PASSWORD</HeaderText>
+              <ResetPasswordText
+                size="large"
+                color="gray"
+              >
+                Enter your email address and we will
+                <br />
+                send you a link to reset your password
+              </ResetPasswordText>
+              <StyledInput placeholder="email" onChange={onEmailChanged} />
+              <FormMessage size="large" />
+              <SubmitButton
+                htmlType="submit"
+                size="middle"
+                color="blue"
+                width={144}
+                role="button"
+                tabIndex={0}
+                onClick={onResetClicked}
+              >
+                Submit
+              </SubmitButton>
+            </>
+          ) : (
+            <>
+              <Link to="/login"><CloseOutlined color="gray" /></Link>
+              <StyledH2>HELP IS ON THE WAY</StyledH2>
+              <ThankYouText
+                size="large"
+                color="gray"
+              >
+                Please check your email to reset your password.
+              </ThankYouText>
+            </>
+          )}
+        </StyledForm>
+      </FormWrapper>
     </Root>
   );
 };

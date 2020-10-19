@@ -30,6 +30,10 @@ export const StyledH2 = styled.h2`
   color: ${colors.blue};
 `;
 
+export const FormWrapper = styled.div`
+  background-color: ${colors.blue};
+`;
+
 export const StyledForm = styled.form`
   position: relative;
   width: 390px;

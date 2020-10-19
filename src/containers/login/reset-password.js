@@ -9,6 +9,7 @@ import {
   Root,
   StyledH1,
   StyledH2,
+  FormWrapper,
   StyledForm,
   StyledInput,
   FormMessage,
@@ -77,49 +78,51 @@ const ResetPassword = () => {
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onChangePasswordClicked}>
-        <HeaderText>RESET YOUR PASSWORD</HeaderText>
-        <label htmlFor="newPassword">
-          <StyledText
+      <FormWrapper>
+        <StyledForm onSubmit={onChangePasswordClicked}>
+          <HeaderText>RESET YOUR PASSWORD</HeaderText>
+          <label htmlFor="newPassword">
+            <StyledText
+              size="middle"
+              color="gray"
+            >
+              New Password
+            </StyledText>
+            <StyledInput type="password" name="newPassword" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
+          </label>
+          <label htmlFor="confirmPassword">
+            <StyledText
+              size="middle"
+              color="gray"
+            >
+              Re-Enter Password
+            </StyledText>
+            <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
+          </label>
+          <FormMessage float="left">
+            <StyledText size="middle" color="pink">
+              {passwordMismatch && 'Passwords do not match.'}
+            </StyledText>
+          </FormMessage>
+          <FormMessage float="right">
+            <StyledText size="small" color={error && !passwordMismatch && password.length < 10 ? 'pink' : 'gray'} float="right">
+              Minimum 10 characters
+            </StyledText>
+          </FormMessage>
+          <FormMessage size="middle" />
+          <StyledButton
+            htmlType="submit"
             size="middle"
-            color="gray"
+            color="blue"
+            width={108}
+            role="button"
+            tabIndex={0}
+            onClick={onChangePasswordClicked}
           >
-            New Password
-          </StyledText>
-          <StyledInput type="password" name="newPassword" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
-        </label>
-        <label htmlFor="confirmPassword">
-          <StyledText
-            size="middle"
-            color="gray"
-          >
-            Re-Enter Password
-          </StyledText>
-          <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
-        </label>
-        <FormMessage float="left">
-          <StyledText size="middle" color="pink">
-            {passwordMismatch && 'Passwords do not match.'}
-          </StyledText>
-        </FormMessage>
-        <FormMessage float="right">
-          <StyledText size="small" color={error && !passwordMismatch && password.length < 10 ? 'pink' : 'gray'} float="right">
-            Minimum 10 characters
-          </StyledText>
-        </FormMessage>
-        <FormMessage size="middle" />
-        <StyledButton
-          htmlType="submit"
-          size="middle"
-          color="blue"
-          width={108}
-          role="button"
-          tabIndex={0}
-          onClick={onChangePasswordClicked}
-        >
-          Submit
-        </StyledButton>
-      </StyledForm>
+            Submit
+          </StyledButton>
+        </StyledForm>
+      </FormWrapper>
     </Root>
   );
 };

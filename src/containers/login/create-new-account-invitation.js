@@ -9,6 +9,7 @@ import {
   Root,
   StyledH1,
   StyledH2,
+  FormWrapper,
   StyledForm,
   StyledInput,
   FormMessage,
@@ -82,73 +83,75 @@ const CreateNewAccountInvitation = () => {
         <br />
         OpenFIDO
       </StyledH1>
-      <StyledForm onSubmit={onCreateAccountClicked}>
-        <StyledH2>
-          Welcome to OpenFIDO.
-          <br />
-          Please create an account
-        </StyledH2>
-        <Space direction="vertical" size={20}>
-          <div>
-            <StyledInput size="small" type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
-            <FormMessage>
-              <div />
-              <StyledText color="pink">
-                {createUserError && password.length < 10 && 'Invalid email'}
-              </StyledText>
-            </FormMessage>
-            <StyledInput size="small" type="text" name="first_name" id="first_name" placeholder="first name" onChange={onFirstNameChanged} />
-            <FormMessage>
-              <div />
-              <StyledText color={createUserError && !firstName.length ? 'pink' : 'gray80'}>
-                Required
-              </StyledText>
-            </FormMessage>
-            <StyledInput size="small" type="text" name="last_name" id="last_name" placeholder="last name" onChange={onLastNameChanged} />
-            <FormMessage>
-              <div />
-              <StyledText color={createUserError && !lastName.length ? 'pink' : 'gray80'}>
-                Required
-              </StyledText>
-            </FormMessage>
-            <StyledInput size="small" type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
-            <FormMessage>
-              <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
-              <StyledText color={createUserError && password.length < 10 ? 'pink' : 'gray80'} float="right">
-                Minimum 10 characters
-              </StyledText>
-            </FormMessage>
-            <StyledInput size="small" type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
-          </div>
-          <Space direction="vertical" size={12}>
-            <StyledButton
-              htmlType="submit"
-              size="middle"
-              color="blue"
-              width={106}
-              role="button"
-              tabIndex={0}
-              onClick={onCreateAccountClicked}
-            >
-              <label>
-                Create
-                <br />
-                Account
-              </label>
-            </StyledButton>
-            <Space direction="vertical" size={8} align="center">
+      <FormWrapper>
+        <StyledForm onSubmit={onCreateAccountClicked}>
+          <StyledH2>
+            Welcome to OpenFIDO.
+            <br />
+            Please create an account
+          </StyledH2>
+          <Space direction="vertical" size={20}>
+            <div>
+              <StyledInput size="small" type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
               <FormMessage>
-                <StyledText size="small" color="pink" align="left">
-                  {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}
+                <div />
+                <StyledText color="pink">
+                  {createUserError && password.length < 10 && 'Invalid email'}
                 </StyledText>
               </FormMessage>
-              <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
-                <StyledText color="blue" fontweight={500}>Already a member? Login in</StyledText>
-              </Link>
+              <StyledInput size="small" type="text" name="first_name" id="first_name" placeholder="first name" onChange={onFirstNameChanged} />
+              <FormMessage>
+                <div />
+                <StyledText color={createUserError && !firstName.length ? 'pink' : 'gray80'}>
+                  Required
+                </StyledText>
+              </FormMessage>
+              <StyledInput size="small" type="text" name="last_name" id="last_name" placeholder="last name" onChange={onLastNameChanged} />
+              <FormMessage>
+                <div />
+                <StyledText color={createUserError && !lastName.length ? 'pink' : 'gray80'}>
+                  Required
+                </StyledText>
+              </FormMessage>
+              <StyledInput size="small" type="password" name="password" id="newPassword" placeholder="password" onChange={onPasswordChanged} />
+              <FormMessage>
+                <StyledText size="small" color="pink">{passwordMismatch && 'Passwords do not match'}</StyledText>
+                <StyledText color={createUserError && password.length < 10 ? 'pink' : 'gray80'} float="right">
+                  Minimum 10 characters
+                </StyledText>
+              </FormMessage>
+              <StyledInput size="small" type="password" name="confirmPassword" id="confirmPassword" placeholder="re-enter password" onChange={onConfirmPasswordChanged} />
+            </div>
+            <Space direction="vertical" size={12}>
+              <StyledButton
+                htmlType="submit"
+                size="middle"
+                color="blue"
+                width={106}
+                role="button"
+                tabIndex={0}
+                onClick={onCreateAccountClicked}
+              >
+                <label>
+                  Create
+                  <br />
+                  Account
+                </label>
+              </StyledButton>
+              <Space direction="vertical" size={8} align="center">
+                <FormMessage>
+                  <StyledText size="small" color="pink" align="left">
+                    {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}
+                  </StyledText>
+                </FormMessage>
+                <Link to={{ pathname: ROUTE_LOGIN, state: { invitation_token } }}>
+                  <StyledText color="blue" fontweight={500}>Already a member? Login in</StyledText>
+                </Link>
+              </Space>
             </Space>
           </Space>
-        </Space>
-      </StyledForm>
+        </StyledForm>
+      </FormWrapper>
     </Root>
   );
 };
