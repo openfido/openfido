@@ -154,6 +154,8 @@ export default (state = DEFAULT_STATE, action) => {
           currentOrg = state.currentOrg;
         } else if (organizations.length) {
           currentOrg = organizations[0].uuid;
+        } else {
+          currentOrg = null;
         }
       }
 
