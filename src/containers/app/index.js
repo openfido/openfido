@@ -100,6 +100,12 @@ const App = ({ children }) => {
   );
 };
 
-App.propTypes = { children: PropTypes.node.isRequired };
+App.propTypes = {
+  children: PropTypes.node,
+};
+
+App.defaultProps = {
+  children: null,
+};
 
 export default App;

@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, applyMiddleware } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
-import { logger } from 'redux-logger';
-import thunk from 'redux-thunk';
 import {
   BrowserRouter,
   Switch,
   Route,
   Redirect,
 } from 'react-router-dom';
-import { composeWithDevTools } from 'redux-devtools-extension';
 
 import Login from 'containers/login';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
@@ -22,7 +18,7 @@ import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import Settings from 'containers/settings';
 import { refreshUserToken } from 'actions/user';
-import reducers from 'reducers';
+import store from 'config/store';
 import {
   ROUTE_LOGIN,
   ROUTE_RESET_PASSWORD,
@@ -37,14 +33,6 @@ import { ROLE_ADMINISTRATOR } from 'config/roles';
 import * as serviceWorker from './serviceWorker';
 import 'antd/dist/antd.compact.min.css';
 import 'index.css';
-
-const middlewares = [];
-middlewares.push(thunk);
-if (process.env.NODE_ENV === 'development') {
-  middlewares.push(logger);
-}
-
-const store = composeWithDevTools(applyMiddleware(...middlewares))(createStore)(reducers);
 
 const AppSwitch = () => {
   const profile = useSelector((state) => state.user.profile);

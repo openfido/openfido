@@ -24,7 +24,7 @@ import {
 import Auth from 'util/auth';
 
 const DEFAULT_STATE = {
-  profile: Auth.getUser(),
+  profile: null,
   organizations: null,
   avatar: null,
   currentOrg: null,
@@ -69,27 +69,25 @@ export default (state = DEFAULT_STATE, action) => {
         },
       };
     case LOGIN_USER:
-      Auth.loginUser(action.payload);
+      Auth.setUserToken(action.payload.token);
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
-        profile: Auth.getUser(),
+        profile: action.payload,
       };
     case REFRESH_JWT: {
-      const profile = {
-        ...state.profile,
-        token: action.payload.token,
-      };
-
-      Auth.loginUser(profile);
+      Auth.setUserToken(action.payload.token);
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
-        profile,
+        profile: {
+          ...state.profile,
+          token: action.payload.token,
+        },
       };
     }
     case AUTH_IN_PROGRESS:
-      Auth.logoutUser();
+      Auth.clearUserToken();
       return {
         ...state,
         messages: {
@@ -108,7 +106,7 @@ export default (state = DEFAULT_STATE, action) => {
         profile: null,
       };
     case LOGOUT_USER:
-      Auth.logoutUser();
+      Auth.clearUserToken();
       return {
         ...DEFAULT_STATE,
         profile: null,
@@ -150,11 +148,20 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_USER_ORGANIZATIONS: {
       const organizations = action.payload;
 
+      let { currentOrg } = state;
+      if (organizations) {
+        if (state.currentOrg && organizations.find((org) => org.uuid === state.currentOrg)) {
+          currentOrg = state.currentOrg;
+        } else if (organizations.length) {
+          currentOrg = organizations[0].uuid;
+        }
+      }
+
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
         organizations,
-        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+        currentOrg,
       };
     }
     case UPDATE_USER_PROFILE: {

@@ -31,7 +31,7 @@ export default class ApiClient {
   static getInstance(
     timeout = config.api.defaultTimeout,
     auth = false,
-    token = Auth.getAuthToken(),
+    token = Auth.getUserToken(),
     contentType = 'application/json',
   ) {
     const headers = {

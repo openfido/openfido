@@ -63,13 +63,12 @@ const SettingsSuccessPopup = ({
         color="blue"
         onClick={handleOk}
         width={108}
-        style={{ padding: 0 }}
       >
-        <label>
+        <div>
           Return to
           <br />
           Settings
-        </label>
+        </div>
       </StyledButton>
     </Space>
   </Modal>

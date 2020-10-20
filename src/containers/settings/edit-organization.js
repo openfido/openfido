@@ -194,9 +194,8 @@ const EditOrganization = () => {
           hoverbgcolor="lightBlue"
           onClick={onAddOrganizationClicked}
           width={136}
-          style={{ height: '22px' }}
         >
-          <label htmlFor="organization_name">+ Add Organization</label>
+          + Add Organization
         </StyledButton>
         {addOrganization && (
         <label htmlFor="organization_name">

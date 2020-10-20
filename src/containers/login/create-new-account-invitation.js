@@ -79,7 +79,7 @@ const CreateNewAccountInvitation = () => {
   return (
     <Root>
       <StyledH1>
-        You've been invited to join
+        You&apos;ve been invited to join
         <br />
         OpenFIDO
       </StyledH1>
@@ -132,11 +132,11 @@ const CreateNewAccountInvitation = () => {
                 tabIndex={0}
                 onClick={onCreateAccountClicked}
               >
-                <label>
+                <div>
                   Create
                   <br />
                   Account
-                </label>
+                </div>
               </StyledButton>
               <Space direction="vertical" size={8} align="center">
                 <FormMessage>
