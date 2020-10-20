@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock, patch
 
 import pytest
 from freezegun import freeze_time
@@ -370,3 +370,16 @@ def test_accept_invitation_error(app, organization, user):
 def test_accept_invitation(app, organization, user):
     invitation = services.create_invitation(organization, user.email)
     services.accept_invitation(invitation.invitation_token)
+
+@patch("app.utils.get_s3")
+def test_update_user_avatar(get_s3_mock, app, user):
+    s3_mock = MagicMock()
+    get_s3_mock.return_value = s3_mock
+
+    data = 'fakedata'
+    services.update_user_avatar(user, data)
+
+    s3_mock.upload_fileobj.assert_called_once()
+    assert s3_mock.mock_calls[0][1][0] == data
+    assert s3_mock.mock_calls[0][1][1] == ''
+    assert s3_mock.mock_calls[0][1][2] == ''
