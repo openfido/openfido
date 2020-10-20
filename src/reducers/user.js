@@ -150,8 +150,8 @@ export default (state = DEFAULT_STATE, action) => {
 
       let { currentOrg } = state;
       if (organizations) {
-        if (state.currentOrg) {
-          currentOrg = organizations.find((org) => org.uuid === state.currentOrg);
+        if (state.currentOrg && organizations.find((org) => org.uuid === state.currentOrg)) {
+          currentOrg = state.currentOrg;
         } else if (organizations.length) {
           currentOrg = organizations[0].uuid;
         }
