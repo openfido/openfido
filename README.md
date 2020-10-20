@@ -26,7 +26,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
 
     # Build the docker image, using the SSH private key you use for github
     # access (to access other openslac private repositories)
-    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/YOURKEY)"
+    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
 
     # Login to an docker instance of the flask app:
     docker-compose run --rm workflow_service bash
