@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 import { requestPasswordReset } from 'services';
 import 'actions/user';
@@ -39,11 +38,11 @@ const SubmitButton = styled(StyledButton)`
   margin-top: -1rem;
 `;
 
-const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) => {
-  const [email, setEmail] = useState();
-  const [thanks, setThanks] = useState(defaultThanks);
+const ResetPasswordRequest = () => {
+  const [email, setEmail] = useState('');
+  const [thanks, setThanks] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(defaultError);
+  // const [error, setError] = useState();
 
   const onEmailChanged = (e) => {
     setEmail(e.target.value);
@@ -60,7 +59,7 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
           setThanks(true);
         })
         .catch(() => {
-          setError(true);
+          // setError(true);
           setLoading(false);
         });
     }
@@ -116,16 +115,6 @@ const ResetPasswordRequest = ({ error: defaultError, thanks: defaultThanks }) =>
       </FormWrapper>
     </Root>
   );
-};
-
-ResetPasswordRequest.propTypes = {
-  error: PropTypes.bool,
-  thanks: PropTypes.bool,
-};
-
-ResetPasswordRequest.defaultProps = {
-  error: false,
-  thanks: false,
 };
 
 export default ResetPasswordRequest;

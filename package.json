@@ -84,6 +84,14 @@
             ".jsx"
           ]
         }
+      ],
+      "camelcase": 1,
+      "max-len": 1,
+      "jsx-a11y/label-has-associated-control": [
+        2,
+        {
+          "assert": "either"
+        }
       ]
     }
   },

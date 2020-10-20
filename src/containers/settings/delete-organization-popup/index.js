@@ -116,8 +116,10 @@ const DeleteOrganizationPopup = ({
     }
   };
 
+  const stopPropagation = (e) => e.stopPropagation();
+
   return (
-    <div role="dialog" onClick={(e) => e.stopPropagation()}>
+    <div role="presentation" onClick={stopPropagation} onKeyDown={stopPropagation}>
       <Modal
         visible
         footer={null}
@@ -162,11 +164,11 @@ const DeleteOrganizationPopup = ({
                 </StyledText>
               </ConfirmBox>
               <StyledButton size="middle" width={128} color="pink" onClick={onPermanentlyDeleteClicked}>
-                <label>
+                <div>
                   Permanently
                   <br />
                   Delete
-                </label>
+                </div>
               </StyledButton>
             </StyledForm>
           </>
@@ -194,11 +196,11 @@ const DeleteOrganizationPopup = ({
                 width={108}
                 onClick={handleCancel}
               >
-                <label>
+                <div>
                   DO NOT
                   <br />
                   DELETE
-                </label>
+                </div>
               </StyledButton>
               <StyledButton type="text" color="transparent">
                 <StyledText

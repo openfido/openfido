@@ -42,11 +42,11 @@ const DeleteColumn = styled.div`
   }
 `;
 
-/*const ErrorMessage = styled(StyledText)`
+/* const ErrorMessage = styled(StyledText)`
   position: absolute;
   right: 32px;
   right: 2rem;
-`;*/
+`; */
 
 const StyledMenu = styled(Menu)`
   display: block;
@@ -107,15 +107,15 @@ const StyledMenuItem = styled(Menu.Item)`
 `;
 
 const UserItem = ({
-  uuid, first_name, last_name, is_system_admin, last_active_at, role, isInvited,
+  uuid, first_name, last_name, last_active_at, role, isInvited,
 }) => {
   const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
   const [invitationCanceled, setInvitationCanceled] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
-  const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
+  // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
+  // const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
   const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
   const changeRoleError = useSelector((state) => state.organization.messages.changeRoleError);
   const dispatch = useDispatch();
@@ -209,17 +209,17 @@ const UserItem = ({
           {first_name}
           {last_name && ` ${last_name}`}
         </StyledText>
-        {/*{removeMemberError && uuid === userRemoved && (
+        {/* {removeMemberError && uuid === userRemoved && (
           <ErrorMessage color="pink">This user could not be deleted.</ErrorMessage>
         )}
         {changeRoleError && uuid === userRoleChanged && (
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
-        )}*/}
+        )} */}
       </NameColumn>
       {isInvited ? roleText : (
-          <StyledDropdown overlay={menu} trigger="click">
-            {roleText}
-          </StyledDropdown>
+        <StyledDropdown overlay={menu} trigger="click">
+          {roleText}
+        </StyledDropdown>
       )}
       <StyledText size="large" color="gray">
         {isInvited ? (
@@ -239,7 +239,6 @@ UserItem.propTypes = {
   uuid: PropTypes.string,
   first_name: PropTypes.string.isRequired,
   last_name: PropTypes.string,
-  is_system_admin: PropTypes.bool,
   last_active_at: PropTypes.string,
   role: PropTypes.shape({
     uuid: PropTypes.string,
@@ -252,7 +251,6 @@ UserItem.propTypes = {
 UserItem.defaultProps = {
   uuid: null,
   last_name: '',
-  is_system_admin: false,
   last_active_at: undefined,
   isInvited: false,
 };

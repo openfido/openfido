@@ -65,8 +65,8 @@ export const StyledTitle = styled.div`
   width: 100%;
   background-color: ${colors.white};
   border-bottom: 1px solid ${colors.lightGray};
-  padding: 24px 16px 20px 16px;
-  padding: 1.5rem 1rem 1.25rem 1rem;
+  padding: 28px 16px 20px 16px;
+  padding: 1.75rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
     margin-right: 16px;
@@ -163,6 +163,7 @@ export const StyledH5 = styled.div`
 
 export const StyledButton = styled(Button)`
   border: 0;
+  border-radius: 3px;
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -171,7 +172,6 @@ export const StyledButton = styled(Button)`
   .anticon {
     line-height: 0;
   }
-  // no size
   &.ant-btn {
     font-size: 14px;
     line-height: 16px;
@@ -180,35 +180,33 @@ export const StyledButton = styled(Button)`
     padding: 0;
     height: auto;
     &:not(.ant-btn-text) span {
-      padding: 4px 8px;
-      padding: 0.25rem 0.5rem;
+      padding: 3px 8px;
+      padding: 0.1875rem 0.5rem;
     }
     label {
       cursor: pointer;
       padding: 3px 8px;
       padding: 0.1875rem 0.5rem;
     }
+    &.ant-btn-sm:not(.ant-btn-text) span {
+      padding: 4px 8px;
+      padding: 0.25rem 0.5rem;
+    }
   }
   &.ant-btn-lg { 
     font-size: 18px;
     line-height: 21px;
     font-weight: 500;
-    border-radius: 2px;
     padding: 8px 12px;
     padding: 0.5rem 0.75rem;
     height: 50px;
     height: 3.125rem;
   }
-  font-size: 16px;
-  line-height: 19px;
-  font-weight: 500;
-  border-radius: 3px;
   &.ant-btn-sm {
     font-size: 12px;
     line-height: 14px;
     height: auto;
     font-weight: 400;
-    border-radius: 3px;
   }
   &.ant-btn[disabled], &.ant-btn[disabled]:hover, &.ant-btn[disabled]:focus {
     background-color: ${colors.lightGray};
