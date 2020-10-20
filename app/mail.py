@@ -25,7 +25,9 @@ class MailDriver(ABC):
 
 class NullDriver(MailDriver):
     def send_organization_invitation_email(self, organization, email, invitation):
-        log(f"send_organization_invitation_email: organization {organization.id} email {email} invitation {invitation.id}")
+        log(
+            f"send_organization_invitation_email: organization {organization.id} email {email} invitation {invitation.id}"
+        )
         return True
 
     def send_password_reset_email(self, user):
@@ -38,12 +40,16 @@ class SendGridDriver(MailDriver):
         base_url = os.environ.get("CLIENT_BASE_URL")
         accept_invitation_url = f"{base_url}/accept-invitation?invitation_token={invitation.invitation_token}"
 
-        message = Mail(from_email=os.environ.get("SYSTEM_FROM_EMAIL_ADDRESS"), to_emails=email)
+        message = Mail(
+            from_email=os.environ.get("SYSTEM_FROM_EMAIL_ADDRESS"), to_emails=email
+        )
         message.dynamic_template_data = {
             "accept_invitation_url": accept_invitation_url,
             "organization_name": organization.name,
         }
-        message.template_id = os.environ.get("SENDGRID_ORGANIZATION_INVITATION_TEMPLATE_ID")
+        message.template_id = os.environ.get(
+            "SENDGRID_ORGANIZATION_INVITATION_TEMPLATE_ID"
+        )
         try:
             log(f"sendgrid: send_organization_invitation_email {email}")
             sendgrid_client = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
@@ -58,10 +64,10 @@ class SendGridDriver(MailDriver):
         base_url = os.environ.get("CLIENT_BASE_URL")
         password_reset_url = f"{base_url}/reset-password/{user.reset_token}"
 
-        message = Mail(from_email=os.environ.get("SYSTEM_FROM_EMAIL_ADDRESS"), to_emails=user.email)
-        message.dynamic_template_data = {
-            "password_reset_url": password_reset_url
-        }
+        message = Mail(
+            from_email=os.environ.get("SYSTEM_FROM_EMAIL_ADDRESS"), to_emails=user.email
+        )
+        message.dynamic_template_data = {"password_reset_url": password_reset_url}
         message.template_id = os.environ.get("SENDGRID_PASSWORD_RESET_TEMPLATE_ID")
         try:
             log(f"sendgrid: send_password_reset_email {user.email}")

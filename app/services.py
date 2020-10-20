@@ -97,7 +97,9 @@ def create_invitation(organization, email):
         db.session.add(invitation)
         db.session.commit()
 
-    if not mail.make_driver().send_organization_invitation_email(organization, email, invitation):
+    if not mail.make_driver().send_organization_invitation_email(
+        organization, email, invitation
+    ):
         raise BadRequestError("Unable to send invitation email")
 
     return invitation
