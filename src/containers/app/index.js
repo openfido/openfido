@@ -18,7 +18,7 @@ import Navigation from './navigation';
 
 const AppDropdown = styled(Dropdown)`
   position: absolute;
-  top: 28px;
+  top: 24px;
   top: 1.75rem;
   right: 16px;
   right: 1rem;

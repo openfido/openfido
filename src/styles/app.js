@@ -65,8 +65,8 @@ export const StyledTitle = styled.div`
   width: 100%;
   background-color: ${colors.white};
   border-bottom: 1px solid ${colors.lightGray};
-  padding: 24px 16px 20px 16px;
-  padding: 1.5rem 1rem 1.25rem 1rem;
+  padding: 28px 16px 20px 16px;
+  padding: 1.75rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
     margin-right: 16px;
