@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { logoutUser } from 'actions/user';
 import colors from 'styles/colors';
 import PhotoImg from 'icons/navigation-profile-avatar.svg';
-import SettingsDropdown from './SettingsDropdown';
+import OrganizationsDropdown from './organizations-dropdown';
 
 const StyledProfileContainer = styled.div`
   position: relative;
@@ -74,7 +74,7 @@ const Profile = () => {
             {profile.last_name && ` ${profile.last_name}`}
           </StyledName>
         )}
-        <SettingsDropdown />
+        <OrganizationsDropdown />
       </StyledProfileContainer>
     </>
   );

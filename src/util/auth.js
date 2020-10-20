@@ -1,29 +1,19 @@
 export const USER_KEY = 'user';
 
 export default class Auth {
-  static loginUser(user) {
-    window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+  static setUserToken(token) {
+    window.localStorage.setItem(`${USER_KEY}_token`, JSON.stringify(token));
   }
 
-  static isUserLoggedIn() {
-    return !!window.localStorage.getItem(USER_KEY);
-  }
-
-  static getUser() {
-    if (Auth.isUserLoggedIn()) {
-      return JSON.parse(window.localStorage.getItem(USER_KEY));
+  static getUserToken() {
+    const userTokenItem = window.localStorage.getItem(`${USER_KEY}_token`);
+    if (userTokenItem) {
+      return JSON.parse(userTokenItem);
     }
     return null;
   }
 
-  static getAuthToken() {
-    if (this.isUserLoggedIn()) {
-      return this.getUser().token;
-    }
-    return null;
-  }
-
-  static logoutUser() {
+  static clearUserToken() {
     window.localStorage.removeItem(USER_KEY);
   }
 }

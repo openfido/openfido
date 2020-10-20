@@ -50,7 +50,7 @@ const StyledMenuItem = styled(Menu.Item)`
   border: 1px solid ${colors.lightBorder};
   border-radius: 3px;
   padding: 2px;
-  &:hover {
+  &:hover, &.ant-dropdown-menu-item-selected {
     background-color: ${colors.blue};
     border-color: transparent;
     color: ${colors.white};
@@ -61,7 +61,7 @@ const StyledMenuItem = styled(Menu.Item)`
    }
 `;
 
-const SettingsDropdown = () => {
+const OrganizationsDropdown = () => {
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
@@ -71,7 +71,7 @@ const SettingsDropdown = () => {
   };
 
   const menu = (
-    <StyledMenu>
+    <StyledMenu selectedKeys={[currentOrg]}>
       <li>Change organization</li>
       {organizations && organizations.map((org) => (
         <StyledMenuItem key={org.uuid} onClick={() => onOrgClicked(org.uuid)}>
@@ -100,4 +100,4 @@ const SettingsDropdown = () => {
   );
 };
 
-export default SettingsDropdown;
+export default OrganizationsDropdown;
