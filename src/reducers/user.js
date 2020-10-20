@@ -150,11 +150,20 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_USER_ORGANIZATIONS: {
       const organizations = action.payload;
 
+      let { currentOrg } = state;
+      if (organizations) {
+        if (state.currentOrg) {
+          currentOrg = organizations.find((org) => org.uuid === state.currentOrg);
+        } else if (organizations.length) {
+          currentOrg = organizations[0].uuid;
+        }
+      }
+
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
         organizations,
-        currentOrg: !state.currentOrg && organizations && organizations.length ? organizations[0].uuid : state.currentOrg,
+        currentOrg,
       };
     }
     case UPDATE_USER_PROFILE: {
