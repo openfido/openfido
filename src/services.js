@@ -101,3 +101,7 @@ export const requestDeleteOrganization = (organization_uuid) => (
 export const requestGetPipelines = (organization_uuid) => (
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines`, appToken)
 );
+
+export const requestGetPipelines = (organization_uuid) => (
+  ApiClient.get(`/organizations/${organization_uuid}/pipelines`)
+);
