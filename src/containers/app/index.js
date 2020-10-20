@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Dropdown, Menu } from 'antd';
 
-
 import { logoutUser } from 'actions/user';
 import {
   StyledLayout,
