@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-
-import { logoutUser } from 'actions/user';
+import { useSelector } from 'react-redux';
 import colors from 'styles/colors';
 import PhotoImg from 'icons/navigation-profile-avatar.svg';
 import SettingsDropdown from './SettingsDropdown';
@@ -34,22 +31,9 @@ const StyledName = styled.div`
   margin: 8px auto 12px auto;
 `;
 
-const SignOutLink = styled.div`
-  position: absolute;
-  right: 20px;
-  right: 1.25rem;
-  top: 8px;
-  top: 0.5rem;
-`;
-
 const Profile = () => {
   const profile = useSelector((state) => state.user.profile);
   const avatar = useSelector((state) => state.user.avatar);
-  const dispatch = useDispatch();
-
-  const onSignOutClicked = () => {
-    dispatch(logoutUser());
-  };
 
   const StyledPhoto = styled.div`
     width: 40px;
@@ -61,9 +45,6 @@ const Profile = () => {
 
   return (
     <>
-      <SignOutLink>
-        <Link to="/login" onClick={onSignOutClicked}>Sign Out</Link>
-      </SignOutLink>
       <StyledProfileContainer>
         <StyledPhotoContainer>
           <StyledPhoto />
