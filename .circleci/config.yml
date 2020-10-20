@@ -21,15 +21,3 @@ jobs:
           name: Build
           command: |
             npm run build
-      - run:
-          name: Deploy
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "staging" ] ; then
-              echo Deploy to Staging...
-              npm run deploy-staging-ci
-              echo Deploy Complete
-            elif [ "${CIRCLE_BRANCH}" == "master" ] ; then
-              echo Deploy to Production...
-              npm run deploy-production-ci
-              echo Deploy Complete
-            fi
