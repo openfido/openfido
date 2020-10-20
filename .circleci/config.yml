@@ -32,5 +32,3 @@ jobs:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
-      - run:
-          command: pipenv run invoke test --junit --enforce-percent 94
