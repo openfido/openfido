@@ -48,7 +48,7 @@ export const createUser = (email, firstName, lastName, password, invitation_toke
     .catch((err) => {
       dispatch({
         type: CREATE_USER_FAILED,
-        payload: err.response.data,
+        payload: !err.response || err.response.data,
       });
     });
 };
@@ -106,7 +106,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     .catch((err) => {
       dispatch({
         type: AUTH_FAILED,
-        payload: err.response.data,
+        payload: !err.response || err.response.data,
       });
     });
 };
@@ -203,7 +203,7 @@ export const updateUserAvatar = (user_uuid, image_content) => (dispatch) => {
     .catch((err) => {
       dispatch({
         type: UPDATE_USER_AVATAR_FAILED,
-        payload: err.response.data,
+        payload: !err.response || err.response.data,
       });
     });
 };
@@ -220,7 +220,7 @@ export const updateUserProfile = (user_uuid, email, first_name, last_name) => as
     .catch((err) => {
       dispatch({
         type: UPDATE_USER_PROFILE_FAILED,
-        payload: err.response.data,
+        payload: !err.response || err.response.data,
       });
     });
 };
@@ -237,7 +237,7 @@ export const changePassword = (old_password, new_password) => async (dispatch) =
     .catch((err) => {
       dispatch({
         type: CHANGE_PASSWORD_FAILED,
-        payload: err.response.data,
+        payload: !err.response || err.response.data,
       });
     });
 };
