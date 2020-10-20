@@ -116,8 +116,10 @@ const DeleteOrganizationPopup = ({
     }
   };
 
+  const stopPropagation = (e) => e.stopPropagation();
+
   return (
-    <div role="dialog" onClick={(e) => e.stopPropagation()}>
+    <div role="presentation" onClick={stopPropagation} onKeyDown={stopPropagation}>
       <Modal
         visible
         footer={null}
