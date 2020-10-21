@@ -7,6 +7,7 @@ import { getPipelines } from 'actions/pipelines';
 import { StyledTitle, StyledButton } from 'styles/app';
 import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
+import AddPipeline from './add-pipeline';
 
 const PipelineItems = styled(Space)`
   padding: 28px 20px 28px 16px;
@@ -19,6 +20,7 @@ const Pipelines = () => {
   const dispatch = useDispatch();
 
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
+  const [showAddPipelines, setShowAddPipelines] = useState(false);
 
   useEffect(() => {
     if (!pipelines) {
@@ -32,36 +34,43 @@ const Pipelines = () => {
     }
   }, [pipelines]);
 
-  const closeGetStartedPopup = () => setShowGetStartedPopup(false);
+  const openAddPipelines = () => {
+    setShowGetStartedPopup(false);
+    setShowAddPipelines(true);
+  };
 
   return (
     <>
       <StyledTitle>
         <div>
           <h1>Pipelines</h1>
-          <StyledButton size="small">
+          <StyledButton size="small" onClick={openAddPipelines}>
             + Add Pipeline
           </StyledButton>
         </div>
       </StyledTitle>
       <Space direction="vertical" size={16}>
         {showGetStartedPopup && (
-          <CreatePipelinePopup handleOk={closeGetStartedPopup} />
+          <CreatePipelinePopup handleOk={openAddPipelines} />
         )}
       </Space>
-      <PipelineItems direction="vertical" size={26}>
-        {pipelines && pipelines.map(({
-          uuid, name, status, updated_at,
-        }) => (
-          <PipelineItem
-            key={uuid}
-            uuid={uuid}
-            name={name}
-            status={status}
-            updated_at={updated_at}
-          />
-        ))}
-      </PipelineItems>
+      {!showAddPipelines ? (
+        <PipelineItems direction="vertical" size={26}>
+          {pipelines && pipelines.map(({
+            uuid, name, status, updated_at,
+          }) => (
+            <PipelineItem
+              key={uuid}
+              uuid={uuid}
+              name={name}
+              status={status}
+              updated_at={updated_at}
+            />
+          ))}
+        </PipelineItems>
+      ) : (
+        <AddPipeline />
+      )}
     </>
   );
 };

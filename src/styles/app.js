@@ -139,9 +139,9 @@ export const StyledH2 = styled.h2`
 `;
 
 export const StyledH3 = styled.h3`
-  color: ${colors.gray};
-  font-size: 16px;
-  line-height: 19px;
+  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.darkGray))};
+  font-size: 18px;
+  line-height: 21px;
   font-weight: 500;
 `;
 
@@ -339,6 +339,20 @@ export const StyledInput = styled(Input)`
   }
   `))}
   `)}
+`;
+
+export const StyledTextArea = styled(Input.TextArea)`
+  border: 0;
+  &:focus {
+    box-shadow: none;
+  }
+  color: ${colors.gray};
+  &:hover {
+    color: ${colors.blue};
+  }
+  font-size: 18px;
+  line-height: 21px;
+  padding: 10px;
 `;
 
 export const StyledCheckbox = styled(Checkbox)`
