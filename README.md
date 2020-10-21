@@ -20,6 +20,7 @@ This service acts as a frontend to both the [openfido-workflow-service](https://
 A convenient way to do this is by setting environmental variables telling
 docker-compose which files to use, and where each project is:
 
+    export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
     export AUTH_PORT=5002
     export AUTH_DIR=../openfido-auth-service
