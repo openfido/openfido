@@ -53,4 +53,8 @@ def create_app(config=None):
 
     app.register_blueprint(organization_pipeline_bp, url_prefix="/v1/organizations")
 
+    @app.route("/healthcheck")
+    def healthcheck():
+        return "OK"
+
     return (app, db, migrate)
