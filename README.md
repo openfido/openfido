@@ -34,6 +34,7 @@ implementation:
 
 * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
 * [2. Authentication](docs/adr/0002-authentication.md)
+* [3. Deployment](docs/adr/0003-deployment.md)
 
 # Development
 
