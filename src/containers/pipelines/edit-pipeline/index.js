@@ -38,8 +38,11 @@ const EditPipeline = ({ handleSuccess, pipelineItem }) => {
       repository_ssh_url: repositorySshUrl,
       repository_branch: repositoryBranch,
     })
-      .catch(() => {
+      .then(() => {
         handleSuccess();
+      })
+      .catch(() => {
+
       });
   };
 
