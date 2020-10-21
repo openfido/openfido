@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.0.0-experimental
 FROM python:3.8-slim as base
 
 ENV PORT 5000
@@ -20,7 +21,7 @@ RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 ADD Pipfile .
 ADD Pipfile.lock .
 RUN pip install pipenv
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
+RUN --mount=type=ssh PIPENV_VENV_IN_PROJECT=1 pipenv install --dev
 
 FROM base as runtime
 
