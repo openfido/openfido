@@ -109,3 +109,7 @@ export const requestCreatePipeline = (organization_uuid, body) => (
 export const requestUpdatePipeline = (organization_uuid, pipeline_uuid, body) => (
   ApiClient.put(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}`, body, appToken)
 );
+
+export const requestDeletePipeline = (organization_uuid, pipeline_uuid) => (
+  ApiClient.delete(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}`, appToken)
+);

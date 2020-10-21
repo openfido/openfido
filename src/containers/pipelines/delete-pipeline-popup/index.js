@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Space } from 'antd';
 
-import { requestDeleteOrganization } from 'services';
+import { requestDeletePipeline } from 'services';
 import CloseOutlined from 'icons/CloseOutlined';
 import AlertOutlined from 'icons/AlertOutlined';
 import CheckOutlined from 'icons/CheckOutlined';
@@ -91,9 +92,11 @@ const ConfirmCheck = styled.div`
   }
 `;
 
-const DeleteOrganizationPopup = ({
-  handleOk, handleCancel, organizationUUID, organizationName,
+const DeletePipelinePopup = ({
+  handleOk, handleCancel, pipelineUUID, pipelineName,
 }) => {
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+
   const [deleteName, setDeleteName] = useState(null);
   const [goToDelete, setGoToDelete] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -104,9 +107,9 @@ const DeleteOrganizationPopup = ({
   };
 
   const onPermanentlyDeleteClicked = () => {
-    if (deleteName === organizationName && confirmDelete && !loading) {
+    if (deleteName === pipelineName && confirmDelete && !loading) {
       setLoading(true);
-      requestDeleteOrganization(organizationUUID)
+      requestDeletePipeline(currentOrg, pipelineUUID)
         .then(() => {
           handleOk();
         })
@@ -141,12 +144,12 @@ const DeleteOrganizationPopup = ({
                   You are about to delete
                   {' '}
                   <br />
-                  <StyledText color="pink">{organizationName}</StyledText>
+                  <StyledText color="pink">{pipelineName}</StyledText>
                 </p>
                 <p>
-                  Please type in the organization
+                  Please type in the pipeline
                   <br />
-                  <strong>{organizationName}</strong>
+                  <strong>{pipelineName}</strong>
                   {' '}
                   to confirm
                 </p>
@@ -184,7 +187,7 @@ const DeleteOrganizationPopup = ({
             </StyledH2>
             <Space direction="vertical" size={36} align="center">
               <StyledText color="gray" size="large">
-                Are you sure you want to delete this organization?
+                Are you sure you want to delete this pipeline?
                 {' '}
                 <strong>This action cannot be undone.</strong>
                 {' '}
@@ -224,11 +227,11 @@ const DeleteOrganizationPopup = ({
   );
 };
 
-DeleteOrganizationPopup.propTypes = {
+DeletePipelinePopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  organizationUUID: PropTypes.string.isRequired,
-  organizationName: PropTypes.string.isRequired,
+  pipelineUUID: PropTypes.string.isRequired,
+  pipelineName: PropTypes.string.isRequired,
 };
 
-export default DeleteOrganizationPopup;
+export default DeletePipelinePopup;
