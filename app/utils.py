@@ -40,7 +40,10 @@ def validate_organization(requires_json=True):
     def decorator(view):
         @wraps(view)
         def wrapper(*args, **kwargs):
-            if requires_json and request.headers.get("Content-Type", None) != "application/json":
+            if (
+                requires_json
+                and request.headers.get("Content-Type", None) != "application/json"
+            ):
                 logger.warning("invalid content type")
                 return {"message": "application/json content-type is required."}, 400
 
