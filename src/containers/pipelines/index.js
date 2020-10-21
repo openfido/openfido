@@ -8,6 +8,7 @@ import { StyledTitle, StyledButton } from 'styles/app';
 import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
 import AddPipeline from './add-pipeline';
+import EditPipeline from './edit-pipeline';
 
 const PipelineItems = styled(Space)`
   padding: 28px 20px 28px 16px;
@@ -21,6 +22,7 @@ const Pipelines = () => {
 
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
+  const [pipelineInEdit, setPipelineInEdit] = useState(null);
 
   useEffect(() => {
     if (!pipelines) {
@@ -44,6 +46,14 @@ const Pipelines = () => {
     dispatch(getPipelines(currentOrg));
   };
 
+  const handlePipelineEdit = (pipeline_uuid) => {
+    setPipelineInEdit(pipeline_uuid);
+  };
+
+  const handleEditPipelineSuccess = () => {
+    setPipelineInEdit(null);
+  };
+
   return (
     <>
       <StyledTitle>
@@ -59,7 +69,10 @@ const Pipelines = () => {
           <CreatePipelinePopup handleOk={openAddPipelines} />
         )}
       </Space>
-      {!showAddPipelines ? (
+      {!showAddPipelines && pipelineInEdit && (
+        <EditPipeline handleSuccess={handleEditPipelineSuccess} pipelineItem={pipelineInEdit} />
+      )}
+      {!showAddPipelines && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
           {pipelines && pipelines.map(({
             uuid, name, status, updated_at,
@@ -70,10 +83,12 @@ const Pipelines = () => {
               name={name}
               status={status}
               updated_at={updated_at}
+              handlePipelineEdit={handlePipelineEdit}
             />
           ))}
         </PipelineItems>
-      ) : (
+      )}
+      {showAddPipelines && (
         <AddPipeline handleSuccess={handleAddPipelineSuccess} />
       )}
     </>

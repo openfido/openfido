@@ -43,7 +43,7 @@ const EditColumn = styled.div`
 `;
 
 const PipelineItem = ({
-  name, updated_at, status,
+  uuid, name, updated_at, status, handlePipelineEdit,
 }) => {
   const statusLegend = {
     NOT_STARTED: 'skyBlue',
@@ -67,16 +67,18 @@ const PipelineItem = ({
         </StyledButton>
       </ViewRunsColumn>
       <EditColumn>
-        <EditOutlined />
+        <EditOutlined onClick={() => handlePipelineEdit(uuid)} />
       </EditColumn>
     </PipelineItemGrid>
   );
 };
 
 PipelineItem.propTypes = {
+  uuid: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   updated_at: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
+  handlePipelineEdit: PropTypes.func.isRequired,
 };
 
 export default PipelineItem;
