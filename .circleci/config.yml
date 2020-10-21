@@ -47,16 +47,6 @@ jobs:
           tag: "$CIRCLE_BRANCH"
           repo: openfido/dev-auth
           extra-build-args: "--ssh default"
-      - aws-ecs/deploy-service-update:
-          requires:
-            - aws-ecr/build-and-push-image
-          filters:
-            branches:
-              only: master
-          family: 'openfido-dev-auth-task'
-          cluster-name: 'openfido-dev-ecs-cluster'
-          service-name: 'openfido-dev-auth-service'
-          container-image-name-updates: 'container=openfido-dev-auth-task,tag=master'
 workflows:
   test_build_and_push:
     jobs:
@@ -64,3 +54,13 @@ workflows:
       - build-docker:
           requires:
             - test
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-auth-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-auth-service'
+          container-image-name-updates: 'container=openfido-dev-auth-task,tag=master'
