@@ -1,7 +1,10 @@
 version: '3'
 services:
   workflow_queue:
-    image: rabbitmq:3
+    build:
+      context: ${WORKFLOW_DIR:-.}
+      dockerfile: Dockerfile.rabbitmq
+    image: openfido/dev-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: rabbit-user
       RABBITMQ_DEFAULT_PASS: rabbit-password

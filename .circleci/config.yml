@@ -60,6 +60,19 @@ jobs:
           tag: "$CIRCLE_BRANCH"
           repo: openfido/dev-workflow-worker
           extra-build-args: "--ssh default"
+  build-docker-worker:
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      DOCKER_BUILDKIT: "1"
+    steps:
+      - setup_remote_docker:
+          version: 18.09.3
+      - aws-ecr/build-and-push-image:
+          dockerfile: Dockerfile.rabbitmq
+          tag: "$CIRCLE_BRANCH"
+          repo: openfido/dev-rabbitmq
+          extra-build-args: "--ssh default"
 workflows:
   test_build_and_push:
     jobs:
