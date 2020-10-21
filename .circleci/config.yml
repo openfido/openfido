@@ -54,7 +54,7 @@ workflows:
             - test
       - aws-ecs/deploy-service-update:
           requires:
-            - aws-ecr/build-and-push-image
+            - build-docker
           family: 'openfido/dev-app-serviceApp-task'
           cluster-name: 'openfido-dev-ecs-cluster'
           service-name: 'openfido/dev-app_service'
