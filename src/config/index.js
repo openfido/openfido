@@ -8,6 +8,8 @@ const BASE_API_URL_AUTH_DEVELOPMENT = process.env.BASE_API_URL_AUTH_DEVELOPMENT 
 const BASE_API_URL_STAGING = process.env.BASE_API_URL_STAGING || 'https://api.staging.openfido.org';
 const BASE_API_URL_PRODUCTION = process.env.BASE_API_URL_PRODUCTION || 'https://api.openfido.org';
 
+const API_TOKEN = process.env.API_TOKEN || '3c864e4a130147fbbcaccb764668c84b';
+
 const parseEnvironment = () => {
   if (window.location.hostname.includes('localhost')) return ENVIRONMENT_DEVELOPMENT;
   if (window.location.hostname.includes('staging')) return ENVIRONMENT_STAGING;
@@ -37,6 +39,6 @@ export default {
       app: baseApiUrlApp,
     },
     version: '',
-    appToken: '850e131394ba4699b703f03e50d9ac50',
+    appToken: API_TOKEN,
   },
 };
