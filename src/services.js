@@ -107,5 +107,5 @@ export const requestCreatePipeline = (organization_uuid, body) => (
 );
 
 export const requestUpdatePipeline = (organization_uuid, pipeline_uuid, body) => (
-  ApiClient.put(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}`, body, 'app')
+  ApiClient.put(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}`, body, appToken)
 );

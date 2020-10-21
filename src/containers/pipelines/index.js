@@ -72,7 +72,7 @@ const Pipelines = () => {
         )}
       </Space>
       {!showAddPipelines && pipelineInEdit && (
-        <EditPipeline handleSuccess={handleEditPipelineSuccess} pipelineItem={pipelineInEdit} />
+        <EditPipeline handleSuccess={handleEditPipelineSuccess} pipelineItem={pipelineItemInEdit} />
       )}
       {!showAddPipelines && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
