@@ -290,7 +290,9 @@ def test_delete_pipeline_http_error(
         },
     )
     assert result.status_code == 503
-    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([organization_pipeline])
+    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set(
+        [organization_pipeline]
+    )
     assert result.json == {"message": "something is wrong"}
 
 
@@ -310,7 +312,9 @@ def test_delete_pipeline_bad_response(
         },
     )
     assert result.status_code == 400
-    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([organization_pipeline])
+    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set(
+        [organization_pipeline]
+    )
 
 
 @responses.activate

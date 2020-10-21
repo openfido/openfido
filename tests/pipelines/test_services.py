@@ -71,7 +71,10 @@ def test_create_pipeline(app):
 @patch("app.pipelines.services.requests.post")
 def test_fetch_pipelines_bad_workflow_response(post_mock, app, organization_pipeline):
     pipeline_list = [
-        {"uuid": "nonexistant-organization-organization_pipeline-uuid", "name": "name 1"}
+        {
+            "uuid": "nonexistant-organization-organization_pipeline-uuid",
+            "name": "name 1",
+        }
     ]
     post_mock().json.return_value = pipeline_list
 
@@ -151,7 +154,9 @@ def test_update_pipeline(app, organization_pipeline):
         f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
         json=json_response,
     )
-    updated_pipeline = update_pipeline(ORGANIZATION_UUID, organization_pipeline.uuid, PIPELINE_JSON)
+    updated_pipeline = update_pipeline(
+        ORGANIZATION_UUID, organization_pipeline.uuid, PIPELINE_JSON
+    )
     organization_pipeline = OrganizationPipeline.query.order_by(
         OrganizationPipeline.id.desc()
     ).first()
@@ -163,7 +168,9 @@ def test_update_pipeline(app, organization_pipeline):
 def test_delete_pipeline_no_pipeline(app, organization_pipeline):
     with pytest.raises(ValueError):
         delete_pipeline(ORGANIZATION_UUID, "badid")
-    organization_pipeline = set(OrganizationPipeline.query.all()) == set([organization_pipeline])
+    organization_pipeline = set(OrganizationPipeline.query.all()) == set(
+        [organization_pipeline]
+    )
 
 
 @responses.activate
