@@ -77,6 +77,12 @@ workflows:
   test_build_and_push:
     jobs:
       - test
-      - build-docker:
+      - build-docker-service:
+          requires:
+            - test
+      - build-docker-worker:
+          requires:
+            - test
+      - build-docker-rabbitmq:
           requires:
             - test
