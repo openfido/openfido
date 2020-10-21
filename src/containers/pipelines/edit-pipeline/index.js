@@ -44,36 +44,39 @@ const EditPipelineForm = styled.form`
   padding: 1.5rem 1rem;
 `;
 
-const EditPipeline = ({ handleSuccess, pipelineItem }) => {
+const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
-  const [pipelineName, setPipelineName] = useState(pipelineItem.name);
-  const [description, setDescription] = useState(pipelineItem.description);
-  const [dockerImageUrl, setDockerImageUrl] = useState(pipelineItem.docker_image_url);
-  const [repositorySshUrl, setRepositorySshUrl] = useState(pipelineItem.repository_ssh_url);
-  const [repositoryBranch, setRepositoryBranch] = useState(pipelineItem.repository_branch);
+  const [pipelineName, setPipelineName] = useState(pipelineItem && pipelineItem.name);
+  const [description, setDescription] = useState(pipelineItem && pipelineItem.description);
+  const [dockerImageUrl, setDockerImageUrl] = useState(pipelineItem && pipelineItem.docker_image_url);
+  const [repositorySshUrl, setRepositorySshUrl] = useState(pipelineItem && pipelineItem.repository_ssh_url);
+  const [repositoryBranch, setRepositoryBranch] = useState(pipelineItem && pipelineItem.repository_branch);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [hasBeenDeleted, setHasBeenDeleted] = useState(false);
 
   const onEditPipelineClicked = (e) => {
     e.preventDefault();
 
-    requestUpdatePipeline(currentOrg, pipelineItem.uuid, {
-      name: pipelineName,
-      description,
-      docker_image_url: dockerImageUrl,
-      repository_ssh_url: repositorySshUrl,
-      repository_branch: repositoryBranch,
-    })
-      .then(() => {
-        handleSuccess();
+    if (pipelineItem && currentOrg) {
+      requestUpdatePipeline(currentOrg, pipelineItem.uuid, {
+        name: pipelineName,
+        description,
+        docker_image_url: dockerImageUrl,
+        repository_ssh_url: repositorySshUrl,
+        repository_branch: repositoryBranch,
       })
-      .catch(() => {
+        .then(() => {
+          handleSuccess();
+        })
+        .catch(() => {
 
-      });
+        });
+    }
   };
 
   const onCancelClicked = () => {
-    handleSuccess();
+    handleCancel();
   };
 
   const openDeletePopup = () => {
@@ -85,9 +88,12 @@ const EditPipeline = ({ handleSuccess, pipelineItem }) => {
   };
 
   const onPermanentlyDeleteClicked = () => {
-    handleSuccess();
     setShowDeletePopup(false);
+    setHasBeenDeleted(true);
+    handleSuccess();
   };
+
+  if (hasBeenDeleted) return null;
 
   return (
     <>
@@ -197,6 +203,7 @@ const EditPipeline = ({ handleSuccess, pipelineItem }) => {
 
 EditPipeline.propTypes = {
   handleSuccess: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
   pipelineItem: PropTypes.objectOf(PropTypes.shape({
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,

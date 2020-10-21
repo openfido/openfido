@@ -19,7 +19,7 @@ const AddPipelineForm = styled.form`
   padding: 1.5rem 1rem;
 `;
 
-const AddPipeline = ({ handleSuccess }) => {
+const AddPipeline = ({ handleSuccess, handleCancel }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
   const [pipelineName, setPipelineName] = useState('');
@@ -44,11 +44,7 @@ const AddPipeline = ({ handleSuccess }) => {
   };
 
   const onCancelClicked = () => {
-    setPipelineName('');
-    setDescription('');
-    setDockerImageUrl('');
-    setRepositorySshUrl('');
-    setRepositoryBranch('');
+    handleCancel();
   };
 
   return (
@@ -143,6 +139,7 @@ const AddPipeline = ({ handleSuccess }) => {
 
 AddPipeline.propTypes = {
   handleSuccess: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
 };
 
 export default AddPipeline;

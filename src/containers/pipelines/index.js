@@ -43,17 +43,29 @@ const Pipelines = () => {
   };
 
   const handleAddPipelineSuccess = () => {
-    setShowAddPipelines(false);
-    dispatch(getPipelines(currentOrg));
+    dispatch(getPipelines(currentOrg))
+      .then(() => setShowAddPipelines(false))
   };
 
-  const handlePipelineEdit = (pipeline_uuid) => {
+  const handleAddPipelineCancel = () => {
+    setShowAddPipelines(false);
+
+    if (pipelines && !pipelines.length) {
+      setShowGetStartedPopup(true);
+    }
+  };
+
+  const openPipelineEdit = (pipeline_uuid) => {
     setPipelineInEdit(pipeline_uuid);
   };
 
   const handleEditPipelineSuccess = () => {
+    dispatch(getPipelines(currentOrg))
+      .then(() => setPipelineInEdit(null));
+  };
+
+  const handleEditPipelineCancel = () => {
     setPipelineInEdit(null);
-    dispatch(getPipelines(currentOrg));
   };
 
   return (
@@ -72,7 +84,11 @@ const Pipelines = () => {
         )}
       </Space>
       {!showAddPipelines && pipelineInEdit && (
-        <EditPipeline handleSuccess={handleEditPipelineSuccess} pipelineItem={pipelineItemInEdit} />
+        <EditPipeline
+          handleSuccess={handleEditPipelineSuccess}
+          handleCancel={handleEditPipelineCancel}
+          pipelineItem={pipelineItemInEdit}
+        />
       )}
       {!showAddPipelines && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
@@ -85,13 +101,16 @@ const Pipelines = () => {
               name={name}
               status={status}
               updated_at={updated_at}
-              handlePipelineEdit={handlePipelineEdit}
+              openPipelineEdit={openPipelineEdit}
             />
           ))}
         </PipelineItems>
       )}
       {showAddPipelines && (
-        <AddPipeline handleSuccess={handleAddPipelineSuccess} />
+        <AddPipeline
+          handleSuccess={handleAddPipelineSuccess}
+          handleCancel={handleAddPipelineCancel}
+        />
       )}
     </>
   );

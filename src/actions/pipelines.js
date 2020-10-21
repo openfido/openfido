@@ -6,7 +6,7 @@ import {
 } from 'actions';
 import { requestGetPipelines } from 'services';
 
-export const getPipelines = (organization_uuid) => (dispatch) => {
+export const getPipelines = (organization_uuid) => (dispatch) => (
   requestGetPipelines(organization_uuid)
     .then((response) => {
       dispatch({
@@ -19,8 +19,8 @@ export const getPipelines = (organization_uuid) => (dispatch) => {
         type: GET_PIPELINES_FAILED,
         payload: !err.response || err.response.data,
       });
-    });
-};
+    })
+);
 
 export const addPipeline = (payload) => ({
   type: ADD_PIPELINE,
