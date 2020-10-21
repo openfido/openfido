@@ -269,7 +269,7 @@ def get_user_avatar(user):
         avatar = _get_file(f"avatars/{user.uuid}")
     except ClientError:
         avatar = "assets/default-user-avatar.png"
-    
+
     return avatar
 
 
@@ -288,7 +288,7 @@ def get_organization_logo(organization):
         logo = _get_file(f"logos/{organization.uuid}")
     except ClientError:
         logo = "assets/default-organization-logo.png"
-    
+
     return logo
 
 
@@ -382,13 +382,15 @@ def _validate_email(email):
     if address.parse(email) is None:
         raise BadRequestError("Invalid email")
 
+
 def _put_file(filename, data):
     s3 = get_s3()
     bucket = os.environ.get("S3_BUCKET")
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
-    
+
     s3.upload_fileobj(data, bucket, filename)
+
 
 def _get_file(filename):
     s3 = get_s3()
@@ -397,4 +399,4 @@ def _get_file(filename):
         s3.create_bucket(ACL="private", Bucket=bucket_name)
 
     response = s3.get_object(Bucket=bucket_name, Key=filename)
-    return response['Body']
+    return response["Body"]

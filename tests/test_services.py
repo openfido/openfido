@@ -373,11 +373,12 @@ def test_accept_invitation(app, organization, user):
     invitation = services.create_invitation(organization, user.email)
     services.accept_invitation(invitation.invitation_token)
 
+
 @patch("app.services.get_s3")
 def test_update_user_avatar(get_s3_mock, app, user):
     bucket = os.environ.get("S3_BUCKET")
     path = f"avatars/{user.uuid}"
-    data = 'fakedata'
+    data = "fakedata"
 
     s3_mock = MagicMock()
     get_s3_mock.return_value = s3_mock
@@ -385,6 +386,7 @@ def test_update_user_avatar(get_s3_mock, app, user):
     services.update_user_avatar(user, data)
 
     s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+
 
 @patch("app.services.get_s3")
 def test_get_user_avatar(get_s3_mock, app, user):
@@ -398,11 +400,12 @@ def test_get_user_avatar(get_s3_mock, app, user):
 
     s3_mock.get_object.assert_called_once_with(Bucket=bucket, Key=path)
 
+
 @patch("app.services.get_s3")
 def test_update_organization_logo(get_s3_mock, app, organization):
     bucket = os.environ.get("S3_BUCKET")
     path = f"logos/{organization.uuid}"
-    data = 'fakedata'
+    data = "fakedata"
 
     s3_mock = MagicMock()
     get_s3_mock.return_value = s3_mock
@@ -410,6 +413,7 @@ def test_update_organization_logo(get_s3_mock, app, organization):
     services.update_organization_logo(organization, data)
 
     s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+
 
 @patch("app.services.get_s3")
 def test_get_organization_logo(get_s3_mock, app, organization):

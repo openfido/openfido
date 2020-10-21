@@ -28,6 +28,7 @@ implementation:
  * `EMAIL_DRIVER`: `sendgrid`
  * `SENDGRID_API_KEY`: SendGrid [API key](https://sendgrid.com/docs/ui/account-and-settings/api-keys/).
  * `SENDGRID_RESET_TEMPLATE_ID`: SendGrid 'reset email' template id of a [dynamic template](https://sendgrid.com/docs/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates/).
+ * `SENDGRID_ORGANIZATION_INVITATION_TEMPLATE_ID`: SendGrid 'invite user' template id of a [dynamic template](https://sendgrid.com/docs/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates/).
 
 # Architecture Decision Records
 
@@ -48,8 +49,12 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     # Run database migrations
     flask db upgrade
 
-    # exit the docker instance
-    exit
+    # Create an super admin user:
+    flask shell
+    from app import models, services
+    u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
+    u.is_system_admin = True
+    models.db.commit()
 
 To start the server locally:
 
@@ -58,18 +63,18 @@ To start the server locally:
 
     # visit the app:
     http://localhost:5000/
-    
+
 To connect to the database:
 
     # while docker-compose is running
     docker-compose exec db psql -d accountservices -U postgres
-    
+
 
 To connect to a shell in the auth_service container:
     
     # while docker-compose is running:
     docker-compose exec auth_service bash
-    
+
 To connect to a shell in the db container:
     
     # while docker-compose is running:
