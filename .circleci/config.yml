@@ -44,6 +44,7 @@ workflows:
             - test
           tag: "$CIRCLE_BRANCH"
           repo: openfido/dev-app-service
+          extra-build-args: "--ssh default"
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image

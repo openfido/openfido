@@ -37,4 +37,14 @@ Other thoughts on design:
 
 Use the structure of the [openfido-workflow-service](https://github.com/slacgismo/openfido-workflow-service) project as a reference.
 
+Use CircleCI for CI, and deploy docker images to AWS ECR for use in deployments.
+CircleCI will need to be configured with the following environmental variables
+in order to deploy docker images (using [CircleCI's aws-ecr
+orb](https://circleci.com/developer/orbs/orb/circleci/aws-ecr)):
+
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_REGION
+- AWS_ECR_ACCOUNT_URL
+
 ## Consequences
