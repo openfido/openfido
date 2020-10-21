@@ -35,16 +35,23 @@ jobs:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
+  build-docker:
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      DOCKER_BUILDKIT: "1"
+    steps:
+      - aws-ecr/build-and-push-image:
+          tag: "$CIRCLE_BRANCH"
+          repo: openfido/dev-app-service
+          extra-build-args: "--ssh default"
 workflows:
   test_build_and_push:
     jobs:
       - test
-      - aws-ecr/build-and-push-image:
+      - build-docker:
           requires:
             - test
-          tag: "$CIRCLE_BRANCH"
-          repo: openfido/dev-app-service
-          extra-build-args: "--ssh default"
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
