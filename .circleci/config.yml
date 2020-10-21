@@ -86,3 +86,33 @@ workflows:
       - build-docker-rabbitmq:
           requires:
             - test
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker-service
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-workflow-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-workflow-service'
+          container-image-name-updates: 'container=openfido-dev-workflow-task,tag=master'
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker-worker
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-workflow-worker-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-workflow-worker-service'
+          container-image-name-updates: 'container=openfido-dev-workflow-worker-task,tag=master'
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker-rabbitmq
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-rabbitmq-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-rabbitmq-service'
+          container-image-name-updates: 'container=openfido-dev-rabbitmq-task,tag=master'
