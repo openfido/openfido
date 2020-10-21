@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_cors import CORS
 from flask_migrate import Migrate
 
 from application_roles.model_utils import get_db
@@ -46,6 +47,7 @@ def create_app(config=None):
             app.config[constants.MAX_CONTENT_LENGTH]
         )
 
+    CORS(app, resources={r"/*": {"origins": "*"}})
     db.init_app(app)
     migrate = Migrate(app, db)
 

@@ -11,6 +11,14 @@ from ..conftest import JWT_TOKEN, ORGANIZATION_UUID, USER_UUID
 from .test_services import PIPELINE_JSON
 
 
+def test_requests_have_cors(app, client, client_application):
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines",
+        content_type="application/json",
+    )
+    assert result.headers["Access-Control-Allow-Origin"] == "*"
+
+
 def test_pipelines_no_roles_provided(app, client, client_application):
     result = client.get(
         f"/v1/organizations/{ORGANIZATION_UUID}/pipelines",
