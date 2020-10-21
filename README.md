@@ -15,6 +15,7 @@ a file server.
  * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
  * [2. Pipelines](docs/adr/0002-pipelines.md)
  * [3. Authentication](docs/adr/0003-authentication.md)
+ * [4. Deployment](docs/adr/0004-deployment.md)
 
 ## Development
 
@@ -26,7 +27,10 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
 
     # Build the docker image, using the SSH private key you use for github
     # access (to access other openslac private repositories)
+    export COMPOSE_DOCKER_CLI_BUILD=1
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
+    # TODO at some point docker-compose will support the "--ssh default" docker
+    # parameter - until then we need to pass the key manually :(
 
     # Login to an docker instance of the flask app:
     docker-compose run --rm workflow_service bash
