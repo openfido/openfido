@@ -39,6 +39,11 @@ const Pipelines = () => {
     setShowAddPipelines(true);
   };
 
+  const handleAddPipelineSuccess = () => {
+    setShowAddPipelines(false);
+    dispatch(getPipelines(currentOrg));
+  };
+
   return (
     <>
       <StyledTitle>
@@ -69,7 +74,7 @@ const Pipelines = () => {
           ))}
         </PipelineItems>
       ) : (
-        <AddPipeline />
+        <AddPipeline handleSuccess={handleAddPipelineSuccess} />
       )}
     </>
   );

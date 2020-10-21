@@ -105,3 +105,7 @@ export const requestGetPipelines = (organization_uuid) => (
 export const requestGetPipelines = (organization_uuid) => (
   ApiClient.get(`/organizations/${organization_uuid}/pipelines`)
 );
+
+export const requestCreatePipeline = (organization_uuid, body) => (
+  ApiClient.post(`/organizations/${organization_uuid}/pipelines`, body, 'app')
+);

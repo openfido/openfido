@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Space } from 'antd';
 
+import { requestCreatePipeline } from 'services';
 import {
   StyledH3, StyledText, StyledInput, StyledTextArea, StyledButton,
 } from 'styles/app';
@@ -16,7 +19,9 @@ const AddPipelineForm = styled.form`
   padding: 1.5rem 1rem;
 `;
 
-const AddPipeline = () => {
+const AddPipeline = ({ handleSuccess }) => {
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+
   const [pipelineName, setPipelineName] = useState('');
   const [description, setDescription] = useState('');
   const [dockerImageUrl, setDockerImageUrl] = useState('');
@@ -25,6 +30,17 @@ const AddPipeline = () => {
 
   const onAddPipelineClicked = (e) => {
     e.preventDefault();
+
+    requestCreatePipeline(currentOrg, {
+      name: pipelineName,
+      description,
+      docker_image_url: dockerImageUrl,
+      repository_ssh_url: repositorySshUrl,
+      repository_branch: repositoryBranch,
+    })
+      .then(() => {
+        handleSuccess();
+      });
   };
 
   const onCancelClicked = () => {
@@ -123,6 +139,10 @@ const AddPipeline = () => {
       </Space>
     </AddPipelineForm>
   );
+};
+
+AddPipeline.propTypes = {
+  handleSuccess: PropTypes.func.isRequired,
 };
 
 export default AddPipeline;
