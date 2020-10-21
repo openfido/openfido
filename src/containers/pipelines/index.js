@@ -54,6 +54,7 @@ const Pipelines = () => {
 
   const handleEditPipelineSuccess = () => {
     setPipelineInEdit(null);
+    dispatch(getPipelines(currentOrg));
   };
 
   return (
