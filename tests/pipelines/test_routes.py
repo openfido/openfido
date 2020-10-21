@@ -81,13 +81,13 @@ def test_pipelines_bad_search(app, client, client_application):
 
 
 @responses.activate
-def test_pipelines(app, client, client_application, pipeline):
+def test_pipelines(app, client, client_application, organization_pipeline):
     pipeline_json = dict(PIPELINE_JSON)
     pipeline_json.update(
         {
             "created_at": "2020-10-08T12:20:36.564095",
             "updated_at": "2020-10-08T12:20:36.564100",
-            "uuid": pipeline.pipeline_uuid,
+            "uuid": organization_pipeline.pipeline_uuid,
         }
     )
     json_response = [pipeline_json]
@@ -106,7 +106,7 @@ def test_pipelines(app, client, client_application, pipeline):
         },
     )
     assert result.status_code == 200
-    json_response[0]["uuid"] = pipeline.uuid
+    json_response[0]["uuid"] = organization_pipeline.uuid
     assert result.json == json_response
 
 
@@ -223,7 +223,7 @@ def test_update_pipeline_backend_error(
 
 
 @responses.activate
-def test_update_pipeline(app, client, client_application, pipeline):
+def test_update_pipeline(app, client, client_application, organization_pipeline):
     json_response = dict(PIPELINE_JSON)
     json_response.update(
         {
@@ -234,12 +234,12 @@ def test_update_pipeline(app, client, client_application, pipeline):
     )
     responses.add(
         responses.PUT,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
         json=json_response,
     )
 
     result = client.put(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
         content_type="application/json",
         json=PIPELINE_JSON,
         headers={
@@ -249,22 +249,22 @@ def test_update_pipeline(app, client, client_application, pipeline):
     )
     assert result.status_code == 200
 
-    pipeline = OrganizationPipeline.query.order_by(
+    organization_pipeline = OrganizationPipeline.query.order_by(
         OrganizationPipeline.id.desc()
     ).first()
-    json_response["uuid"] = pipeline.uuid
+    json_response["uuid"] = organization_pipeline.uuid
     assert result.json == json_response
 
 
 @responses.activate
-def test_delete_pipeline(app, client, client_application, pipeline):
+def test_delete_pipeline(app, client, client_application, organization_pipeline):
     responses.add(
         responses.DELETE,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
     )
 
     result = client.delete(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
         content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
@@ -278,11 +278,11 @@ def test_delete_pipeline(app, client, client_application, pipeline):
 @patch("app.pipelines.routes.delete_pipeline")
 @responses.activate
 def test_delete_pipeline_http_error(
-    delete_mock, app, client, client_application, pipeline
+    delete_mock, app, client, client_application, organization_pipeline
 ):
     delete_mock.side_effect = HTTPError("something is wrong")
     result = client.delete(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
         content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
@@ -290,19 +290,19 @@ def test_delete_pipeline_http_error(
         },
     )
     assert result.status_code == 503
-    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([pipeline])
+    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([organization_pipeline])
     assert result.json == {"message": "something is wrong"}
 
 
 @patch("app.pipelines.routes.delete_pipeline")
 @responses.activate
 def test_delete_pipeline_bad_response(
-    delete_mock, app, client, client_application, pipeline
+    delete_mock, app, client, client_application, organization_pipeline
 ):
     message = {"message": "error"}
     delete_mock.side_effect = ValueError(message)
     result = client.delete(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
         content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
@@ -310,18 +310,18 @@ def test_delete_pipeline_bad_response(
         },
     )
     assert result.status_code == 400
-    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([pipeline])
+    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set([organization_pipeline])
 
 
 @responses.activate
-def test_delete_pipeline(app, client, client_application, pipeline):
+def test_delete_pipeline(app, client, client_application, organization_pipeline):
     responses.add(
         responses.DELETE,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
     )
 
     result = client.delete(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{pipeline.uuid}",
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
         content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",

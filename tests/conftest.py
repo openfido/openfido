@@ -54,7 +54,7 @@ def client(app):
 
 
 @pytest.fixture
-def pipeline(app):
+def organization_pipeline(app):
     op = OrganizationPipeline(
         organization_uuid=ORGANIZATION_UUID, pipeline_uuid=PIPELINE_UUID
     )
