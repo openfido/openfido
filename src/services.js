@@ -97,3 +97,7 @@ export const requestUpdateOrganization = (organization_uuid, organization_name) 
 export const requestDeleteOrganization = (organization_uuid) => (
   ApiClient.delete(`${baseUrl.auth}/organizations/${organization_uuid}`)
 );
+
+export const requestGetPipelines = (organization_uuid) => (
+  ApiClient.get(`/organizations/${organization_uuid}/pipelines`)
+);

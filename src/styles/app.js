@@ -570,7 +570,7 @@ export const StyledGrid = styled.div`
   ${gridgap ? (`
   grid-gap: ${gridgap}px;
   `) : ''} 
-  padding: ${padding || '12px 16px'};
+  padding: ${padding || '12px 20px 12px 16px'};
   margin: ${margin || 0};
   `)}
 `;

@@ -1,17 +1,32 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 import { Space } from 'antd';
-import PropTypes from 'prop-types';
 
-import { getPipelines as getPipelinesAction } from 'actions/pipelines';
+import { getPipelines } from 'actions/pipelines';
 import { StyledTitle, StyledButton } from 'styles/app';
-import PipelineItem from './PipelineItem';
+import PipelineItem from './pipeline-item';
+import CreatePipelinePopup from './get-started-popup';
 
-function Pipelines({ getPipelines, pipelines }) {
+const PipelineItems = styled(Space)`
+  padding: 28px 20px 28px 16px;
+  padding: 1.75rem 1.25rem 1.75rem 1rem;
+`;
+
+const Pipelines = () => {
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+  const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const dispatch = useDispatch();
+
+  const [showGetStartedPopup, setGetStartedPopup] = useState(pipelines && !pipelines.length);
+
   useEffect(() => {
-    getPipelines();
-  }, [getPipelines]);
+    if (!pipelines) {
+      dispatch(getPipelines(currentOrg));
+    }
+  }, [currentOrg]);
+
+  const closeGetStartedPopup = () => setGetStartedPopup(false);
 
   return (
     <>
@@ -24,28 +39,25 @@ function Pipelines({ getPipelines, pipelines }) {
         </div>
       </StyledTitle>
       <Space direction="vertical" size={16}>
-        {pipelines.map(({ id, name, last_updated: lastUpdated }) => (
-          <PipelineItem key={id} id={id} name={name} lastUpdated={lastUpdated} />
-        ))}
+        {showGetStartedPopup && (
+          <CreatePipelinePopup handleOk={closeGetStartedPopup} />
+        )}
       </Space>
+      <PipelineItems direction="vertical" size={26}>
+        {pipelines && pipelines.map(({
+          uuid, name, status, updated_at,
+        }) => (
+          <PipelineItem
+            key={uuid}
+            uuid={uuid}
+            name={name}
+            status={status}
+            updated_at={updated_at}
+          />
+        ))}
+      </PipelineItems>
     </>
   );
-}
-
-Pipelines.propTypes = {
-  getPipelines: PropTypes.func.isRequired,
-  pipelines: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    last_updated: PropTypes.string.isRequired,
-  })).isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  pipelines: state.pipelines.pipelines,
-});
-
-const mapDispatch = (dispatch) => bindActionCreators({
-  getPipelines: getPipelinesAction,
-}, dispatch);
-
-export default connect(mapStateToProps, mapDispatch)(Pipelines);
+export default Pipelines;
