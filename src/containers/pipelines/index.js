@@ -18,15 +18,21 @@ const Pipelines = () => {
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const dispatch = useDispatch();
 
-  const [showGetStartedPopup, setGetStartedPopup] = useState(pipelines && !pipelines.length);
+  const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
 
   useEffect(() => {
     if (!pipelines) {
       dispatch(getPipelines(currentOrg));
     }
-  }, [currentOrg]);
+  }, [currentOrg, pipelines]);
 
-  const closeGetStartedPopup = () => setGetStartedPopup(false);
+  useEffect(() => {
+    if (pipelines && !pipelines.length) {
+      setShowGetStartedPopup(true);
+    }
+  }, [pipelines]);
+
+  const closeGetStartedPopup = () => setShowGetStartedPopup(false);
 
   return (
     <>

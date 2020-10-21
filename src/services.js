@@ -1,7 +1,7 @@
 import ApiClient from 'util/api-client';
 import config from 'config';
 
-const { baseUrl } = config.api;
+const { baseUrl, appToken } = config.api;
 
 export const requestCreateUser = (email, first_name, last_name, password, invitation_token) => (
   ApiClient.post(`${baseUrl.auth}/users`, {
@@ -99,5 +99,5 @@ export const requestDeleteOrganization = (organization_uuid) => (
 );
 
 export const requestGetPipelines = (organization_uuid) => (
-  ApiClient.get(`/organizations/${organization_uuid}/pipelines`)
+  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines`, appToken)
 );
