@@ -27,10 +27,9 @@ const Pipelines = () => {
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
 
   useEffect(() => {
-    if (!pipelines) {
-      dispatch(getPipelines(currentOrg));
-    }
-  }, [currentOrg, pipelines]);
+    dispatch(getPipelines(currentOrg));
+    setShowGetStartedPopup(false);
+  }, [currentOrg, dispatch]);
 
   useEffect(() => {
     if (pipelines && !pipelines.length) {
