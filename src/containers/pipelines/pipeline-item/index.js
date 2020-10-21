@@ -39,6 +39,10 @@ const EditColumn = styled.div`
   .anticon {
     top: -10px;
     top: -0.625rem;
+    &:hover svg path {
+      fill: ${colors.blue};
+      transition: fill 0.3s;
+    }
   }
 `;
 

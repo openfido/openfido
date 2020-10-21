@@ -24,11 +24,19 @@ const EditPipelineForm = styled.form`
     .ant-btn {
       height: 20px;
       color: ${colors.gray20};
+      padding-right: 16px;
+      padding-right: 1rem;
       &:hover {
         color: ${colors.pink};
       }
+      svg path {
+        transition: fill 0.3s cubic-bezier(.645,.045,.355,1);
+      }
       &:hover svg path {
         fill: ${colors.pink};
+      }
+      &:focus>span, &:active>span {
+        position: absolute;
       }
     }
   }

@@ -17,7 +17,13 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_PIPELINES: {
       const pipelines = action.payload || [];
 
-      pipelines.sort((pipelineA, pipelineB) => pipelineB.name - pipelineA.name);
+      pipelines.sort((pipelineA, pipelineB) => {
+        if (pipelineA.name && pipelineB.name) {
+          return pipelineA.name.localeCompare(pipelineB.name);
+        }
+
+        return -1;
+      });
 
       return {
         ...state,
