@@ -45,7 +45,7 @@ jobs:
           version: 18.09.3
       - aws-ecr/build-and-push-image:
           tag: "$CIRCLE_BRANCH"
-          repo: openfido/dev-app-service
+          repo: openfido/dev-app_service
           extra-build-args: "--ssh default"
 workflows:
   test_build_and_push:
