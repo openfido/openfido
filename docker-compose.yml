@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: dev-password
   auth_storage:
     image: minio/minio
-    command: server /data
+    command: server http://auth_storage/data
     environment:
       MINIO_ACCESS_KEY: minio_access_key
       MINIO_SECRET_KEY: minio123
@@ -30,6 +30,7 @@ services:
       SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
+      S3_BUCKET: openfido-data
       S3_ENDPOINT_URL: http://auth_storage:9000
     volumes:
       - ${AUTH_DIR:-.}:/opt/app:delegated

@@ -1,6 +1,9 @@
 import uuid
+import os
+from io import StringIO
 from datetime import datetime, timedelta
 from email.utils import parseaddr
+from flask import current_app
 
 from flanker.addresslib import address
 
@@ -255,7 +258,7 @@ def update_user_avatar(user, stream):
         raise BadRequestError("Invalid user")
 
     s3 = get_s3()
-    bucket = current_app.config[S3_BUCKET]
+    bucket = os.environ.get("S3_BUCKET")
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
     s3.upload_fileobj(
@@ -270,11 +273,11 @@ def get_user_avatar(user):
         raise BadRequestError("Invalid user")
 
     s3 = get_s3()
-    bucket = current_app.config[S3_BUCKET]
+    bucket = os.environ.get("S3_BUCKET")
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
 
-    string_io = StringIO.StringIO()
+    string_io = StringIO()
     filename = f"avatars/{user.uuid}"
     s3.download_file(bucket, filename, string_io)
 
@@ -286,13 +289,13 @@ def update_organization_logo(organization, stream):
         raise BadRequestError("Invalid organization")
 
     s3 = get_s3()
-    bucket = current_app.config[S3_BUCKET]
+    bucket = os.environ.get("S3_BUCKET")
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
     s3.upload_fileobj(
         stream,
         bucket,
-        f"logos/{user.uuid}",
+        f"logos/{organization.uuid}",
     )
 
 
@@ -301,12 +304,13 @@ def get_organization_logo(organization):
         raise BadRequestError("Invalid organization")
 
     s3 = get_s3()
-    bucket = current_app.config[S3_BUCKET]
+    
+    bucket = os.environ.get("S3_BUCKET")
     if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
         s3.create_bucket(ACL="private", Bucket=bucket)
 
-    string_io = StringIO.StringIO()
-    filename = f"logos/{user.uuid}"
+    string_io = StringIO()
+    filename = f"logos/{organization.uuid}"
     s3.download_file(bucket, filename, string_io)
 
     return string_io

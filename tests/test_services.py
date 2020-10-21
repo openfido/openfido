@@ -1,5 +1,7 @@
+import os
+from io import StringIO
 from datetime import datetime, timedelta
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch, ANY
 
 import pytest
 from freezegun import freeze_time
@@ -371,15 +373,52 @@ def test_accept_invitation(app, organization, user):
     invitation = services.create_invitation(organization, user.email)
     services.accept_invitation(invitation.invitation_token)
 
-@patch("app.utils.get_s3")
+@patch("app.services.get_s3")
 def test_update_user_avatar(get_s3_mock, app, user):
+    bucket = os.environ.get("S3_BUCKET")
+    path = f"avatars/{user.uuid}"
+    data = 'fakedata'
+
     s3_mock = MagicMock()
     get_s3_mock.return_value = s3_mock
 
-    data = 'fakedata'
     services.update_user_avatar(user, data)
 
-    s3_mock.upload_fileobj.assert_called_once()
-    assert s3_mock.mock_calls[0][1][0] == data
-    assert s3_mock.mock_calls[0][1][1] == ''
-    assert s3_mock.mock_calls[0][1][2] == ''
+    s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+
+@patch("app.services.get_s3")
+def test_get_user_avatar(get_s3_mock, app, user):
+    bucket = os.environ.get("S3_BUCKET")
+    path = f"avatars/{user.uuid}"
+
+    s3_mock = MagicMock()
+    get_s3_mock.return_value = s3_mock
+
+    services.get_user_avatar(user)
+
+    s3_mock.download_file.assert_called_once_with(bucket, path, ANY)
+
+@patch("app.services.get_s3")
+def test_update_organization_logo(get_s3_mock, app, organization):
+    bucket = os.environ.get("S3_BUCKET")
+    path = f"logos/{organization.uuid}"
+    data = 'fakedata'
+
+    s3_mock = MagicMock()
+    get_s3_mock.return_value = s3_mock
+
+    services.update_organization_logo(organization, data)
+
+    s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+
+@patch("app.services.get_s3")
+def test_get_organization_logo(get_s3_mock, app, organization):
+    bucket = os.environ.get("S3_BUCKET")
+    path = f"logos/{organization.uuid}"
+
+    s3_mock = MagicMock()
+    get_s3_mock.return_value = s3_mock
+
+    services.get_organization_logo(organization)
+
+    s3_mock.download_file.assert_called_once_with(bucket, path, ANY)
