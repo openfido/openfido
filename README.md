@@ -7,7 +7,8 @@ Summary: A service for the [openfido-client](https://github.com/slacgismo/openfi
 # Architecture Decision Records
 
 * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
-* [2. project structure](docs/adr/0002-project-structure.md)
+* [2. Project Structure](docs/adr/0002-project-structure.md)
+* [3. Deployment](docs/adr/0003-deployment.md)
 
 ## Development
 
