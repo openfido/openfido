@@ -5,7 +5,7 @@ import re
 import logging
 import json
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, send_file
 from . import models, queries, services, utils
 from .utils import BadRequestError
 from werkzeug.exceptions import BadRequest
@@ -388,7 +388,7 @@ def get_user_avatar(user_uuid):
 
     try:
         stream = services.get_user_avatar(user)
-        return send_file(stream)
+        return send_file(stream, attachment_filename="avatar.png")
     except BadRequestError as bad_request_error:
         utils.log(f"could not get user avatar: {bad_request_error}", logging.WARN)
         return {"message": str(bad_request_error)}, 400

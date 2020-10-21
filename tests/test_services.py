@@ -396,7 +396,7 @@ def test_get_user_avatar(get_s3_mock, app, user):
 
     services.get_user_avatar(user)
 
-    s3_mock.download_file.assert_called_once_with(bucket, path, ANY)
+    s3_mock.get_object.assert_called_once_with(Bucket=bucket, Key=path)
 
 @patch("app.services.get_s3")
 def test_update_organization_logo(get_s3_mock, app, organization):
@@ -421,4 +421,4 @@ def test_get_organization_logo(get_s3_mock, app, organization):
 
     services.get_organization_logo(organization)
 
-    s3_mock.download_file.assert_called_once_with(bucket, path, ANY)
+    s3_mock.get_object.assert_called_once_with(Bucket=bucket, Key=path)

@@ -4,6 +4,7 @@ from io import StringIO
 from datetime import datetime, timedelta
 from email.utils import parseaddr
 from flask import current_app
+from botocore.exceptions import ClientError
 
 from flanker.addresslib import address
 
@@ -253,67 +254,42 @@ def update_user_last_active_at(user):
     return user
 
 
-def update_user_avatar(user, stream):
+def update_user_avatar(user, data):
     if not isinstance(user, User):
         raise BadRequestError("Invalid user")
 
-    s3 = get_s3()
-    bucket = os.environ.get("S3_BUCKET")
-    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
-        s3.create_bucket(ACL="private", Bucket=bucket)
-    s3.upload_fileobj(
-        stream,
-        bucket,
-        f"avatars/{user.uuid}",
-    )
+    _put_file(f"avatars/{user.uuid}", data)
 
 
 def get_user_avatar(user):
     if not isinstance(user, User):
         raise BadRequestError("Invalid user")
 
-    s3 = get_s3()
-    bucket = os.environ.get("S3_BUCKET")
-    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
-        s3.create_bucket(ACL="private", Bucket=bucket)
-
-    string_io = StringIO()
-    filename = f"avatars/{user.uuid}"
-    s3.download_file(bucket, filename, string_io)
-
-    return string_io
+    try:
+        avatar = _get_file(f"avatars/{user.uuid}")
+    except ClientError:
+        avatar = "assets/default-user-avatar.png"
+    
+    return avatar
 
 
-def update_organization_logo(organization, stream):
+def update_organization_logo(organization, data):
     if not isinstance(organization, Organization):
         raise BadRequestError("Invalid organization")
 
-    s3 = get_s3()
-    bucket = os.environ.get("S3_BUCKET")
-    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
-        s3.create_bucket(ACL="private", Bucket=bucket)
-    s3.upload_fileobj(
-        stream,
-        bucket,
-        f"logos/{organization.uuid}",
-    )
+    _put_file(f"logos/{organization.uuid}", data)
 
 
 def get_organization_logo(organization):
     if not isinstance(organization, Organization):
         raise BadRequestError("Invalid organization")
 
-    s3 = get_s3()
+    try:
+        logo = _get_file(f"logos/{organization.uuid}")
+    except ClientError:
+        logo = "assets/default-organization-logo.png"
     
-    bucket = os.environ.get("S3_BUCKET")
-    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
-        s3.create_bucket(ACL="private", Bucket=bucket)
-
-    string_io = StringIO()
-    filename = f"logos/{organization.uuid}"
-    s3.download_file(bucket, filename, string_io)
-
-    return string_io
+    return logo
 
 
 def change_password(user, old_password, new_password):
@@ -405,3 +381,20 @@ def _validate_email(email):
         raise BadRequestError("Invalid email")
     if address.parse(email) is None:
         raise BadRequestError("Invalid email")
+
+def _put_file(filename, data):
+    s3 = get_s3()
+    bucket = os.environ.get("S3_BUCKET")
+    if bucket not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket)
+    
+    s3.upload_fileobj(data, bucket, filename)
+
+def _get_file(filename):
+    s3 = get_s3()
+    bucket_name = os.environ.get("S3_BUCKET")
+    if bucket_name not in [b["Name"] for b in s3.list_buckets()["Buckets"]]:
+        s3.create_bucket(ACL="private", Bucket=bucket_name)
+
+    response = s3.get_object(Bucket=bucket_name, Key=filename)
+    return response['Body']

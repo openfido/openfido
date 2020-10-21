@@ -2,7 +2,7 @@
 """
 import logging
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, send_file
 from . import models, queries, services, utils
 from .utils import BadRequestError
 from .auth import verify_system_admin, jwt_required, verify_content_type_and_params
@@ -224,7 +224,7 @@ def get_organization_logo(organization_uuid):
 
     try:
         stream = services.get_organization_logo(organization)
-        return send_file(stream)
+        return send_file(stream, attachment_filename="logo.png")
     except BadRequestError as bad_request_error:
         utils.log(f"could not get organization logo: {bad_request_error}", logging.WARN)
         return {"message": str(bad_request_error)}, 400
