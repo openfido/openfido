@@ -1,7 +1,7 @@
 # A system that has the same dependencies of the main project, and docker as
 # well.
 
-FROM slacgismo/openfido-workflow-service
+FROM openfido/dev-workflow
 
 RUN apt-get update -qq && \
   apt-get install -y apt-transport-https \
@@ -17,4 +17,5 @@ RUN apt update
 RUN apt install -y docker-ce
 RUN apt-get clean
 
-CMD "flask" "run"
+CMD "celery" "-A" "app.worker" "worker"
+HEALTHCHECK --timeout=2s CMD test $(curl -s -o /dev/null -w "%{http_code}" localhost:5000/v1/pipelines) = "400"

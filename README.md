@@ -27,6 +27,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
 
     # Build the docker image, using the SSH private key you use for github
     # access (to access other openslac private repositories)
+    export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
     # TODO at some point docker-compose will support the "--ssh default" docker
