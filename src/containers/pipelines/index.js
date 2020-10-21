@@ -24,6 +24,8 @@ const Pipelines = () => {
   const [showAddPipelines, setShowAddPipelines] = useState(false);
   const [pipelineInEdit, setPipelineInEdit] = useState(null);
 
+  const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
+
   useEffect(() => {
     if (!pipelines) {
       dispatch(getPipelines(currentOrg));

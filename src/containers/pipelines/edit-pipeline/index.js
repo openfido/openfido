@@ -31,7 +31,7 @@ const EditPipeline = ({ handleSuccess, pipelineItem }) => {
   const onEditPipelineClicked = (e) => {
     e.preventDefault();
 
-    requestUpdatePipeline(currentOrg, {
+    requestUpdatePipeline(currentOrg, pipelineItem.uuid, {
       name: pipelineName,
       description,
       docker_image_url: dockerImageUrl,
