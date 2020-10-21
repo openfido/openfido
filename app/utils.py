@@ -25,7 +25,7 @@ permissions_required = make_permission_decorator(ApplicationsEnum)
 any_application_required = permissions_required(list(ApplicationsEnum))
 
 
-def validate_organization():
+def validate_organization(requires_json=True):
     """Decorator enforcing that organization_uuid is valid, and that the
     content type is application/json.
 
@@ -40,7 +40,7 @@ def validate_organization():
     def decorator(view):
         @wraps(view)
         def wrapper(*args, **kwargs):
-            if request.headers.get("Content-Type", None) != "application/json":
+            if requires_json and request.headers.get("Content-Type", None) != "application/json":
                 logger.warning("invalid content type")
                 return {"message": "application/json content-type is required."}, 400
 
