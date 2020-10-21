@@ -44,5 +44,6 @@ export default {
       app: baseApiUrlApp,
     },
     version: '',
+    appToken: '850e131394ba4699b703f03e50d9ac50',
   },
 };
