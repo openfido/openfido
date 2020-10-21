@@ -60,7 +60,7 @@ jobs:
           tag: "$CIRCLE_BRANCH"
           repo: openfido/dev-workflow-worker
           extra-build-args: "--ssh default"
-  build-docker-worker:
+  build-docker-rabbitmq:
     docker:
       - image: circleci/python:3.8
     environment:
