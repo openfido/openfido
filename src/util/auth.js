@@ -14,6 +14,6 @@ export default class Auth {
   }
 
   static clearUserToken() {
-    window.localStorage.removeItem(USER_KEY);
+    window.localStorage.removeItem(`${USER_KEY}_token`);
   }
 }
