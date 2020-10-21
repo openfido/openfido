@@ -43,6 +43,6 @@ export default {
       workflow: baseApiUrlWorkflow,
       app: baseApiUrlApp,
     },
-    version: '/v1',
+    version: '',
   },
 };
