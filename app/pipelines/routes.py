@@ -154,7 +154,7 @@ def update(organization_uuid, organization_pipeline_uuid):
     "/<organization_uuid>/pipelines/<organization_pipeline_uuid>", methods=["DELETE"]
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def remove(organization_uuid, organization_pipeline_uuid):
     """Delete a Organization Pipeline.
     ---
