@@ -2,9 +2,10 @@ const ENVIRONMENT_DEVELOPMENT = 'DEVELOPMENT';
 const ENVIRONMENT_STAGING = 'STAGING';
 const ENVIRONMENT_PRODUCTION = 'PRODUCTION';
 
-const BASE_API_URL_AUTH_DEVELOPMENT = process.env.BASE_API_URL_AUTH_DEVELOPMENT || 'http://localhost:5000';
+const BASE_API_URL_APP_DEVELOPMENT = process.env.BASE_API_URL_AUTH_DEVELOPMENT || 'http://localhost:5000';
 const BASE_API_URL_WORKFLOW_DEVELOPMENT = process.env.BASE_API_URL_WORKFLOW_DEVELOPMENT || 'http://localhost:5001';
-const BASE_API_URL_APP_DEVELOPMENT = process.env.BASE_API_URL_APP_DEVELOPMENT || 'http://localhost:5002/v1';
+const BASE_API_URL_AUTH_DEVELOPMENT = process.env.BASE_API_URL_AUTH_DEVELOPMENT || 'http://localhost:5002';
+
 
 const BASE_API_URL_STAGING = process.env.BASE_API_URL_STAGING || 'https://api.staging.openfido.org';
 const BASE_API_URL_PRODUCTION = process.env.BASE_API_URL_PRODUCTION || 'https://api.openfido.org';
@@ -43,6 +44,6 @@ export default {
       workflow: baseApiUrlWorkflow,
       app: baseApiUrlApp,
     },
-    version: '',
+    version: '/v1',
   },
 };
