@@ -81,13 +81,13 @@ def test_pipelines_bad_search(app, client, client_application):
 
 
 @responses.activate
-def test_pipelines(app, client, client_application):
+def test_pipelines(app, client, client_application, pipeline):
     pipeline_json = dict(PIPELINE_JSON)
     pipeline_json.update(
         {
             "created_at": "2020-10-08T12:20:36.564095",
             "updated_at": "2020-10-08T12:20:36.564100",
-            "uuid": "daf6febec1714ac79a73327760c89f15",
+            "uuid": pipeline.pipeline_uuid,
         }
     )
     json_response = [pipeline_json]
@@ -106,6 +106,7 @@ def test_pipelines(app, client, client_application):
         },
     )
     assert result.status_code == 200
+    json_response[0]["uuid"] = pipeline.uuid
     assert result.json == json_response
 
 

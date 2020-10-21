@@ -69,15 +69,40 @@ def test_create_pipeline(app):
 
 
 @patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines(post_mock, app):
-    post_mock().json.return_value = ["somedata"]
+def test_fetch_pipelines_bad_workflow_response(post_mock, app, pipeline):
+    pipeline_list = [
+        {"uuid": "nonexistant-organization-pipeline-uuid", "name": "name 1"}
+    ]
+    post_mock().json.return_value = pipeline_list
 
-    assert fetch_pipelines(ORGANIZATION_UUID) == ["somedata"]
+    expected_result = [{"uuid": pipeline.uuid, "name": "name 1"}]
+
+    # we got back bogus workflow service data, but we did make the API call:
+    with pytest.raises(HTTPError):
+        fetch_pipelines(ORGANIZATION_UUID)
+
     post_mock.assert_called()
     get_call = post_mock.call_args
     assert get_call[0][0].startswith(app.config[WORKFLOW_HOSTNAME])
     assert get_call[1]["headers"][ROLES_KEY] == app.config[WORKFLOW_API_TOKEN]
-    assert get_call[1]["json"] == {"uuids": []}
+    assert get_call[1]["json"] == {"uuids": [pipeline.pipeline_uuid]}
+
+    post_mock().raise_for_status.assert_called()
+    post_mock().json.assert_called()
+
+
+@patch("app.pipelines.services.requests.post")
+def test_fetch_pipelines(post_mock, app, pipeline):
+    pipeline_list = [{"uuid": pipeline.pipeline_uuid, "name": "name 1"}]
+    post_mock().json.return_value = pipeline_list
+
+    expected_result = [{"uuid": pipeline.uuid, "name": "name 1"}]
+    assert fetch_pipelines(ORGANIZATION_UUID) == expected_result
+    post_mock.assert_called()
+    get_call = post_mock.call_args
+    assert get_call[0][0].startswith(app.config[WORKFLOW_HOSTNAME])
+    assert get_call[1]["headers"][ROLES_KEY] == app.config[WORKFLOW_API_TOKEN]
+    assert get_call[1]["json"] == {"uuids": [pipeline.pipeline_uuid]}
 
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
