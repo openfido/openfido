@@ -54,3 +54,13 @@ workflows:
       - build-docker:
           requires:
             - test
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-app-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-app-service'
+          container-image-name-updates: 'container=openfido-dev-app-task,tag=master'
