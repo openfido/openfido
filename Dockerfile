@@ -29,6 +29,8 @@ RUN apt-get update -qq && \
   apt-get install -y pipenv \
   # for db connectivity
   postgresql-client \
+  # for healthcheck
+  curl \
   && \
   apt-get clean
 
@@ -41,3 +43,4 @@ ENV PATH="/.venv/bin:$PATH"
 COPY . .
 
 CMD "flask" "run"
+HEALTHCHECK --timeout=2s CMD test $(curl -s -o /dev/null -w "%{http_code}" localhost:5000/users/000/profile) = "401"
