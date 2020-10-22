@@ -42,5 +42,5 @@ ENV PATH="/.venv/bin:$PATH"
 
 COPY . .
 
-CMD "flask" "run"
-HEALTHCHECK --timeout=2s CMD test $(curl -s -o /dev/null -w "%{http_code}" localhost:5000/users/000/profile) = "401"
+CMD "flask" "run" "-h" "0.0.0.0"
+# HEALTHCHECK --timeout=2s CMD test $(curl -s -o /dev/null -w "%{http_code}" localhost:5000/healthcheck) = "200"
