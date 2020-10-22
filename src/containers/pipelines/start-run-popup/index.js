@@ -153,10 +153,23 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
   };
 
   const onStartRunClicked = () => {
-    requestStartPipelineRun(currentOrg, pipeline_uuid, inputs)
-      .then(() => {
-        handleOk();
+    if (inputs) {
+      const inputBinaryFiles = [];
+
+      inputs.forEach((file) => {
+        const fileReader = new window.FileReader();
+        fileReader.onload = function () {
+          inputBinaryFiles.push(fileReader.result);
+        };
+
+        fileReader.readAsBinaryString(file);
       });
+
+      requestStartPipelineRun(currentOrg, pipeline_uuid, inputBinaryFiles)
+        .then(() => {
+          handleOk();
+        });
+    }
   };
 
   const removeInputFile = (index) => {
