@@ -76,7 +76,7 @@ const ArtifactsSection = styled.section`
 `;
 
 export const PipelineRuns = ({ pipelineInView }) => {
-  const [showStartRunPopup, setStartRunPopup] = useState(true);
+  const [showStartRunPopup, setStartRunPopup] = useState(false);
 
   const openStartRunPopup = () => {
     setStartRunPopup(true);

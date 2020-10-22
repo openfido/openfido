@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Space } from 'antd';
 
 import { getPipelines } from 'actions/pipelines';
-import { StyledTitle, StyledButton } from 'styles/app';
+import { StyledTitle, StyledButton, StyledText } from 'styles/app';
 import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
 import AddPipeline from './add-pipeline';
@@ -24,7 +24,7 @@ const Pipelines = () => {
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
   const [pipelineInEdit, setPipelineInEdit] = useState(null);
-  const [pipelineInView, setPipelineInView] = useState('a8d6866e5e06424186399359e7b5f578');
+  const [pipelineInView, setPipelineInView] = useState(null);
 
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
@@ -47,7 +47,7 @@ const Pipelines = () => {
 
   const handleAddPipelineSuccess = () => {
     dispatch(getPipelines(currentOrg))
-      .then(() => setShowAddPipelines(false))
+      .then(() => setShowAddPipelines(false));
   };
 
   const handleAddPipelineCancel = () => {
@@ -73,16 +73,28 @@ const Pipelines = () => {
 
   const viewPipelineRuns = (pipeline_uuid) => {
     setPipelineInView(pipeline_uuid);
-  }
+  };
 
   return (
     <>
       <StyledTitle>
         <div>
-          <h1>Pipelines</h1>
-          <StyledButton size="small" onClick={openAddPipelines}>
-            + Add Pipeline
-          </StyledButton>
+          <h1>
+            {pipelineInView && pipelineItemInView ? (
+              <>
+                Pipeline Runs:
+                {' '}
+                <StyledText color="blue">{pipelineItemInView.name}</StyledText>
+              </>
+            ) : (
+              <>
+                Pipelines
+                <StyledButton size="small" onClick={openAddPipelines}>
+                  + Add Pipeline
+                </StyledButton>
+              </>
+            )}
+          </h1>
         </div>
       </StyledTitle>
       <Space direction="vertical" size={16}>
@@ -91,10 +103,10 @@ const Pipelines = () => {
         )}
       </Space>
       {showAddPipelines && (
-          <AddPipeline
-              handleSuccess={handleAddPipelineSuccess}
-              handleCancel={handleAddPipelineCancel}
-          />
+      <AddPipeline
+        handleSuccess={handleAddPipelineSuccess}
+        handleCancel={handleAddPipelineCancel}
+      />
       )}
       {!showAddPipelines && pipelineInEdit && (
         <EditPipeline

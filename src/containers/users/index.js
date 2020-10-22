@@ -45,10 +45,12 @@ const Users = () => {
     <>
       <StyledTitle>
         <div>
-          <h1>Users</h1>
-          <StyledButton onClick={openInviteUserPopup} size="small">
-            + Invite User
-          </StyledButton>
+          <h1>
+            Users
+            <StyledButton onClick={openInviteUserPopup} size="small">
+              + Invite User
+            </StyledButton>
+          </h1>
         </div>
       </StyledTitle>
       <HeaderRow gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)">

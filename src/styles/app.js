@@ -69,7 +69,15 @@ export const StyledTitle = styled.div`
   padding: 1.75rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
-    margin-right: 16px;
+    margin-right: 100px;
+    white-space: pre;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    > button {
+      margin-left: 16px;
+      margin-left: 1rem;
+    } 
   }
   > div {
     position: relative;
