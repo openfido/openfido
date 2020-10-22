@@ -201,7 +201,7 @@ export default (state = DEFAULT_STATE, action) => {
       return {
         ...state,
         messages: DEFAULT_STATE.messages,
-        avatar: action.payload,
+        avatar: `data:image/jpeg;base64,${window.btoa(action.payload)}`,
       };
     }
     case UPDATE_USER_AVATAR: {
