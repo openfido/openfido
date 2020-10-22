@@ -5,7 +5,7 @@ import re
 import logging
 import json
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, send_file
 from . import models, queries, services, utils
 from .utils import BadRequestError
 from werkzeug.exceptions import BadRequest
@@ -331,6 +331,67 @@ def get_user_profile(user_uuid):
         return {}, 401
 
     return g.user.serialize()
+
+
+@auth_bp.route("/<user_uuid>/avatar", methods=["PUT"])
+@jwt_required
+def update_user_avatar(user_uuid):
+    """Update a user's avatar image.
+    ---
+    requestBody:
+      description: "binary file content"
+      required: true
+    responses:
+      "200":
+        description: "Updated"
+      "400":
+        description: "Bad request"
+      "413":
+        description: "Payload Too Large"
+    """
+    user = queries.find_user_by_uuid(user_uuid)
+
+    if not user:
+        utils.log("Invalid user", logging.WARN)
+        return {}, 401
+
+    if g.user != user:
+        utils.log("ERROR: Cannot update a different user's avatar")
+        return {}, 401
+
+    try:
+        services.update_user_avatar(user, request.stream)
+        return {}, 200
+
+    except BadRequestError as bad_request_error:
+        utils.log(f"could not update user avatar: {bad_request_error}", logging.WARN)
+        return {"message": str(bad_request_error)}, 400
+
+
+@auth_bp.route("/<user_uuid>/avatar", methods=["GET"])
+@jwt_required
+def get_user_avatar(user_uuid):
+    """Get a user's avatar image.
+    ---
+    requestBody:
+    responses:
+      "200":
+        description: "Found"
+      "400":
+        description: "Bad request"
+    """
+    user = queries.find_user_by_uuid(user_uuid)
+
+    if not user:
+        utils.log("Invalid user", logging.WARN)
+        return {}, 401
+
+    try:
+        stream = services.get_user_avatar(user)
+        return send_file(stream, attachment_filename="avatar.png")
+    except BadRequestError as bad_request_error:
+        utils.log(f"could not get user avatar: {bad_request_error}", logging.WARN)
+        return {"message": str(bad_request_error)}, 400
 
 
 @auth_bp.route("/<user_uuid>/organizations", methods=["GET"])

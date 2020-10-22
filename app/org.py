@@ -2,7 +2,7 @@
 """
 import logging
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, send_file
 from . import models, queries, services, utils
 from .utils import BadRequestError
 from .auth import verify_system_admin, jwt_required, verify_content_type_and_params
@@ -165,6 +165,68 @@ def update_organization_profile(organization_uuid):
         return organization.serialize()
     except BadRequestError as bad_request_error:
         utils.log(f"could not update organization: {bad_request_error}", logging.WARN)
+        return {"message": str(bad_request_error)}, 400
+
+
+@org_bp.route("/<organization_uuid>/logo", methods=["PUT"])
+@jwt_required
+def update_organization_logo(organization_uuid):
+    """Update an organization's logo image.
+    ---
+    requestBody:
+      description: "binary file content"
+      required: true
+    responses:
+      "200":
+        description: "Updated"
+      "400":
+        description: "Bad request"
+      "413":
+        description: "Payload Too Large"
+    """
+    organization = queries.find_organization_by_uuid(organization_uuid)
+
+    if not organization:
+        utils.log("Invalid organization", logging.WARN)
+        return {}, 401
+
+    if not queries.is_user_organization_admin(organization, g.user):
+        utils.log("ERROR: User is not an organization admin")
+        return {}, 401
+
+    try:
+        services.update_organization_logo(organization, request.stream)
+        return {}, 200
+    except BadRequestError as bad_request_error:
+        utils.log(
+            f"could not update organization logo: {bad_request_error}", logging.WARN
+        )
+        return {"message": str(bad_request_error)}, 400
+
+
+@org_bp.route("/<organization_uuid>/logo", methods=["GET"])
+@jwt_required
+def get_organization_logo(organization_uuid):
+    """Get an organization's logo image.
+    ---
+    requestBody:
+    responses:
+      "200":
+        description: "Found"
+      "400":
+        description: "Bad request"
+    """
+    organization = queries.find_organization_by_uuid(organization_uuid)
+
+    if not organization:
+        utils.log("Invalid organization", logging.WARN)
+        return {}, 401
+
+    try:
+        stream = services.get_organization_logo(organization)
+        return send_file(stream, attachment_filename="logo.png")
+    except BadRequestError as bad_request_error:
+        utils.log(f"could not get organization logo: {bad_request_error}", logging.WARN)
         return {"message": str(bad_request_error)}, 400
 
 

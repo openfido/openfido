@@ -9,3 +9,4 @@ test-results
 .env.staging
 .env.prod
 .env.test
+uploads

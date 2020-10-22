@@ -37,6 +37,7 @@ def app():
             "TESTING": True,
             "DEBUG": True,
             "SECRET_KEY": "PYTEST",
+            "EMAIL_DRIVER": "null",
         }
     )
 
