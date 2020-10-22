@@ -7,8 +7,7 @@ terraform {
     commands = get_terraform_commands_that_need_vars()
 
     arguments = [
-      "-var-file=${get_parent_terragrunt_dir()}/variables/common.tfvars",
-      "-var-file=${get_parent_terragrunt_dir()}/variables/${get_env("TF_VAR_environment")}/ecs.tfvars"
+      "-var-file=${get_parent_terragrunt_dir()}/variables/common.tfvars"
     ]
   }
 }

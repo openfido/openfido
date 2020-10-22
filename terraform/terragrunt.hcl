@@ -6,11 +6,11 @@ remote_state {
     if_exists = "overwrite"
   }
   config  = {
-    bucket         = "fido-remote-state"
-    dynamodb_table = "fido-remote-state-lock"
+    bucket         = "openfido-remote-state"
+    dynamodb_table = "openfido-remote-state-lock"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "us-east-1"
-    profile        = "fido"
+    profile        = "openfido"
     encrypt        = true
   }
 }

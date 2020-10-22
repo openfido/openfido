@@ -33,6 +33,16 @@ vpc:
 	cd enviroments/$(arg1)/vpc/; terragrunt $c
 
 # ********** ecs ********** #
-ecs:
-	@echo "Running "$c" on $(arg1) ecs"
-	cd enviroments/$(arg1)/services/ecs/; terragrunt $c
+api:
+	@echo "Running "$c" on $(arg1) Api Services"
+	cd enviroments/$(arg1)/services/api_services/; terragrunt $c
+
+# ********** front-end ********** #
+front:
+	@echo "Running "$c" on $(arg1) Front-End"
+	cd enviroments/$(arg1)/services/front_end/; terragrunt $c
+
+# ********** rds ********** #
+rds:
+	@echo "Running "$c" on $(arg1) RDS"
+	cd enviroments/$(arg1)/data-storage/postgreSQL/; terragrunt $c
