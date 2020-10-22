@@ -13,6 +13,8 @@ import { requestCancelOrganizationInvitation } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
+import MailOutlined from 'icons/MailOutlined';
+import UserFilled from 'icons/UserFilled';
 import {
   StyledGrid,
   StyledText,
@@ -80,6 +82,9 @@ const StyledMenu = styled(Menu)`
 
 const NameColumn = styled.div`
   position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
@@ -104,6 +109,27 @@ const StyledMenuItem = styled(Menu.Item)`
     margin-bottom: 10px;
     margin-bottom: 0.625rem;
    }
+`;
+
+const StyledPhotoContainer = styled.div`
+  width: 53px;
+  height: 53px;
+  border-radius: 50%;
+  border: 2px solid ${colors.lightGray};
+  margin-right: 16px;
+  margin-right: 1rem;
+  .anticon-mail {
+    width: 32px;
+    height: 32px;
+    left: 8px;
+    top: 10px;
+  }
+  .anticon-user {
+    width: 48px;
+    height: 48px;
+    left: 3px;
+    top: 0;
+  }
 `;
 
 const UserItem = ({
@@ -202,9 +228,24 @@ const UserItem = ({
     </StyledText>
   );
 
+  /* const StyledPhoto = styled.div`
+    width: 40px;
+    height: 40px;
+    background-image: url(); // TODO: StyledPhoto - plug in url avatar
+    background-size: 40px;
+    border-radius: 20px;
+  `; */
+
   return (
-    <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
+    <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(108px, 1fr)" bgcolor="white">
       <NameColumn>
+        <StyledPhotoContainer>
+          {!isInvited ? (
+            <UserFilled /> // <StyledPhoto />
+          ) : (
+            <MailOutlined />
+          )}
+        </StyledPhotoContainer>
         <StyledText size="large" color="gray">
           {first_name}
           {last_name && ` ${last_name}`}
