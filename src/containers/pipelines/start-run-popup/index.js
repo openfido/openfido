@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import { requestStartPipelineRun } from 'services';
 import CloseOutlined from 'icons/CloseOutlined';
 import CloudOutlined from 'icons/CloudOutlined';
 import {
@@ -73,7 +75,7 @@ const UploadBox = styled.div`
 
 export const UploadSection = styled.div`
   width: 100%;
-  padding: 0 42px 28px 36px;
+  padding: 0 42px 16px 36px;
   padding: 0 2.625rem 1.75rem 2.25rem;
   border-bottom: 1px solid ${colors.grey};
 `;
@@ -83,10 +85,15 @@ const ArtifactsSection = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 48px;
   grid-row-gap: 24px;
   grid-row-gap: 1.5rem;
   grid-column-gap: 88px;
-  grid-column-gap: 5.5
+  grid-column-gap: 5.5rem;
+  overflow-y: scroll;
+  height: 188px;
+  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 `;
 
 export const Artifact = styled.div`
@@ -95,13 +102,21 @@ export const Artifact = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px 14px 24px;
+  padding: 4px 16px 4px 24px;
+  padding: 0.25rem 1rem 0.25rem 1.5rem;
   font-size: 16px;
   line-height: 19px;
   width: 261px;
-  max-height: 64px;
+  height: 48px;
+  max-height: 48px;
   cursor: pointer;
   position: relative;
+  span:first-child {
+    margin-right: 8px;
+    margin-right: 0.5rem;
+    white-space: pre;
+    overflow: hidden;
+  }
   .anticon {
     position: static;
     float: right;
@@ -119,70 +134,97 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel }) => (
-  <Modal
-    visible
-    footer={null}
-    onOk={handleOk}
-    onCancel={handleCancel}
-    closeIcon={<CloseOutlined color="darkText" />}
-    width={690}
-    maskStyle={{ top: '82px', left: '250px' }}
-    style={{ position: 'fixed', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
-    title="Start a run"
-  >
-    <StyledForm>
-      <UploadSection>
-        <UploadBox>
-          <input type="file" id="inputs" />
-          <CloudOutlined />
-          <div>
-            <StyledText size="large" color="darkText">
-              Drag and drop your input file here, or
-              {' '}
-              <StyledButton
-                type="text"
-                size="middle"
-                fontweight="bold"
-                textcolor="lightBlue"
-              >
-                <label htmlFor="inputs">
-                  browse
-                </label>
-              </StyledButton>
-              .
-            </StyledText>
-          </div>
-        </UploadBox>
-      </UploadSection>
-      <ArtifactsSection>
-        <Artifact>
-          CA-Bakersfield-meadows-field-highwind-mocked.tmy3
-          <CloseOutlined color="lightGray" />
-        </Artifact>
-        <Artifact>
-          anticipation-ieee123-pole-vulnerability.glm
-          <CloseOutlined color="lightGray" />
-        </Artifact>
-        <Artifact>
-          config.json
-          <CloseOutlined color="lightGray" />
-        </Artifact>
-      </ArtifactsSection>
-      <StyledButton
-        size="middle"
-        color="blue"
-        width={108}
-      >
-        Start Run
-      </StyledButton>
-    </StyledForm>
-  </Modal>
-);
+const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+
+  const [inputs, setInputs] = useState([]);
+
+  const onInputsChanged = (e) => {
+    const inputFiles = [];
+
+    Array.from(e.target.files).forEach((file) => {
+      inputFiles.push(file);
+    });
+
+    setInputs([
+      ...inputs,
+      ...inputFiles,
+    ]);
+  };
+
+  const onStartRunClicked = () => {
+    requestStartPipelineRun(currentOrg, pipeline_uuid, inputs)
+      .then(() => {
+        handleOk();
+      });
+  };
+
+  const removeInputFile = (index) => {
+    const inputFiles = [...inputs];
+    inputFiles.splice(index, 1);
+    setInputs(inputFiles);
+  };
+
+  return (
+    <Modal
+      visible
+      footer={null}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      closeIcon={<CloseOutlined color="darkText" />}
+      width={690}
+      maskStyle={{ top: '82px', left: '250px' }}
+      style={{ position: 'fixed', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
+      title="Start a run"
+    >
+      <StyledForm onSubmit={onStartRunClicked}>
+        <UploadSection>
+          <UploadBox>
+            <input type="file" id="inputs" onChange={onInputsChanged} multiple />
+            <CloudOutlined />
+            <div>
+              <StyledText size="large" color="darkText">
+                Drag and drop your input file here, or
+                {' '}
+                <StyledButton
+                  type="text"
+                  size="middle"
+                  textcolor="lightBlue"
+                >
+                  <label htmlFor="inputs">
+                    <strong>browse</strong>
+                  </label>
+                </StyledButton>
+                .
+              </StyledText>
+            </div>
+          </UploadBox>
+        </UploadSection>
+        <ArtifactsSection>
+          {inputs && Array.from(inputs).map((inputFile, index) => (
+            <Artifact key={`${inputFile.name}${Math.random()}`} alt={inputFile.name}>
+              <StyledText>{inputFile.name}</StyledText>
+              <CloseOutlined color="lightGray" onClick={() => removeInputFile(index)} />
+            </Artifact>
+          ))}
+        </ArtifactsSection>
+        <StyledButton
+          size="middle"
+          color="blue"
+          width={108}
+          onClick={onStartRunClicked}
+        >
+          Start Run
+        </StyledButton>
+      </StyledForm>
+    </Modal>
+  );
+};
 
 StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  pipeline_uuid: PropTypes.string.isRequired,
 };
 
 export default StartRunPopup;

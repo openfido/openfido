@@ -7,16 +7,11 @@ export default class ApiClient {
     return this.getInstance(timeout, apiKey).get(url);
   }
 
-  static post(url, data = {}, apiKey, timeout = config.api.defaultTimeout) {
-    return this.getInstance(timeout, apiKey).post(url, data);
+  static post(url, data = {}, apiKey, contentType = 'application/json', timeout = config.api.defaultTimeout) {
+    return this.getInstance(timeout, apiKey, contentType).post(url, data);
   }
 
-  static postForm(url, formFields, apiKey, timeout = config.api.defaultTimeout) {
-    const data = new window.FormData();
-    Object.keys(formFields).forEach((prop) => {
-      data.set(prop, formFields[prop]);
-    });
-
+  static postForm(url, data, apiKey, timeout = config.api.defaultTimeout) {
     return this.getInstance(timeout, apiKey, 'multipart/form-data').post(url, data);
   }
 

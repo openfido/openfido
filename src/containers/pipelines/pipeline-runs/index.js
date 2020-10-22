@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -74,8 +75,8 @@ const ArtifactsSection = styled.section`
   height: 398px;
 `;
 
-export const PipelineRuns = () => {
-  const [showStartRunPopup, setStartRunPopup] = useState(false);
+export const PipelineRuns = ({ pipelineInView }) => {
+  const [showStartRunPopup, setStartRunPopup] = useState(true);
 
   const openStartRunPopup = () => {
     setStartRunPopup(true);
@@ -105,10 +106,15 @@ export const PipelineRuns = () => {
         <StartRunPopup
           handleOk={closeStartRunPopup}
           handleCancel={closeStartRunPopup}
+          pipeline_uuid={pipelineInView}
         />
       )}
     </>
   );
+};
+
+PipelineRuns.propTypes = {
+  pipelineInView: PropTypes.string.isRequired,
 };
 
 export default PipelineRuns;

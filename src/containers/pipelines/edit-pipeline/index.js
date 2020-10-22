@@ -176,7 +176,7 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
               tabIndex={0}
               onClick={onEditPipelineClicked}
             >
-              Edit Pipeline
+              Update Pipeline
             </StyledButton>
             <StyledButton
               htmlType="reset"

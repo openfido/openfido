@@ -24,7 +24,7 @@ const Pipelines = () => {
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
   const [pipelineInEdit, setPipelineInEdit] = useState(null);
-  const [pipelineInView, setPipelineInView] = useState(null);
+  const [pipelineInView, setPipelineInView] = useState('a8d6866e5e06424186399359e7b5f578');
 
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
@@ -122,8 +122,7 @@ const Pipelines = () => {
       )}
       {!showAddPipelines && pipelineInView && (
         <PipelineRuns
-            handleOk
-            pipelineItem={pipelineInView}
+          pipelineInView={pipelineInView}
         />
       )}
     </>
