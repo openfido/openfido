@@ -1,36 +1,26 @@
 import {
-  GET_PIPELINES_STARTED,
-  GET_PIPELINES_COMPLETED,
+  GET_PIPELINES,
   GET_PIPELINES_FAILED,
   ADD_PIPELINE,
   DELETE_PIPELINE,
 } from 'actions';
-import ApiClient from 'util/api-client';
+import { requestGetPipelines } from 'services';
 
-export const getPipelinesStarted = () => ({
-  type: GET_PIPELINES_STARTED,
-});
-
-export const getPipelinesCompleted = (payload) => ({
-  type: GET_PIPELINES_COMPLETED,
-  payload,
-});
-
-export const getPipelinesFailed = (error) => ({
-  type: GET_PIPELINES_FAILED,
-  payload: error,
-});
-
-export const getPipelines = () => (dispatch) => {
-  dispatch(getPipelinesStarted());
-  ApiClient.get('/v1/pipelines')
-    .then((res) => {
-      dispatch(getPipelinesCompleted(res.data));
+export const getPipelines = (organization_uuid) => (dispatch) => (
+  requestGetPipelines(organization_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_PIPELINES,
+        payload: response.data,
+      });
     })
     .catch((err) => {
-      dispatch(getPipelinesFailed(err));
-    });
-};
+      dispatch({
+        type: GET_PIPELINES_FAILED,
+        payload: !err.response || err.response.data,
+      });
+    })
+);
 
 export const addPipeline = (payload) => ({
   type: ADD_PIPELINE,

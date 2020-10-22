@@ -15,6 +15,7 @@ import DeleteOrganizationPopup from './delete-organization-popup';
 
 const StyledForm = styled.form`
   display: grid;
+  align-items: flex-start;
   grid-gap: 16px;
   grid-gap: 1rem;
   max-width: 432px;
