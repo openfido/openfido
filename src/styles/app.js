@@ -214,7 +214,7 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor, size, textColor,
+    type, color, width, height, hoverbgcolor, size, textcolor,
   }) => (`
   ${size === 'middle' ? (`
   &.ant-btn {
@@ -232,7 +232,11 @@ export const StyledButton = styled(Button)`
     padding: 0;
   }
   &:hover, &:focus {
+    color: ${colors.lightBlue};
     background-color: transparent;
+  }
+  &.ant-btn {
+    height: auto;
   }
   `) : (`
   &, &:hover, &:focus {
@@ -269,8 +273,8 @@ export const StyledButton = styled(Button)`
   ${height ? (`
   height: ${height}px;
   `) : ''}
-  ${textColor in colors ? (`
-  color: ${colors[textColor]};
+  ${textcolor in colors ? (`
+  color: ${colors[textcolor]};
   `) : ''}
   `)}
 `;
@@ -463,7 +467,8 @@ export const StyledModal = styled(Modal)`
     padding-bottom: 0;
   }
   .ant-modal-header {
-    padding: 16px 36px;
+    padding: 14px 36px;
+    padding: 0.875rem 2.25rem;
     border-bottom: 1px solid ${colors.lightGray};
   }
   .ant-modal-title {

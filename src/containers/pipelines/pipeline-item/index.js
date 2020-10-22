@@ -47,7 +47,7 @@ const EditColumn = styled.div`
 `;
 
 const PipelineItem = ({
-  uuid, name, updated_at, status, openPipelineEdit,
+  uuid, name, updated_at, status, openPipelineEdit, viewPipelineRuns,
 }) => {
   const statusLegend = {
     NOT_STARTED: 'skyBlue',
@@ -66,7 +66,12 @@ const PipelineItem = ({
         {`Last run started ${moment.utc(updated_at).fromNow()}`}
       </StyledText>
       <ViewRunsColumn>
-        <StyledButton size="middle" width={108} color="blue">
+        <StyledButton
+          size="middle"
+          color="blue"
+          width={108}
+          onClick={() => viewPipelineRuns(uuid)}
+        >
           View Runs
         </StyledButton>
       </ViewRunsColumn>
@@ -83,6 +88,7 @@ PipelineItem.propTypes = {
   updated_at: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
   openPipelineEdit: PropTypes.func.isRequired,
+  viewPipelineRuns: PropTypes.func.isRequired,
 };
 
 export default PipelineItem;

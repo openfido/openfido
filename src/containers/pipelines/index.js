@@ -9,6 +9,7 @@ import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
 import AddPipeline from './add-pipeline';
 import EditPipeline from './edit-pipeline';
+import PipelineRuns from './pipeline-runs';
 
 const PipelineItems = styled(Space)`
   padding: 28px 20px 28px 16px;
@@ -23,8 +24,10 @@ const Pipelines = () => {
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
   const [pipelineInEdit, setPipelineInEdit] = useState(null);
+  const [pipelineInView, setPipelineInView] = useState(null);
 
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
+  const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
 
   useEffect(() => {
     dispatch(getPipelines(currentOrg));
@@ -68,6 +71,10 @@ const Pipelines = () => {
     setPipelineInEdit(null);
   };
 
+  const viewPipelineRuns = (pipeline_uuid) => {
+    setPipelineInView(pipeline_uuid);
+  }
+
   return (
     <>
       <StyledTitle>
@@ -83,6 +90,12 @@ const Pipelines = () => {
           <CreatePipelinePopup handleOk={openAddPipelines} />
         )}
       </Space>
+      {showAddPipelines && (
+          <AddPipeline
+              handleSuccess={handleAddPipelineSuccess}
+              handleCancel={handleAddPipelineCancel}
+          />
+      )}
       {!showAddPipelines && pipelineInEdit && (
         <EditPipeline
           handleSuccess={handleEditPipelineSuccess}
@@ -90,7 +103,7 @@ const Pipelines = () => {
           pipelineItem={pipelineItemInEdit}
         />
       )}
-      {!showAddPipelines && !pipelineInEdit && (
+      {!showAddPipelines && !pipelineInView && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
           {pipelines && pipelines.map(({
             uuid, name, status, updated_at,
@@ -102,14 +115,15 @@ const Pipelines = () => {
               status={status}
               updated_at={updated_at}
               openPipelineEdit={openPipelineEdit}
+              viewPipelineRuns={viewPipelineRuns}
             />
           ))}
         </PipelineItems>
       )}
-      {showAddPipelines && (
-        <AddPipeline
-          handleSuccess={handleAddPipelineSuccess}
-          handleCancel={handleAddPipelineCancel}
+      {!showAddPipelines && pipelineInView && (
+        <PipelineRuns
+            handleOk
+            pipelineItem={pipelineInView}
         />
       )}
     </>
