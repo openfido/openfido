@@ -99,7 +99,12 @@ const EditProfile = () => {
     const { files = [] } = e.target;
 
     if (profile && files.length) {
-      dispatch(updateUserAvatar(profile.uuid, files[0]));
+      const fileReader = new window.FileReader();
+      fileReader.onload = () => {
+        dispatch(updateUserAvatar(profile.uuid, fileReader.result));
+      };
+
+      fileReader.readAsBinaryString(files[0]);
       e.target.value = '';
     }
   };
