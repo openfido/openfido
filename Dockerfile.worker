@@ -43,4 +43,4 @@ RUN apt install -y docker-ce
 RUN apt-get clean
 
 CMD "celery" "-A" "app.worker" "worker"
-HEALTHCHECK --timeout=2s CMD celery -A app.worker inspect ping | grep $HOSTNAME
+# HEALTHCHECK --timeout=2s CMD celery -A app.worker inspect ping | grep $HOSTNAME
