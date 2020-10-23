@@ -154,19 +154,20 @@ export const StyledH3 = styled.h3`
 `;
 
 export const StyledH4 = styled.h4`
-  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.darkGray))};
+  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.gray))};
   font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  margin: 0;
 `;
 
-export const StyledH5 = styled.div`
-  color: ${colors.gray};
+export const StyledH5 = styled.h5`
+  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.gray))};
   font-size: 14px;
   line-height: 16px;
   font-weight: 500;
-  display: flex;
-  justify-content: space-between;
+  margin: 0;
 `;
 
 export const StyledButton = styled(Button)`
