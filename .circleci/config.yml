@@ -80,12 +80,21 @@ workflows:
       - build-docker-service:
           requires:
             - test
+          filters:
+            branches:
+              only: master
       - build-docker-worker:
           requires:
             - test
+          filters:
+            branches:
+              only: master
       - build-docker-rabbitmq:
           requires:
             - test
+          filters:
+            branches:
+              only: master
       - aws-ecs/deploy-service-update:
           requires:
             - build-docker-service
