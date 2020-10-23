@@ -7,13 +7,13 @@ let DeployBucket
 let Region
 
 if (process.env.NODE_ENV === 'production') {
-    CloudFrontDistributionID = 'E1QGWGOP1SBXD1'
-    DeployBucket = 'www.loadinsight.org'
-    Region = 'us-east-2'
+    CloudFrontDistributionID = 'TBD'
+    DeployBucket = 'TBD'
+    Region = 'TBD'
 } else if (process.env.NODE_ENV === 'staging') {
-    CloudFrontDistributionID = 'E2JL1I76TWQRZL'
-    DeployBucket = 'staging.loadinsight.org'
-    Region = 'us-west-1'
+    CloudFrontDistributionID = 'E3LEDU9R7ILAUB'
+    DeployBucket = 'openfido-dev-website'
+    Region = 'us-east-1'
 } else {
     throw new Error('NODE_ENV not specified')
 }
