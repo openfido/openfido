@@ -10,11 +10,9 @@ variable "aws_tags" { type = map(string) }
 // ECS Variables
 variable "ecs_containers" {
   description = "The containers to create."
-
-  type = list(object({
-    name              = string
-    port              = number
+  type        = map(object({
     img_tag           = string
+    port              = number
     enable_lb         = bool
     health_check_path = string
   }))
@@ -26,8 +24,8 @@ variable "vpc_default_sg" { type = string }
 variable "vpc_public_subnets" { type = list(string) }
 variable "vpc_private_subnets" { type = list(string) }
 variable "db_user" { type = string }
-variable "db_name" { type = string }
 variable "db_password" { type = string }
 variable "db_endpoint" { type = string }
+variable "db_sg_id" { type = string }
 variable "cf_domain" { type = string }
 variable "s3_blob_url" { type = string }

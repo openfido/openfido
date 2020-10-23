@@ -33,9 +33,9 @@ inputs = {
   vpc_public_subnets  = dependency.vpc.outputs.vpc_public_subnets
   vpc_private_subnets = dependency.vpc.outputs.vpc_private_subnets
   db_user             = dependency.rds.outputs.db_instance_username
-  db_name             = dependency.rds.outputs.db_instance_name
   db_password         = dependency.rds.outputs.db_instance_password
   db_endpoint         = dependency.rds.outputs.db_instance_address
+  db_sg_id            = dependency.rds.outputs.db_sg_id
   s3_blob_url         = dependency.front.outputs.s3_blob_url
   cf_domain           = dependency.front.outputs.cf_domain
 }

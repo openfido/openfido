@@ -1,30 +1,26 @@
-ecs_containers = [
-  {
-    name              = "app"
+ecs_containers = {
+  app             = {
     port              = 5000
     img_tag           = "latest"
     enable_lb         = true
     health_check_path = "/healthcheck"
-  },
-  {
-    name              = "auth"
+  }
+  auth            = {
     port              = 5000
     img_tag           = "latest"
     enable_lb         = true
     health_check_path = "/healthcheck"
-  },
-  {
-    name              = "workflow"
+  }
+  workflow        = {
     port              = 5000
     img_tag           = "latest"
     enable_lb         = true
     health_check_path = "/healthcheck"
-  },
-  {
-    name              = "workflow-worker"
-    port              = 5000
+  }
+  workflow-worker = {
+    port              = 5151
     img_tag           = "latest"
     enable_lb         = false
     health_check_path = null
   }
-]
+}

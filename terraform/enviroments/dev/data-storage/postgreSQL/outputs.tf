@@ -22,3 +22,8 @@ output "db_instance_port" {
   description = "The database port"
   value       = module.rds.db_instance_port
 }
+
+output "db_sg_id" {
+  description = "The database security group id"
+  value       = module.rds.db_security_group
+}

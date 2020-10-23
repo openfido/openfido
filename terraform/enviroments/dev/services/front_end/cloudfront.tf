@@ -39,18 +39,20 @@ module "cf" {
     # S3 Website
     default = {
       target_origin_id       = "s3_front"
-      viewer_protocol_policy = "redirect-to-https"
+      viewer_protocol_policy = "allow-all" // "redirect-to-https"
 
       allowed_methods = ["GET", "HEAD", "OPTIONS"]
       cached_methods  = ["GET", "HEAD"]
       compress        = true
       query_string    = true
+
+      cookies_forward = "all"
     }
     # Static S3 content
     s3 = {
       path_pattern           = "/static/*"
       target_origin_id       = "static_s3"
-      viewer_protocol_policy = "redirect-to-https"
+      viewer_protocol_policy = "allow-all" // "redirect-to-https"
 
       allowed_methods = ["GET", "HEAD", "OPTIONS"]
       cached_methods  = ["GET", "HEAD"]
@@ -61,6 +63,14 @@ module "cf" {
 
   viewer_certificate = {
     cloudfront_default_certificate = true
-//    minimum_protocol_version       = "TLSv1.2"
+  }
+
+  custom_error_response = {
+    not_found = {
+      error_caching_min_ttl = 10
+      error_code            = 404
+      response_code         = 200
+      response_page_path    = "/"
+    }
   }
 }

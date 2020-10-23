@@ -16,7 +16,7 @@ locals {
 }
 
 module "rds" {
-  source = "git@github.com:PresencePG/presence-devops-module-rds.git?ref=0.1.0"
+  source = "git@github.com:PresencePG/presence-devops-module-rds.git?ref=0.1.2"
 
   environment       = local.env
   client            = var.stack_name

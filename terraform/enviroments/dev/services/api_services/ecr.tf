@@ -8,9 +8,9 @@ resource "aws_ecr_repository" "rabbitMQ" {
 }
 
 resource "aws_ecr_repository" "ecr" {
-  count = length(var.ecs_containers)
+  count = length(local.list_ecs_name)
 
-  name                 = "${var.stack_name}/${var.environment}-${var.ecs_containers[count.index].name}"
+  name                 = "${var.stack_name}/${var.environment}-${local.list_ecs_name[count.index]}"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
