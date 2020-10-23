@@ -23,6 +23,9 @@ a {
     display: inline-block;
     min-width: 142px;
 }
+.ant-modal-mask {
+    background-color: rgba(196, 196, 196, 0.75);
+}
 form {
     width: 100%;
 }

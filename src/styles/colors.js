@@ -8,6 +8,7 @@ export default {
   overlay20: 'rgba(210, 210, 210, 0.2)',
   darkOverlay: 'rgba(0, 0, 0, 0.1)',
   lightGrey: '#EDEDED',
+  grey: '#E0E0E0',
   lightGray: '#D2D2D2',
   darkGray: '#A9A9A9',
   gray20: '#AAAAAA',

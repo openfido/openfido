@@ -69,7 +69,15 @@ export const StyledTitle = styled.div`
   padding: 1.75rem 1rem 1.25rem 1rem;
   h1 {
     ${StyledTitleText}
-    margin-right: 16px;
+    margin-right: 100px;
+    white-space: pre;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    > button {
+      margin-left: 16px;
+      margin-left: 1rem;
+    } 
   }
   > div {
     position: relative;
@@ -146,19 +154,20 @@ export const StyledH3 = styled.h3`
 `;
 
 export const StyledH4 = styled.h4`
-  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.darkGray))};
+  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.gray))};
   font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: 0.05em;
+  margin: 0;
 `;
 
-export const StyledH5 = styled.div`
-  color: ${colors.gray};
+export const StyledH5 = styled.h5`
+  color: ${(props) => (props.color in colors ? colors[props.color] : (props.color || colors.gray))};
   font-size: 14px;
   line-height: 16px;
   font-weight: 500;
-  display: flex;
-  justify-content: space-between;
+  margin: 0;
 `;
 
 export const StyledButton = styled(Button)`
@@ -214,7 +223,7 @@ export const StyledButton = styled(Button)`
     cursor: default;
   }
   ${({
-    type, color, width, height, hoverbgcolor, size, textColor,
+    type, color, width, height, hoverbgcolor, size, textcolor,
   }) => (`
   ${size === 'middle' ? (`
   &.ant-btn {
@@ -232,7 +241,11 @@ export const StyledButton = styled(Button)`
     padding: 0;
   }
   &:hover, &:focus {
+    color: ${colors.lightBlue};
     background-color: transparent;
+  }
+  &.ant-btn {
+    height: auto;
   }
   `) : (`
   &, &:hover, &:focus {
@@ -269,8 +282,8 @@ export const StyledButton = styled(Button)`
   ${height ? (`
   height: ${height}px;
   `) : ''}
-  ${textColor in colors ? (`
-  color: ${colors[textColor]};
+  ${textcolor in colors ? (`
+  color: ${colors[textcolor]};
   `) : ''}
   `)}
 `;
@@ -463,7 +476,8 @@ export const StyledModal = styled(Modal)`
     padding-bottom: 0;
   }
   .ant-modal-header {
-    padding: 16px 36px;
+    padding: 14px 36px;
+    padding: 0.875rem 2.25rem;
     border-bottom: 1px solid ${colors.lightGray};
   }
   .ant-modal-title {
