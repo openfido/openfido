@@ -55,7 +55,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     from app import models, services
     u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
     u.is_system_admin = True
-    models.db.commit()
+    models.db.session.commit()
 
 To start the server locally:
 
