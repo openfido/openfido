@@ -54,6 +54,9 @@ workflows:
       - build-docker:
           requires:
             - test
+          filters:
+            branches:
+              only: master
       - aws-ecs/deploy-service-update:
           requires:
             - build-docker
