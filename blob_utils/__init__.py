@@ -50,3 +50,15 @@ def create_url(key):
         },
         ExpiresIn=S3_PRESIGNED_TIMEOUT,
     )
+
+def get_file(key):
+    """ Return the binary content of key. """
+
+    s3_client = get_s3()
+    bucket_name = os.environ.get("S3_BUCKET")
+    if bucket_name not in [b["Name"] for b in s3_client.list_buckets()["Buckets"]]:
+        s3_client.create_bucket(ACL="private", Bucket=bucket_name)
+
+    response = s3_client.get_object(Bucket=bucket_name, Key=filename)
+
+    return response["Body"]
