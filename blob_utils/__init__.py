@@ -1,3 +1,4 @@
+import os
 from flask import request, current_app
 import boto3
 from botocore.client import Config
@@ -9,6 +10,7 @@ from .constants import (
     S3_REGION_NAME,
     S3_PRESIGNED_TIMEOUT,
 )
+
 
 def get_s3():
     """ Get access to the Boto s3 service. """
@@ -50,6 +52,7 @@ def create_url(key):
         },
         ExpiresIn=S3_PRESIGNED_TIMEOUT,
     )
+
 
 def get_file(key):
     """ Return the binary content of key. """
