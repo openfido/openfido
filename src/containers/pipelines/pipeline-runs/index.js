@@ -155,7 +155,7 @@ const StatusText = styled.mark`
   text-align: center;
 `;
 
-export const PipelineRuns = ({ pipelineInView }) => {
+const PipelineRuns = ({ pipelineInView }) => {
   const [showStartRunPopup, setStartRunPopup] = useState(false);
   const [selectedRun, setSelectedRun] = useState('run6');
 

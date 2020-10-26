@@ -17,6 +17,7 @@ const localStorageLoadConfig = {
     'user.profile',
     'user.currentOrg',
   ],
+  disableWarnings: true,
 };
 
 const middlewares = [
