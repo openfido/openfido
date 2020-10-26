@@ -9,6 +9,7 @@ const localStorageSaveConfig = {
   states: [
     'user.profile',
     'user.currentOrg',
+    'user.messages',
   ],
 };
 
