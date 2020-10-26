@@ -44,7 +44,7 @@ const Pipelines = () => {
 
   const handleAddPipelineSuccess = () => {
     dispatch(getPipelines(currentOrg))
-      .then(() => setShowAddPipelines(false))
+      .then(() => setShowAddPipelines(false));
   };
 
   const handleAddPipelineCancel = () => {

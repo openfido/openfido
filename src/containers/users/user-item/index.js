@@ -121,7 +121,7 @@ const StyledPhotoContainer = styled.div`
   .anticon-mail {
     width: 32px;
     height: 32px;
-    left: 8px;
+    left: 7.4px;
     top: 10px;
   }
   .anticon-user {
@@ -140,6 +140,7 @@ const UserItem = ({
   const [invitationCanceled, setInvitationCanceled] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const userAvatar = useSelector((state) => state.user.avatar);
   // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
   // const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
   const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
@@ -228,23 +229,20 @@ const UserItem = ({
     </StyledText>
   );
 
-  /* const StyledPhoto = styled.div`
+  const StyledPhoto = styled.div`
     width: 40px;
     height: 40px;
-    background-image: url(); // TODO: StyledPhoto - plug in url avatar
+    background-image: url(${userAvatar});
     background-size: 40px;
     border-radius: 20px;
-  `; */
+  `;
 
   return (
     <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(108px, 1fr)" bgcolor="white">
       <NameColumn>
         <StyledPhotoContainer>
-          {!isInvited ? (
-            <UserFilled /> // <StyledPhoto />
-          ) : (
-            <MailOutlined />
-          )}
+          {!isInvited && (userAvatar ? <StyledPhoto /> : <UserFilled />)}
+          {isInvited && <MailOutlined />}
         </StyledPhotoContainer>
         <StyledText size="large" color="gray">
           {first_name}
