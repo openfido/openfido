@@ -1,7 +1,10 @@
 version: '3'
 services:
   workflow_queue:
-    image: rabbitmq:3
+    build:
+      context: ${WORKFLOW_DIR:-.}
+      dockerfile: Dockerfile.rabbitmq
+    image: openfido/dev-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: rabbit-user
       RABBITMQ_DEFAULT_PASS: rabbit-password
@@ -23,7 +26,7 @@ services:
       - "9000:9000"
   workflow_service:
     build: ${WORKFLOW_DIR:-.}
-    image: slacgismo/openfido-workflow-service
+    image: openfido/dev-workflow
     command: flask run -h 0.0.0.0
     environment:
       PGDATABASE: workflowservice
@@ -49,7 +52,7 @@ services:
     build:
       context: ${WORKFLOW_DIR:-.}
       dockerfile: Dockerfile.worker
-    image: presencepg/presence-workflow-worker
+    image: openfido/dev-workflow-worker
     command: celery -A app.worker worker -l DEBUG
     environment:
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue

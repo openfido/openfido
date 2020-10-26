@@ -62,4 +62,8 @@ def create_app(config=None):
     app.register_blueprint(workflow_pipeline_bp, url_prefix="/v1/workflows")
     app.register_blueprint(workflow_run_bp, url_prefix="/v1/workflows")
 
+    @app.route("/healthcheck")
+    def healthcheck():
+        return "OK"
+
     return (app, db, celery, migrate)

@@ -104,7 +104,6 @@ def create():
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
-@verify_content_type_and_params([], [])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get(pipeline_uuid):
     """Get a pipeline.
@@ -190,7 +189,6 @@ def remove(pipeline_uuid):
 
 
 @pipeline_bp.route("", methods=["GET"])
-@verify_content_type_and_params([], [])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def list_pipelines():
     """List all pipelines.
