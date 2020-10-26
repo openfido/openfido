@@ -1,11 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Dropdown, Menu } from 'antd';
 
-import { logoutUser } from 'actions/user';
+import { ROUTE_LOGOUT } from 'config/routes';
 import {
   StyledLayout,
   StyledSider,
@@ -66,16 +65,10 @@ const AppDropdownMenuItem = styled(Menu.Item)`
 `;
 
 const App = ({ children }) => {
-  const dispatch = useDispatch();
-
-  const onSignOutClicked = () => {
-    dispatch(logoutUser());
-  };
-
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
-        <Link to="/login" onClick={onSignOutClicked}>Log Out</Link>
+        <Link to={ROUTE_LOGOUT}>Log Out</Link>
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );

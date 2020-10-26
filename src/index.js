@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 
 import Login from 'containers/login';
+import Logout from 'containers/login/logout';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
 import Users from 'containers/users';
@@ -22,6 +23,7 @@ import { refreshUserToken } from 'actions/user';
 import store from 'config/store';
 import {
   ROUTE_LOGIN,
+  ROUTE_LOGOUT,
   ROUTE_RESET_PASSWORD,
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
@@ -67,6 +69,10 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_LOGIN}>
         {hasProfileRedirectToPipelines}
         <Login />
+      </Route>
+      <Route exact path={ROUTE_LOGOUT}>
+        {noProfileRedirectToLogin}
+        {hasProfile && <Logout />}
       </Route>
       <Route exact path={ROUTE_RESET_PASSWORD}>
         <ResetPasswordRequest />
