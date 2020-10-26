@@ -1,13 +1,107 @@
 version: '3'
 services:
+  blob_storage:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: minio123
+    volumes:
+      - ./uploads:/data:delegated
+    ports:
+      - "10000:9000"
+  workflow_queue:
+    build:
+      context: ../openfido-workflow-service/
+      dockerfile: Dockerfile.rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit-user
+      RABBITMQ_DEFAULT_PASS: rabbit-password
+      RABBITMQ_DEFAULT_VHOST: api-queue
+  workflow_db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: workflowservice
+      POSTGRES_PASSWORD: dev-password
+  workflow_service:
+    build: ../openfido-workflow-service/
+    environment:
+      PGDATABASE: workflowservice
+      PGUSER: postgres
+      PGHOST: workflow_db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blob_storage:9000
+    volumes:
+      - ../openfido-workflow-service:/opt/app:delegated
+    ports:
+      - "6001:5000"
+    depends_on:
+      - workflow_db
+      - workflow_queue
+      - blob_storage
+  workflow_worker:
+    build:
+      context: ../openfido-workflow-service
+      dockerfile: Dockerfile.worker
+    command: celery -A app.worker worker -l DEBUG
+    environment:
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      WORKER_API_SERVER: http://workflow_service:5001
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blob_storage:9000
+    env_file:
+      - .worker-env
+    volumes:
+      - ../openfido-workflow-service:/opt/app:delegated
+      - /var/run/docker.sock:/var/run/docker.sock
+      # The 'docker in docker' nature of this local configuration means that
+      # bind mounts happen on the 'host docker' not the first docker container.
+      # Make temp directories on the main host (otherwise files cannot be
+      # found).
+      - /tmp:/tmp
+    depends_on:
+      - workflow_queue
+      - workflow_service
+      - blob_storage
+  auth_db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: accountservices
+      POSTGRES_PASSWORD: dev-password
+  auth_service:
+    build: ../openfido-auth-service
+    command: flask run -h 0.0.0.0
+    env_file:
+      - ../openfido-auth-service/.env
+    environment:
+      PGDATABASE: accountservices
+      PGUSER: postgres
+      PGHOST: auth_db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
+    volumes:
+      - ../openfido-auth-service:/opt/app:delegated
+    ports:
+      - "6002:5000"
+    depends_on:
+      - auth_db
+      - blob_storage
   app_db:
     image: postgres:11
     environment:
       POSTGRES_DB: appservice
       POSTGRES_PASSWORD: dev-password
   app_service:
-    build: ${APP_DIR:-.}
-    command: flask run -h 0.0.0.0
+    build: .
     environment:
       PGDATABASE: appservice
       PGUSER: postgres
@@ -18,15 +112,15 @@ services:
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app_db/appservice
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
-      S3_ENDPOINT_URL: http://workflow_storage:9000
+      S3_ENDPOINT_URL: http://blob_storage:9000
       AUTH_HOSTNAME: http://auth_service:5000
       WORKFLOW_HOSTNAME: http://workflow_service:5000
     volumes:
-      - ${APP_DIR:-.}:/opt/app:delegated
+      - .:/opt/app:delegated
     ports:
-      - "${APP_PORT:-5000}:5000"
+      - "6000:5000"
     depends_on:
       - app_db
-      - workflow_storage
       - auth_service
+      - blob_storage
       - workflow_service
