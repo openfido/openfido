@@ -123,7 +123,15 @@ def fetch_pipelines(organization_uuid):
         json_value = response.json()
         response.raise_for_status()
 
-        # TODO these uuids should be OrganizationPipeline uuids.
+        for pipeline in json_value:
+            matching_pipelines = [
+                op.uuid
+                for op in organization_pipelines
+                if op.pipeline_uuid == pipeline["uuid"]
+            ]
+            if len(matching_pipelines) != 1:
+                raise ValueError("Unexpected response from workflow service")
+            pipeline["uuid"] = matching_pipelines[0]
         return json_value
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error

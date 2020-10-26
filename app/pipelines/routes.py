@@ -154,7 +154,7 @@ def update(organization_uuid, organization_pipeline_uuid):
     "/<organization_uuid>/pipelines/<organization_pipeline_uuid>", methods=["DELETE"]
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def remove(organization_uuid, organization_pipeline_uuid):
     """Delete a Organization Pipeline.
     ---
@@ -183,7 +183,7 @@ def remove(organization_uuid, organization_pipeline_uuid):
 
 @organization_pipeline_bp.route("/<organization_uuid>/pipelines", methods=["GET"])
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def pipelines(organization_uuid):
     """List all Organization Pipelines.
     ---

@@ -7,7 +7,8 @@ Summary: A service for the [openfido-client](https://github.com/slacgismo/openfi
 # Architecture Decision Records
 
 * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
-* [2. project structure](docs/adr/0002-project-structure.md)
+* [2. Project Structure](docs/adr/0002-project-structure.md)
+* [3. Deployment](docs/adr/0003-deployment.md)
 
 ## Development
 
@@ -19,6 +20,8 @@ This service acts as a frontend to both the [openfido-workflow-service](https://
 A convenient way to do this is by setting environmental variables telling
 docker-compose which files to use, and where each project is:
 
+    export DOCKER_BUILDKIT=1
+    export COMPOSE_DOCKER_CLI_BUILD=1
     export AUTH_PORT=5002
     export AUTH_DIR=../openfido-auth-service
     export WORKFLOW_PORT=5001
@@ -32,6 +35,8 @@ docker-compose which files to use, and where each project is:
     # Because these repositories make use of private github repositories, they
     # need access to an SSH key that you have configured for github access:
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
+    # TODO at some point docker-compose will support the "--ssh default" docker
+    # parameter - until then we need to pass the key manually :(
 
     # Initialize all the databases for all the services:
     docker-compose run --rm auth_service flask db upgrade

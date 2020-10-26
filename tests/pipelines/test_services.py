@@ -69,30 +69,58 @@ def test_create_pipeline(app):
 
 
 @patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines(post_mock, app):
-    post_mock().json.return_value = ["somedata"]
+def test_fetch_pipelines_bad_workflow_response(post_mock, app, organization_pipeline):
+    pipeline_list = [
+        {
+            "uuid": "nonexistant-organization-organization_pipeline-uuid",
+            "name": "name 1",
+        }
+    ]
+    post_mock().json.return_value = pipeline_list
 
-    assert fetch_pipelines(ORGANIZATION_UUID) == ["somedata"]
+    expected_result = [{"uuid": organization_pipeline.uuid, "name": "name 1"}]
+
+    # we got back bogus workflow service data, but we did make the API call:
+    with pytest.raises(HTTPError):
+        fetch_pipelines(ORGANIZATION_UUID)
+
     post_mock.assert_called()
     get_call = post_mock.call_args
     assert get_call[0][0].startswith(app.config[WORKFLOW_HOSTNAME])
     assert get_call[1]["headers"][ROLES_KEY] == app.config[WORKFLOW_API_TOKEN]
-    assert get_call[1]["json"] == {"uuids": []}
+    assert get_call[1]["json"] == {"uuids": [organization_pipeline.pipeline_uuid]}
+
+    post_mock().raise_for_status.assert_called()
+    post_mock().json.assert_called()
+
+
+@patch("app.pipelines.services.requests.post")
+def test_fetch_pipelines(post_mock, app, organization_pipeline):
+    pipeline_list = [{"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"}]
+    post_mock().json.return_value = pipeline_list
+
+    expected_result = [{"uuid": organization_pipeline.uuid, "name": "name 1"}]
+    assert fetch_pipelines(ORGANIZATION_UUID) == expected_result
+    post_mock.assert_called()
+    get_call = post_mock.call_args
+    assert get_call[0][0].startswith(app.config[WORKFLOW_HOSTNAME])
+    assert get_call[1]["headers"][ROLES_KEY] == app.config[WORKFLOW_API_TOKEN]
+    assert get_call[1]["json"] == {"uuids": [organization_pipeline.pipeline_uuid]}
 
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
 
 
 @responses.activate
-def test_update_pipeline_bad_response(app, pipeline):
+def test_update_pipeline_bad_response(app, organization_pipeline):
     responses.add(
         responses.PUT,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
         json=PIPELINE_JSON,
         status=500,
     )
     with pytest.raises(ValueError):
-        update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
+        update_pipeline(ORGANIZATION_UUID, organization_pipeline.uuid, PIPELINE_JSON)
 
 
 def test_update_pipeline_no_pipeline(app):
@@ -101,18 +129,18 @@ def test_update_pipeline_no_pipeline(app):
 
 
 @responses.activate
-def test_update_pipeline_bad_json(app, pipeline):
+def test_update_pipeline_bad_json(app, organization_pipeline):
     responses.add(
         responses.PUT,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
         body="notjson",
     )
     with pytest.raises(HTTPError):
-        update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
+        update_pipeline(ORGANIZATION_UUID, organization_pipeline.uuid, PIPELINE_JSON)
 
 
 @responses.activate
-def test_update_pipeline(app, pipeline):
+def test_update_pipeline(app, organization_pipeline):
     json_response = dict(PIPELINE_JSON)
     json_response.update(
         {
@@ -123,30 +151,34 @@ def test_update_pipeline(app, pipeline):
     )
     responses.add(
         responses.PUT,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
         json=json_response,
     )
-    updated_pipeline = update_pipeline(ORGANIZATION_UUID, pipeline.uuid, PIPELINE_JSON)
-    pipeline = OrganizationPipeline.query.order_by(
+    updated_pipeline = update_pipeline(
+        ORGANIZATION_UUID, organization_pipeline.uuid, PIPELINE_JSON
+    )
+    organization_pipeline = OrganizationPipeline.query.order_by(
         OrganizationPipeline.id.desc()
     ).first()
-    json_response["uuid"] = pipeline.uuid
+    json_response["uuid"] = organization_pipeline.uuid
     assert updated_pipeline == json_response
 
 
 @responses.activate
-def test_delete_pipeline_no_pipeline(app, pipeline):
+def test_delete_pipeline_no_pipeline(app, organization_pipeline):
     with pytest.raises(ValueError):
         delete_pipeline(ORGANIZATION_UUID, "badid")
-    pipeline = set(OrganizationPipeline.query.all()) == set([pipeline])
+    organization_pipeline = set(OrganizationPipeline.query.all()) == set(
+        [organization_pipeline]
+    )
 
 
 @responses.activate
-def test_delete_pipeline(app, pipeline):
+def test_delete_pipeline(app, organization_pipeline):
     responses.add(
         responses.DELETE,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
     )
-    delete_pipeline(ORGANIZATION_UUID, pipeline.uuid)
+    delete_pipeline(ORGANIZATION_UUID, organization_pipeline.uuid)
 
-    assert pipeline.is_deleted
+    assert organization_pipeline.is_deleted

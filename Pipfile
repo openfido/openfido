@@ -26,6 +26,7 @@ boto3 = "*"
 requests = "*"
 openfido-utils = {editable = true, git = "git@github.com:slacgismo/openfido-utils.git", ref = "master"}
 pyjwt = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.8"
