@@ -90,13 +90,13 @@ const CreateNewAccountInvitation = () => {
             <br />
             Please create an account
           </StyledH2>
-          <Space direction="vertical" size={20}>
+          <Space direction="vertical" size={-4}>
             <div>
               <StyledInput size="small" type="email" name="email" id="email" placeholder="email" onChange={onEmailChanged} />
               <FormMessage>
                 <div />
                 <StyledText color="pink">
-                  {createUserError && password.length < 10 && 'Invalid email'}
+                  {createUserError && 'Invalid email'}
                 </StyledText>
               </FormMessage>
               <StyledInput size="small" type="text" name="first_name" id="first_name" placeholder="first name" onChange={onFirstNameChanged} />
@@ -138,7 +138,7 @@ const CreateNewAccountInvitation = () => {
                   Account
                 </div>
               </StyledButton>
-              <Space direction="vertical" size={8} align="center">
+              <Space direction="vertical" size={4} align="center">
                 <FormMessage>
                   <StyledText size="small" color="pink" align="left">
                     {createUserError && !passwordMismatch && 'Please be sure to use the email address invitation was sent to'}

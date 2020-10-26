@@ -25,8 +25,8 @@ const ResetPassword = () => {
   const history = useHistory();
   const { reset_token: resetToken } = useParams();
 
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [passwordMismatch, setPasswordMismatch] = useState(false);
@@ -99,17 +99,14 @@ const ResetPassword = () => {
             </StyledText>
             <StyledInput type="password" name="confirmPassword" id="confirmPassword" placeholder="password" onChange={onConfirmPasswordChanged} />
           </label>
-          <FormMessage float="left">
+          <FormMessage size="large">
             <StyledText size="middle" color="pink">
               {passwordMismatch && 'Passwords do not match.'}
             </StyledText>
-          </FormMessage>
-          <FormMessage float="right">
-            <StyledText size="small" color={error && !passwordMismatch && password.length < 10 ? 'pink' : 'gray'} float="right">
+            <StyledText size="small" color={error && !passwordMismatch && password.length < 10 ? 'pink' : 'gray'}>
               Minimum 10 characters
             </StyledText>
           </FormMessage>
-          <FormMessage size="middle" />
           <StyledButton
             htmlType="submit"
             size="middle"

@@ -7,13 +7,15 @@ import reducers from 'reducers';
 
 const localStorageSaveConfig = {
   states: [
-    'user',
+    'user.profile',
+    'user.currentOrg',
   ],
 };
 
 const localStorageLoadConfig = {
   states: [
-    'user',
+    'user.profile',
+    'user.currentOrg',
   ],
 };
 
