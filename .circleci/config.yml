@@ -1,6 +1,9 @@
-version: 2
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.12.2
+  aws-ecs: circleci/aws-ecs@1.3.0
 jobs:
-  build:
+  test:
     docker:
       - image: python:3.8
     environment:
@@ -25,10 +28,42 @@ jobs:
       - run:
           command: |
             mkdir test-results
-            pipenv run invoke test --junit
+            pipenv run invoke test --junit --enforce-percent 92
       - store_test_results:
           path: test-results
       - run:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
+  build-docker:
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      DOCKER_BUILDKIT: "1"
+    steps:
+      - setup_remote_docker:
+          version: 18.09.3
+      - aws-ecr/build-and-push-image:
+          tag: "$CIRCLE_BRANCH"
+          repo: openfido/dev-auth
+          extra-build-args: "--ssh default"
+workflows:
+  test_build_and_push:
+    jobs:
+      - test
+      - build-docker:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+      - aws-ecs/deploy-service-update:
+          requires:
+            - build-docker
+          filters:
+            branches:
+              only: master
+          family: 'openfido-dev-auth-task'
+          cluster-name: 'openfido-dev-ecs-cluster'
+          service-name: 'openfido-dev-auth-service'
+          container-image-name-updates: 'container=openfido-dev-auth-task,tag=master'

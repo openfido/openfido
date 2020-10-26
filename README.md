@@ -34,6 +34,7 @@ implementation:
 
 * [1. Record architecture decisions](docs/adr/0001-record-architecture-decisions.md)
 * [2. Authentication](docs/adr/0002-authentication.md)
+* [3. Deployment](docs/adr/0003-deployment.md)
 
 # Development
 
@@ -54,7 +55,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     from app import models, services
     u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
     u.is_system_admin = True
-    models.db.commit()
+    models.db.session.commit()
 
 To start the server locally:
 

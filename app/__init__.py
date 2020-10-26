@@ -33,4 +33,8 @@ def create_app(config=None):
     app.register_blueprint(auth_bp, url_prefix="/users")
     app.register_blueprint(org_bp, url_prefix="/organizations")
 
+    @app.route("/healthcheck")
+    def healthcheck():
+        return "OK"
+
     return (app, db, migrate)
