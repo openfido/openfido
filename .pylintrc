@@ -4,4 +4,4 @@ load-plugins=pylint_flask_sqlalchemy
 
 [MESSAGES CONTROL]
 
-disable=C0114
+disable=C0114,singleton-comparison,too-few-public-methods
