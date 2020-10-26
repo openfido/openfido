@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
 
+import { ROLE_ADMINISTRATOR } from 'config/roles';
 import { StyledTitle, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 import EditProfile from './edit-profile';
@@ -18,7 +19,7 @@ const Root = styled.div`
 const StyledMenu = styled(Menu)`
   background-color: transparent;
   border-right: 0;
-  &.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  &.ant-menu-vertical .ant-menu-item-selected {
     border-color: ${colors.blue};
     background-color: transparent;
     font-weight: bold;
@@ -46,7 +47,9 @@ const StyledMenu = styled(Menu)`
 `;
 
 const Settings = () => {
+  const organizations = useSelector((state) => state.user.organizations);
   const profile = useSelector((state) => state.user.profile);
+
   const [selectedKey, setSelectedKey] = useState('Edit Profile');
 
   let content = null;
@@ -64,6 +67,8 @@ const Settings = () => {
       break;
   }
 
+  const isAnOrganizationAdmin = organizations && organizations.find((org) => org.role.code === ROLE_ADMINISTRATOR.code);
+
   return (
     <>
       <StyledTitle>
@@ -77,7 +82,7 @@ const Settings = () => {
           <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
-          {profile && profile.is_system_admin && (
+          {profile && (profile.is_system_admin || isAnOrganizationAdmin) && (
           <Menu.Item key="Edit Organization" onClick={() => setSelectedKey('Edit Organization')}>
             <StyledText size="xlarge">Edit Organization</StyledText>
           </Menu.Item>

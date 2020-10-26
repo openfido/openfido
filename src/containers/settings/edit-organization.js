@@ -190,42 +190,44 @@ const EditOrganization = () => {
   return (
     <>
       <StyledForm onSubmit={onSaveClicked} autoComplete="off" onClick={(e) => e.stopPropagation()}>
-        <StyledButton
-          color="gray80"
-          hoverbgcolor="lightBlue"
-          onClick={onAddOrganizationClicked}
-          width={136}
-        >
-          + Add Organization
-        </StyledButton>
-        {addOrganization && (
-        <label htmlFor="organization_name">
-          <StyledText display="block" color="darkText">Create Organization</StyledText>
-          <StyledInput
-            ref={createOrganizationInput}
-            type="text"
-            bgcolor="white"
-            size="large"
-            name="organization_name"
-            id="organization_name"
-            value={addOrganizationName}
-            onChange={(e) => setAddOrganizationName(e.target.value)}
-          />
-          <FormMessage>
-            <StyledText color="pink">
-              {error === 'add' && 'Could add organization.'}
-            </StyledText>
-            <StyledButton
-              htmlType="submit"
-              color="lightBlue"
-              hoverbgcolor="blue"
-              width={50}
-              onClick={onSaveClicked}
-            >
-              <span>Save</span>
-            </StyledButton>
-          </FormMessage>
-        </label>
+        {profile.is_system_admin && (
+          <StyledButton
+            color="gray80"
+            hoverbgcolor="lightBlue"
+            onClick={onAddOrganizationClicked}
+            width={136}
+          >
+            + Add Organization
+          </StyledButton>
+        )}
+        {profile.is_system_admin && addOrganization && (
+          <label htmlFor="organization_name">
+            <StyledText display="block" color="darkText">Create Organization</StyledText>
+            <StyledInput
+              ref={createOrganizationInput}
+              type="text"
+              bgcolor="white"
+              size="large"
+              name="organization_name"
+              id="organization_name"
+              value={addOrganizationName}
+              onChange={(e) => setAddOrganizationName(e.target.value)}
+            />
+            <FormMessage>
+              <StyledText color="pink">
+                {error === 'add' && 'Could add organization.'}
+              </StyledText>
+              <StyledButton
+                htmlType="submit"
+                color="lightBlue"
+                hoverbgcolor="blue"
+                width={50}
+                onClick={onSaveClicked}
+              >
+                <span>Save</span>
+              </StyledButton>
+            </FormMessage>
+          </label>
         )}
         {organizations && organizations.map((org) => (
           <label
