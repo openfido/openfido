@@ -10,9 +10,9 @@ const BASE_API_URL_APP_DEVELOPMENT = 'http://localhost:5000/v1';
 const BASE_API_URL_APP_STAGING = 'http://openfido-dev-app-alb-1500931865.us-east-1.elb.amazonaws.com/v1';
 const BASE_API_URL_APP_PRODUCTION = 'http://localhost:5000/v1';
 
-const API_TOKEN_DEVELOPMENT = process.env.API_TOKEN || '846f2acb2f594f15a5e6dcdf69f85aa7';
-const API_TOKEN_STAGING = process.env.API_TOKEN || '846f2acb2f594f15a5e6dcdf69f85aa7';
-const API_TOKEN_PRODUCTION = process.env.API_TOKEN || '846f2acb2f594f15a5e6dcdf69f85aa7';
+const API_TOKEN_DEVELOPMENT = process.env.API_TOKEN || '0e60a9e9fa794e6eb6849a4e73a21fa6';
+const API_TOKEN_STAGING = process.env.API_TOKEN || '0e60a9e9fa794e6eb6849a4e73a21fa6';
+const API_TOKEN_PRODUCTION = process.env.API_TOKEN || '0e60a9e9fa794e6eb6849a4e73a21fa6';
 
 const parseEnvironment = () => {
   if (window.location.hostname.includes('localhost')) return ENVIRONMENT_DEVELOPMENT;
@@ -40,10 +40,10 @@ if (isDevelopment()) apiToken = API_TOKEN_DEVELOPMENT;
 else if (isStaging()) apiToken = API_TOKEN_STAGING;
 else if (isProduction()) apiToken = API_TOKEN_PRODUCTION;
 
-console.log("*****")
-console.log(baseApiUrlApp)
-console.log(baseApiUrlAuth)
-console.log("*****")
+console.log('*****');
+console.log(baseApiUrlApp);
+console.log(baseApiUrlAuth);
+console.log('*****');
 
 export default {
   api: {
