@@ -1,4 +1,3 @@
-import os
 from flask import request, current_app
 import boto3
 from botocore.client import Config
@@ -58,10 +57,10 @@ def get_file(key):
     """ Return the binary content of key. """
 
     s3_client = get_s3()
-    bucket_name = os.environ.get("S3_BUCKET")
-    if bucket_name not in [b["Name"] for b in s3_client.list_buckets()["Buckets"]]:
-        s3_client.create_bucket(ACL="private", Bucket=bucket_name)
+    bucket = current_app.config[S3_BUCKET]
+    if bucket not in [b["Name"] for b in s3_client.list_buckets()["Buckets"]]:
+        s3_client.create_bucket(ACL="private", Bucket=bucket)
 
-    response = s3_client.get_object(Bucket=bucket_name, Key=filename)
+    response = s3_client.get_object(Bucket=bucket, Key=filename)
 
     return response["Body"]
