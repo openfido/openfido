@@ -110,8 +110,10 @@ def test_delete_organization_invalid_organization_uuid(client, admin_auth_token)
     assert response.status_code == 400
 
 
-@patch('app.org.services.delete_organization')
-def test_delete_organization_bad_error(delete_org_mock, client, admin_auth_token, organization):
+@patch("app.org.services.delete_organization")
+def test_delete_organization_bad_error(
+    delete_org_mock, client, admin_auth_token, organization
+):
     delete_org_mock.side_effect = BadRequestError("err")
     response = client.delete(
         "/organizations/" + organization.uuid,
@@ -255,9 +257,13 @@ def test_update_organization_logo_401(
     assert response.status_code == 401
 
 
-@patch('app.org.services.update_organization_logo')
+@patch("app.org.services.update_organization_logo")
 def test_update_organization_logo_failure(
-    update_org_logo_mock, client, organization, user_auth_token, organization_admin_auth_token
+    update_org_logo_mock,
+    client,
+    organization,
+    user_auth_token,
+    organization_admin_auth_token,
 ):
     update_org_logo_mock.side_effect = BadRequestError("err")
     response = client.put(
@@ -272,9 +278,13 @@ def test_update_organization_logo_failure(
     assert response.status_code == 400
 
 
-@patch('app.org.services.update_organization_logo')
+@patch("app.org.services.update_organization_logo")
 def test_update_organization_logo(
-    update_org_logo_mock, client, organization, user_auth_token, organization_admin_auth_token
+    update_org_logo_mock,
+    client,
+    organization,
+    user_auth_token,
+    organization_admin_auth_token,
 ):
     response = client.put(
         f"/organizations/{organization.uuid}/logo",
@@ -303,8 +313,10 @@ def test_get_organization_logo_401(client, organization, user_auth_token):
     assert response.status_code == 401
 
 
-@patch('app.org.services.get_organization_logo')
-def test_get_organization_logo_bad_error(get_org_logo_mock, client, organization, admin_auth_token):
+@patch("app.org.services.get_organization_logo")
+def test_get_organization_logo_bad_error(
+    get_org_logo_mock, client, organization, admin_auth_token
+):
     get_org_logo_mock.side_effect = BadRequestError("err")
     response = client.get(
         "/organizations/" + organization.uuid + "/logo",
@@ -316,8 +328,10 @@ def test_get_organization_logo_bad_error(get_org_logo_mock, client, organization
     assert response.status_code == 400
 
 
-@patch('app.org.services.get_organization_logo')
-def test_get_organization_logo_bad_error(get_org_logo_mock, client, organization, admin_auth_token):
+@patch("app.org.services.get_organization_logo")
+def test_get_organization_logo_bad_error(
+    get_org_logo_mock, client, organization, admin_auth_token
+):
     get_org_logo_mock.return_value = io.StringIO("some data")
     response = client.get(
         "/organizations/" + organization.uuid + "/logo",

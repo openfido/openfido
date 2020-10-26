@@ -22,7 +22,7 @@ def test_enums(app, organization, user):
     org_role = OrganizationRole(name="name", code=5)
     db.session.add(org_role)
     db.session.commit()
-    assert org_role.role_enum() == ("name", '5')
+    assert org_role.role_enum() == ("name", "5")
 
     organization_member = OrganizationMember(
         organization=organization,
@@ -31,4 +31,4 @@ def test_enums(app, organization, user):
     )
     db.session.add(organization_member)
     db.session.commit()
-    assert organization_member.role_enum() == ("name", '5')
+    assert organization_member.role_enum() == ("name", "5")

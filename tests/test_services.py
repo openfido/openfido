@@ -201,6 +201,7 @@ def test_update_organization_non_org(app, organization):
     with pytest.raises(BadRequestError):
         services.update_organization(None, NEW_ORG_NAME)
 
+
 def test_update_organization(app, organization):
     organization = services.update_organization(organization, NEW_ORG_NAME)
     assert organization.name == NEW_ORG_NAME
@@ -209,15 +210,21 @@ def test_update_organization(app, organization):
 def test_update_organization_member_role_errors(app, organization, user):
     # no org
     with pytest.raises(BadRequestError):
-        services.update_organization_member_role(None, user, find_organization_role(ROLE_USER_CODE))
+        services.update_organization_member_role(
+            None, user, find_organization_role(ROLE_USER_CODE)
+        )
 
     # no user
     with pytest.raises(BadRequestError):
-        services.update_organization_member_role(organization, None, find_organization_role(ROLE_USER_CODE))
+        services.update_organization_member_role(
+            organization, None, find_organization_role(ROLE_USER_CODE)
+        )
 
     # not a member
     with pytest.raises(BadRequestError):
-        services.update_organization_member_role(organization, user, find_organization_role(ROLE_USER_CODE))
+        services.update_organization_member_role(
+            organization, user, find_organization_role(ROLE_USER_CODE)
+        )
 
 
 def test_remove_organization_member_missing_data(app, organization, user):
@@ -494,7 +501,7 @@ def test_get_user_avatar_bad_user(app):
 
 @patch("app.services.get_file")
 def test_get_user_avatar_no_file(get_file_mock, app, user):
-    get_file_mock.side_effect = ClientError({},[])
+    get_file_mock.side_effect = ClientError({}, [])
     assert "default-user" in services.get_user_avatar(user)
 
 
@@ -510,5 +517,5 @@ def test_get_organization_logo_bad_user(app):
 
 @patch("app.services.get_file")
 def test_get_organization_logo_no_file(get_file_mock, app, organization):
-    get_file_mock.side_effect = ClientError({},[])
+    get_file_mock.side_effect = ClientError({}, [])
     assert "default-organization" in services.get_organization_logo(organization)
