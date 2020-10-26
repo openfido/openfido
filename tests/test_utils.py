@@ -90,9 +90,3 @@ def test_time_conversion(app):
     assert datetime.utcnow().replace(tzinfo=timezone.utc) == utils.to_datetime(
         unix_time
     )
-
-
-@patch("app.utils.boto3.client")
-def test_get_s3(client_mock, app):
-    assert utils.get_s3() is not None
-    client_mock.assert_called()

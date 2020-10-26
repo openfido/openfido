@@ -29,13 +29,6 @@ def find_user_by_uuid(user_uuid):
     return User.query.filter(User.uuid == user_uuid).one_or_none()
 
 
-def find_organization_by_name(organization_name):
-    """ Find an organization by their name, or return None """
-    return Organization.query.filter(
-        Organization.name == organization_name, Organization.is_deleted == False
-    ).one_or_none()
-
-
 def find_organization_by_uuid(organization_uuid):
     """ Find an organization by their uuid, or return None """
     return Organization.query.filter(

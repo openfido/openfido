@@ -1,4 +1,4 @@
-from app.models import db, User
+from app.models import db, User, OrganizationRole, OrganizationMember
 from freezegun import freeze_time
 import datetime
 
@@ -16,3 +16,19 @@ def test_create_user(app, user):
 
     # The representation is from the user details
     assert str(user) == f"<User {user.id}: {user.email}>"
+
+
+def test_enums(app, organization, user):
+    org_role = OrganizationRole(name="name", code=5)
+    db.session.add(org_role)
+    db.session.commit()
+    assert org_role.role_enum() == ("name", '5')
+
+    organization_member = OrganizationMember(
+        organization=organization,
+        organization_role=org_role,
+        user=user,
+    )
+    db.session.add(organization_member)
+    db.session.commit()
+    assert organization_member.role_enum() == ("name", '5')
