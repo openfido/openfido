@@ -4,12 +4,12 @@ import { load, save } from 'redux-localstorage-simple';
 import { logger } from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import reducers from 'reducers';
+import { DEFAULT_STATE as userDefaultState } from 'reducers/user';
 
 const localStorageSaveConfig = {
   states: [
     'user.profile',
     'user.currentOrg',
-    'user.messages',
   ],
 };
 
@@ -18,6 +18,9 @@ const localStorageLoadConfig = {
     'user.profile',
     'user.currentOrg',
   ],
+  preloadedState: {
+    user: userDefaultState,
+  },
   disableWarnings: true,
 };
 
