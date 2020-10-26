@@ -8,8 +8,19 @@ from .auth import auth_bp
 from .org import org_bp
 from .models import db
 
+from blob_utils import constants
+
 # Allow a specific set of environmental variables to be configurable:
-CONFIG_VARS = ("SECRET_KEY", "SQLALCHEMY_DATABASE_URI")
+CONFIG_VARS = (
+    "SECRET_KEY",
+    "SQLALCHEMY_DATABASE_URI",
+    constants.S3_ACCESS_KEY_ID,
+    constants.S3_SECRET_ACCESS_KEY,
+    constants.S3_ENDPOINT_URL,
+    constants.S3_REGION_NAME,
+    constants.S3_BUCKET,
+    constants.S3_PRESIGNED_TIMEOUT,
+)
 
 
 def create_app(config=None):
