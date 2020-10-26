@@ -6,6 +6,7 @@ import {
   Switch,
   Route,
   Redirect,
+  useLocation,
 } from 'react-router-dom';
 
 import Login from 'containers/login';
@@ -35,6 +36,8 @@ import 'antd/dist/antd.compact.min.css';
 import 'index.css';
 
 const AppSwitch = () => {
+  const location = useLocation();
+
   const profile = useSelector((state) => state.user.profile);
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -60,7 +63,7 @@ const AppSwitch = () => {
   const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
 
   return (
-    <Switch>
+    <Switch key={location.key}>
       <Route exact path={ROUTE_LOGIN}>
         {hasProfileRedirectToPipelines}
         <Login />

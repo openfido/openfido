@@ -89,9 +89,11 @@ const Pipelines = () => {
             ) : (
               <>
                 Pipelines
-                <StyledButton size="small" onClick={openAddPipelines}>
-                  + Add Pipeline
-                </StyledButton>
+                {(showGetStartedPopup || (!showAddPipelines && !pipelineInEdit)) && (
+                  <StyledButton size="small" onClick={openAddPipelines}>
+                    + Add Pipeline
+                  </StyledButton>
+                )}
               </>
             )}
           </h1>
