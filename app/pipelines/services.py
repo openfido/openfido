@@ -145,6 +145,8 @@ def fetch_pipelines(organization_uuid):
 
 def create_pipeline_input_file(organization_pipeline, filename, stream):
     """ Create a OrganizationPipelineInputFile from a stream. """
+    if len(filename) < 2:
+        raise ValueError("filename too short")
     if len(filename) > OrganizationPipelineInputFile.name.type.length:
         raise ValueError("filename too long")
 

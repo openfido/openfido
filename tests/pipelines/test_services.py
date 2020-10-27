@@ -198,6 +198,8 @@ def test_create_pipeline_input_file_validate(
     data = io.StringIO("some data")
     with pytest.raises(ValueError):
         create_pipeline_input_file(organization_pipeline, "saname.txt" * 26, data)
+    with pytest.raises(ValueError):
+        create_pipeline_input_file(organization_pipeline, "1", data)
     assert not upload_stream_mock.called
 
 
