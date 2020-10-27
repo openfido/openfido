@@ -79,6 +79,6 @@ def get_file(key, s3_client=None):
 
     return (
         s3_client
-        .get_object(Bucket=current_app.config[S3_BUCKET], Key=filename)
+        .get_object(Bucket=current_app.config[S3_BUCKET], Key=key)
         .get("Body")
     )

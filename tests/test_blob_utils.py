@@ -43,7 +43,6 @@ def test_verify_bucket(client_mock, s3_client, app):
     mock_create_response = {
         "Location": "quix",
     }
-    mock_upload = {}
 
     with Stubber(s3_client) as stubber:
         stubber.add_response('list_buckets', mock_response, {})
