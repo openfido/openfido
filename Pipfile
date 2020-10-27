@@ -17,6 +17,11 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 boto3 = "*"
 simplejson = "*"
+pytest-mock = "*"
+pylint = "*"
+pylint-flask-sqlalchemy = "*"
+invoke = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"

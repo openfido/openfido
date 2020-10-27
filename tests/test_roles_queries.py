@@ -7,6 +7,8 @@ class ExampleEnum(IntEnum):
 
 
 def test_get_system_permission(app):
+    """Tests system permissions. """
+
     perm = queries.get_system_permission(ExampleEnum.A_ROLE)
     assert perm.name == ExampleEnum.A_ROLE.name
     assert perm.code == ExampleEnum.A_ROLE.value
