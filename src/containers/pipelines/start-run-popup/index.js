@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { requestStartPipelineRun } from 'services';
+import {
+  requestUploadInputFile,
+  requestStartPipelineRun,
+} from 'services';
 import CloseOutlined from 'icons/CloseOutlined';
 import CloudOutlined from 'icons/CloudOutlined';
 import {
@@ -141,9 +144,18 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
 
   const onInputsChanged = (e) => {
     const inputFiles = [];
-
     Array.from(e.target.files).forEach((file) => {
-      inputFiles.push(file);
+      inputFiles.push(file.name);
+
+      const fileReader = new window.FileReader();
+      fileReader.onload = () => {
+        requestUploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result)
+          .catch(() => {
+            // TODO: tell user the file could not be uploaded
+          });
+      };
+
+      fileReader.readAsBinaryString(file);
     });
 
     setInputs([
@@ -154,18 +166,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
 
   const onStartRunClicked = () => {
     if (inputs) {
-      const inputBinaryFiles = [];
-
-      inputs.forEach((file) => {
-        const fileReader = new window.FileReader();
-        fileReader.onload = function () {
-          inputBinaryFiles.push(fileReader.result);
-        };
-
-        fileReader.readAsBinaryString(file);
-      });
-
-      requestStartPipelineRun(currentOrg, pipeline_uuid, inputBinaryFiles)
+      requestStartPipelineRun(currentOrg, pipeline_uuid, inputs)
         .then(() => {
           handleOk();
         });
@@ -214,9 +215,9 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
           </UploadBox>
         </UploadSection>
         <ArtifactsSection>
-          {inputs && Array.from(inputs).map((inputFile, index) => (
-            <Artifact key={`${inputFile.name}${Math.random()}`} alt={inputFile.name}>
-              <StyledText>{inputFile.name}</StyledText>
+          {inputs && inputs.map((inputFile, index) => (
+            <Artifact key={`${inputFile}${Math.random()}`} alt={inputFile}>
+              <StyledText>{inputFile}</StyledText>
               <CloseOutlined color="lightGray" onClick={() => removeInputFile(index)} />
             </Artifact>
           ))}
