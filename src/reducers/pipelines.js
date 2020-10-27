@@ -1,12 +1,16 @@
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
+  GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
   pipelines: null,
+  pipelineRuns: null,
   messages: {
     getPipelinesError: null,
+    getPipelineRunsError: null,
   },
 };
 
@@ -36,6 +40,19 @@ export default (state = DEFAULT_STATE, action) => {
         messages: {
           ...DEFAULT_STATE.messages,
           getPipelinesError: action.payload,
+        },
+      };
+    case GET_PIPELINE_RUNS:
+      return {
+        ...state,
+        pipelineRuns: action.payload,
+      };
+    case GET_PIPELINE_RUNS_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunsError: action.payload,
         },
       };
     default:

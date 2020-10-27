@@ -117,3 +117,7 @@ export const requestDeletePipeline = (organization_uuid, pipeline_uuid) => (
 export const requestStartPipelineRun = (organization_uuid, pipeline_uuid, inputs) => (
   ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs`, { inputs }, appToken)
 );
+
+export const requestGetPipelineRuns = (organization_uuid, pipeline_uuid) => (
+  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs`, appToken)
+);

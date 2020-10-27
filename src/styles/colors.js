@@ -17,7 +17,9 @@ export default {
   gray: '#707070',
   darkText: '#595657',
   black: '#404040',
+  purple: '#BA83D5',
   blue: '#0C486B',
+  mediumBlue: '#27598E',
   lightBlue: '#2A7AB7',
   skyBlue: '#88B4E3',
   green: '#76BF9A',
@@ -26,6 +28,6 @@ export default {
   lightGreen: '#76C2AD',
   yellow: '#FEDF88',
   orangeRed: '#F76D42',
-  orange: '#F66D42',
+  orange: '#FFD151',
   pink: '#F27F58',
 };
