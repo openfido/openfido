@@ -7,9 +7,9 @@ let DeployBucket
 let Region
 
 if (process.env.NODE_ENV === 'production') {
-    CloudFrontDistributionID = 'TBD'
-    DeployBucket = 'TBD'
-    Region = 'TBD'
+    CloudFrontDistributionID = 'E3LEDU9R7ILAUB'
+    DeployBucket = 'openfido-dev-website'
+    Region = 'us-east-1'
 } else if (process.env.NODE_ENV === 'staging') {
     CloudFrontDistributionID = 'E3LEDU9R7ILAUB'
     DeployBucket = 'openfido-dev-website'
