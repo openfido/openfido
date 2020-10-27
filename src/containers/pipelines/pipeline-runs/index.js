@@ -26,7 +26,6 @@ import colors from 'styles/colors';
 import { getPipelineRuns } from 'actions/pipelines';
 import StartRunPopup from '../start-run-popup';
 
-
 const PipelineRunsGrid = styled(StyledGrid)`
   align-items: start;
   grid-gap: 20px;
