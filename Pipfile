@@ -26,6 +26,7 @@ requests = "*"
 flask-cors = "==3.0.9"
 black = "*"
 boto3 = "*"
+openfido-utils = {editable = true, git = "git@github.com:slacgismo/openfido-utils.git", ref = "master"}
 
 [requires]
 python_version = "3.8"

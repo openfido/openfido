@@ -2,6 +2,8 @@ import os
 from io import StringIO
 from datetime import datetime, timedelta
 from unittest.mock import Mock, MagicMock, patch, ANY
+from app.utils import BadRequestError
+from botocore.exceptions import ClientError
 
 import pytest
 from freezegun import freeze_time
@@ -173,21 +175,56 @@ def test_update_user_validate_user(app, organization):
 #     assert [om.user for om in organization.organization_members] == [user]
 
 
-def test_delete_organization(app, organization):
-    # You need a user to create an organization
-    db.session.add(organization)
-    db.session.commit()
-    organization = services.delete_organization(organization)
+def test_delete_organization_bad_org(app):
+    with pytest.raises(BadRequestError):
+        services.delete_organization(None)
 
-    assert organization.is_deleted == True
+
+def test_delete_organization(app, organization, user):
+    invitation = services.create_invitation(organization, user.email)
+    invitation_accepted = services.create_invitation(organization, "accept@example.com")
+    invitation_accepted.accepted = True
+    invitation_rejected = services.create_invitation(organization, "reject@example.com")
+    invitation_rejected.rejected = True
+    db.session.commit()
+
+    organization = services.delete_organization(organization)
+    assert organization.is_deleted
+    assert invitation.cancelled
+    assert invitation_accepted.accepted
+    assert not invitation_accepted.cancelled
+    assert invitation_rejected.rejected
+    assert not invitation_rejected.cancelled
+
+
+def test_update_organization_non_org(app, organization):
+    with pytest.raises(BadRequestError):
+        services.update_organization(None, NEW_ORG_NAME)
 
 
 def test_update_organization(app, organization):
-    db.session.add(organization)
-    db.session.commit()
     organization = services.update_organization(organization, NEW_ORG_NAME)
-
     assert organization.name == NEW_ORG_NAME
+
+
+def test_update_organization_member_role_errors(app, organization, user):
+    # no org
+    with pytest.raises(BadRequestError):
+        services.update_organization_member_role(
+            None, user, find_organization_role(ROLE_USER_CODE)
+        )
+
+    # no user
+    with pytest.raises(BadRequestError):
+        services.update_organization_member_role(
+            organization, None, find_organization_role(ROLE_USER_CODE)
+        )
+
+    # not a member
+    with pytest.raises(BadRequestError):
+        services.update_organization_member_role(
+            organization, user, find_organization_role(ROLE_USER_CODE)
+        )
 
 
 def test_remove_organization_member_missing_data(app, organization, user):
@@ -237,6 +274,11 @@ def test_remove_organization_member_must_belong(organization, user, admin):
 
     with pytest.raises(ValueError):
         services.remove_organization_member(organization, user_two)
+
+
+def test_request_password_reset_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.request_password_reset(None)
 
 
 def test_request_password_reset_email_down(app, organization, monkeypatch):
@@ -335,6 +377,11 @@ def test_create_invitation_validate_organization(app, user, organization):
         invitation = services.create_invitation("", user.email)
 
 
+def test_change_password_bad_user(app):
+    with pytest.raises(ValueError):
+        services.change_password(None, USER_PASSWORD, "tooshort")
+
+
 def test_change_password_bad_password(app, user):
     with pytest.raises(ValueError):
         services.change_password(user, USER_PASSWORD, "tooshort")
@@ -369,60 +416,106 @@ def test_accept_invitation_error(app, organization, user):
         services.accept_invitation(invitation.invitation_token)
 
 
+def test_accept_invitation_not_found(app, organization, user):
+    invitation = services.create_invitation(organization, user.email)
+    with pytest.raises(BadRequestError):
+        services.accept_invitation(None)
+    assert not invitation.accepted
+
+
 def test_accept_invitation(app, organization, user):
     invitation = services.create_invitation(organization, user.email)
     services.accept_invitation(invitation.invitation_token)
+    assert invitation.accepted
 
 
-@patch("app.services.get_s3")
-def test_update_user_avatar(get_s3_mock, app, user):
+def test_cancel_invitation_not_found(app, organization, user):
+    invitation = services.create_invitation(organization, user.email)
+    with pytest.raises(BadRequestError):
+        services.cancel_invitation(None)
+    assert not invitation.cancelled
+
+
+def test_cancel_invitation(app, organization, user):
+    invitation = services.create_invitation(organization, user.email)
+    services.cancel_invitation(invitation.uuid)
+    assert invitation.cancelled
+
+
+@patch("app.services.upload_stream")
+def test_update_user_avatar(upload_stream_mock, app, user):
     bucket = os.environ.get("S3_BUCKET")
     path = f"avatars/{user.uuid}"
     data = "fakedata"
-
-    s3_mock = MagicMock()
-    get_s3_mock.return_value = s3_mock
 
     services.update_user_avatar(user, data)
 
-    s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+    upload_stream_mock.assert_called_once_with(path, data)
 
 
-@patch("app.services.get_s3")
-def test_get_user_avatar(get_s3_mock, app, user):
+@patch("app.services.get_file")
+def test_get_user_avatar(get_file_mock, app, user):
     bucket = os.environ.get("S3_BUCKET")
     path = f"avatars/{user.uuid}"
 
-    s3_mock = MagicMock()
-    get_s3_mock.return_value = s3_mock
-
     services.get_user_avatar(user)
 
-    s3_mock.get_object.assert_called_once_with(Bucket=bucket, Key=path)
+    get_file_mock.assert_called_once_with(path)
 
 
-@patch("app.services.get_s3")
-def test_update_organization_logo(get_s3_mock, app, organization):
+@patch("app.services.upload_stream")
+def test_update_organization_logo(upload_stream_mock, app, organization):
     bucket = os.environ.get("S3_BUCKET")
     path = f"logos/{organization.uuid}"
     data = "fakedata"
 
-    s3_mock = MagicMock()
-    get_s3_mock.return_value = s3_mock
-
     services.update_organization_logo(organization, data)
 
-    s3_mock.upload_fileobj.assert_called_once_with(data, bucket, path)
+    upload_stream_mock.assert_called_once_with(path, data)
 
 
-@patch("app.services.get_s3")
-def test_get_organization_logo(get_s3_mock, app, organization):
+@patch("app.services.get_file")
+def test_get_organization_logo(get_file_mock, app, organization):
     bucket = os.environ.get("S3_BUCKET")
     path = f"logos/{organization.uuid}"
 
-    s3_mock = MagicMock()
-    get_s3_mock.return_value = s3_mock
-
     services.get_organization_logo(organization)
 
-    s3_mock.get_object.assert_called_once_with(Bucket=bucket, Key=path)
+    get_file_mock.assert_called_once_with(path)
+
+
+def test_update_user_last_active_at_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.update_user_last_active_at(None)
+
+
+def test_update_user_avatar_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.update_user_avatar(None, "data")
+
+
+def test_get_user_avatar_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.get_user_avatar(None)
+
+
+@patch("app.services.get_file")
+def test_get_user_avatar_no_file(get_file_mock, app, user):
+    get_file_mock.side_effect = ClientError({}, [])
+    assert "default-user" in services.get_user_avatar(user)
+
+
+def test_update_organization_logo_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.update_organization_logo(None, "data")
+
+
+def test_get_organization_logo_bad_user(app):
+    with pytest.raises(BadRequestError):
+        services.get_organization_logo(None)
+
+
+@patch("app.services.get_file")
+def test_get_organization_logo_no_file(get_file_mock, app, organization):
+    get_file_mock.side_effect = ClientError({}, [])
+    assert "default-organization" in services.get_organization_logo(organization)

@@ -41,6 +41,11 @@ implementation:
 The local development environment has been set up with docker compose. Once you
 have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) execute the following commands to setup your local development environment:
 
+    # Build the docker image, using the SSH private key you use for github
+    # access (to access other openslac private repositories)
+    export DOCKER_BUILDKIT=1
+    export COMPOSE_DOCKER_CLI_BUILD=1
+
     # Copy the .env.example file into .env
     cp .env.example .env
 
