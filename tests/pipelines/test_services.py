@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import io
 import pytest
 import responses
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
@@ -9,6 +10,7 @@ from app.pipelines.services import (
     fetch_pipelines,
     update_pipeline,
     delete_pipeline,
+    create_pipeline_input_file,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
@@ -145,7 +147,7 @@ def test_update_pipeline(app, organization_pipeline):
     json_response.update(
         {
             "updated_at": "2020-10-08T14:22:26.276242",
-            "updated_at": "2020-10-08T14:22:26.276278",
+            "created_at": "2020-10-08T14:22:26.276278",
             "uuid": "83ac3b4e9433431fbd6d21e7a56b6f0a",
         }
     )
@@ -182,3 +184,27 @@ def test_delete_pipeline(app, organization_pipeline):
     delete_pipeline(ORGANIZATION_UUID, organization_pipeline.uuid)
 
     assert organization_pipeline.is_deleted
+
+
+def test_create_pipeline_input_file_no_org(app, organization_pipeline):
+    with pytest.raises(ValueError):
+        create_pipeline_input_file(None, "saname.txt" * 26, None)
+
+
+@patch("app.pipelines.services.upload_stream")
+def test_create_pipeline_input_file_validate(
+    upload_stream_mock, app, organization_pipeline
+):
+    data = io.StringIO("some data")
+    with pytest.raises(ValueError):
+        create_pipeline_input_file(organization_pipeline, "saname.txt" * 26, data)
+    assert not upload_stream_mock.called
+
+
+@patch("app.pipelines.services.upload_stream")
+def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeline):
+    data = io.StringIO("some data")
+    input_file = create_pipeline_input_file(organization_pipeline, "aname.txt", data)
+    assert input_file.name == "aname.txt"
+    assert upload_stream_mock.called
+    assert set(organization_pipeline.organization_pipeline_input_files) == {input_file}

@@ -1,10 +1,14 @@
+import uuid
+
 import requests
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 from application_roles.decorators import ROLES_KEY
+from blob_utils import upload_stream
 from flask import current_app
 from requests import HTTPError
+from werkzeug.utils import secure_filename
 
-from .models import OrganizationPipeline, db
+from .models import OrganizationPipeline, OrganizationPipelineInputFile, db
 from .queries import find_organization_pipeline, find_organization_pipelines
 
 
@@ -137,3 +141,23 @@ def fetch_pipelines(organization_uuid):
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(json_value) from http_error
+
+
+def create_pipeline_input_file(organization_pipeline, filename, stream):
+    """ Create a OrganizationPipelineInputFile from a stream. """
+    if len(filename) > OrganizationPipelineInputFile.name.type.length:
+        raise ValueError("filename too long")
+
+    sname = secure_filename(filename)
+    input_file_uuid = uuid.uuid4().hex
+    upload_stream(
+        f"{organization_pipeline.uuid}/{input_file_uuid}-{sname}",
+        stream,
+    )
+
+    input_file = OrganizationPipelineInputFile(uuid=input_file_uuid, name=filename)
+    organization_pipeline.organization_pipeline_input_files.append(input_file)
+
+    db.session.commit()
+
+    return input_file

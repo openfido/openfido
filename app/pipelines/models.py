@@ -79,7 +79,6 @@ class PostProcessingState(CommonColumnsMixin, db.Model):
     )
 
 
-
 class OrganizationPipelineRunPostProcessingState(CommonColumnsMixin, db.Model):
     """ The statuses of on organization pipeline """
 

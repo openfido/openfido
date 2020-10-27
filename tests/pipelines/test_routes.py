@@ -1,11 +1,17 @@
+import io
 from unittest.mock import patch
 
+from app.constants import (
+    AUTH_HOSTNAME,
+)
+from application_roles.services import create_application
+from app.utils import ApplicationsEnum
 import responses
 from app.constants import WORKFLOW_HOSTNAME
 from app.pipelines.models import OrganizationPipeline, db
+from app.pipelines.queries import find_organization_pipelines
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
-from app.pipelines.queries import find_organization_pipelines
 
 from ..conftest import JWT_TOKEN, ORGANIZATION_UUID, USER_UUID
 from .test_services import PIPELINE_JSON
@@ -318,19 +324,110 @@ def test_delete_pipeline_bad_response(
 
 
 @responses.activate
-def test_delete_pipeline(app, client, client_application, organization_pipeline):
+def test_upload_input_file_bad_data(app, client, organization_pipeline):
+    application = create_application("test client", ApplicationsEnum.REACT_CLIENT)
+
+    db.session.add(application)
+    db.session.commit()
+
     responses.add(
-        responses.DELETE,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+        responses.GET,
+        f"{app.config[AUTH_HOSTNAME]}/users/{USER_UUID}/organizations",
+        body="not json",
     )
 
-    result = client.delete(
-        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
-        content_type="application/json",
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/input_files",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: application.api_key,
+        },
+        data=io.BytesIO(b"some data"),
+    )
+    assert result.status_code == 401
+    assert len(organization_pipeline.organization_pipeline_input_files) == 0
+
+
+@responses.activate
+def test_upload_input_file_no_org(
+    app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/nouuid/input_files",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
         },
+        data=b"some data",
+    )
+    assert result.status_code == 400
+    assert len(organization_pipeline.organization_pipeline_input_files) == 0
+
+
+@responses.activate
+def test_upload_input_file_invalid_args(
+    app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/input_files",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        data=b"some data",
+    )
+    assert result.status_code == 400
+    assert len(organization_pipeline.organization_pipeline_input_files) == 0
+
+
+@patch("app.pipelines.services.upload_stream")
+@responses.activate
+def test_upload_input_file_value_error(
+    upload_stream_mock, app, client, client_application, organization_pipeline
+):
+    upload_stream_mock.side_effect = ValueError("blah")
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/input_files?name=afile.txt",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        data=b"some data",
+    )
+    assert result.status_code == 400
+    assert len(organization_pipeline.organization_pipeline_input_files) == 0
+
+
+@patch("app.pipelines.services.upload_stream")
+@responses.activate
+def test_upload_input_file_http_error(
+    upload_stream_mock, app, client, client_application, organization_pipeline
+):
+    upload_stream_mock.side_effect = HTTPError("err")
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/input_files?name=afile.txt",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        data=b"some data",
+    )
+    assert result.status_code == 503
+    assert len(organization_pipeline.organization_pipeline_input_files) == 0
+
+
+@patch("app.pipelines.services.upload_stream")
+@responses.activate
+def test_upload_input_file(
+    upload_stream_mock, app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/input_files?name=afile.txt",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        data=b"some data",
     )
     assert result.status_code == 200
-    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set()
+    assert len(organization_pipeline.organization_pipeline_input_files) == 1
