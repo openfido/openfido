@@ -23,7 +23,7 @@ import {
 } from 'actions';
 import Auth from 'util/auth';
 
-const DEFAULT_STATE = {
+export const DEFAULT_STATE = {
   profile: null,
   organizations: null,
   avatar: null,

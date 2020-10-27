@@ -6,9 +6,11 @@ import {
   Switch,
   Route,
   Redirect,
+  useLocation,
 } from 'react-router-dom';
 
 import Login from 'containers/login';
+import Logout from 'containers/login/logout';
 import ResetPasswordRequest from 'containers/login/reset-password-request';
 import ResetPassword from 'containers/login/reset-password';
 import Users from 'containers/users';
@@ -21,6 +23,7 @@ import { refreshUserToken } from 'actions/user';
 import store from 'config/store';
 import {
   ROUTE_LOGIN,
+  ROUTE_LOGOUT,
   ROUTE_RESET_PASSWORD,
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
@@ -35,6 +38,8 @@ import 'antd/dist/antd.compact.min.css';
 import 'index.css';
 
 const AppSwitch = () => {
+  const location = useLocation();
+
   const profile = useSelector((state) => state.user.profile);
   const organizations = useSelector((state) => state.user.organizations);
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -60,10 +65,14 @@ const AppSwitch = () => {
   const isOrganizationAdmin = currentOrg && organizations && organizations.find((org) => org.uuid === currentOrg && org.role.code === ROLE_ADMINISTRATOR.code);
 
   return (
-    <Switch>
+    <Switch key={location.key}>
       <Route exact path={ROUTE_LOGIN}>
         {hasProfileRedirectToPipelines}
         <Login />
+      </Route>
+      <Route exact path={ROUTE_LOGOUT}>
+        {noProfileRedirectToLogin}
+        {hasProfile && <Logout />}
       </Route>
       <Route exact path={ROUTE_RESET_PASSWORD}>
         <ResetPasswordRequest />

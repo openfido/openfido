@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Menu } from 'antd';
@@ -17,35 +17,30 @@ const StyledMenu = styled(Menu)`
   padding: 1rem 0.625rem 0 0;
   &.ant-menu-vertical {
     border-right: 0;
-    .ant-menu-item-selected {
-      background-color: ${colors.blue};
-      color: ${colors.white};
-      cursor: default;
-    }
     > .ant-menu-item {
-      margin: 0;
       height: auto;
+      font-size: 16px;
+      font-size: 1rem;
       line-height: 47px;
+      font-weight: 500;
+      text-transform: uppercase;
+      border-radius: 2px;
+      &, a {
+        color: ${colors.black};
+      }
+      &:hover {
+        background-color: ${colors.lightGray};
+      }
+      &.ant-menu-item-selected, &.ant-menu-item-selected:hover {
+        background-color: ${colors.blue};
+        &, a, a:hover {
+          color: ${colors.white};
+        }
+      }
     }
-`;
-
-const StyledMenuItem = styled(Menu.Item)`
-  padding-left: 16px 13px; 
-  font-size: 16px;
-  font-weight: 500;
-  text-transform: uppercase;
-  border-radius: 2px;
-  &, &:hover {
-    color: #404040;
-  }
-  &:hover {
-    background-color: ${colors.lightGray};
-  }
 `;
 
 const MainMenu = () => {
-  const history = useHistory();
-  const navigate = (path) => (() => history.push(path));
   const location = useLocation();
   const path = location.pathname;
 
@@ -61,9 +56,19 @@ const MainMenu = () => {
 
   return (
     <StyledMenu selectedKeys={selectedKeys}>
-      {currentOrg && <StyledMenuItem key="pipelines" onClick={navigate(ROUTE_PIPELINES)}>Pipelines</StyledMenuItem>}
-      {isOrganizationAdmin && <StyledMenuItem key="users" onClick={navigate(ROUTE_USERS)}>Users</StyledMenuItem>}
-      <StyledMenuItem key="settings" onClick={navigate(ROUTE_SETTINGS)}>Settings</StyledMenuItem>
+      {currentOrg && (
+        <Menu.Item key="pipelines">
+          <Link to={ROUTE_PIPELINES}>Pipelines</Link>
+        </Menu.Item>
+      )}
+      {isOrganizationAdmin && (
+        <Menu.Item key="users">
+          <Link to={ROUTE_USERS}>Users</Link>
+        </Menu.Item>
+      )}
+      <Menu.Item key="settings">
+        <Link to={ROUTE_SETTINGS}>Settings</Link>
+      </Menu.Item>
     </StyledMenu>
   );
 };

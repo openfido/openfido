@@ -4,7 +4,9 @@ import colors from 'styles/colors';
 
 export const Root = styled.div`
   width: 100%;
+  min-width: 390px;
   height: 100vh;
+  min-height: 768px;
   text-align: center;
   background-color: ${colors.blue};
 `;
@@ -15,8 +17,8 @@ export const StyledH1 = styled.h1`
   line-height: 36px;
   line-height: 2.25rem;
   font-weight: 400;
-  padding-top: 100px;
-  padding-top: 6.25rem;
+  padding-top: 69px;
+  padding-top: 4.3125rem;
   color: ${colors.white};
 `;
 
@@ -40,26 +42,21 @@ export const StyledForm = styled.form`
   height: 548px;
   padding: 24px 30px;
   padding: 1.5rem 1.875rem;
-  margin: 42px auto 0 auto;
-  margin: 2.625rem auto 0 auto;
+  margin: 40px auto 0 auto;
+  margin: 2.5rem auto 0 auto;
   background-color: ${colors.white};
   text-align: left;
   border-radius: 3px;
   > label {
     display: inline-block;
-    margin-top: 16px;
-    margin-top: 1rem;
-    &:not(:last-of-type) {
-      margin-bottom: 16px;
-      margin-bottom: 16px;
-    }
     input {
-      &:first-of-type {
-        margin-top: 0;
-      }
+      margin-top: 0;
+    }
+    &:last-of-type input {
+      margin-bottom: 0;
     }
     span {
-      line-height: 2.5rem;
+      line-height: 2.25rem;
     }
   }
   .anticon {
@@ -89,24 +86,17 @@ export const StyledInput = styled.input`
   &::placeholder {
     color: ${colors.lightGray};
   }
-  margin-top: 16px;
-  margin-top: 1rem;
-  margin-bottom: 16px;
-  margin-bottom: 1rem;
+  margin-top: 12px;
+  margin-top: 0.75rem;
+  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
   & + div { 
-    margin-top: -16px;
-    margin-top: -1rem;
+    margin-top: -22px;
+    margin-top: -1.375rem;
   }
-  &:last-of-type {
-    margin-bottom: 0;
-  }
-  ${({ size }) => (`
-  ${size === 'small' && (`
   &:not(:first-of-type) {
     margin-top: 0;
   }
-  `)}
-  `)}
 `;
 
 export const FormMessage = styled.div`
@@ -115,23 +105,16 @@ export const FormMessage = styled.div`
   flex-wrap: wrap;
   ${({ size, float }) => (`
   ${size === 'large' ? (`
-  padding: 1.75rem 0 1.75rem 0;
-  height: 4.5rem;
-  font-size: 14px;
-  line-height: 16px;
-  `) : (`
-  ${size === 'middle' ? (`
-  padding: 0.75rem 0 1.75rem 0;
+  padding: 0.5rem 0 1.75rem 0;
   height: 3.5rem;
   font-size: 14px;
   line-height: 16px;
   `) : (`
-  padding-top: 0.5rem;
+  padding-top: 0.25rem;
   font-size: 12px;
   line-height: 14px;
   height: 22px;
   height: 1.375rem;
-  `)}
   `)}
   ${float ? (`
   float: ${float};

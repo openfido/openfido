@@ -153,6 +153,7 @@ const EditProfile = () => {
           </StyledButton>
           <StyledButton
             htmlType="reset"
+            textcolor="lightBlue"
             type="text"
             height={50}
             onClick={onCancelClicked}

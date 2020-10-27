@@ -22,8 +22,8 @@ const HeaderText = styled(StyledH2)`
 `;
 
 const ResetPasswordText = styled(StyledText)`
-  margin-bottom: 32px;
-  margin-bottom: 2rem;
+  margin-bottom: 44px;
+  margin-bottom: 2.75rem;
   display: inline-block;
 `;
 
