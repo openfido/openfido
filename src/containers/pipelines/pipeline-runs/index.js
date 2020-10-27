@@ -321,7 +321,7 @@ const PipelineRuns = ({ pipelineInView }) => {
 
   useEffect(() => {
     dispatch(getPipelineRuns(currentOrg, pipelineInView));
-  }, [currentOrg, pipelineInView]);
+  }, [currentOrg, pipelineInView, dispatch]);
 
   useEffect(() => {
     if (pipelineRuns && pipelineRuns.length) {
