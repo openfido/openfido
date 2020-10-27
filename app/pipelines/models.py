@@ -1,10 +1,9 @@
 from flask import current_app
 
 from application_roles.model_utils import CommonColumnsMixin, get_db
+from blob_utils import create_url
 
-from ..constants import S3_BUCKET, S3_PRESIGNED_TIMEOUT
 from ..model_utils import RunStateEnum
-from ..utils import get_s3
 
 db = get_db()
 
@@ -74,13 +73,8 @@ class PipelineRunArtifact(CommonColumnsMixin, db.Model):
     def public_url(self):
         """ Generate a publicly visible URL for this artifact. """
 
-        return get_s3().generate_presigned_url(
-            "get_object",
-            Params={
-                "Bucket": current_app.config[S3_BUCKET],
-                "Key": f"{self.pipeline_run.pipeline.uuid}/{self.pipeline_run.uuid}/{self.uuid}-{self.name}",
-            },
-            ExpiresIn=S3_PRESIGNED_TIMEOUT,
+        return create_url(
+            f"{self.pipeline_run.pipeline.uuid}/{self.pipeline_run.uuid}/{self.uuid}-{self.name}"
         )
 
 

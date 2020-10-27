@@ -49,12 +49,12 @@ def create(workflow_uuid):
                 type: array
                 items:
                   type: string
-                description: List of incoming Workflow Pipeline UUIDs that feed into this Workflow Pipeline
+                description: List of incoming Workflow Pipeline UUIDs that feed into this.
               destination_workflow_pipelines:
                 type: array
                 items:
                   type: string
-                description: List of outgoing Workflow Pipeline UUIDs that this Workflow Pipeline's output will go.
+                description: List of outgoing Workflow Pipeline UUIDs that this output will go to.
     responses:
       "200":
         description: "Created"
@@ -141,12 +141,12 @@ def update(workflow_uuid, workflow_pipeline_uuid):
                 type: array
                 items:
                   type: string
-                description: List of incoming Workflow Pipeline UUIDs that feed into this Workflow Pipeline
+                description: List of incoming Workflow Pipeline UUIDs that feed into this.
               destination_workflow_pipelines:
                 type: array
                 items:
                   type: string
-                description: List of outgoing Workflow Pipeline UUIDs that this Workflow Pipeline's output will go.
+                description: List of outgoing Workflow Pipeline UUIDs that this output will go to.
     responses:
       "200":
         description: "Updated"

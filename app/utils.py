@@ -3,35 +3,12 @@ from functools import wraps
 
 from flask import request, current_app
 
-import boto3
-from botocore.client import Config
 from application_roles.decorators import make_permission_decorator
 from .model_utils import SystemPermissionEnum
-from .constants import (
-    S3_ACCESS_KEY_ID,
-    S3_SECRET_ACCESS_KEY,
-    S3_ENDPOINT_URL,
-    S3_REGION_NAME,
-)
 
 logger = logging.getLogger("utils")
 
 permissions_required = make_permission_decorator(SystemPermissionEnum)
-
-
-def get_s3():
-    """ Get access to the Boto s3 service. """
-
-    params = {
-        "endpoint_url": current_app.config[S3_ENDPOINT_URL],
-        "config": Config(signature_version="s3v4"),
-        "region_name": current_app.config[S3_REGION_NAME],
-    }
-    if S3_ACCESS_KEY_ID in current_app.config:
-        params["aws_access_key_id"] = current_app.config[S3_ACCESS_KEY_ID]
-        params["aws_secret_access_key"] = current_app.config[S3_SECRET_ACCESS_KEY]
-
-    return boto3.client("s3", **params)
 
 
 def to_iso8601(date):

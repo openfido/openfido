@@ -6,7 +6,6 @@ from app.pipelines.schemas import CreateRunSchema
 from app.pipelines.services import (
     copy_pipeline_run_artifact,
     create_pipeline_run,
-    create_pipeline_run_state,
     start_pipeline_run,
     update_pipeline_run_state,
 )
@@ -147,6 +146,7 @@ def create_workflow_pipeline(workflow_uuid, pipeline_json):
 
 
 def update_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid, pipeline_json):
+    """ Update a workflow pipeline. """
     workflow = find_workflow(workflow_uuid)
     if workflow is None:
         raise ValueError("no Workflow found")
@@ -162,24 +162,19 @@ def update_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid, pipeline_jso
         raise ValueError(f"Pipeline {pipeline} not found")
     workflow_pipeline.pipeline = pipeline
 
-    existing_sources = set(
-        [
-            wp.from_workflow_pipeline.uuid
-            for wp in workflow_pipeline.source_workflow_pipelines
-        ]
-    )
+    existing_sources = {
+        wp.from_workflow_pipeline.uuid
+        for wp in workflow_pipeline.source_workflow_pipelines
+    }
     new_sources = set(data["source_workflow_pipelines"])
     for new_workflow_pipeline_uuid in new_sources - existing_sources:
         _add_dependency(workflow_pipeline, new_workflow_pipeline_uuid, True)
     for new_workflow_pipeline_uuid in existing_sources - new_sources:
         _remove_dependency(workflow_pipeline, new_workflow_pipeline_uuid, True)
 
-    existing_dests = set(
-        [
-            wp.to_workflow_pipeline.uuid
-            for wp in workflow_pipeline.dest_workflow_pipelines
-        ]
-    )
+    existing_dests = {
+        wp.to_workflow_pipeline.uuid for wp in workflow_pipeline.dest_workflow_pipelines
+    }
     new_dests = set(data["destination_workflow_pipelines"])
     for new_workflow_pipeline_uuid in new_dests - existing_dests:
         _add_dependency(workflow_pipeline, new_workflow_pipeline_uuid, False)
@@ -192,6 +187,7 @@ def update_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid, pipeline_jso
 
 
 def create_workflow_run_state(run_state_enum):
+    """ Create a new WorkflowRunState """
     run_state_type = find_run_state_type(run_state_enum)
     workflow_run_state = WorkflowRunState()
     run_state_type.workflow_run_states.append(workflow_run_state)
@@ -206,7 +202,7 @@ def update_workflow_run_state(workflow_run, run_state_enum):
     WorkflowPipelineRun instances will be updated appropriately as well.
     """
     if workflow_run.run_state_enum() == run_state_enum:
-        return
+        return workflow_run
 
     if not workflow_run.run_state_enum().is_valid_transition(run_state_enum):
         raise ValueError(
