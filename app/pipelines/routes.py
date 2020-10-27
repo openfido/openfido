@@ -5,7 +5,15 @@ from requests import HTTPError
 
 from app.utils import validate_organization, any_application_required
 
-from .services import fetch_pipelines, create_pipeline, update_pipeline, delete_pipeline
+from .services import (
+    fetch_pipelines,
+    create_pipeline,
+    update_pipeline,
+    delete_pipeline,
+    create_pipeline_input_file,
+)
+
+from .queries import find_organization_pipeline
 
 logger = logging.getLogger("organization-pipelines")
 
@@ -226,6 +234,63 @@ def pipelines(organization_uuid):
     """
     try:
         return jsonify(fetch_pipelines(organization_uuid))
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/input_files",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization(False)
+def upload_input_file(organization_uuid, organization_pipeline_uuid):
+    """Upload a file that will be used as an input to a PipelineRun.
+    ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+      - in: query
+        name: name
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "OK"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+      "400":
+        description: "Bad request"
+    """
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+    if "name" not in request.args:
+        logger.warning("Invalid query arguments")
+        return {}, 400
+    filename = request.args["name"]
+
+    try:
+        input_file = create_pipeline_input_file(
+            organization_pipeline, filename, request.stream
+        )
+        return jsonify(uuid=input_file.uuid, name=input_file.name)
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
