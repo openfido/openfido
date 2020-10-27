@@ -7,11 +7,14 @@ class ExampleEnum(IntEnum):
 
 
 def test_get_system_permission(app):
-    perm = queries.get_system_permission(ExampleEnum.A_ROLE)
-    assert perm.name == ExampleEnum.A_ROLE.name
-    assert perm.code == ExampleEnum.A_ROLE.value
+    """Tests system permissions. """
 
-    # A second call works too!
-    perm = queries.get_system_permission(ExampleEnum.A_ROLE)
-    assert perm.name == ExampleEnum.A_ROLE.name
-    assert perm.code == ExampleEnum.A_ROLE.value
+    with app.app_context():
+        perm = queries.get_system_permission(ExampleEnum.A_ROLE)
+        assert perm.name == ExampleEnum.A_ROLE.name
+        assert perm.code == ExampleEnum.A_ROLE.value
+
+        # A second call works too!
+        perm = queries.get_system_permission(ExampleEnum.A_ROLE)
+        assert perm.name == ExampleEnum.A_ROLE.name
+        assert perm.code == ExampleEnum.A_ROLE.value
