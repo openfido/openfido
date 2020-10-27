@@ -30,25 +30,19 @@ def test_verify_bucket(s3_client, app):
     app.config[S3_BUCKET] = "missing"
 
     mock_response = {
-        "Owner": {
-            "ID": "foo",
-            "DisplayName": "bar"
-        },
-        "Buckets": [{
-            "CreationDate": datetime.now(),
-            "Name": "baz"
-        }]
+        "Owner": {"ID": "foo", "DisplayName": "bar"},
+        "Buckets": [{"CreationDate": datetime.now(), "Name": "baz"}],
     }
     mock_create_response = {
         "Location": "quix",
     }
 
     with Stubber(s3_client) as stubber:
-        stubber.add_response('list_buckets', mock_response, {})
+        stubber.add_response("list_buckets", mock_response, {})
         stubber.add_response(
-            'create_bucket',
+            "create_bucket",
             mock_create_response,
-            {"ACL": "private", "Bucket": "missing"}
+            {"ACL": "private", "Bucket": "missing"},
         )
 
         blob_utils.verify_bucket(stubber.client)
