@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import { requestStartPipelineRun } from 'services';
 import {
-  requestUploadInputFile,
-  requestStartPipelineRun,
-} from 'services';
+  uploadInputFile,
+  removeInputFile,
+  clearInputFiles,
+} from 'actions/pipelines';
 import CloseOutlined from 'icons/CloseOutlined';
 import CloudOutlined from 'icons/CloudOutlined';
 import {
@@ -93,8 +95,7 @@ const ArtifactsSection = styled.div`
   grid-row-gap: 1.5rem;
   grid-column-gap: 88px;
   grid-column-gap: 5.5rem;
-  overflow-y: scroll;
-  height: 188px;
+  min-height: 188px;
   margin-bottom: 24px;
   margin-bottom: 1.5rem;
 `;
@@ -139,44 +140,42 @@ export const Artifact = styled.div`
 
 const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const dispatch = useDispatch();
 
-  const [inputs, setInputs] = useState([]);
+  const inputFiles = useSelector((state) => state.pipelines.inputFiles);
 
   const onInputsChanged = (e) => {
-    const inputFiles = [];
     Array.from(e.target.files).forEach((file) => {
-      inputFiles.push(file.name);
-
       const fileReader = new window.FileReader();
       fileReader.onload = () => {
-        requestUploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result)
-          .catch(() => {
-            // TODO: tell user the file could not be uploaded
-          });
+        dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result));
       };
 
       fileReader.readAsBinaryString(file);
     });
-
-    setInputs([
-      ...inputs,
-      ...inputFiles,
-    ]);
   };
 
   const onStartRunClicked = () => {
-    if (inputs) {
-      requestStartPipelineRun(currentOrg, pipeline_uuid, inputs)
+    if (inputFiles) {
+      const inputUuids = [];
+      inputFiles.forEach(({ uuid: input_uuid }) => {
+        inputUuids.push(input_uuid);
+      });
+
+      requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
         .then(() => {
           handleOk();
         });
     }
   };
 
-  const removeInputFile = (index) => {
-    const inputFiles = [...inputs];
-    inputFiles.splice(index, 1);
-    setInputs(inputFiles);
+  const onRemoveInputFileClicked = (index) => {
+    dispatch(removeInputFile(index));
+  };
+
+  const onCloseStartRunPopup = () => {
+    handleCancel();
+    dispatch(clearInputFiles());
   };
 
   return (
@@ -184,7 +183,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
       visible
       footer={null}
       onOk={handleOk}
-      onCancel={handleCancel}
+      onCancel={onCloseStartRunPopup}
       closeIcon={<CloseOutlined color="darkText" />}
       width={690}
       maskStyle={{ top: '82px', left: '250px' }}
@@ -215,10 +214,10 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
           </UploadBox>
         </UploadSection>
         <ArtifactsSection>
-          {inputs && inputs.map((inputFile, index) => (
-            <Artifact key={`${inputFile}${Math.random()}`} alt={inputFile}>
-              <StyledText>{inputFile}</StyledText>
-              <CloseOutlined color="lightGray" onClick={() => removeInputFile(index)} />
+          {inputFiles && inputFiles.map(({ name: input_name }, index) => (
+            <Artifact key={`${input_name}${Math.random()}`} alt={input_name}>
+              <StyledText>{input_name}</StyledText>
+              <CloseOutlined color="lightGray" onClick={() => onRemoveInputFileClicked(index)} />
             </Artifact>
           ))}
         </ArtifactsSection>
