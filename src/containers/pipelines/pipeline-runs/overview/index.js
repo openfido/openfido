@@ -93,7 +93,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
                   {statusLongNameLegend[runStatus]}
                 </StyledText>
                 {runStatus === pipelineStates.RUNNING && (
-                <Spin indicator={<LoadingFilled spin />} />
+                  <Spin indicator={<LoadingFilled spin />} />
                 )}
               </>
             )}

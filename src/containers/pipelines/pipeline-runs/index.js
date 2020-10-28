@@ -26,7 +26,6 @@ const PipelineRunsGrid = styled(StyledGrid)`
     padding: 20px 28px 20px 16px;
     padding: 1.25rem 1.75rem 1.25rem 1rem;
   }
-    
 `;
 
 const AllRunsSection = styled.section`

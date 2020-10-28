@@ -9,7 +9,7 @@ import DownloadFilled from 'icons/DownloadFilled';
 import { StyledH3, StyledText } from 'styles/app';
 import colors from 'styles/colors';
 
-const Root = styled.div`
+const StyledFilesList = styled.div`
   .anticon.anticon-download {
     margin-right: 4px;
     margin-right: 0.25rem;
@@ -64,7 +64,7 @@ const FilesList = ({ title, files, pipelineRunSelected: run }) => {
   const runStatus = run && run.states && run.states.length && run.states[0].state;
 
   return (
-    <Root>
+    <StyledFilesList>
       <StyledH3 color="black">
         <span>{title}</span>
         <span>Size</span>
@@ -97,7 +97,7 @@ const FilesList = ({ title, files, pipelineRunSelected: run }) => {
           </li>
         </ul>
       )}
-    </Root>
+    </StyledFilesList>
   );
 };
 

@@ -24,10 +24,10 @@ const RunMenu = styled(Menu)`
       line-height: inherit;
       padding: 0;
     }
-  }
-  &.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-    background-color: transparent;
-  }
+    .ant-menu-item-selected, .ant-menu-item-active {
+      background-color: transparent;
+    }
+  } 
 `;
 
 const RunItem = styled(Menu.Item)`
@@ -65,9 +65,6 @@ const RunItem = styled(Menu.Item)`
     color: ${colors.white};
     border: 1px solid transparent;
     background-clip: padding-box;
-  }
-  &.ant-menu-item-active {
-    background-color: transparent;
   }
   &.ant-menu-item-selected {
     > div {
@@ -125,7 +122,7 @@ const AllRuns = ({
       {pipelineRuns && pipelineRuns.map(({
         uuid: run_uuid, sequence, states, started_at,
       }) => {
-        const status = states[0] && states[0].state;
+        const status = states && states[0] && states[0].state;
         const momentStartedAt = moment.utc(started_at);
 
         return (
