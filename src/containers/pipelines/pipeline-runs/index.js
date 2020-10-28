@@ -25,6 +25,8 @@ import {
 import colors from 'styles/colors';
 import { getPipelineRuns } from 'actions/pipelines';
 import StartRunPopup from '../start-run-popup';
+import OverviewTabMenu from './overview-tab-menu';
+import ConsoleOutput from './console-output';
 
 const PipelineRunsGrid = styled(StyledGrid)`
   align-items: start;
@@ -233,33 +235,6 @@ const StatusText = styled.mark`
   text-align: center;
 `;
 
-const OverviewTabMenu = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  display: grid;
-  grid-gap: 32px;
-  grid-gap: 2rem;
-  grid-auto-flow: column;
-  justify-content: start;
-  li {
-    padding-bottom: 4px;
-    padding-bottom: 0.25rem;
-    button {
-      color: ${colors.gray};
-      font-size: 16px;
-      font-size: 1rem;
-      line-height: 19px;
-      line-height: 1.1875rem;
-    }
-    &.active {
-      button {
-        color: ${colors.lightBlue};
-      }
-      border-bottom: 1px solid ${colors.lightBlue};
-    }
-  }
-`;
-
 const Overview = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -337,6 +312,16 @@ const PipelineRuns = ({ pipelineInView }) => {
     setStartRunPopup(false);
   };
 
+  if (displayTab === 'Console Output') {
+    return (
+      <ConsoleOutput
+        pipelineInView={pipelineInView}
+        sequence={pipelineRunSelected && pipelineRunSelected.sequence}
+        setDisplayTab={setDisplayTab}
+      />
+    );
+  }
+
   return (
     <>
       <PipelineRunsGrid gridTemplateColumns="1fr 1fr 1fr">
@@ -374,23 +359,7 @@ const PipelineRuns = ({ pipelineInView }) => {
           </RunMenu>
         </AllRunsSection>
         <OverviewSection>
-          <OverviewTabMenu mode="horizontal">
-            <li className={displayTab === 'Overview' ? 'active' : ''}>
-              <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Overview')}>
-                Overview
-              </StyledButton>
-            </li>
-            <li className={displayTab === 'Data Visualization' ? 'active' : ''}>
-              <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Overview')}>
-                Data Visualization
-              </StyledButton>
-            </li>
-            <li className={displayTab === 'Console Output' ? 'active' : ''}>
-              <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Overview')}>
-                Console Output
-              </StyledButton>
-            </li>
-          </OverviewTabMenu>
+          <OverviewTabMenu displayTab={displayTab} setDisplayTab={setDisplayTab} />
           {pipelineRunSelected && (
             <Overview>
               <StyledH2 color="black">
