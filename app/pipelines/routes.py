@@ -284,8 +284,6 @@ def upload_input_file(organization_uuid, organization_pipeline_uuid):
     if not organization_pipeline:
         return {"message": "No such pipeline found"}, 400
     if "name" not in request.args:
-        logger.warning("--------")
-        logger.warning(request.args)
         logger.warning("Invalid query arguments")
         return {}, 400
     filename = request.args["name"]
