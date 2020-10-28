@@ -9,7 +9,7 @@ import {
   ROLE_ADMINISTRATOR,
   ROLE_USER,
 } from 'config/roles';
-import { requestCancelOrganizationInvitation } from 'services';
+import { requestCancelOrganizationInvitation, requestUserAvatar } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
@@ -138,14 +138,26 @@ const UserItem = ({
   const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
   const [invitationCanceled, setInvitationCanceled] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
-  const userAvatar = useSelector((state) => state.user.avatar);
   // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
   // const removeMemberError = useSelector((state) => state.organization.messages.removeMemberError);
   const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
   const changeRoleError = useSelector((state) => state.organization.messages.changeRoleError);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    requestUserAvatar(uuid)
+      .then((response) => {
+        if (typeof response.data === 'string') {
+          setUserAvatar(`data:image/jpeg;base64,${window.btoa(response.data)}`);
+        }
+      })
+      .catch(() => {
+
+      });
+  }, [userAvatar, currentOrg, uuid]);
 
   useEffect(() => {
     if (!changeRoleError && userRoleChanged === uuid && userRoleClicked) {
@@ -230,11 +242,11 @@ const UserItem = ({
   );
 
   const StyledPhoto = styled.div`
-    width: 48px;
-    height: 48px;
+    width: 49px;
+    height: 49px;
     background-image: url(${userAvatar});
-    background-size: 40px;
-    border-radius: 20px;
+    background-size: 49px;
+    border-radius: 50%;
   `;
 
   return (
