@@ -9,10 +9,12 @@ import {
   ROLE_ADMINISTRATOR,
   ROLE_USER,
 } from 'config/roles';
-import { requestCancelOrganizationInvitation } from 'services';
+import { requestCancelOrganizationInvitation, requestUserAvatar } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
+import MailOutlined from 'icons/MailOutlined';
+import UserFilled from 'icons/UserFilled';
 import {
   StyledGrid,
   StyledText,
@@ -80,6 +82,9 @@ const StyledMenu = styled(Menu)`
 
 const NameColumn = styled.div`
   position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
@@ -106,12 +111,34 @@ const StyledMenuItem = styled(Menu.Item)`
    }
 `;
 
+const StyledPhotoContainer = styled.div`
+  width: 53px;
+  height: 53px;
+  border-radius: 50%;
+  border: 2px solid ${colors.lightGray};
+  margin-right: 16px;
+  margin-right: 1rem;
+  .anticon-mail {
+    width: 32px;
+    height: 32px;
+    left: 7.4px;
+    top: 10px;
+  }
+  .anticon-user {
+    width: 48px;
+    height: 48px;
+    left: 3px;
+    top: 0;
+  }
+`;
+
 const UserItem = ({
   uuid, first_name, last_name, last_active_at, role, isInvited,
 }) => {
   const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
   const [invitationCanceled, setInvitationCanceled] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
@@ -119,6 +146,18 @@ const UserItem = ({
   const userRoleChanged = useSelector((state) => state.organization.messages.userRoleChanged);
   const changeRoleError = useSelector((state) => state.organization.messages.changeRoleError);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    requestUserAvatar(uuid)
+      .then((response) => {
+        if (typeof response.data === 'string') {
+          setUserAvatar(`data:image/jpeg;base64,${window.btoa(response.data)}`);
+        }
+      })
+      .catch(() => {
+
+      });
+  }, [userAvatar, currentOrg, uuid]);
 
   useEffect(() => {
     if (!changeRoleError && userRoleChanged === uuid && userRoleClicked) {
@@ -202,9 +241,21 @@ const UserItem = ({
     </StyledText>
   );
 
+  const StyledPhoto = styled.div`
+    width: 49px;
+    height: 49px;
+    background-image: url(${userAvatar});
+    background-size: 49px;
+    border-radius: 50%;
+  `;
+
   return (
-    <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(208px, 1fr)" bgcolor="white">
+    <UserItemGrid gridTemplateColumns="3fr 2fr 2fr minmax(108px, 1fr)" bgcolor="white">
       <NameColumn>
+        <StyledPhotoContainer>
+          {!isInvited && (userAvatar ? <StyledPhoto /> : <UserFilled />)}
+          {isInvited && <MailOutlined />}
+        </StyledPhotoContainer>
         <StyledText size="large" color="gray">
           {first_name}
           {last_name && ` ${last_name}`}
