@@ -472,7 +472,6 @@ def test_create_pipeline_run(app, client, client_application, organization_pipel
     ).first()
 
     assert result.status_code == 200
-
     assert new_run is not None
     assert result.json == json_response
 

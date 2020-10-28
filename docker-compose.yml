@@ -120,7 +120,7 @@ services:
     volumes:
       - .:/opt/app:delegated
     ports:
-      - "6003:5000"
+      - "6000:5000"
     depends_on:
       - app_db
       - auth_service

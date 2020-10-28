@@ -4,13 +4,15 @@ import io
 import pytest
 import responses
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
-from app.pipelines.models import OrganizationPipeline
+from app.pipelines.models import OrganizationPipeline, OrganizationPipelineRun
 from app.pipelines.services import (
     create_pipeline,
     fetch_pipelines,
     update_pipeline,
     delete_pipeline,
     create_pipeline_input_file,
+    create_pipeline_run,
+    fetch_pipeline_runs,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
@@ -231,3 +233,49 @@ def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeli
     assert input_file.name == "aname.txt"
     assert upload_stream_mock.called
     assert set(organization_pipeline.organization_pipeline_input_files) == {input_file}
+
+
+@responses.activate
+def test_create_pipeline_run(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
+        json=json_response,
+    )
+
+    created_pipeline_run = create_pipeline_run(
+        pipeline.organization_uuid, pipeline.uuid, PIPELINE_RUN_JSON
+    )
+
+    new_run = OrganizationPipelineRun.query.filter(
+        OrganizationPipelineRun.pipeline_run_uuid == created_pipeline_run["uuid"]
+    ).first()
+
+    assert new_run is not None
+    assert created_pipeline_run == json_response
+
+
+@responses.activate
+def test_fetch_pipeline_runs(app, organization_pipeline):
+    json_response = [PIPELINE_RUN_RESPONSE_JSON]
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
+        json=json_response,
+    )
+
+    pipeline_runs = fetch_pipeline_runs(pipeline.organization_uuid, pipeline.uuid)
+
+    assert pipeline_runs is not None
+    assert pipeline_runs == json_response
