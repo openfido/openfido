@@ -1,8 +1,9 @@
 import flask
+import secrets
 from unittest.mock import patch
 from requests import HTTPError
 
-from app.utils import validate_organization
+from app.utils import validate_organization, make_hash, verify_hash
 from .conftest import JWT_TOKEN, USER_UUID
 
 
@@ -68,3 +69,17 @@ def test_validate_organization(in_org_mock, app):
         message, status = a_view(organization_uuid=12)
         assert status == 503
         assert in_org_mock.called
+
+
+def test_make_hash():
+    hash_p, hash_s = make_hash("password")
+
+    assert hash_p is not None
+    assert hash_s is not None
+
+
+def verify_hash():
+    pw = "password"
+    hash_p, hash_s = make_hash(pw)
+
+    assert verify_hash(pw, hash_p, hash_s) is True

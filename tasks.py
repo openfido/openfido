@@ -48,7 +48,7 @@ def precommit(c, fix=False):
 
 @task
 def create_application_key(c, name, permission):
-    """ Create an application api_key.
+    """Create an application api_key.
 
     name = name of the application
     permission = permission to support.

@@ -11,7 +11,6 @@ from .services import (
     update_pipeline,
     delete_pipeline,
     create_pipeline_input_file,
-
     fetch_pipeline_runs,
     create_pipeline_run,
 )
@@ -21,6 +20,7 @@ from .queries import find_organization_pipeline
 logger = logging.getLogger("organization-pipelines")
 
 organization_pipeline_bp = Blueprint("organization-pipelines", __name__)
+
 
 @organization_pipeline_bp.route("/<organization_uuid>/pipelines", methods=["POST"])
 @any_application_required
@@ -408,9 +408,7 @@ def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
     try:
         return jsonify(
             create_pipeline_run(
-                organization_uuid,
-                organization_pipeline_uuid,
-                request.json
+                organization_uuid, organization_pipeline_uuid, request.json
             )
         )
     except ValueError as value_error:
