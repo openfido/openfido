@@ -230,8 +230,8 @@ const UserItem = ({
   );
 
   const StyledPhoto = styled.div`
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     background-image: url(${userAvatar});
     background-size: 40px;
     border-radius: 20px;
