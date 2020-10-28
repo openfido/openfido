@@ -163,3 +163,54 @@ def create_pipeline_input_file(organization_pipeline, filename, stream):
     db.session.commit()
 
     return input_file
+
+
+def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
+    """Find all OrganizationPipelineRuns for a pipline."""
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, pipeline_uuid
+    )
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        }
+    )
+
+    try:
+        json_value = response.json()
+        response.raise_for_status()
+
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
+
+
+def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
+    """Creates OrganizationPipelineRuns for a pipline."""
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, pipeline_uuid
+    )
+
+    response = requests.post(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json=request_json
+    )
+
+    try:
+        json_value = response.json()
+        response.raise_for_status()
+
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
