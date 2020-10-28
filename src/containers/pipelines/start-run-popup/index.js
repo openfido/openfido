@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -76,6 +76,12 @@ const UploadBox = styled.div`
   .ant-btn label {
     padding: 0;
   }
+  &.dragged {
+    border-color: ${colors.lightBlue};
+    svg path {
+      fill: ${colors.lightBlue};
+    }
+  }
 `;
 
 export const UploadSection = styled.div`
@@ -144,8 +150,12 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
 
   const inputFiles = useSelector((state) => state.pipelines.inputFiles);
 
-  const onInputsChanged = (e) => {
-    Array.from(e.target.files).forEach((file) => {
+  const [uploadBoxDragged, setUploadBoxDragged] = useState(false);
+
+  const onInputsChangedOrDropped = (e) => {
+    e.preventDefault();
+
+    Array.from(e.target.files || e.dataTransfer.files).forEach((file) => {
       const fileReader = new window.FileReader();
       fileReader.onload = () => {
         dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result));
@@ -153,6 +163,18 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
 
       fileReader.readAsBinaryString(file);
     });
+
+    if (uploadBoxDragged) setUploadBoxDragged(false);
+  };
+
+  const onUploadBoxDragOverOrEnter = (e) => {
+    e.preventDefault();
+
+    if (!uploadBoxDragged) setUploadBoxDragged(true);
+  };
+
+  const onUploadBoxDragLeave = () => {
+    if (uploadBoxDragged) setUploadBoxDragged(false);
   };
 
   const onStartRunClicked = () => {
@@ -192,8 +214,14 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
     >
       <StyledForm onSubmit={onStartRunClicked}>
         <UploadSection>
-          <UploadBox>
-            <input type="file" id="inputs" onChange={onInputsChanged} multiple />
+          <UploadBox
+            onDragOver={onUploadBoxDragOverOrEnter}
+            onDragEnter={onUploadBoxDragOverOrEnter}
+            onDragLeave={onUploadBoxDragLeave}
+            onDrop={onInputsChangedOrDropped}
+            className={uploadBoxDragged ? 'dragged' : ''}
+          >
+            <input type="file" id="inputs" onChange={onInputsChangedOrDropped} multiple />
             <CloudOutlined />
             <div>
               <StyledText size="large" color="darkText">
