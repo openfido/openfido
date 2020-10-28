@@ -8,13 +8,23 @@ from application_roles.services import create_application
 from app.utils import ApplicationsEnum
 import responses
 from app.constants import WORKFLOW_HOSTNAME
-from app.pipelines.models import OrganizationPipeline, db
+from app.pipelines.models import OrganizationPipeline, OrganizationPipelineRun, db
 from app.pipelines.queries import find_organization_pipelines
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
-from ..conftest import JWT_TOKEN, ORGANIZATION_UUID, USER_UUID
-from .test_services import PIPELINE_JSON
+from ..conftest import (
+    JWT_TOKEN,
+    ORGANIZATION_UUID,
+    USER_UUID,
+    PIPELINE_UUID,
+    PIPELINE_RUN_UUID,
+)
+from .test_services import (
+    PIPELINE_JSON,
+    PIPELINE_RUN_JSON,
+    PIPELINE_RUN_RESPONSE_JSON,
+)
 
 
 def test_requests_have_cors(app, client, client_application):
@@ -431,3 +441,66 @@ def test_upload_input_file(
     )
     assert result.status_code == 200
     assert len(organization_pipeline.organization_pipeline_input_files) == 1
+
+
+@responses.activate
+def test_create_pipeline_run(app, client, client_application, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
+        json=json_response,
+    )
+
+    result = client.post(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+    new_run = OrganizationPipelineRun.query.filter(
+        OrganizationPipelineRun.pipeline_run_uuid == resp["uuid"]
+    ).first()
+
+    assert result.status_code == 200
+
+    assert new_run is not None
+    assert result.json == json_response
+
+
+@responses.activate
+def test_list_pipeline_runs(app, client, client_application, organization_pipeline):
+    json_response = [PIPELINE_RUN_RESPONSE_JSON]
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 200
+    assert result.json == json_response

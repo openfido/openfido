@@ -303,6 +303,68 @@ def upload_input_file(organization_uuid, organization_pipeline_uuid):
 
 @organization_pipeline_bp.route(
     "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization(False)
+def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
+    """List all Organization Pipeline Runs.
+    ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "List of pipeline runs"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                artifacts:
+                  type: array
+                  items:
+                    type: object
+                sequence:
+                  type: string
+                states:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                      state:
+                        type: string
+                created_at:
+                  type: string
+                uuid:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    try:
+        return jsonify(
+            create_pipeline_run(
+                organization_uuid, organization_pipeline_uuid, request.json
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs",
     methods=["GET"],
 )
 @any_application_required
@@ -328,88 +390,34 @@ def pipeline_runs(organization_uuid, organization_pipeline_uuid):
               items:
                 type: object
                 properties:
-                  uuid:
+                  artifacts:
+                    type: array
+                    items:
+                      type: object
+                  sequence:
                     type: string
-                  name:
-                    type: string
-                  description:
-                    type: string
-                  docker_image_url:
-                    type: string
-                  repository_ssh_url:
-                    type: string
-                  repository_branch:
-                    type: string
+                  states:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                        state:
+                          type: string
                   created_at:
                     type: string
-                  updated_at:
+                  uuid:
                     type: string
       "400":
         description: "Bad request"
+      "503":
+        description: "Http error
     """
 
     try:
         return jsonify(
             fetch_pipeline_runs(organization_uuid, organization_pipeline_uuid)
-        )
-    except ValueError as value_error:
-        return jsonify(value_error.args[0]), 400
-    except HTTPError as http_error:
-        return {"message": http_error.args[0]}, 503
-
-
-@organization_pipeline_bp.route(
-    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs",
-    methods=["POST"],
-)
-@any_application_required
-@validate_organization(False)
-def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
-    """List all Organization Pipeline Runs.
-    ---
-    tags:
-      - pipelines
-    parameters:
-      - in: header
-        name: Workflow-API-Key
-        description: Requires key type REACT_CLIENT
-        schema:
-          type: string
-    responses:
-      "200":
-        description: "List of pipeline runs"
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  uuid:
-                    type: string
-                  name:
-                    type: string
-                  description:
-                    type: string
-                  docker_image_url:
-                    type: string
-                  repository_ssh_url:
-                    type: string
-                  repository_branch:
-                    type: string
-                  created_at:
-                    type: string
-                  updated_at:
-                    type: string
-      "400":
-        description: "Bad request"
-    """
-
-    try:
-        return jsonify(
-            create_pipeline_run(
-                organization_uuid, organization_pipeline_uuid, request.json
-            )
         )
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400

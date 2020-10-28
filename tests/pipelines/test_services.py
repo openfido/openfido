@@ -24,6 +24,27 @@ PIPELINE_JSON = {
     "repository_branch": "master",
     "repository_ssh_url": "https://github.com/PresencePG/presence-pipeline-example.git",
 }
+PIPELINE_RUN_JSON = {
+    "callback_url": "http://callbackurl.com",
+    "inputs": [
+        {"name": "foo.csv", "url": "http://www.baz.com"},
+        {"name": "bar.csv", "url": "http://www.quix.com"},
+    ],
+}
+PIPELINE_RUN_RESPONSE_JSON = {
+    "artifacts": [],
+    "created_at": "2020-10-28T22:01:48.950370",
+    "inputs": [
+        {"name": "file6.csv", "url": "http://www.example1.com"},
+        {"name": "file4.csv", "url": "http://www.example2.com"},
+    ],
+    "sequence": 1,
+    "states": [
+        {"created_at": "2020-10-28T22:01:48.951140", "state": "QUEUED"},
+        {"created_at": "2020-10-28T22:01:48.955688", "state": "NOT_STARTED"},
+    ],
+    "uuid": "35654b0b6f1044d0afcdf8bedaa0bd71",
+}
 
 
 @responses.activate
