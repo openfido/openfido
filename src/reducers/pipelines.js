@@ -1,6 +1,8 @@
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
+  GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -9,9 +11,11 @@ import {
 
 const DEFAULT_STATE = {
   pipelines: null,
+  pipelineRuns: null,
   inputFiles: null,
   messages: {
     getPipelinesError: null,
+    getPipelineRunsError: null,
     uploadInputFileError: null,
   },
 };
@@ -42,6 +46,19 @@ export default (state = DEFAULT_STATE, action) => {
         messages: {
           ...DEFAULT_STATE.messages,
           getPipelinesError: action.payload,
+        },
+      };
+    case GET_PIPELINE_RUNS:
+      return {
+        ...state,
+        pipelineRuns: action.payload,
+      };
+    case GET_PIPELINE_RUNS_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunsError: action.payload,
         },
       };
     case UPLOAD_INPUT_FILE:

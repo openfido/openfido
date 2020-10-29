@@ -3,12 +3,18 @@ import {
   GET_PIPELINES_FAILED,
   ADD_PIPELINE,
   DELETE_PIPELINE,
+  GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
   CLEAR_INPUT_FILES,
 } from 'actions';
-import { requestGetPipelines, requestUploadInputFile } from 'services';
+import {
+  requestGetPipelines,
+  requestGetPipelineRuns,
+  requestUploadInputFile,
+} from 'services';
 
 export const getPipelines = (organization_uuid) => (dispatch) => (
   requestGetPipelines(organization_uuid)
@@ -35,6 +41,22 @@ export const deletePipeline = (payload) => ({
   type: DELETE_PIPELINE,
   payload,
 });
+
+export const getPipelineRuns = (organization_uuid, pipeline_uuid) => (dispatch) => (
+  requestGetPipelineRuns(organization_uuid, pipeline_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_PIPELINE_RUNS,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: GET_PIPELINE_RUNS_FAILED,
+        payload: !err.response || err.response.data,
+      });
+    })
+);
 
 export const uploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (dispatch) => (
   requestUploadInputFile(organization_uuid, pipeline_uuid, file_name, file_content)

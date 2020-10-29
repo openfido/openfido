@@ -158,7 +158,6 @@ export const StyledH4 = styled.h4`
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  letter-spacing: 0.05em;
   margin: 0;
 `;
 
