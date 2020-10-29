@@ -336,3 +336,36 @@ def test_fetch_pipeline_runs(app, organization_pipeline):
 
     assert pipeline_runs is not None
     assert pipeline_runs == json_response
+
+
+@responses.activate
+def test_fetch_pipeline_runs_response_error(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_pipeline_runs(
+            organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_runs_notfound_error(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs",
+        json={"error": "not found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        fetch_pipeline_runs(
+            organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )

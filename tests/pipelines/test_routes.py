@@ -577,14 +577,16 @@ def test_list_pipeline_runs(app, client, client_application, organization_pipeli
 
 
 @patch("app.pipelines.routes.fetch_pipeline_runs")
+@patch("flask.jsonify")
 @responses.activate
 def test_list_pipeline_runs_value_error(
-    mock_fetch, app, client, client_application, organization_pipeline
+    mock_fetch, mock_jsonify, app, client, client_application, organization_pipeline
 ):
-    mock_fetch.side_effect = ValueError("error")
+    mock_fetch.side_effect = {"some": "json"}
+    mock_jsonify.side_effect = ValueError("error")
 
     result = client.get(
-        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
         content_type="application/json",
         json=PIPELINE_RUN_JSON,
         headers={
@@ -594,11 +596,12 @@ def test_list_pipeline_runs_value_error(
     )
 
     assert result.status_code == 400
+    assert mock_jsonify.called is True
 
 
 @patch("app.pipelines.routes.fetch_pipeline_runs")
 @responses.activate
-def test_list_pipeline_runs_value_error(
+def test_list_pipeline_runs_http_error(
     mock_fetch, app, client, client_application, organization_pipeline
 ):
     mock_fetch.side_effect = HTTPError("error")

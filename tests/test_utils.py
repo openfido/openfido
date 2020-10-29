@@ -86,7 +86,7 @@ def test_make_hash_w_salt():
     assert hash_s is not None
 
 
-def verify_hash():
+def test_verify_hash():
     pw = "password"
     hash_p, hash_s = make_hash(pw)
 
