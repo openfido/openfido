@@ -8,7 +8,14 @@ EXPOSE 5000
 
 FROM base as python-deps
 
-RUN apt-get update -qq && apt-get install -y ssh git
+RUN apt-get update -qq && apt-get install -y \
+  ssh \
+  git \
+  libsasl2-dev \
+  python3-dev \
+  libldap2-dev \
+  libssl-dev \
+  libevent-dev
 
 # require a private key to access private github repositories
 ARG SSH_PRIVATE_KEY
