@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { requestStartPipelineRun } from 'services';
+import {
+  uploadInputFile,
+  removeInputFile,
+  clearInputFiles,
+} from 'actions/pipelines';
 import CloseOutlined from 'icons/CloseOutlined';
 import CloudOutlined from 'icons/CloudOutlined';
 import {
@@ -71,6 +76,12 @@ const UploadBox = styled.div`
   .ant-btn label {
     padding: 0;
   }
+  &.dragged {
+    border-color: ${colors.lightBlue};
+    svg path {
+      fill: ${colors.lightBlue};
+    }
+  }
 `;
 
 export const UploadSection = styled.div`
@@ -90,8 +101,7 @@ const ArtifactsSection = styled.div`
   grid-row-gap: 1.5rem;
   grid-column-gap: 88px;
   grid-column-gap: 5.5rem;
-  overflow-y: scroll;
-  height: 188px;
+  min-height: 188px;
   margin-bottom: 24px;
   margin-bottom: 1.5rem;
 `;
@@ -136,46 +146,58 @@ export const Artifact = styled.div`
 
 const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const dispatch = useDispatch();
 
-  const [inputs, setInputs] = useState([]);
+  const inputFiles = useSelector((state) => state.pipelines.inputFiles);
 
-  const onInputsChanged = (e) => {
-    const inputFiles = [];
+  const [uploadBoxDragged, setUploadBoxDragged] = useState(false);
 
-    Array.from(e.target.files).forEach((file) => {
-      inputFiles.push(file);
+  const onInputsChangedOrDropped = (e) => {
+    e.preventDefault();
+
+    Array.from(e.target.files || e.dataTransfer.files).forEach((file) => {
+      const fileReader = new window.FileReader();
+      fileReader.onload = () => {
+        dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result));
+      };
+
+      fileReader.readAsBinaryString(file);
     });
 
-    setInputs([
-      ...inputs,
-      ...inputFiles,
-    ]);
+    if (uploadBoxDragged) setUploadBoxDragged(false);
+  };
+
+  const onUploadBoxDragOverOrEnter = (e) => {
+    e.preventDefault();
+
+    if (!uploadBoxDragged) setUploadBoxDragged(true);
+  };
+
+  const onUploadBoxDragLeave = () => {
+    if (uploadBoxDragged) setUploadBoxDragged(false);
   };
 
   const onStartRunClicked = () => {
-    if (inputs) {
-      const inputBinaryFiles = [];
-
-      inputs.forEach((file) => {
-        const fileReader = new window.FileReader();
-        fileReader.onload = function () {
-          inputBinaryFiles.push(fileReader.result);
-        };
-
-        fileReader.readAsBinaryString(file);
+    if (inputFiles) {
+      const inputUuids = [];
+      inputFiles.forEach(({ uuid: input_uuid }) => {
+        inputUuids.push(input_uuid);
       });
 
-      requestStartPipelineRun(currentOrg, pipeline_uuid, inputBinaryFiles)
+      requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
         .then(() => {
           handleOk();
         });
     }
   };
 
-  const removeInputFile = (index) => {
-    const inputFiles = [...inputs];
-    inputFiles.splice(index, 1);
-    setInputs(inputFiles);
+  const onRemoveInputFileClicked = (index) => {
+    dispatch(removeInputFile(index));
+  };
+
+  const onCloseStartRunPopup = () => {
+    handleCancel();
+    dispatch(clearInputFiles());
   };
 
   return (
@@ -183,7 +205,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
       visible
       footer={null}
       onOk={handleOk}
-      onCancel={handleCancel}
+      onCancel={onCloseStartRunPopup}
       closeIcon={<CloseOutlined color="darkText" />}
       width={690}
       maskStyle={{ top: '82px', left: '250px' }}
@@ -192,8 +214,14 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
     >
       <StyledForm onSubmit={onStartRunClicked}>
         <UploadSection>
-          <UploadBox>
-            <input type="file" id="inputs" onChange={onInputsChanged} multiple />
+          <UploadBox
+            onDragOver={onUploadBoxDragOverOrEnter}
+            onDragEnter={onUploadBoxDragOverOrEnter}
+            onDragLeave={onUploadBoxDragLeave}
+            onDrop={onInputsChangedOrDropped}
+            className={uploadBoxDragged ? 'dragged' : ''}
+          >
+            <input type="file" id="inputs" onChange={onInputsChangedOrDropped} multiple />
             <CloudOutlined />
             <div>
               <StyledText size="large" color="darkText">
@@ -214,10 +242,10 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
           </UploadBox>
         </UploadSection>
         <ArtifactsSection>
-          {inputs && Array.from(inputs).map((inputFile, index) => (
-            <Artifact key={`${inputFile.name}${Math.random()}`} alt={inputFile.name}>
-              <StyledText>{inputFile.name}</StyledText>
-              <CloseOutlined color="lightGray" onClick={() => removeInputFile(index)} />
+          {inputFiles && inputFiles.map(({ name: input_name }, index) => (
+            <Artifact key={`${input_name}${Math.random()}`} alt={input_name}>
+              <StyledText>{input_name}</StyledText>
+              <CloseOutlined color="lightGray" onClick={() => onRemoveInputFileClicked(index)} />
             </Artifact>
           ))}
         </ArtifactsSection>

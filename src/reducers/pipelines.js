@@ -3,14 +3,20 @@ import {
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_FAILED,
+  UPLOAD_INPUT_FILE,
+  UPLOAD_INPUT_FILE_FAILED,
+  REMOVE_INPUT_FILE,
+  CLEAR_INPUT_FILES,
 } from 'actions';
 
 const DEFAULT_STATE = {
   pipelines: null,
   pipelineRuns: null,
+  inputFiles: null,
   messages: {
     getPipelinesError: null,
     getPipelineRunsError: null,
+    uploadInputFileError: null,
   },
 };
 
@@ -54,6 +60,45 @@ export default (state = DEFAULT_STATE, action) => {
           ...DEFAULT_STATE.messages,
           getPipelineRunsError: action.payload,
         },
+      };
+    case UPLOAD_INPUT_FILE:
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        inputFiles: state.inputFiles ? (
+          [
+            ...state.inputFiles,
+            action.payload,
+          ]
+        ) : (
+          [
+            action.payload,
+          ]
+        ),
+      };
+    case UPLOAD_INPUT_FILE_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          uploadInputFileError: action.payload,
+        },
+      };
+    case REMOVE_INPUT_FILE: {
+      const inputFiles = [...state.inputFiles];
+      inputFiles.splice(action.payload, 1);
+
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        inputFiles,
+      };
+    }
+    case CLEAR_INPUT_FILES:
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        inputFiles: null,
       };
     default:
       return state;
