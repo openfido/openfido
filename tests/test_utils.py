@@ -78,6 +78,14 @@ def test_make_hash():
     assert hash_s is not None
 
 
+def test_make_hash_w_salt():
+    mock_salt = secrets.token_urlsafe(32)
+    hash_p, hash_s = make_hash("password", mock_salt)
+
+    assert hash_p is not None
+    assert hash_s is not None
+
+
 def verify_hash():
     pw = "password"
     hash_p, hash_s = make_hash(pw)

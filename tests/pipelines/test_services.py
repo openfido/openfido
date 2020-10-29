@@ -261,6 +261,63 @@ def test_create_pipeline_run(app, organization_pipeline):
     assert created_pipeline_run == json_response
 
 
+@patch("app.pipelines.services.upload_stream")
+def test_create_pipeline_run_missing_pipeline(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
+        json=json_response,
+    )
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run(
+            pipeline.organization_uuid, "1234", PIPELINE_RUN_JSON
+        )
+
+
+@responses.activate
+def test_create_pipeline_run_response_error(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        created_pipeline_run = create_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            PIPELINE_RUN_JSON,
+        )
+
+
+@responses.activate
+def test_create_pipeline_run_notfound_error(app, organization_pipeline):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs",
+        json={"error": "not found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            PIPELINE_RUN_JSON,
+        )
+
+
 @responses.activate
 def test_fetch_pipeline_runs(app, organization_pipeline):
     json_response = [PIPELINE_RUN_RESPONSE_JSON]

@@ -1,4 +1,5 @@
-.PHONY: up
+help:
+	echo "available targets are: up, down, logs, upgrade-dbs, access-tokens, webflow-api-key, auth-shell"
 
 up: access-tokens webflow-api-key
 	docker-compose up -d

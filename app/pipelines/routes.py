@@ -306,10 +306,10 @@ def upload_input_file(organization_uuid, organization_pipeline_uuid):
 @any_application_required
 @validate_organization(False)
 def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
-    """List all Organization Pipeline Runs.
+    """Create a Pipeline Run
     ---
     tags:
-      - pipelines
+      - pipeline runs
     parameters:
       - in: header
         name: Workflow-API-Key
@@ -318,7 +318,7 @@ def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
           type: string
     responses:
       "200":
-        description: "List of pipeline runs"
+        description: "Create a pipeline run"
         content:
           application/json:
             schema:
@@ -371,7 +371,7 @@ def pipeline_runs(organization_uuid, organization_pipeline_uuid):
     """List all Organization Pipeline Runs.
     ---
     tags:
-      - pipelines
+      - pipeline runs
     parameters:
       - in: header
         name: Workflow-API-Key
@@ -410,7 +410,7 @@ def pipeline_runs(organization_uuid, organization_pipeline_uuid):
       "400":
         description: "Bad request"
       "503":
-        description: "Http error
+        description: "Http error"
     """
 
     try:

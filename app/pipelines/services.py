@@ -177,6 +177,9 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     """Creates OrganizationPipelineRuns for a pipline."""
     org_pipeline = find_organization_pipeline(organization_uuid, pipeline_uuid)
 
+    if not org_pipeline:
+        raise ValueError({"message": "organizational_pipeline_uuid not found"})
+
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
         headers={
@@ -190,19 +193,14 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         json_value = response.json()
         response.raise_for_status()
 
-        # TODO: where does this password come from? for now,
-        #       lets use the uuid of the org pipeline as the password
-        #       and we can update later.
-        share_hash, share_salt = make_hash(org_pipeline.uuid)
-
         org_pipeline_run = OrganizationPipelineRun(
             organization_pipeline_id=org_pipeline.id,
             pipeline_run_uuid=json_value["uuid"],
             status_update_token=uuid.uuid4().hex,
             status_update_token_expires_at=datetime.now() + timedelta(days=7),
             share_token=uuid.uuid4().hex,
-            share_password_hash=share_hash,
-            share_password_salt=share_salt,
+            share_password_hash=None,
+            share_password_salt=None,
         )
         db.session.add(org_pipeline_run)
         db.session.commit()

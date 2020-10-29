@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+black = "*"
 flasgger = "*"
 pylint-flask-sqlalchemy = "*"
 invoke = "*"
@@ -23,18 +24,12 @@ marshmallow = "*"
 marshmallow_enum = "*"
 boto3 = "*"
 requests = "*"
+openfido-utils = {editable = true, git = "git@github.com:slacgismo/openfido-utils.git", ref = "master"}
 pyjwt = "*"
 flask-cors = "*"
-secrets = "*"
-pyopenssl = "*"
 
 [requires]
 python_version = "3.8"
 
 [pipenv]
 allow_prereleases = true
-
-[packages.openfido-utils]
-editable = true
-git = "git@github.com:slacgismo/openfido-utils.git"
-ref = "master"
