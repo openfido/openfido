@@ -486,7 +486,7 @@ def test_create_pipeline_run_value_error(
     result = client.post(
         f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
         content_type="application/json",
-        json=b"some json",
+        json={"some": "json"},
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
@@ -508,7 +508,7 @@ def test_create_pipeline_run_http_error(
     result = client.post(
         f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
         content_type="application/json",
-        json=b"some data",
+        json={"some": "json"},
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
