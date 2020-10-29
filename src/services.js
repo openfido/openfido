@@ -114,6 +114,10 @@ export const requestDeletePipeline = (organization_uuid, pipeline_uuid) => (
   ApiClient.delete(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}`, appToken)
 );
 
+export const requestUploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (
+  ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/input_files?name=${file_name}`, file_content, appToken)
+);
+
 export const requestStartPipelineRun = (organization_uuid, pipeline_uuid, inputs) => (
   ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs`, { inputs }, appToken)
 );
