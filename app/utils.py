@@ -8,6 +8,7 @@ from application_roles.decorators import make_permission_decorator
 from flask import g, request
 from jwt.exceptions import DecodeError
 from requests import HTTPError
+from simplejson.errors import JSONDecodeError
 
 from .services import fetch_is_user_in_org
 
@@ -77,6 +78,9 @@ def validate_organization(requires_json=True):
                 return {}, 503
             except DecodeError:
                 logger.warning("unable to decode JWT")
+                return {}, 401
+            except JSONDecodeError:
+                logger.warning("Unable to read auth server response")
                 return {}, 401
 
         return wrapper

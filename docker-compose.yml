@@ -34,6 +34,7 @@ services:
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      S3_BUCKET: workflow-service
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
@@ -53,9 +54,6 @@ services:
     environment:
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
       WORKER_API_SERVER: http://workflow_service:5001
-      S3_ACCESS_KEY_ID: minio_access_key
-      S3_SECRET_ACCESS_KEY: minio123
-      S3_ENDPOINT_URL: http://blobstorage:9000
     env_file:
       - .worker-env
     volumes:
@@ -88,6 +86,10 @@ services:
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
+      S3_BUCKET: auth-service
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blobstorage:9000
     volumes:
       - ../openfido-auth-service:/opt/app:delegated
     ports:
