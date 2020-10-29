@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
+import { OVERVIEW_TAB, DATA_VISUALIZATION_TAB, CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
 import { StyledButton } from 'styles/app';
 import colors from 'styles/colors';
 
@@ -33,18 +35,18 @@ const StyledOverviewTabMenu = styled.ul`
 
 const OverviewTabMenu = ({ displayTab, setDisplayTab }) => (
   <StyledOverviewTabMenu mode="horizontal">
-    <li className={displayTab === 'Overview' ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Overview')}>
+    <li className={displayTab === OVERVIEW_TAB ? 'active' : ''}>
+      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(OVERVIEW_TAB)}>
         Overview
       </StyledButton>
     </li>
-    <li className={displayTab === 'Data Visualization' ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Data Visualization')}>
+    <li className={displayTab === DATA_VISUALIZATION_TAB ? 'active' : ''}>
+      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(DATA_VISUALIZATION_TAB)}>
         Data Visualization
       </StyledButton>
     </li>
-    <li className={displayTab === 'Console Output' ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab('Console Output')}>
+    <li className={displayTab === CONSOLE_OUTPUT_TAB ? 'active' : ''}>
+      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(CONSOLE_OUTPUT_TAB)}>
         Console Output
       </StyledButton>
     </li>

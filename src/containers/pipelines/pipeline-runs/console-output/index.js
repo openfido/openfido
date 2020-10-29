@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { requestPipelineRunConsoleOutput } from 'services';
+import { CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
 import { StyledH2, StyledH5 } from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
@@ -64,7 +65,7 @@ const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
           Run #
           {sequence}
         </StyledH2>
-        <OverviewTabMenu displayTab="Console Output" setDisplayTab={setDisplayTab} />
+        <OverviewTabMenu displayTab={CONSOLE_OUTPUT_TAB} setDisplayTab={setDisplayTab} />
       </header>
       <section>
         <StyledH5 color="black">stdout:</StyledH5>

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { OVERVIEW_TAB, CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
 import { getPipelineRuns } from 'actions/pipelines';
 import { StyledGrid } from 'styles/app';
 import colors from 'styles/colors';
@@ -79,7 +80,7 @@ const ArtifactsSection = styled.section`
 const PipelineRuns = ({ pipelineInView }) => {
   const [showStartRunPopup, setStartRunPopup] = useState(false);
   const [selectedRun, setSelectedRun] = useState(null);
-  const [displayTab, setDisplayTab] = useState('Overview');
+  const [displayTab, setDisplayTab] = useState(OVERVIEW_TAB);
 
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns);
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -105,7 +106,7 @@ const PipelineRuns = ({ pipelineInView }) => {
     setStartRunPopup(false);
   };
 
-  if (displayTab === 'Console Output') {
+  if (displayTab === CONSOLE_OUTPUT_TAB) {
     return (
       <ConsoleOutput
         pipelineInView={pipelineInView}
