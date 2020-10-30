@@ -624,14 +624,20 @@ def test_pipeline_run(
 ):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
     responses.add(
         responses.GET,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.uuid}",
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs/{pipeline_run.pipeline_run_uuid}",
         json=json_response,
     )
 
     result = client.get(
-        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.uuid}",
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
         content_type="application/json",
         json=PIPELINE_RUN_JSON,
         headers={
@@ -643,3 +649,66 @@ def test_pipeline_run(
 
     assert result.status_code == 200
     assert result.json == json_response
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@patch("flask.jsonify")
+@responses.activate
+def test_list_pipeline_run_value_error(
+    mock_fetch,
+    mock_jsonify,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = {"some": "json"}
+    mock_jsonify.side_effect = ValueError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert mock_jsonify.called is True
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@responses.activate
+def test_list_pipeline_run_http_error(
+    mock_fetch,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = HTTPError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503

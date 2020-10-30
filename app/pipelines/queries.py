@@ -1,5 +1,3 @@
-from app.pipelines.models import OrganizationPipeline, OrganizationPipelineInputFile, db
-
 from app.pipelines.models import (
     OrganizationPipeline,
     OrganizationPipelineInputFile,

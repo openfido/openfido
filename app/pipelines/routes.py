@@ -430,7 +430,9 @@ def pipeline_runs(organization_uuid, organization_pipeline_uuid):
 )
 @any_application_required
 @validate_organization(False)
-def pipeline_run(organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid):
+def pipeline_run(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
     """Fetch an Organization Pipeline Run
     ---
     tags:
@@ -473,6 +475,12 @@ def pipeline_run(organization_uuid, organization_pipeline_uuid, organization_pip
       "503":
         description: "Http error"
     """
+
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
 
     try:
         return jsonify(
