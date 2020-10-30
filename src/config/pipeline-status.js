@@ -1,6 +1,6 @@
 export const statusLegend = {
   NOT_STARTED: 'purple',
-  IN_QUEUE: 'skyBlue',
+  QUEUED: 'skyBlue',
   RUNNING: 'lightBlue',
   COMPLETED: 'green',
   FAILED: 'pink',
@@ -9,7 +9,7 @@ export const statusLegend = {
 
 export const statusNameLegend = {
   NOT_STARTED: 'Not Started',
-  IN_QUEUE: 'In Queue',
+  QUEUED: 'In Queue',
   RUNNING: 'In Progress',
   COMPLETED: 'Succeeded',
   FAILED: 'Failed',
@@ -18,7 +18,7 @@ export const statusNameLegend = {
 
 export const statusLongNameLegend = {
   NOT_STARTED: 'Not started',
-  IN_QUEUE: 'In the queue',
+  QUEUED: 'In the queue',
   RUNNING: 'In Progress',
   COMPLETED: 'Succeeded',
   FAILED: 'Failed',
@@ -27,7 +27,7 @@ export const statusLongNameLegend = {
 
 export const pipelineStates = {
   NOT_STARTED: 'NOT_STARTED',
-  IN_QUEUE: 'IN_QUEUE',
+  QUEUED: 'QUEUED',
   RUNNING: 'RUNNING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',

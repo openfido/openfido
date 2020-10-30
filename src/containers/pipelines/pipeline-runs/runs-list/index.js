@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import { Menu } from 'antd';
 import moment from 'moment';
 
-import { statusLegend, statusNameLegend } from 'config/pipeline-status';
+import {
+  statusLegend,
+  statusNameLegend,
+} from 'config/pipeline-status';
 import {
   StyledButton,
   StyledH2,
@@ -134,9 +137,17 @@ const AllRuns = ({
               </StyledH4>
               <StatusText>{statusNameLegend[status]}</StatusText>
               <StyledH5>Started At:</StyledH5>
-              <StyledText size="middle" color="gray">{momentStartedAt.format('M/D/YY')}</StyledText>
+              {started_at && (
+                <StyledText size="middle" color="gray">
+                  {momentStartedAt.format('M/D/YY')}
+                </StyledText>
+              )}
               <StyledH5>Duration:</StyledH5>
-              <StyledText size="middle" color="gray">{momentStartedAt.fromNow(true)}</StyledText>
+              {started_at && (
+                <StyledText size="middle" color="gray">
+                  {momentStartedAt.fromNow(true)}
+                </StyledText>
+              )}
             </div>
           </RunItem>
         );

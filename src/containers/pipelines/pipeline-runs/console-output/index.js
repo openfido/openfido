@@ -9,7 +9,7 @@ import { StyledH2, StyledH5 } from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
 
-const Root = styled.div`
+const StyledConsoleOutput = styled.div`
   padding: 16px 20px;
   padding: 1rem 1.25rem;
   header {
@@ -59,7 +59,7 @@ const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
   });
 
   return (
-    <Root>
+    <StyledConsoleOutput>
       <header>
         <StyledH2 color="black">
           Run #
@@ -74,7 +74,7 @@ const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
         <StyledH5 color="black">stderr:</StyledH5>
         {stderr}
       </section>
-    </Root>
+    </StyledConsoleOutput>
 
   );
 };

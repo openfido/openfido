@@ -34,15 +34,28 @@ const StyledFilesList = styled.div`
       font-size: 1rem;
       line-height: 19px;
       line-height: 1.195rem;
-      padding: 12px 4px;
-      padding: 0.75rem 0.25rem;
+      padding: 12px 0 12px 4px;
+      padding: 0.75rem 0 0.75rem 0.25rem;
       color: ${colors.gray};
+      white-space: nowrap;
       a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 8px;
+        margin-right: 0.5rem;
         color: ${colors.mediumBlue};
         font-weight: 500;
         &:hover {
           color: ${colors.lightBlue};
+          .anticon.anticon-download svg path {
+            fill: ${colors.lightBlue};
+            fill-opacity: 1.0;
+          }
         }
+      }
+      > span {
+        min-width: 56px;
+        max-width: 56px;
       }
       > div {
         display: block;
@@ -75,7 +88,7 @@ const FilesList = ({ title, files, pipelineRunSelected: run }) => {
             uuid, name: file_name, url, size,
           }) => (
             <li key={uuid}>
-              <a href={url}>
+              <a href={url} rel="noreferrer" target="_blank" title={file_name}>
                 <DownloadFilled />
                 {file_name}
               </a>

@@ -11,7 +11,7 @@ import StartRunPopup from './start-run-popup';
 import OverviewTabMenu from './overview-tab-menu';
 import ConsoleOutput from './console-output';
 import Overview from './overview';
-import AllRuns from './all-runs';
+import RunsList from './runs-list';
 import FilesList from './files-list';
 
 const PipelineRunsGrid = styled(StyledGrid)`
@@ -120,7 +120,7 @@ const PipelineRuns = ({ pipelineInView }) => {
     <>
       <PipelineRunsGrid gridTemplateColumns="1fr 1fr 1fr">
         <AllRunsSection>
-          <AllRuns
+          <RunsList
             openStartRunPopup={openStartRunPopup}
             pipelineRuns={pipelineRuns}
             selectedRun={selectedRun}

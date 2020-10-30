@@ -8,7 +8,7 @@ import { pipelineStates, statusLongNameLegend } from 'config/pipeline-status';
 import LoadingFilled from 'icons/LoadingFilled';
 import styled from 'styled-components';
 
-const Root = styled.div`
+const StyledOverview = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   width: 294px;
@@ -48,7 +48,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
 
     if (run && run.states && run.states.length) {
       statuses.forEach((status) => {
-        if (run.states[0].state === status) {
+        if (runStatus === status) {
           result = true;
         }
       });
@@ -58,7 +58,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
   };
 
   return (
-    <Root>
+    <StyledOverview>
       <StyledH2 color="black">
         Run #
         {run.sequence}
@@ -67,12 +67,20 @@ const Overview = ({ pipelineRunSelected: run }) => {
         <div>
           <StyledText size="middle" color="gray20" fontweight="bold">Started At:</StyledText>
           <OverviewMeta>
-            <StyledText size="large" color="black" fontweight={500}>
-              {moment.utc(run.started_at).format('M/D/YY')}
-            </StyledText>
-            <StyledText size="large" color="black" fontweight={500}>
-              {moment.utc(run.started_at).format('h:m:sa')}
-            </StyledText>
+            {run.started_at ? (
+              <>
+                <StyledText size="large" color="black" fontweight={500}>
+                  {moment.utc(run.started_at).format('M/D/YY')}
+                </StyledText>
+                <StyledText size="large" color="black" fontweight={500}>
+                  {moment.utc(run.started_at).format('h:mm:ssa')}
+                </StyledText>
+              </>
+            ) : (
+              <StyledText size="large" color="black" fontweight={500}>
+                {statusLongNameLegend[runStatus]}
+              </StyledText>
+            )}
           </OverviewMeta>
         </div>
         <div>
@@ -84,7 +92,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
                   {moment.utc(run.updated_at).format('M/D/YY')}
                 </StyledText>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {moment.utc(run.updated_at).format('h:m:sa')}
+                  {moment.utc(run.updated_at).format('h:mm:ssa')}
                 </StyledText>
               </>
             ) : (
@@ -124,7 +132,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
           </StyledText>
         </div>
       </OverviewGrid>
-    </Root>
+    </StyledOverview>
   );
 };
 
