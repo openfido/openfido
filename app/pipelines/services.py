@@ -191,7 +191,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline_input_files:
         raise ValueError({"message": "missing organizational pipeline input files."})
 
-    new_pipeline = {"callback": "https://www.example.com", "inputs": []}
+    new_pipeline = {"callback_url": "https://www.example.com", "inputs": []}
 
     for opf in org_pipeline_input_files:
         new_pipeline["inputs"].append(
