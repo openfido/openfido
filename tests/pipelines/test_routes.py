@@ -712,3 +712,32 @@ def test_list_pipeline_run_http_error(
     )
 
     assert result.status_code == 503
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@responses.activate
+def test_list_pipeline_run_invalid_org_pipeline(
+    mock_fetch,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = HTTPError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/123445/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
