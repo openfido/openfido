@@ -185,19 +185,18 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         raise ValueError({"message": "organizational_pipeline_uuid not found"})
 
     org_pipeline_input_files = find_organization_pipeline_input_files(
-        org_pipeline.id, request_json.get("inputs")
+        org_pipeline.id, request_json.get("inputs", [])
     )
 
-    new_pipeline = {
-        "callback": "https://www.example.com",
-        "inputs": []
-    }
+    if not org_pipeline_input_files:
+        raise ValueError({"message": "missing organizational pipeline input files."})
+
+    new_pipeline = {"callback": "https://www.example.com", "inputs": []}
 
     for opf in org_pipeline_input_files:
-        new_pipeline["inputs"].append({
-            "url": "https://thisisstoredsomewhere.com"
-            "name": opf.name
-        })
+        new_pipeline["inputs"].append(
+            {"url": "https://thisisstoredsomewhere.com", "name": opf.name}
+        )
 
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",

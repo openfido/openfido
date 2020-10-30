@@ -10,7 +10,7 @@ from app.constants import (
     WORKFLOW_API_TOKEN,
     WORKFLOW_HOSTNAME,
 )
-from app.pipelines.models import OrganizationPipeline, db
+from app.pipelines.models import OrganizationPipeline, OrganizationPipelineInputFile, db
 from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
@@ -63,6 +63,18 @@ def organization_pipeline(app):
     db.session.commit()
 
     return op
+
+
+@pytest.fixture
+def organization_pipeline_input_file(app, organization_pipeline):
+    opif = OrganizationPipelineInputFile(
+        organization_pipeline_id=organization_pipeline.id,
+        name=f"organization_pipeline_input_file.csv",
+    )
+    db.session.add(opif)
+    db.session.commit()
+
+    return opif
 
 
 @pytest.fixture

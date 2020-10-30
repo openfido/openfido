@@ -444,7 +444,13 @@ def test_upload_input_file(
 
 
 @responses.activate
-def test_create_pipeline_run(app, client, client_application, organization_pipeline):
+def test_create_pipeline_run(
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_input_file,
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -460,13 +466,14 @@ def test_create_pipeline_run(app, client, client_application, organization_pipel
     result = client.post(
         f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
-        json=PIPELINE_RUN_JSON,
+        json={"inputs": [organization_pipeline_input_file.uuid]},
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
         },
     )
     resp = result.json
+
     new_run = OrganizationPipelineRun.query.filter(
         OrganizationPipelineRun.pipeline_run_uuid == resp["uuid"]
     ).first()

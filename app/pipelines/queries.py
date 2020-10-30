@@ -21,6 +21,7 @@ def find_organization_pipeline(organization_uuid, organization_pipeline_uuid):
 def find_organization_pipeline_input_files(organization_pipeline_id, uuids):
     """ Find Organization Pipeline Input Files """
     return OrganizationPipelineInputFile.query.filter(
-        OrganizationPipelineInputFile.organization_pipeline_id == organization_pipeline_id,
-        OrganizationPipelineInputFile.uuid.in_(uuids)
+        OrganizationPipelineInputFile.organization_pipeline_id
+        == organization_pipeline_id,
+        OrganizationPipelineInputFile.uuid.in_(uuids),
     ).all()
