@@ -16,7 +16,11 @@ from .models import (
     OrganizationPipelineRun,
     db,
 )
-from .queries import find_organization_pipeline, find_organization_pipelines
+from .queries import (
+    find_organization_pipeline,
+    find_organization_pipelines,
+    find_organization_pipeline_input_files,
+)
 from ..utils import make_hash
 
 
@@ -180,13 +184,25 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline:
         raise ValueError({"message": "organizational_pipeline_uuid not found"})
 
+    org_pipeline_input_files = find_organization_pipeline_input_files(
+        org_pipeline.id, request_json.get("inputs")
+    )
+
+    for opf in org_pipeline_input_files:
+        opf["url"] = "https://thisisstoredsomewhere.com"
+
+    new_pipeline = {
+        "callback": "https://www.example.com",
+        "inputs": org_pipeline_input_files
+    }
+
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
         headers={
             "Content-Type": "application/json",
             ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
         },
-        json=request_json,
+        json=new_pipeline,
     )
 
     try:
