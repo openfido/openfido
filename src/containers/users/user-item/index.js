@@ -29,6 +29,8 @@ const UserItemGrid = styled(StyledGrid)`
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
+  margin-righT: 16px;
+  margin-right: 1rem;
   &.ant-dropdown-trigger {
     width: 116px;
     display: inline-flex;
@@ -99,6 +101,9 @@ const NameColumn = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  margin-right: 16px;
+  margin-right: 1rem;
+  overflow: hidden;
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
@@ -127,6 +132,7 @@ const StyledMenuItem = styled(Menu.Item)`
 
 const StyledPhotoContainer = styled.div`
   width: 53px;
+  min-width: 53px;
   height: 53px;
   border-radius: 50%;
   border: 2px solid ${colors.lightGray};
@@ -281,16 +287,15 @@ const UserItem = ({
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )} */}
       </NameColumn>
-      {isInvited ? roleText : (
-        <StyledDropdown
-          overlay={menu}
-          visible={visible}
-          trigger="click"
-          onVisibleChange={(flag) => setVisible(flag)}
-        >
-          {roleText}
-        </StyledDropdown>
-      )}
+      <StyledDropdown
+        overlay={menu}
+        visible={visible}
+        trigger="click"
+        onVisibleChange={(flag) => setVisible(flag)}
+        disabled={isInvited}
+      >
+        {roleText}
+      </StyledDropdown>
       <StyledText size="large" color="gray">
         {isInvited ? (
           <StyledText color="blue">Invitation sent</StyledText>
