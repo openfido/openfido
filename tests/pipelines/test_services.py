@@ -37,8 +37,7 @@ PIPELINE_RUN_RESPONSE_JSON = {
     "artifacts": [],
     "created_at": "2020-10-28T22:01:48.950370",
     "inputs": [
-        {"name": "file6.csv", "url": "http://www.example1.com"},
-        {"name": "file4.csv", "url": "http://www.example2.com"},
+        {"name": "organization_pipeline_input_file.csv", "url": "https://thisisstoredsomewhere.com"},
     ],
     "sequence": 1,
     "states": [
