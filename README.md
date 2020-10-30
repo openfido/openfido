@@ -55,9 +55,7 @@ docker-compose which files to use, and where each project is:
     docker-compose up
 
 ## Deployment
-
 TODO
 
 ## Provisioning
-
 TODO
