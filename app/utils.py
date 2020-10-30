@@ -1,9 +1,12 @@
+import hashlib
 import logging
 import re
+import secrets
 from enum import IntEnum, unique
 from functools import wraps
 
 import jwt
+import secrets
 from application_roles.decorators import make_permission_decorator
 from flask import g, request
 from jwt.exceptions import DecodeError
@@ -86,3 +89,29 @@ def validate_organization(requires_json=True):
         return wrapper
 
     return decorator
+
+
+def make_hash(password, salt=None):
+    """Make a hash of a password.
+
+    If a salt is not provided, a random one is created.
+
+    Returns the hash and salt."""
+    # NIST guidelines for password storage:
+    #  * salt > 32 bits
+    #  * PBKDF2
+    #  * iterate at least 10,000 times.
+    #  * TODO consider adding pepper (probably SECRET_KEY?)
+    if salt is None:
+        salt = secrets.token_urlsafe(32)
+    return (
+        hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt.encode("utf-8"), 10000
+        ).hex(),
+        salt,
+    )
+
+
+def verify_hash(password, p_hash, salt):
+    """ Returns True when 'password' matches a value from make_hash(). """
+    return make_hash(password, salt)[0] == p_hash

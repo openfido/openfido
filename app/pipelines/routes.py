@@ -11,6 +11,8 @@ from .services import (
     update_pipeline,
     delete_pipeline,
     create_pipeline_input_file,
+    fetch_pipeline_runs,
+    create_pipeline_run,
 )
 
 from .queries import find_organization_pipeline
@@ -291,6 +293,130 @@ def upload_input_file(organization_uuid, organization_pipeline_uuid):
             organization_pipeline, filename, request.stream
         )
         return jsonify(uuid=input_file.uuid, name=input_file.name)
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization(False)
+def create_pipeline_runs(organization_uuid, organization_pipeline_uuid):
+    """Create a Pipeline Run
+    ---
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Create a pipeline run"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                artifacts:
+                  type: array
+                  items:
+                    type: object
+                sequence:
+                  type: string
+                states:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                      state:
+                        type: string
+                created_at:
+                  type: string
+                uuid:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    try:
+        return jsonify(
+            create_pipeline_run(
+                organization_uuid, organization_pipeline_uuid, request.json
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs",
+    methods=["GET"],
+)
+@any_application_required
+@validate_organization(False)
+def pipeline_runs(organization_uuid, organization_pipeline_uuid):
+    """List all Organization Pipeline Runs.
+    ---
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "List of pipeline runs"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  artifacts:
+                    type: array
+                    items:
+                      type: object
+                  sequence:
+                    type: string
+                  states:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        created_at:
+                          type: string
+                        state:
+                          type: string
+                  created_at:
+                    type: string
+                  uuid:
+                    type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    try:
+        return jsonify(
+            fetch_pipeline_runs(organization_uuid, organization_pipeline_uuid)
+        )
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:

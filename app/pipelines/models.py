@@ -54,8 +54,8 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
     status_update_token_expires_at = db.Column(db.DateTime, nullable=False)
 
     share_token = db.Column(db.String(32), nullable=False)
-    share_password_hash = db.Column(db.String(127), nullable=False)
-    share_password_salt = db.Column(db.String(127), nullable=False)
+    share_password_hash = db.Column(db.String(127), nullable=True)
+    share_password_salt = db.Column(db.String(127), nullable=True)
 
     organization_pipeline_run_post_processing_states = db.relationship(
         "OrganizationPipelineRunPostProcessingState",

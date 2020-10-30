@@ -116,7 +116,7 @@ services:
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
       AUTH_HOSTNAME: http://auth_service:5000
-      WORKFLOW_HOSTNAME: http://workflow_service:5000
+      WORKFLOW_HOSTNAME: http://workflow_service:6001
     volumes:
       - .:/opt/app:delegated
     ports:
