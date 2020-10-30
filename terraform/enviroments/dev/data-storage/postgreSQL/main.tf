@@ -19,7 +19,7 @@ module "rds" {
   source = "git@github.com:PresencePG/presence-devops-module-rds.git?ref=0.1.2"
 
   environment       = local.env
-  client            = var.stack_name
+  client            = var.client
   db_engine         = var.db_engine
   db_engine_version = var.db_engine_version
   db_name           = var.db_name

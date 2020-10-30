@@ -1,3 +1,7 @@
+output "s3_blob_arn" {
+  value = aws_s3_bucket.blob.arn
+}
+
 output "s3_blob_url" {
   value = aws_s3_bucket.blob.bucket_regional_domain_name
 }

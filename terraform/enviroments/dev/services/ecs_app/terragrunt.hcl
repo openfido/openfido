@@ -8,12 +8,20 @@ terraform {
 
     arguments = [
       "-var-file=${get_parent_terragrunt_dir()}/variables/common.tfvars",
-      "-var-file=${get_parent_terragrunt_dir()}/variables/${get_env("TF_VAR_environment")}/ecs.tfvars"
+      "-var-file=${get_parent_terragrunt_dir()}/variables/${get_env("TF_VAR_environment")}/ecs_app.tfvars"
     ]
   }
 }
 
 // Dependency's for this terraform
+dependency "ecs_workflow" {
+  config_path = "../ecs_workflow"
+}
+
+dependency "ecs_auth" {
+  config_path = "../ecs_auth"
+}
+
 dependency "front" {
   config_path = "../front_end"
 }
@@ -37,5 +45,12 @@ inputs = {
   db_endpoint         = dependency.rds.outputs.db_instance_address
   db_sg_id            = dependency.rds.outputs.db_sg_id
   s3_blob_url         = dependency.front.outputs.s3_blob_url
+  s3_blob_arn         = dependency.front.outputs.s3_blob_arn
   cf_domain           = dependency.front.outputs.cf_domain
+  ecs_cluster_id      = dependency.ecs_auth.outputs.ecs_cluster_id
+  ecs_cluster_name    = dependency.ecs_auth.outputs.ecs_cluster_name
+  auth_domain         = dependency.ecs_auth.outputs.auth_domain
+  secret_key          = dependency.ecs_auth.outputs.secret_key
+  workflow_sg_id      = dependency.ecs_workflow.outputs.workflow_sg_id
+  workflow_url        = dependency.ecs_workflow.outputs.workflow_url
 }

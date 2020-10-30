@@ -30,7 +30,6 @@ resource "random_password" "secret" {
 
 // Tag all resources
 locals {
-  env           = var.environment
-  tags          = merge(map("Environment", local.env), var.aws_tags)
-  list_ecs_name = tolist(keys(var.ecs_containers))
+  env  = var.environment
+  tags = merge(map("Environment", local.env), var.aws_tags)
 }

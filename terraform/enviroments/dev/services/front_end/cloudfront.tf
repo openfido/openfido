@@ -3,7 +3,7 @@ module "cf" {
 
   environment         = local.env
   tags                = local.tags
-  client              = var.stack_name
+  client              = var.client
   is_ipv6_enabled     = true
   price_class         = "PriceClass_100"
   retain_on_delete    = false

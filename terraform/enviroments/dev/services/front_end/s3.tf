@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "blob" {
   policy = data.aws_iam_policy_document.s3_blob.json
 
   tags = merge(map(
-  "Name", local.s3_blob
+    "Name", local.s3_blob
   ), local.tags)
 }
 

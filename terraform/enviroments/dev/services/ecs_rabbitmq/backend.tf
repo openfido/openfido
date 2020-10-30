@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     dynamodb_table = "openfido-remote-state-lock"
     encrypt        = true
-    key            = "enviroments/dev/services/front_end/terraform.tfstate"
+    key            = "enviroments/dev/services/ecs_rabbitmq/terraform.tfstate"
     profile        = "openfido"
     region         = "us-east-1"
     bucket         = "openfido-remote-state"

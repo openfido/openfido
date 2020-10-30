@@ -8,8 +8,8 @@ aws_profile = "openfido"
 // AWS Region
 aws_region = "us-east-1"
 
-// Project Name
-stack_name = "openfido"
+// Client Name
+client = "openfido"
 
 // Tags for instance
 aws_tags = {

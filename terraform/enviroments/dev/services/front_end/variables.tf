@@ -4,7 +4,7 @@ variable "environment" { type = string }
 // Common variables
 variable "aws_profile" { type = string }
 variable "aws_region" { type = string }
-variable "stack_name" { type = string }
+variable "client" { type = string }
 variable "aws_tags" { type = map(string) }
 
 // Inherit from vpn module

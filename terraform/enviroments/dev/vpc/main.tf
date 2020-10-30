@@ -20,7 +20,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "2.57.0"
 
-  name = "${var.stack_name}-${local.env}"
+  name = "${var.client}-${local.env}"
   cidr = "10.12.0.0/16"
 
   azs              = slice(data.aws_availability_zones.available.names, 0, 2)

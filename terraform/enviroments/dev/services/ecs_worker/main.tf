@@ -17,8 +17,6 @@ terraform {
 
 // Tag all resources
 locals {
-  env        = var.environment
-  tags       = merge(map("Environment", local.env), var.aws_tags)
-  s3_blob    = "${var.client}-${local.env}-blob"
-  s3_website = "${var.client}-${local.env}-website"
+  env  = var.environment
+  tags = merge(map("Environment", local.env), var.aws_tags)
 }
