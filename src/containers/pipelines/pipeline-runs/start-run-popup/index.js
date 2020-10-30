@@ -126,6 +126,7 @@ export const Artifact = styled.div`
     margin-right: 0.5rem;
     white-space: pre;
     overflow: hidden;
+    text-overflow: ellipsis;
   }
   .anticon {
     position: static;
@@ -243,7 +244,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
         </UploadSection>
         <ArtifactsSection>
           {inputFiles && inputFiles.map(({ name: input_name }, index) => (
-            <Artifact key={`${input_name}${Math.random()}`} alt={input_name}>
+            <Artifact key={`${input_name}${Math.random()}`} title={input_name}>
               <StyledText>{input_name}</StyledText>
               <CloseOutlined color="lightGray" onClick={() => onRemoveInputFileClicked(index)} />
             </Artifact>
