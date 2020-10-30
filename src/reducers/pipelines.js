@@ -48,11 +48,22 @@ export default (state = DEFAULT_STATE, action) => {
           getPipelinesError: action.payload,
         },
       };
-    case GET_PIPELINE_RUNS:
+    case GET_PIPELINE_RUNS: {
+      const pipelineRuns = action.payload || [];
+
+      pipelineRuns.sort((runA, runB) => {
+        if (runA.sequence && runB.sequence) {
+          return runB.sequence - runA.sequence;
+        }
+
+        return -1;
+      });
+
       return {
         ...state,
         pipelineRuns: action.payload,
       };
+    }
     case GET_PIPELINE_RUNS_FAILED:
       return {
         ...state,
