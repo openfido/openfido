@@ -229,7 +229,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(json_value) from http_error
+        raise ValueError(created_pipeline) from http_error
 
 
 def fetch_pipeline_runs(organization_uuid, pipeline_uuid):

@@ -17,7 +17,7 @@ from app.pipelines.services import (
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
-from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID
+from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID, PIPELINE_RUN_INPUT_FILE_UUID
 
 PIPELINE_JSON = {
     "description": "a pipeline",
@@ -27,17 +27,16 @@ PIPELINE_JSON = {
     "repository_ssh_url": "https://github.com/PresencePG/presence-pipeline-example.git",
 }
 PIPELINE_RUN_JSON = {
-    "callback_url": "http://callbackurl.com",
-    "inputs": [
-        {"name": "foo.csv", "url": "http://www.baz.com"},
-        {"name": "bar.csv", "url": "http://www.quix.com"},
-    ],
+    "inputs": [PIPELINE_RUN_INPUT_FILE_UUID],
 }
 PIPELINE_RUN_RESPONSE_JSON = {
     "artifacts": [],
     "created_at": "2020-10-28T22:01:48.950370",
     "inputs": [
-        {"name": "organization_pipeline_input_file.csv", "url": "https://thisisstoredsomewhere.com"},
+        {
+            "name": "organization_pipeline_input_file.csv",
+            "url": "https://thisisstoredsomewhere.com",
+        },
     ],
     "sequence": 1,
     "states": [
@@ -235,7 +234,9 @@ def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeli
 
 
 @responses.activate
-def test_create_pipeline_run(app, organization_pipeline):
+def test_create_pipeline_run(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -260,8 +261,26 @@ def test_create_pipeline_run(app, organization_pipeline):
     assert created_pipeline_run == json_response
 
 
-@patch("app.pipelines.services.upload_stream")
-def test_create_pipeline_run_missing_pipeline(app, organization_pipeline):
+def test_create_pipeline_run_invalid_org_and_input(
+    app, organization_pipeline, organization_pipeline_input_file
+):
+    json_request = {"inputs": []}
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run("12345", "12345", json_request)
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            json_request,
+        )
+
+
+@responses.activate
+def test_create_pipeline_run_missing_pipeline(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -281,7 +300,9 @@ def test_create_pipeline_run_missing_pipeline(app, organization_pipeline):
 
 
 @responses.activate
-def test_create_pipeline_run_response_error(app, organization_pipeline):
+def test_create_pipeline_run_response_error(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(
@@ -299,7 +320,9 @@ def test_create_pipeline_run_response_error(app, organization_pipeline):
 
 
 @responses.activate
-def test_create_pipeline_run_notfound_error(app, organization_pipeline):
+def test_create_pipeline_run_notfound_error(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(

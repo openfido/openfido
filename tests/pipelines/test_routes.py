@@ -483,6 +483,35 @@ def test_create_pipeline_run(
     assert result.json == json_response
 
 
+@responses.activate
+def test_create_pipeline_run_invalid_org_and_file(
+    app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/12345/pipelines/{organization_pipeline.uuid}/runs",
+        content_type="application/json",
+        json={"some": "json"},
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 404
+
+    result = client.post(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
+        content_type="application/json",
+        json={"inputs": []},
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
 @patch("app.pipelines.routes.create_pipeline_run")
 @responses.activate
 def test_create_pipeline_run_value_error(
