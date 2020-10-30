@@ -111,3 +111,5 @@ Other tasks are available, in particular the `precommit` task, which mirrors the
 tests performed by CircleCI.
 
 Endpoints have been documented with [swagger](https://swagger.io/blog/news/whats-new-in-openapi-3-0/), which is configured to be easily explored in the default `run.py` configuration. When the flask server is running visit http://localhost:5000/apidocs to see documentation and interact with the API directly.
+
+# Others
