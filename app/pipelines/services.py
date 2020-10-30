@@ -191,12 +191,13 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline_input_files:
         raise ValueError({"message": "missing organizational pipeline input files."})
 
+    # TODO: we will need to update the actual file URLs in a future ticket.
+    #       for now, lets stub these and callback url.
     new_pipeline = {"callback_url": "https://www.example.com", "inputs": []}
+    url_stub = "https://thisisstoredsomewhere.com"
 
     for opf in org_pipeline_input_files:
-        new_pipeline["inputs"].append(
-            {"url": "https://thisisstoredsomewhere.com", "name": opf.name}
-        )
+        new_pipeline["inputs"].append({"url": url_stub, "name": opf.name})
 
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
@@ -223,7 +224,12 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         db.session.add(org_pipeline_run)
         db.session.commit()
 
-        created_pipeline["inputs"] = new_pipeline["inputs"]
+        # reshape input collection for client.
+        created_pipeline["inputs"] = []
+        for opf in org_pipeline_input_files:
+            created_pipeline["inputs"].append(
+                {"url": url_stub, "name": opf.name, "uuid": opf.uuid}
+            )
 
         return created_pipeline
     except ValueError as value_error:

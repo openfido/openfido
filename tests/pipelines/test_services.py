@@ -36,6 +36,7 @@ PIPELINE_RUN_RESPONSE_JSON = {
         {
             "name": "organization_pipeline_input_file.csv",
             "url": "https://thisisstoredsomewhere.com",
+            "uuid": PIPELINE_RUN_INPUT_FILE_UUID,
         },
     ],
     "sequence": 1,
