@@ -208,12 +208,12 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     )
 
     try:
-        json_value = response.json()
+        created_pipeline = response.json()
         response.raise_for_status()
 
         org_pipeline_run = OrganizationPipelineRun(
             organization_pipeline_id=org_pipeline.id,
-            pipeline_run_uuid=json_value["uuid"],
+            pipeline_run_uuid=created_pipeline["uuid"],
             status_update_token=uuid.uuid4().hex,
             status_update_token_expires_at=datetime.now() + timedelta(days=7),
             share_token=uuid.uuid4().hex,
@@ -223,7 +223,9 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         db.session.add(org_pipeline_run)
         db.session.commit()
 
-        return json_value
+        created_pipeline["inputs"] = new_pipeline["inputs"]
+
+        return created_pipeline
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
