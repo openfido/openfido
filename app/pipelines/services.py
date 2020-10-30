@@ -188,13 +188,16 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         org_pipeline.id, request_json.get("inputs")
     )
 
-    for opf in org_pipeline_input_files:
-        opf["url"] = "https://thisisstoredsomewhere.com"
-
     new_pipeline = {
         "callback": "https://www.example.com",
-        "inputs": org_pipeline_input_files
+        "inputs": []
     }
+
+    for opf in org_pipeline_input_files:
+        new_pipeline["inputs"].append({
+            "url": "https://thisisstoredsomewhere.com"
+            "name": opf.name
+        })
 
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
