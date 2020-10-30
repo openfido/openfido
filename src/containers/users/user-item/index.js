@@ -137,7 +137,6 @@ const UserItem = ({
 }) => {
   const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
-  const [invitationCanceled, setInvitationCanceled] = useState(false);
   const [userAvatar, setUserAvatar] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -166,17 +165,14 @@ const UserItem = ({
     }
   }, [changeRoleError, userRoleChanged, uuid, userRoleClicked]);
 
-  if (invitationCanceled) return null;
-
   const onDeleteUserClicked = () => {
     if (isInvited && uuid) {
       requestCancelOrganizationInvitation(uuid)
         .then(() => {
           dispatch(getOrganizationMembers(currentOrg));
-          setInvitationCanceled(true);
         })
         .catch(() => {
-          setInvitationCanceled(false);
+
         });
     } else {
       dispatch(removeOrganizationMember(currentOrg, uuid));
