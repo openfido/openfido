@@ -13,6 +13,7 @@ from app.pipelines.services import (
     create_pipeline_input_file,
     create_pipeline_run,
     fetch_pipeline_runs,
+    fetch_pipeline_run,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
@@ -368,4 +369,57 @@ def test_fetch_pipeline_runs_notfound_error(app, organization_pipeline):
     with pytest.raises(ValueError):
         fetch_pipeline_runs(
             organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_run(app, organization_pipeline, organization_pipeline_run):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=json_response,
+    )
+
+    pipeline_run = fetch_pipeline_run(
+        organization_pipeline.organization_uuid,
+        organization_pipeline.uuid,
+        organization_pipeline_run.uuid,
+    )
+
+    assert pipeline_run is not None
+    assert pipeline_run == json_response
+
+
+@responses.activate
+def test_fetch_pipeline_error(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_notfound(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json={"error": "not found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        fetch_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
         )

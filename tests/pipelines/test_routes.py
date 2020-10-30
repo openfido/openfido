@@ -442,7 +442,6 @@ def test_upload_input_file(
     assert result.status_code == 200
     assert len(organization_pipeline.organization_pipeline_input_files) == 1
 
-
 @responses.activate
 def test_create_pipeline_run(app, client, client_application, organization_pipeline):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
@@ -617,3 +616,30 @@ def test_list_pipeline_runs_http_error(
     )
 
     assert result.status_code == 503
+
+
+@responses.activate
+def test_pipeline_run(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.uuid}",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 200
+    assert result.json == json_response
