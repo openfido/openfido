@@ -12,6 +12,7 @@ import {
 import { requestCancelOrganizationInvitation, requestUserAvatar } from 'services';
 import { getOrganizationMembers, removeOrganizationMember, changeOrganizationMemberRole } from 'actions/organization';
 import DownOutlined from 'icons/DownOutlined';
+import CloseOutlined from 'icons/CloseOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import MailOutlined from 'icons/MailOutlined';
 import UserFilled from 'icons/UserFilled';
@@ -28,6 +29,8 @@ const UserItemGrid = styled(StyledGrid)`
 
 const StyledDropdown = styled(Dropdown)`
   position: relative;
+  margin-righT: 16px;
+  margin-right: 1rem;
   &.ant-dropdown-trigger {
     width: 116px;
     display: inline-flex;
@@ -71,12 +74,25 @@ const StyledMenu = styled(Menu)`
     text-align: center;
   }
   li:not(.ant-dropdown-menu-item) {
-    margin: 8px 16px;
-    margin: 0.5rem 1rem;
+    margin: 8px 20px;
+    margin: 0.5rem 1.25rem;
     font-size: 12px;
     font-size: 0.75rem;
     line-height: 14px;
     line-height: 0.875rem;
+  }
+  .anticon.anticon-close-outlined {
+    top: 4px;
+    right: 4px;
+    svg {
+      width: 18px;
+      width: 1.125rem;
+      height: 18px;
+      height: 1.125rem;
+    } 
+    &:hover svg line {
+      stroke: ${colors.gray20};
+    }
   }
 `;
 
@@ -85,6 +101,9 @@ const NameColumn = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  margin-right: 16px;
+  margin-right: 1rem;
+  overflow: hidden;
 `;
 
 const StyledMenuItem = styled(Menu.Item)`
@@ -108,11 +127,12 @@ const StyledMenuItem = styled(Menu.Item)`
   &:not(:last-child) {
     margin-bottom: 10px;
     margin-bottom: 0.625rem;
-   }
+  }
 `;
 
 const StyledPhotoContainer = styled.div`
   width: 53px;
+  min-width: 53px;
   height: 53px;
   border-radius: 50%;
   border: 2px solid ${colors.lightGray};
@@ -137,8 +157,8 @@ const UserItem = ({
 }) => {
   const [userRole, setUserRole] = useState(role || ROLE_USER);
   const [userRoleClicked, setUserRoleClicked] = useState(null);
-  const [invitationCanceled, setInvitationCanceled] = useState(false);
   const [userAvatar, setUserAvatar] = useState(null);
+  const [visible, setVisible] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   // const userRemoved = useSelector((state) => state.organization.messages.userRemoved);
@@ -166,17 +186,14 @@ const UserItem = ({
     }
   }, [changeRoleError, userRoleChanged, uuid, userRoleClicked]);
 
-  if (invitationCanceled) return null;
-
   const onDeleteUserClicked = () => {
     if (isInvited && uuid) {
       requestCancelOrganizationInvitation(uuid)
         .then(() => {
           dispatch(getOrganizationMembers(currentOrg));
-          setInvitationCanceled(true);
         })
         .catch(() => {
-          setInvitationCanceled(false);
+
         });
     } else {
       dispatch(removeOrganizationMember(currentOrg, uuid));
@@ -190,6 +207,9 @@ const UserItem = ({
 
   const menu = (
     <StyledMenu selectedKeys={[userRole && userRole.name]}>
+      <li>
+        <CloseOutlined onClick={() => setVisible(false)} />
+      </li>
       <li>
         <StyledText size="large" fontweight={500}>Change role</StyledText>
       </li>
@@ -267,11 +287,15 @@ const UserItem = ({
           <ErrorMessage color="pink">Cannot change this member's role.</ErrorMessage>
         )} */}
       </NameColumn>
-      {isInvited ? roleText : (
-        <StyledDropdown overlay={menu} trigger="click">
-          {roleText}
-        </StyledDropdown>
-      )}
+      <StyledDropdown
+        overlay={menu}
+        visible={visible}
+        trigger="click"
+        onVisibleChange={(flag) => setVisible(flag)}
+        disabled={isInvited}
+      >
+        {roleText}
+      </StyledDropdown>
       <StyledText size="large" color="gray">
         {isInvited ? (
           <StyledText color="blue">Invitation sent</StyledText>

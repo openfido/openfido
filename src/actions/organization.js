@@ -25,7 +25,7 @@ import {
   requestUserOrganizations,
 } from 'services';
 
-export const getOrganizationMembers = (organization_uuid) => async (dispatch) => {
+export const getOrganizationMembers = (organization_uuid) => async (dispatch) => (
   requestOrganizationMembers(organization_uuid)
     .then((membersResponse) => {
       dispatch({
@@ -52,8 +52,8 @@ export const getOrganizationMembers = (organization_uuid) => async (dispatch) =>
         type: GET_ORGANIZATION_MEMBERS_FAILED,
         payload: !err.response || err.response.data,
       });
-    });
-};
+    })
+);
 
 export const removeOrganizationMember = (organization_uuid, user_uuid) => async (dispatch) => {
   // organization_uuid === currentOrg
