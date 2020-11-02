@@ -20,7 +20,7 @@ jobs:
           keys:
             - project-pipfile-{{ checksum "Pipfile.lock" }}
       - run:
-          command: pipenv install --dev
+          command: pipenv install --dev --deploy
       - save_cache:
           key: project-pipfile-{{ checksum "Pipfile.lock" }}
           paths:
