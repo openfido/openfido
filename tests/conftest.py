@@ -71,7 +71,7 @@ def organization_pipeline_input_file(app, organization_pipeline):
     opif = OrganizationPipelineInputFile(
         uuid=PIPELINE_RUN_INPUT_FILE_UUID,
         organization_pipeline_id=organization_pipeline.id,
-        name=f"organization_pipeline_input_file.csv",
+        name=f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
     )
     db.session.add(opif)
     db.session.commit()

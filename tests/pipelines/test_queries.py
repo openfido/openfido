@@ -2,6 +2,8 @@ from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID
 from app.pipelines.queries import (
     find_organization_pipeline,
     find_organization_pipelines,
+    find_organization_pipeline_input_files,
+    search_organization_pipeline_input_files,
 )
 from app.pipelines.models import db
 
@@ -36,3 +38,38 @@ def test_find_organization_pipeline(app, organization_pipeline):
         )
         is None
     )
+
+
+def test_find_organization_pipeline(app, organization_pipeline):
+    assert (
+        find_organization_pipeline(
+            organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )
+        == organization_pipeline
+    )
+
+    # deleted pipelines are not returned
+    organization_pipeline.is_deleted = True
+    db.session.commit()
+    assert (
+        find_organization_pipeline(
+            organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )
+        is None
+    )
+
+
+def test_search_organization_pipeline_input_files(
+    app, organization_pipeline, organization_pipeline_input_file
+):
+    assert search_organization_pipeline_input_files(
+        organization_pipeline.id, [organization_pipeline_input_file.uuid]
+    ) == [organization_pipeline_input_file]
+
+
+def test_find_organization_pipeline_input_files(
+    app, organization_pipeline, organization_pipeline_input_file
+):
+    assert find_organization_pipeline_input_files(organization_pipeline.id) == [
+        organization_pipeline_input_file
+    ]

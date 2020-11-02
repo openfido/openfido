@@ -583,35 +583,6 @@ def test_list_pipeline_runs(app, client, client_application, organization_pipeli
     assert result.json == json_response
 
 
-@responses.activate
-def test_list_pipeline_runs(app, client, client_application, organization_pipeline):
-    json_response = [PIPELINE_RUN_RESPONSE_JSON]
-
-    pipeline = OrganizationPipeline.query.order_by(
-        OrganizationPipeline.id.desc()
-    ).first()
-
-    responses.add(
-        responses.GET,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
-        json=json_response,
-    )
-
-    result = client.get(
-        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
-        content_type="application/json",
-        json=PIPELINE_RUN_JSON,
-        headers={
-            "Authorization": f"Bearer {JWT_TOKEN}",
-            ROLES_KEY: client_application.api_key,
-        },
-    )
-    resp = result.json
-
-    assert result.status_code == 200
-    assert result.json == json_response
-
-
 @patch("app.pipelines.routes.fetch_pipeline_runs")
 @patch("flask.jsonify")
 @responses.activate

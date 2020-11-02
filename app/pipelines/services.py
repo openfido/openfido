@@ -19,7 +19,7 @@ from .models import (
 from .queries import (
     find_organization_pipeline,
     find_organization_pipelines,
-    find_organization_pipeline_input_files,
+    search_organization_pipeline_input_files,
 )
 from ..utils import make_hash
 
@@ -184,7 +184,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline:
         raise ValueError({"message": "organizational_pipeline_uuid not found"})
 
-    org_pipeline_input_files = find_organization_pipeline_input_files(
+    org_pipeline_input_files = search_organization_pipeline_input_files(
         org_pipeline.id, request_json.get("inputs", [])
     )
 

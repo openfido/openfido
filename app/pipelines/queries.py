@@ -18,7 +18,15 @@ def find_organization_pipeline(organization_uuid, organization_pipeline_uuid):
     ).one_or_none()
 
 
-def find_organization_pipeline_input_files(organization_pipeline_id, uuids):
+def find_organization_pipeline_input_files(organization_pipeline_id):
+    """ Search for Organization Pipeline Input Files """
+    return OrganizationPipelineInputFile.query.filter(
+        OrganizationPipelineInputFile.organization_pipeline_id
+        == organization_pipeline_id
+    ).all()
+
+
+def search_organization_pipeline_input_files(organization_pipeline_id, uuids):
     """ Find Organization Pipeline Input Files """
     return OrganizationPipelineInputFile.query.filter(
         OrganizationPipelineInputFile.organization_pipeline_id
