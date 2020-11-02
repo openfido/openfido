@@ -15,14 +15,13 @@ from .constants import (
 def get_s3():
     """ Get access to the Boto s3 service. """
 
-    params = {
-        "endpoint_url": current_app.config[S3_ENDPOINT_URL],
-        "config": Config(signature_version="s3v4"),
-        "region_name": current_app.config[S3_REGION_NAME],
-    }
+    params = { }
     if S3_ACCESS_KEY_ID in current_app.config:
         params["aws_access_key_id"] = current_app.config[S3_ACCESS_KEY_ID]
         params["aws_secret_access_key"] = current_app.config[S3_SECRET_ACCESS_KEY]
+        params["endpoint_url"] = current_app.config[S3_ENDPOINT_URL]
+        params["config"] = Config(signature_version="s3v4"),
+        params["region_name"] = current_app.config[S3_REGION_NAME],
 
     return boto3.client("s3", **params)
 
