@@ -93,9 +93,7 @@ def validate_organization(requires_json=True):
 
 def make_hash(password, salt=None):
     """Make a hash of a password.
-
     If a salt is not provided, a random one is created.
-
     Returns the hash and salt."""
     # NIST guidelines for password storage:
     #  * salt > 32 bits

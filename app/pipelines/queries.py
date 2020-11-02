@@ -1,4 +1,9 @@
-from app.pipelines.models import OrganizationPipeline, OrganizationPipelineInputFile, db
+from app.pipelines.models import (
+    OrganizationPipeline,
+    OrganizationPipelineInputFile,
+    OrganizationPipelineRun,
+    db,
+)
 
 
 def find_organization_pipelines(organization_uuid):

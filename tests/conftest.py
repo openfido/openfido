@@ -1,3 +1,5 @@
+import uuid
+from datetime import datetime, timedelta
 import pytest
 import responses
 from app import create_app
@@ -10,7 +12,12 @@ from app.constants import (
     WORKFLOW_API_TOKEN,
     WORKFLOW_HOSTNAME,
 )
-from app.pipelines.models import OrganizationPipeline, OrganizationPipelineInputFile, db
+from app.pipelines.models import (
+    OrganizationPipeline,
+    OrganizationPipelineRun,
+    OrganizationPipelineInputFile,
+    db,
+)
 from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
@@ -77,6 +84,22 @@ def organization_pipeline_input_file(app, organization_pipeline):
     db.session.commit()
 
     return opif
+
+@pytest.fixture
+def organization_pipeline_run(app, organization_pipeline):
+    opr = OrganizationPipelineRun(
+        organization_pipeline_id=organization_pipeline.id,
+        pipeline_run_uuid=PIPELINE_RUN_UUID,
+        status_update_token=uuid.uuid4().hex,
+        status_update_token_expires_at=datetime.now() + timedelta(days=7),
+        share_token=uuid.uuid4().hex,
+        share_password_hash=None,
+        share_password_salt=None,
+    )
+    db.session.add(opr)
+    db.session.commit()
+
+    return opr
 
 
 @pytest.fixture
