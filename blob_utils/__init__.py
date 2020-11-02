@@ -30,25 +30,11 @@ def get_s3():
     return boto3.client("s3")
 
 
-def verify_bucket(s3_client):
-    """Takes an s3 client, fetches a list of buckets, and verifies the
-    bucket exists. If not, create the configured bucket.
-    """
-    target_bucket = current_app.config[S3_BUCKET]
-
-    buckets = (s3_client.list_buckets() or {}).get("Buckets", [])
-
-    if target_bucket not in [bucket["Name"] for bucket in buckets]:
-        s3_client.create_bucket(ACL="private", Bucket=target_bucket)
-
-
 def upload_stream(key, stream, s3_client=None):
     """ Upload a io stream to an s3 bucket with the specified key. """
 
     if not s3_client:
         s3_client = get_s3()
-
-    verify_bucket(s3_client)
 
     s3_client.upload_fileobj(
         stream,
@@ -77,8 +63,6 @@ def get_file(key, s3_client=None):
 
     if not s3_client:
         s3_client = get_s3()
-
-    verify_bucket(s3_client)
 
     return (
         s3_client
