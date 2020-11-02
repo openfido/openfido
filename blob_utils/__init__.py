@@ -10,17 +10,18 @@ from .constants import (
     S3_ENDPOINT_URL,
     S3_REGION_NAME,
     S3_PRESIGNED_TIMEOUT,
+    FLASK_ENV
 )
 
 def get_s3():
     """ Get access to the Boto s3 service. """
 
     # For local development we need to explicitly set the S3 keys:
-    if current_app.config['FLASK_ENV'] != 'production':
+    if FLASK_ENV in current_app.config and current_app.config[FLASK_ENV] != 'production':
         params = {
-            "aws_access_key_id": current_app.config[S3_ACCESS_KEY_ID]
-            "aws_secret_access_key": current_app.config[S3_SECRET_ACCESS_KEY]
-            "endpoint_url": current_app.config[S3_ENDPOINT_URL]
+            "aws_access_key_id": current_app.config[S3_ACCESS_KEY_ID],
+            "aws_secret_access_key": current_app.config[S3_SECRET_ACCESS_KEY],
+            "endpoint_url": current_app.config[S3_ENDPOINT_URL],
             "config": Config(signature_version="s3v4"),
             "region_name": current_app.config[S3_REGION_NAME],
         }
