@@ -125,7 +125,7 @@ const RunsList = ({
       {pipelineRuns && pipelineRuns.map(({
         uuid: run_uuid, sequence, states, started_at,
       }) => {
-        const status = states && states[0] && states[0].state;
+        const status = states && states.length && states[states.length - 1].state;
         const momentStartedAt = moment.utc(started_at);
 
         return (
