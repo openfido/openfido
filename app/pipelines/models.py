@@ -14,7 +14,7 @@ class Pipeline(CommonColumnsMixin, db.Model):
     __tablename__ = "pipeline"
 
     name = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(300), nullable=False)
+    description = db.Column(db.String(300), nullable=True)
     docker_image_url = db.Column(db.String(2000), nullable=True)
     repository_ssh_url = db.Column(db.String(2000), nullable=True)
     repository_branch = db.Column(db.String(100), nullable=True)
