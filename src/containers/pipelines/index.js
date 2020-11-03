@@ -7,12 +7,11 @@ import { Space } from 'antd';
 
 import { ROUTE_PIPELINE_RUNS } from 'config/routes';
 import { getPipelines } from 'actions/pipelines';
-import { StyledTitle, StyledButton, StyledText } from 'styles/app';
+import { StyledTitle, StyledButton } from 'styles/app';
 import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
 import AddPipeline from './add-pipeline';
 import EditPipeline from './edit-pipeline';
-import PipelineRuns from './pipeline-runs';
 
 const PipelineItems = styled(Space)`
   padding: 28px 20px 28px 16px;
