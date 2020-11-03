@@ -18,6 +18,7 @@ import AcceptOrganizationInvitation from 'containers/login/accept-organization-i
 import CreateNewAccountInvitation from 'containers/login/create-new-account-invitation';
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
+import PipelineRuns from 'containers/pipelines/pipeline-runs';
 import Settings from 'containers/settings';
 import { refreshUserToken } from 'actions/user';
 import store from 'config/store';
@@ -27,6 +28,7 @@ import {
   ROUTE_RESET_PASSWORD,
   ROUTE_UPDATE_PASSWORD,
   ROUTE_PIPELINES,
+  ROUTE_PIPELINE_RUNS,
   ROUTE_USERS,
   ROUTE_ACCEPT_ORGANIZATION_INVITATION,
   ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
@@ -90,6 +92,10 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_PIPELINES}>
         {noProfileRedirectToLogin}
         {hasProfile && <App>{organizations && <Pipelines />}</App>}
+      </Route>
+      <Route exact path={ROUTE_PIPELINE_RUNS}>
+        {noProfileRedirectToLogin}
+        {hasProfile && <App>{organizations && <PipelineRuns />}</App>}
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}

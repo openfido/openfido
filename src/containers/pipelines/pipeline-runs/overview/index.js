@@ -41,7 +41,7 @@ const OverviewMeta = styled.div`
 `;
 
 const Overview = ({ pipelineRunSelected: run }) => {
-  const runStatus = run && run.states && run.states.length && run.states[0].state;
+  const runStatus = run && run.states && run.states.length && run.states[run.states.length - 1].state;
 
   const checkPipelineRunStatus = (statuses = []) => {
     let result = false;

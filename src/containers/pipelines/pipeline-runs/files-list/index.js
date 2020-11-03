@@ -74,7 +74,7 @@ const OverviewMeta = styled.div`
 `;
 
 const FilesList = ({ title, files, pipelineRunSelected: run }) => {
-  const runStatus = run && run.states && run.states.length && run.states[0].state;
+  const runStatus = run && run.states && run.states.length && run.states[run.states.length - 1].state;
 
   return (
     <StyledFilesList>
@@ -120,7 +120,7 @@ FilesList.propTypes = {
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
-  })).isRequired,
+  })),
   pipelineRunSelected: PropTypes.shape({
     sequence: PropTypes.number.isRequired,
     updated_at: PropTypes.string.isRequired,
@@ -129,7 +129,12 @@ FilesList.propTypes = {
     states: PropTypes.arrayOf(PropTypes.shape({
       state: PropTypes.string.isRequired,
     })),
-  }).isRequired,
+  }),
+};
+
+FilesList.defaultProps = {
+  files: [],
+  pipelineRunSelected: null,
 };
 
 export default FilesList;
