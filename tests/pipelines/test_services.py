@@ -13,11 +13,13 @@ from app.pipelines.services import (
     create_pipeline_input_file,
     create_pipeline_run,
     fetch_pipeline_runs,
+    fetch_pipeline_run,
+    fetch_pipeline_run_console,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
-from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID
+from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID, PIPELINE_RUN_INPUT_FILE_UUID
 
 PIPELINE_JSON = {
     "description": "a pipeline",
@@ -27,18 +29,17 @@ PIPELINE_JSON = {
     "repository_ssh_url": "https://github.com/PresencePG/presence-pipeline-example.git",
 }
 PIPELINE_RUN_JSON = {
-    "callback_url": "http://callbackurl.com",
-    "inputs": [
-        {"name": "foo.csv", "url": "http://www.baz.com"},
-        {"name": "bar.csv", "url": "http://www.quix.com"},
-    ],
+    "inputs": [PIPELINE_RUN_INPUT_FILE_UUID],
 }
 PIPELINE_RUN_RESPONSE_JSON = {
     "artifacts": [],
     "created_at": "2020-10-28T22:01:48.950370",
     "inputs": [
-        {"name": "file6.csv", "url": "http://www.example1.com"},
-        {"name": "file4.csv", "url": "http://www.example2.com"},
+        {
+            "name": f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
+            "url": "https://thisisstoredsomewhere.com",
+            "uuid": PIPELINE_RUN_INPUT_FILE_UUID,
+        },
     ],
     "sequence": 1,
     "states": [
@@ -46,6 +47,10 @@ PIPELINE_RUN_RESPONSE_JSON = {
         {"created_at": "2020-10-28T22:01:48.955688", "state": "NOT_STARTED"},
     ],
     "uuid": "35654b0b6f1044d0afcdf8bedaa0bd71",
+}
+PIPELINE_RUN_CONSOLE_RESPONSE_JSON = {
+    "std_out": "success messages",
+    "std_err": "the error output...",
 }
 
 
@@ -236,7 +241,9 @@ def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeli
 
 
 @responses.activate
-def test_create_pipeline_run(app, organization_pipeline):
+def test_create_pipeline_run(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -261,8 +268,26 @@ def test_create_pipeline_run(app, organization_pipeline):
     assert created_pipeline_run == json_response
 
 
-@patch("app.pipelines.services.upload_stream")
-def test_create_pipeline_run_missing_pipeline(app, organization_pipeline):
+def test_create_pipeline_run_invalid_org_and_input(
+    app, organization_pipeline, organization_pipeline_input_file
+):
+    json_request = {"inputs": []}
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run("12345", "12345", json_request)
+
+    with pytest.raises(ValueError):
+        created_pipeline_run = create_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            json_request,
+        )
+
+
+@responses.activate
+def test_create_pipeline_run_missing_pipeline(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -282,7 +307,9 @@ def test_create_pipeline_run_missing_pipeline(app, organization_pipeline):
 
 
 @responses.activate
-def test_create_pipeline_run_response_error(app, organization_pipeline):
+def test_create_pipeline_run_response_error(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(
@@ -300,7 +327,9 @@ def test_create_pipeline_run_response_error(app, organization_pipeline):
 
 
 @responses.activate
-def test_create_pipeline_run_notfound_error(app, organization_pipeline):
+def test_create_pipeline_run_notfound_error(
+    app, organization_pipeline, organization_pipeline_input_file
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(
@@ -368,4 +397,116 @@ def test_fetch_pipeline_runs_notfound_error(app, organization_pipeline):
     with pytest.raises(ValueError):
         fetch_pipeline_runs(
             organization_pipeline.organization_uuid, organization_pipeline.uuid
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_run(app, organization_pipeline, organization_pipeline_run):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=json_response,
+    )
+
+    pipeline_run = fetch_pipeline_run(
+        organization_pipeline.organization_uuid,
+        organization_pipeline.uuid,
+        organization_pipeline_run.uuid,
+    )
+
+    assert pipeline_run is not None
+    assert pipeline_run == json_response
+
+
+@responses.activate
+def test_fetch_pipeline_error(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_notfound(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json={"error": "not found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        fetch_pipeline_run(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_run_console(
+    app, organization_pipeline, organization_pipeline_run
+):
+    json_response = dict(PIPELINE_RUN_CONSOLE_RESPONSE_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}/console",
+        json=json_response,
+    )
+
+    console_output = fetch_pipeline_run_console(
+        organization_pipeline.organization_uuid,
+        organization_pipeline.uuid,
+        organization_pipeline_run.uuid,
+    )
+
+    assert console_output is not None
+    assert console_output == json_response
+
+
+@responses.activate
+def test_fetch_pipeline_run_error(
+    app, organization_pipeline, organization_pipeline_run
+):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}/console",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_pipeline_run_console(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
+        )
+
+
+@responses.activate
+def test_fetch_pipeline_run_notfound(
+    app, organization_pipeline, organization_pipeline_run
+):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}/console",
+        json={},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        fetch_pipeline_run_console(
+            organization_pipeline.organization_uuid,
+            organization_pipeline.uuid,
+            organization_pipeline_run.uuid,
         )

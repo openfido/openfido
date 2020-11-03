@@ -24,6 +24,7 @@ from .test_services import (
     PIPELINE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
+    PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
 )
 
 
@@ -444,7 +445,13 @@ def test_upload_input_file(
 
 
 @responses.activate
-def test_create_pipeline_run(app, client, client_application, organization_pipeline):
+def test_create_pipeline_run(
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_input_file,
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -460,13 +467,14 @@ def test_create_pipeline_run(app, client, client_application, organization_pipel
     result = client.post(
         f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
         content_type="application/json",
-        json=PIPELINE_RUN_JSON,
+        json={"inputs": [organization_pipeline_input_file.uuid]},
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
         },
     )
     resp = result.json
+
     new_run = OrganizationPipelineRun.query.filter(
         OrganizationPipelineRun.pipeline_run_uuid == resp["uuid"]
     ).first()
@@ -474,6 +482,35 @@ def test_create_pipeline_run(app, client, client_application, organization_pipel
     assert result.status_code == 200
     assert new_run is not None
     assert result.json == json_response
+
+
+@responses.activate
+def test_create_pipeline_run_invalid_org_and_file(
+    app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/12345/pipelines/{organization_pipeline.uuid}/runs",
+        content_type="application/json",
+        json={"some": "json"},
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 404
+
+    result = client.post(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
+        content_type="application/json",
+        json={"inputs": []},
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
 
 
 @patch("app.pipelines.routes.create_pipeline_run")
@@ -547,35 +584,6 @@ def test_list_pipeline_runs(app, client, client_application, organization_pipeli
     assert result.json == json_response
 
 
-@responses.activate
-def test_list_pipeline_runs(app, client, client_application, organization_pipeline):
-    json_response = [PIPELINE_RUN_RESPONSE_JSON]
-
-    pipeline = OrganizationPipeline.query.order_by(
-        OrganizationPipeline.id.desc()
-    ).first()
-
-    responses.add(
-        responses.GET,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs",
-        json=json_response,
-    )
-
-    result = client.get(
-        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs",
-        content_type="application/json",
-        json=PIPELINE_RUN_JSON,
-        headers={
-            "Authorization": f"Bearer {JWT_TOKEN}",
-            ROLES_KEY: client_application.api_key,
-        },
-    )
-    resp = result.json
-
-    assert result.status_code == 200
-    assert result.json == json_response
-
-
 @patch("app.pipelines.routes.fetch_pipeline_runs")
 @patch("flask.jsonify")
 @responses.activate
@@ -617,3 +625,249 @@ def test_list_pipeline_runs_http_error(
     )
 
     assert result.status_code == 503
+
+
+@responses.activate
+def test_pipeline_run(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline.pipeline_uuid}/runs/{pipeline_run.pipeline_run_uuid}",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 200
+    assert result.json == json_response
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@patch("flask.jsonify")
+@responses.activate
+def test_list_pipeline_run_value_error(
+    mock_fetch,
+    mock_jsonify,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = {"some": "json"}
+    mock_jsonify.side_effect = ValueError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert mock_jsonify.called is True
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@responses.activate
+def test_list_pipeline_run_http_error(
+    mock_fetch,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = HTTPError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run")
+@responses.activate
+def test_list_pipeline_run_invalid_org_pipeline(
+    mock_fetch,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_fetch.side_effect = HTTPError("error")
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/123445/runs/{organization_pipeline.uuid}",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.find_organization_pipeline")
+@responses.activate
+def test_pipeline_run_console_org_not_found(
+    mock_pipeline,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_pipeline.return_value = None
+
+    result = client.get(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/12345/runs/{organization_pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run_console")
+@responses.activate
+def test_pipeline_run_console_error(
+    mock_console,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_console.side_effect = ValueError("error")
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run_console")
+@responses.activate
+def test_pipeline_run_console_notfound(
+    mock_console,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_console.side_effect = HTTPError("not found")
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_pipeline_run_console(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    json_response = dict(PIPELINE_RUN_CONSOLE_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}/console",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 200
+    assert result.json == json_response

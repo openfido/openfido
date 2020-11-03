@@ -16,7 +16,11 @@ from .models import (
     OrganizationPipelineRun,
     db,
 )
-from .queries import find_organization_pipeline, find_organization_pipelines
+from .queries import (
+    find_organization_pipeline,
+    find_organization_pipelines,
+    search_organization_pipeline_input_files,
+)
 from ..utils import make_hash
 
 
@@ -180,22 +184,37 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline:
         raise ValueError({"message": "organizational_pipeline_uuid not found"})
 
+    org_pipeline_input_files = search_organization_pipeline_input_files(
+        org_pipeline.id, request_json.get("inputs", [])
+    )
+
+    if not org_pipeline_input_files:
+        raise ValueError({"message": "missing organizational pipeline input files."})
+
+    # TODO: we will need to update the actual file URLs in a future ticket.
+    #       for now, lets stub these and callback url.
+    new_pipeline = {"callback_url": "https://www.example.com", "inputs": []}
+    url_stub = "https://thisisstoredsomewhere.com"
+
+    for opf in org_pipeline_input_files:
+        new_pipeline["inputs"].append({"url": url_stub, "name": opf.name})
+
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
         headers={
             "Content-Type": "application/json",
             ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
         },
-        json=request_json,
+        json=new_pipeline,
     )
 
     try:
-        json_value = response.json()
+        created_pipeline = response.json()
         response.raise_for_status()
 
         org_pipeline_run = OrganizationPipelineRun(
             organization_pipeline_id=org_pipeline.id,
-            pipeline_run_uuid=json_value["uuid"],
+            pipeline_run_uuid=created_pipeline["uuid"],
             status_update_token=uuid.uuid4().hex,
             status_update_token_expires_at=datetime.now() + timedelta(days=7),
             share_token=uuid.uuid4().hex,
@@ -205,11 +224,18 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         db.session.add(org_pipeline_run)
         db.session.commit()
 
-        return json_value
+        # reshape input collection for client.
+        created_pipeline["inputs"] = []
+        for opf in org_pipeline_input_files:
+            created_pipeline["inputs"].append(
+                {"url": url_stub, "name": opf.name, "uuid": opf.uuid}
+            )
+
+        return created_pipeline
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(json_value) from http_error
+        raise ValueError(created_pipeline) from http_error
 
 
 def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
@@ -233,3 +259,71 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(pipeline_runs) from http_error
+
+
+def fetch_pipeline_run(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Find an OrganizationPipelineRun for a pipline."""
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    org_pipeline_run = next(
+        filter(
+            lambda r: r.uuid == organization_pipeline_run_uuid,
+            org_pipeline.organization_pipeline_runs,
+        )
+    )
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs/{org_pipeline_run.pipeline_run_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        pipeline_runs = response.json()
+        response.raise_for_status()
+
+        return pipeline_runs
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(pipeline_runs) from http_error
+
+
+def fetch_pipeline_run_console(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Fetches console output for an OrganizationPipelineRun."""
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    org_pipeline_run = next(
+        filter(
+            lambda r: r.uuid == organization_pipeline_run_uuid,
+            org_pipeline.organization_pipeline_runs,
+        )
+    )
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs/{org_pipeline_run.pipeline_run_uuid}/console",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        console_output = response.json()
+        response.raise_for_status()
+
+        return console_output
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(console_output) from http_error
