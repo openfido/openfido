@@ -1,3 +1,7 @@
+output "s3_blob_name" {
+  value = aws_s3_bucket.blob.bucket
+}
+
 output "s3_blob_arn" {
   value = aws_s3_bucket.blob.arn
 }

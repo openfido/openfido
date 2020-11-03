@@ -45,12 +45,13 @@ inputs = {
   db_endpoint         = dependency.rds.outputs.db_instance_address
   db_sg_id            = dependency.rds.outputs.db_sg_id
   cf_domain           = dependency.front.outputs.cf_domain
-  s3_blob_url         = dependency.front.outputs.s3_blob_url
+  s3_blob_name        = dependency.front.outputs.s3_blob_name
   s3_blob_arn         = dependency.front.outputs.s3_blob_arn
   ecs_cluster_id      = dependency.ecs_auth.outputs.ecs_cluster_id
   ecs_cluster_name    = dependency.ecs_auth.outputs.ecs_cluster_name
   secret_key          = dependency.ecs_auth.outputs.secret_key
   rabbitmq_url        = dependency.ecs_rabbitmq.outputs.rabbitmq_url
   rabbitmq_sg_id      = dependency.ecs_rabbitmq.outputs.rabbitmq_sg_id
+  sd_domain           = dependency.ecs_rabbitmq.outputs.sd_domain
   sd_namespace        = dependency.ecs_rabbitmq.outputs.sd_namespace
 }

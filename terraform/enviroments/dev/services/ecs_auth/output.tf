@@ -11,5 +11,5 @@ output "ecs_cluster_name" {
 }
 
 output "auth_domain" {
-  value = module.ecs.lb_dns_name[0]
+  value = "http://${module.ecs.lb_dns_name[0]}"
 }

@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.0.0"
+  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.1.0"
 
   client      = var.client
   environment = local.env
@@ -20,7 +20,8 @@ module "ecs" {
       CLIENT_BASE_URL         = var.cf_domain
       FLASK_APP               = "run.py"
       FLASK_ENV               = "production"
-      S3_ENDPOINT_URL         = var.s3_blob_url
+      S3_BUCKET               = var.s3_blob_name
+      S3_PRESIGNED_TIMEOUT    = 3600
       SECRET_KEY              = var.secret_key
       SQLALCHEMY_DATABASE_URI = "postgresql://${var.db_user}:${var.db_password}@${var.db_endpoint}/${var.ecs_name}service"
     }

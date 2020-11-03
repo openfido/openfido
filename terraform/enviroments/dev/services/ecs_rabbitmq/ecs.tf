@@ -1,6 +1,6 @@
 // App Service
 module "ecs" {
-  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.0.0"
+  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.1.0"
 
   client      = var.client
   environment = local.env

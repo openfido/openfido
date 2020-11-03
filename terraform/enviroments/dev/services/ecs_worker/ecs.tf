@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.0.0"
+  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.1.0"
 
   client         = var.client
   environment    = local.env
@@ -23,6 +23,20 @@ module "ecs" {
 
     secrets = {}
     ssm     = {}
+  }]
+
+  container_task_volumes = [{
+    name           = "docker_in_docker"
+    host_path      = "/var/run/docker.sock"
+    read_only      = false
+    container_path = "/var/run/docker.sock"
+    add_to         = [var.ecs_name]
+  },{
+    name           = "tmb_in_docker"
+    host_path      = "/tmp"
+    read_only      = false
+    container_path = "/tmp"
+    add_to         = [var.ecs_name]
   }]
 
   sg_list = [var.rabbitmq_sg_id, var.workflow_sg_id]

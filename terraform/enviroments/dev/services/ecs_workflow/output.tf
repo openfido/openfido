@@ -3,5 +3,5 @@ output "workflow_sg_id" {
 }
 
 output "workflow_url" {
-  value = "http://${module.ecs.sd_name}.${var.rabbitmq_url}:${var.ecs_port}"
+  value = "http://${module.ecs.sd_name}.${var.sd_domain}:${var.ecs_port}"
 }

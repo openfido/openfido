@@ -36,7 +36,7 @@ inputs = {
   db_password         = dependency.rds.outputs.db_instance_password
   db_endpoint         = dependency.rds.outputs.db_instance_address
   db_sg_id            = dependency.rds.outputs.db_sg_id
-  s3_blob_url         = dependency.front.outputs.s3_blob_url
+  s3_blob_name        = dependency.front.outputs.s3_blob_name
   s3_blob_arn         = dependency.front.outputs.s3_blob_arn
   cf_domain           = dependency.front.outputs.cf_domain
 }

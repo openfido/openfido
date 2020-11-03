@@ -35,8 +35,7 @@ variable "db_password" { type = string }
 variable "db_endpoint" { type = string }
 variable "db_sg_id" { type = string }
 variable "cf_domain" { type = string }
-variable "s3_blob_url" { type = string }
-// Other ECS Need variables
+variable "s3_blob_name" { type = string }
 variable "ecs_cluster_id" { type = string }
 variable "ecs_cluster_name" { type = string }
 variable "rabbitmq_url" { type = string }
