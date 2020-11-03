@@ -14,6 +14,7 @@ from .services import (
     fetch_pipeline_run,
     fetch_pipeline_runs,
     create_pipeline_run,
+    fetch_pipeline_run_console,
 )
 
 from .queries import find_organization_pipeline
@@ -485,6 +486,64 @@ def pipeline_run(
     try:
         return jsonify(
             fetch_pipeline_run(
+                organization_uuid,
+                organization_pipeline_uuid,
+                organization_pipeline_run_uuid,
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/console",
+    methods=["GET"],
+)
+@any_application_required
+@validate_organization(False)
+def pipeline_run_console(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Fetch an Organization Pipeline Run Console Output
+    ---
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Get a Pipeline Run"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                std_out:
+                  type: string
+                std_err:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+
+    try:
+        return jsonify(
+            fetch_pipeline_run_console(
                 organization_uuid,
                 organization_pipeline_uuid,
                 organization_pipeline_run_uuid,

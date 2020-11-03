@@ -261,13 +261,17 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
         raise ValueError(pipeline_runs) from http_error
 
 
-def fetch_pipeline_run(organization_uuid, pipeline_uuid, pipeline_run_uuid):
+def fetch_pipeline_run(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
     """Find an OrganizationPipelineRun for a pipline."""
-    org_pipeline = find_organization_pipeline(organization_uuid, pipeline_uuid)
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
 
     org_pipeline_run = next(
         filter(
-            lambda r: r.uuid == pipeline_run_uuid,
+            lambda r: r.uuid == organization_pipeline_run_uuid,
             org_pipeline.organization_pipeline_runs,
         )
     )
@@ -289,3 +293,37 @@ def fetch_pipeline_run(organization_uuid, pipeline_uuid, pipeline_run_uuid):
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(pipeline_runs) from http_error
+
+
+def fetch_pipeline_run_console(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Fetches console output for an OrganizationPipelineRun."""
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    org_pipeline_run = next(
+        filter(
+            lambda r: r.uuid == organization_pipeline_run_uuid,
+            org_pipeline.organization_pipeline_runs,
+        )
+    )
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs/{org_pipeline_run.pipeline_run_uuid}/console",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        console_output = response.json()
+        response.raise_for_status()
+
+        return console_output
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(console_output) from http_error

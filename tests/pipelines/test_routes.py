@@ -24,6 +24,7 @@ from .test_services import (
     PIPELINE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
+    PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
 )
 
 
@@ -741,7 +742,7 @@ def test_list_pipeline_run_invalid_org_pipeline(
     pipeline_run = pipeline.organization_pipeline_runs[0]
 
     result = client.get(
-        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/123445/runs/{pipeline_run.uuid}",
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/123445/runs/{organization_pipeline.uuid}",
         content_type="application/json",
         json=PIPELINE_RUN_JSON,
         headers={
@@ -751,3 +752,122 @@ def test_list_pipeline_run_invalid_org_pipeline(
     )
 
     assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.find_organization_pipeline")
+@responses.activate
+def test_pipeline_run_console_org_not_found(
+    mock_pipeline,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_pipeline.return_value = None
+
+    result = client.get(
+        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/12345/runs/{organization_pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run_console")
+@responses.activate
+def test_pipeline_run_console_error(
+    mock_console,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_console.side_effect = ValueError("error")
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.fetch_pipeline_run_console")
+@responses.activate
+def test_pipeline_run_console_notfound(
+    mock_console,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_console.side_effect = HTTPError("not found")
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_pipeline_run_console(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    json_response = dict(PIPELINE_RUN_CONSOLE_RESPONSE_JSON)
+
+    pipeline = OrganizationPipeline.query.order_by(
+        OrganizationPipeline.id.desc()
+    ).first()
+
+    pipeline_run = pipeline.organization_pipeline_runs[0]
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}/console",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{pipeline.organization_uuid}/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}/console",
+        content_type="application/json",
+        json=PIPELINE_RUN_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    resp = result.json
+
+    assert result.status_code == 200
+    assert result.json == json_response

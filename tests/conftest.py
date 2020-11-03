@@ -85,6 +85,7 @@ def organization_pipeline_input_file(app, organization_pipeline):
 
     return opif
 
+
 @pytest.fixture
 def organization_pipeline_run(app, organization_pipeline):
     opr = OrganizationPipelineRun(
