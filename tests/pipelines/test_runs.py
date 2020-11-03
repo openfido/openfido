@@ -393,9 +393,9 @@ def test_upload_run_artifact_service_valueerror(
     assert result.status_code == 400
 
 
-@patch("app.pipelines.services.get_s3")
+@patch("app.pipelines.services.upload_stream")
 def test_upload_run_artifact(
-    get_s3_mock, client, pipeline, worker_application, mock_execute_pipeline
+    upload_stream_mock, client, pipeline, worker_application, mock_execute_pipeline
 ):
     db.session.commit()
     pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)

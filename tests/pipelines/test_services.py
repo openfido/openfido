@@ -261,11 +261,13 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
     assert pipeline_run.run_state_enum() == RunStateEnum.RUNNING
 
 
-@patch("app.pipelines.services.get_s3")
-@patch("app.pipelines.models.get_s3")
+@patch("app.pipelines.services.upload_stream")
+@patch("app.pipelines.models.create_url")
 @patch("app.pipelines.services.urllib_request.urlopen")
-def test_copy_pipeline_run_artifact(urlopen_mock, s3_mock, services_s3_mock, pipeline):
-    s3_mock().generate_presigned_url.return_value = "http://example.com/presigned"
+def test_copy_pipeline_run_artifact(
+    urlopen_mock, create_url_mock, upload_stream_mock, pipeline
+):
+    create_url_mock.return_value = "http://example.com/presigned"
     urlopen_mock.return_value = io.BytesIO(b"this is data")
     another_run = services.create_pipeline_run(
         pipeline.uuid, VALID_CALLBACK_INPUT, True
@@ -286,35 +288,3 @@ def test_copy_pipeline_run_artifact(urlopen_mock, s3_mock, services_s3_mock, pip
 def test_create_pipeline_run_artifact_no_pipeline(app):
     with pytest.raises(ValueError):
         services.create_pipeline_run_artifact("nosuchid", "file.name", None)
-
-
-@patch("app.pipelines.services.get_s3")
-def test_create_pipeline_run_artifact_no_bucket(
-    get_s3_mock, app, pipeline, mock_execute_pipeline
-):
-    stream = io.BytesIO(b"this is data")
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-
-    services.create_pipeline_run_artifact(pipeline_run.uuid, "file.name", stream)
-
-    assert get_s3_mock().create_bucket.called
-    assert get_s3_mock().upload_fileobj.called
-
-
-@patch("app.pipelines.services.get_s3")
-def test_create_pipeline_run_artifact(
-    get_s3_mock, app, pipeline, mock_execute_pipeline
-):
-    get_s3_mock().list_buckets.return_value = {
-        "Buckets": [{"Name": app.config[S3_BUCKET]}]
-    }
-
-    stream = io.BytesIO(b"this is data")
-    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
-
-    services.create_pipeline_run_artifact(pipeline_run.uuid, "file.name", stream)
-
-    assert len(pipeline_run.pipeline_run_artifacts) == 1
-    assert pipeline_run.pipeline_run_artifacts[0].name == "file.name"
-    assert not get_s3_mock().create_bucket.called
-    assert get_s3_mock().upload_fileobj.called

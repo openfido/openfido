@@ -114,9 +114,7 @@ following command:
     invoke create-application-key -n "local worker" -p PIPELINES_WORKER
 
 ## Deployment
-
 **TODO**
 
 ## Provisioning
-
 **TODO**
