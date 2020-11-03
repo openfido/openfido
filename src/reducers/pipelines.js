@@ -1,5 +1,6 @@
 import moment from 'moment';
 
+import { pipelineStates } from 'config/pipeline-status';
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
@@ -61,9 +62,11 @@ export default (state = DEFAULT_STATE, action) => {
         return -1;
       });
 
-      pipelineRuns.forEach((run) => {
-        if (run.states) {
-          run.states.sort((stateA, stateB) => {
+      pipelineRuns.forEach((run, index) => {
+        const { states } = run;
+
+        if (states) {
+          states.sort((stateA, stateB) => {
             const dateA = moment(stateA.created_at);
             const dateB = moment(stateB.created_at);
 
@@ -74,6 +77,38 @@ export default (state = DEFAULT_STATE, action) => {
             return -1;
           });
         }
+
+        let status = null;
+        let startedAt = null;
+        let completedAt = null;
+        let momentStartedAt = null;
+        let momentCompletedAt = null;
+        let duration = null;
+
+        if (states && states.length) {
+          status = states[states.length - 1].state;
+          startedAt = states.find((stateItem) => stateItem.state === pipelineStates.RUNNING);
+          completedAt = states.find((stateItem) => (
+            stateItem.state === pipelineStates.COMPLETED
+              || stateItem.state === pipelineStates.FAILED
+              || stateItem.state === pipelineStates.CANCELED
+          ));
+
+          startedAt = startedAt && startedAt.created_at;
+          completedAt = completedAt && completedAt.created_at;
+
+          momentStartedAt = startedAt && moment.utc(startedAt).local();
+          momentCompletedAt = completedAt && moment.utc(completedAt).local();
+
+          if (momentStartedAt && momentCompletedAt) {
+            duration = moment.duration(momentStartedAt.diff(momentCompletedAt)).humanize();
+          }
+        }
+
+        pipelineRuns[index].status = status;
+        pipelineRuns[index].startedAt = momentStartedAt;
+        pipelineRuns[index].completedAt = momentCompletedAt;
+        pipelineRuns[index].duration = duration;
       });
 
       return {

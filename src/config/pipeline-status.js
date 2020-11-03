@@ -4,7 +4,7 @@ export const statusLegend = {
   RUNNING: 'lightBlue',
   COMPLETED: 'green',
   FAILED: 'pink',
-  ABORTED: 'orange',
+  CANCELED: 'orange',
 };
 
 export const statusNameLegend = {
@@ -13,7 +13,7 @@ export const statusNameLegend = {
   RUNNING: 'In Progress',
   COMPLETED: 'Succeeded',
   FAILED: 'Failed',
-  ABORTED: 'Canceled',
+  CANCELED: 'Canceled',
 };
 
 export const statusLongNameLegend = {
@@ -22,7 +22,7 @@ export const statusLongNameLegend = {
   RUNNING: 'In Progress',
   COMPLETED: 'Succeeded',
   FAILED: 'Failed',
-  ABORTED: 'Canceled',
+  CANCELED: 'Canceled',
 };
 
 export const pipelineStates = {
@@ -31,5 +31,5 @@ export const pipelineStates = {
   RUNNING: 'RUNNING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED',
-  ABORTED: 'ABORTED',
+  CANCELED: 'CANCELED',
 };

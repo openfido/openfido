@@ -124,7 +124,6 @@ FilesList.propTypes = {
   pipelineRunSelected: PropTypes.shape({
     sequence: PropTypes.number.isRequired,
     updated_at: PropTypes.string.isRequired,
-    started_at: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired,
     states: PropTypes.arrayOf(PropTypes.shape({
       state: PropTypes.string.isRequired,

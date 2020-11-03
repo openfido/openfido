@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Spin } from 'antd';
-import moment from 'moment';
 
 import { StyledH2, StyledText } from 'styles/app';
 import { pipelineStates, statusLongNameLegend } from 'config/pipeline-status';
@@ -41,7 +40,9 @@ const OverviewMeta = styled.div`
 `;
 
 const Overview = ({ pipelineRunSelected: run }) => {
-  const runStatus = run && run.states && run.states.length && run.states[run.states.length - 1].state;
+  const {
+    status: runStatus, startedAt, completedAt, duration,
+  } = run;
 
   const checkPipelineRunStatus = (statuses = []) => {
     let result = false;
@@ -67,13 +68,13 @@ const Overview = ({ pipelineRunSelected: run }) => {
         <div>
           <StyledText size="middle" color="gray20" fontweight="bold">Started At:</StyledText>
           <OverviewMeta>
-            {run.started_at ? (
+            {startedAt ? (
               <>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {moment.utc(run.started_at).format('M/D/YY')}
+                  {startedAt.format('M/D/YY')}
                 </StyledText>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {moment.utc(run.started_at).format('h:mm:ssa')}
+                  {startedAt.format('h:mm:ssa')}
                 </StyledText>
               </>
             ) : (
@@ -86,13 +87,13 @@ const Overview = ({ pipelineRunSelected: run }) => {
         <div>
           <StyledText size="middle" color="gray20" fontweight="bold">Completed At:</StyledText>
           <OverviewMeta>
-            {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.ABORTED]) ? (
+            {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.CANCELED]) ? (
               <>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {moment.utc(run.updated_at).format('M/D/YY')}
+                  {completedAt && completedAt.format('M/D/YY')}
                 </StyledText>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {moment.utc(run.updated_at).format('h:mm:ssa')}
+                  {completedAt && completedAt.format('h:mm:ssa')}
                 </StyledText>
               </>
             ) : (
@@ -112,10 +113,10 @@ const Overview = ({ pipelineRunSelected: run }) => {
           <StyledText size="middle" color="gray20" fontweight="bold">Duration</StyledText>
           <StyledText size="large" color="black" fontweight={500}>
             <OverviewMeta>
-              {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.ABORTED]) ? (
+              {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.CANCELED]) ? (
                 <>
                   <StyledText size="large" color="black" fontweight={500}>
-                    {moment.utc(run.started_at).fromNow(true)}
+                    {duration}
                   </StyledText>
                 </>
               ) : (
@@ -140,7 +141,6 @@ Overview.propTypes = {
   pipelineRunSelected: PropTypes.shape({
     sequence: PropTypes.number.isRequired,
     updated_at: PropTypes.string.isRequired,
-    started_at: PropTypes.string.isRequired,
     created_at: PropTypes.string.isRequired,
     states: PropTypes.arrayOf(PropTypes.shape({
       state: PropTypes.string.isRequired,

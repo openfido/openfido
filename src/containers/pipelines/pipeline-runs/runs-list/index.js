@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Menu } from 'antd';
-import moment from 'moment';
 
 import {
   statusLegend,
@@ -123,35 +122,30 @@ const RunsList = ({
     </StyledH2>
     <RunMenu selectedKeys={[selectedRun]}>
       {pipelineRuns && pipelineRuns.map(({
-        uuid: run_uuid, sequence, states, started_at,
-      }) => {
-        const status = states && states.length && states[states.length - 1].state;
-        const momentStartedAt = moment.utc(started_at);
-
-        return (
-          <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => setSelectedRun(run_uuid)}>
-            <div>
-              <StyledH4>
-                Run #
-                {sequence}
-              </StyledH4>
-              <StatusText>{statusNameLegend[status]}</StatusText>
-              <StyledH5>Started At:</StyledH5>
-              {started_at && (
-                <StyledText size="middle" color="gray">
-                  {momentStartedAt.format('M/D/YY')}
-                </StyledText>
-              )}
-              <StyledH5>Duration:</StyledH5>
-              {started_at && (
-                <StyledText size="middle" color="gray">
-                  {momentStartedAt.fromNow(true)}
-                </StyledText>
-              )}
-            </div>
-          </RunItem>
-        );
-      })}
+        uuid: run_uuid, sequence, status, startedAt, duration,
+      }) => (
+        <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => setSelectedRun(run_uuid)}>
+          <div>
+            <StyledH4>
+              Run #
+              {sequence}
+            </StyledH4>
+            <StatusText>{statusNameLegend[status]}</StatusText>
+            <StyledH5>Started At:</StyledH5>
+            {startedAt && (
+            <StyledText size="middle" color="gray">
+              {startedAt.format('M/D/YY')}
+            </StyledText>
+            )}
+            <StyledH5>Duration:</StyledH5>
+            {duration && (
+            <StyledText size="middle" color="gray">
+              {duration}
+            </StyledText>
+            )}
+          </div>
+        </RunItem>
+      ))}
     </RunMenu>
   </>
 );
