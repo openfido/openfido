@@ -28,7 +28,7 @@ pipeline_bp = Blueprint("pipelines", __name__)
         "repository_branch",
     ],
     [
-      "description",
+        "description",
     ],
 )
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
