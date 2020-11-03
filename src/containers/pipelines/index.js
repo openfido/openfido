@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { generatePath } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Space } from 'antd';
 
+import { ROUTE_PIPELINE_RUNS } from 'config/routes';
 import { getPipelines } from 'actions/pipelines';
 import { StyledTitle, StyledButton, StyledText } from 'styles/app';
 import PipelineItem from './pipeline-item';
@@ -17,6 +20,8 @@ const PipelineItems = styled(Space)`
 `;
 
 const Pipelines = () => {
+  const history = useHistory();
+
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const dispatch = useDispatch();
@@ -24,10 +29,8 @@ const Pipelines = () => {
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
   const [pipelineInEdit, setPipelineInEdit] = useState(null);
-  const [pipelineInView, setPipelineInView] = useState(null);
 
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
-  const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
 
   useEffect(() => {
     dispatch(getPipelines(currentOrg));
@@ -72,7 +75,7 @@ const Pipelines = () => {
   };
 
   const viewPipelineRuns = (pipeline_uuid) => {
-    setPipelineInView(pipeline_uuid);
+    history.push(generatePath(ROUTE_PIPELINE_RUNS, { pipeline_uuid }));
   };
 
   return (
@@ -80,21 +83,11 @@ const Pipelines = () => {
       <StyledTitle>
         <div>
           <h1>
-            {pipelineInView && pipelineItemInView ? (
-              <>
-                Pipeline Runs:
-                {' '}
-                <StyledText color="blue">{pipelineItemInView.name}</StyledText>
-              </>
-            ) : (
-              <>
-                Pipelines
-                {(showGetStartedPopup || (!showAddPipelines && !pipelineInEdit)) && (
-                  <StyledButton size="small" onClick={openAddPipelines}>
-                    + Add Pipeline
-                  </StyledButton>
-                )}
-              </>
+            Pipelines
+            {(showGetStartedPopup || (!showAddPipelines && !pipelineInEdit)) && (
+            <StyledButton size="small" onClick={openAddPipelines}>
+              + Add Pipeline
+            </StyledButton>
             )}
           </h1>
         </div>
@@ -117,7 +110,7 @@ const Pipelines = () => {
           pipelineItem={pipelineItemInEdit}
         />
       )}
-      {!showAddPipelines && !pipelineInView && !pipelineInEdit && (
+      {!showAddPipelines && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
           {pipelines && pipelines.map(({
             uuid, name, status, updated_at,
@@ -133,11 +126,6 @@ const Pipelines = () => {
             />
           ))}
         </PipelineItems>
-      )}
-      {!showAddPipelines && pipelineInView && (
-        <PipelineRuns
-          pipelineInView={pipelineInView}
-        />
       )}
     </>
   );
