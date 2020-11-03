@@ -104,6 +104,8 @@ const ArtifactsSection = styled.div`
   }
   margin-bottom: 24px;
   margin-bottom: 1.5rem;
+  max-height: 33vh;
+  overflow: scroll;
 `;
 
 export const Artifact = styled.div`
