@@ -88,7 +88,7 @@ const FilesList = ({ title, files, pipelineRunSelected: run }) => {
             uuid, name: file_name, url, size,
           }) => (
             <li key={uuid}>
-              <a href={url} rel="noreferrer" target="_blank" title={file_name}>
+              <a href={url} rel="noopener noreferrer" target="_blank" title={file_name}>
                 <DownloadFilled />
                 {file_name}
               </a>
