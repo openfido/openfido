@@ -126,6 +126,6 @@ export const requestGetPipelineRuns = (organization_uuid, pipeline_uuid) => (
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs`, appToken)
 );
 
-export const requestPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid) => (
-  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/console`, appToken)
+export const requestPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
+  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/console`, appToken)
 );

@@ -40,7 +40,9 @@ const StyledConsoleOutput = styled.div`
   }
 `;
 
-const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
+const ConsoleOutput = ({
+  pipelineInView, pipelineRunSelectedUuid, sequence, setDisplayTab,
+}) => {
   const [stdout, setStdout] = useState();
   const [stderr, setStderr] = useState();
   // const [getConsoleOutputError, setGetConsoleOutputError] = useState();
@@ -48,7 +50,7 @@ const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
   useEffect(() => {
-    requestPipelineRunConsoleOutput(currentOrg, pipelineInView)
+    requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
       .then((response) => {
         if ('stdout' in response.data) setStdout(response.data.stdout);
         if ('stderr' in response.data) setStderr(response.data.stderr);
@@ -81,6 +83,7 @@ const ConsoleOutput = ({ pipelineInView, sequence, setDisplayTab }) => {
 
 ConsoleOutput.propTypes = {
   pipelineInView: PropTypes.string.isRequired,
+  pipelineRunSelectedUuid: PropTypes.string.isRequired,
   sequence: PropTypes.number.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
 };

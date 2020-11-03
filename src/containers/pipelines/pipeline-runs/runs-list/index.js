@@ -110,7 +110,7 @@ const StatusText = styled.mark`
   text-align: center;
 `;
 
-const AllRuns = ({
+const RunsList = ({
   openStartRunPopup, pipelineRuns, selectedRun, setSelectedRun,
 }) => (
   <>
@@ -156,13 +156,18 @@ const AllRuns = ({
   </>
 );
 
-AllRuns.propTypes = {
+RunsList.propTypes = {
   openStartRunPopup: PropTypes.func.isRequired,
   pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
 
-  })).isRequired,
-  selectedRun: PropTypes.string.isRequired,
+  })),
+  selectedRun: PropTypes.string,
   setSelectedRun: PropTypes.func.isRequired,
 };
 
-export default AllRuns;
+RunsList.defaultProps = {
+  pipelineRuns: [],
+  selectedRun: null,
+};
+
+export default RunsList;

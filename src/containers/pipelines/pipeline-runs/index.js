@@ -158,6 +158,7 @@ const PipelineRuns = () => {
       {displayTab === CONSOLE_OUTPUT_TAB && (
         <ConsoleOutput
           pipelineInView={pipelineInView}
+          pipelineRunSelectedUuid={pipelineRunSelected.uuid}
           sequence={pipelineRunSelected && pipelineRunSelected.sequence}
           setDisplayTab={setDisplayTab}
         />

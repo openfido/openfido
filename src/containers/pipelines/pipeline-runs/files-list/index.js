@@ -120,7 +120,7 @@ FilesList.propTypes = {
     uuid: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
-  })).isRequired,
+  })),
   pipelineRunSelected: PropTypes.shape({
     sequence: PropTypes.number.isRequired,
     updated_at: PropTypes.string.isRequired,
@@ -129,7 +129,12 @@ FilesList.propTypes = {
     states: PropTypes.arrayOf(PropTypes.shape({
       state: PropTypes.string.isRequired,
     })),
-  }).isRequired,
+  }),
+};
+
+FilesList.defaultProps = {
+  files: [],
+  pipelineRunSelected: null,
 };
 
 export default FilesList;
