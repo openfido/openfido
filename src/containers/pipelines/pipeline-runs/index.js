@@ -3,13 +3,18 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { OVERVIEW_TAB, CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
+import {
+  OVERVIEW_TAB,
+  DATA_VISUALIZATION_TAB,
+  CONSOLE_OUTPUT_TAB,
+} from 'config/pipeline-runs';
 import { getPipelineRuns } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
 import StartRunPopup from './start-run-popup';
 import OverviewTabMenu from './overview-tab-menu';
 import ConsoleOutput from './console-output';
+import DataVisualization from './data-visualization';
 import Overview from './overview';
 import RunsList from './runs-list';
 import FilesList from './files-list';
@@ -159,6 +164,13 @@ const PipelineRuns = () => {
         <ConsoleOutput
           pipelineInView={pipelineInView}
           pipelineRunSelectedUuid={pipelineRunSelected.uuid}
+          sequence={pipelineRunSelected && pipelineRunSelected.sequence}
+          setDisplayTab={setDisplayTab}
+        />
+      )}
+      {displayTab === DATA_VISUALIZATION_TAB && (
+        <DataVisualization
+          pipelineInView={pipelineInView}
           sequence={pipelineRunSelected && pipelineRunSelected.sequence}
           setDisplayTab={setDisplayTab}
         />

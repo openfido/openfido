@@ -10,7 +10,7 @@ const BASE_API_URL_APP_DEVELOPMENT = 'http://localhost:8080/v1';
 const BASE_API_URL_APP_STAGING = 'http://openfido-dev-app-alb-654410805.us-east-1.elb.amazonaws.com/v1';
 const BASE_API_URL_APP_PRODUCTION = 'http://localhost:8080/v1';
 
-const API_TOKEN_DEVELOPMENT = process.env.API_TOKEN || '40da9b4ae3c24e12b767bd4aaee61cea';
+const API_TOKEN_DEVELOPMENT = process.env.API_TOKEN || 'e7d79ec348b540b78f03a59d0956bacf';
 const API_TOKEN_STAGING = process.env.API_TOKEN || '2c873e166d1e40439de6f811104134e7';
 const API_TOKEN_PRODUCTION = process.env.API_TOKEN || '2c873e166d1e40439de6f811104134e7';
 
