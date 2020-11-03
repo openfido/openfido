@@ -3,7 +3,7 @@ const ENVIRONMENT_STAGING = 'STAGING';
 const ENVIRONMENT_PRODUCTION = 'PRODUCTION';
 
 const BASE_API_URL_AUTH_DEVELOPMENT = 'http://localhost:6002';
-const BASE_API_URL_AUTH_STAGING = 'http://openfido-dev-auth-alb-665516109.us-east-1.elb.amazonaws.com';
+const BASE_API_URL_AUTH_STAGING = 'http://openfido-dev-auth-alb-433407301.us-east-1.elb.amazonaws.com';
 const BASE_API_URL_AUTH_PRODUCTION = 'http://localhost:6002';
 
 const BASE_API_URL_APP_DEVELOPMENT = 'http://localhost:8080/v1';
