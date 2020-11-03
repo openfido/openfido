@@ -92,18 +92,20 @@ export const UploadSection = styled.div`
 `;
 
 const ArtifactsSection = styled.div`
-  padding: 24px 36px;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 48px;
-  grid-row-gap: 24px;
-  grid-row-gap: 1.5rem;
-  grid-column-gap: 88px;
-  grid-column-gap: 5.5rem;
-  min-height: 188px;
+  > div {
+    margin: 24px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 48px;
+    grid-row-gap: 24px;
+    grid-row-gap: 1.5rem;
+    grid-column-gap: 88px;
+    grid-column-gap: 5.5rem;
+  }
   margin-bottom: 24px;
   margin-bottom: 1.5rem;
+  max-height: 33vh;
+  overflow: scroll;
 `;
 
 export const Artifact = styled.div`
@@ -179,17 +181,18 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
   };
 
   const onStartRunClicked = () => {
+    const inputUuids = [];
+
     if (inputFiles) {
-      const inputUuids = [];
       inputFiles.forEach(({ uuid: input_uuid }) => {
         inputUuids.push(input_uuid);
       });
-
-      requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
-        .then(() => {
-          handleOk();
-        });
     }
+
+    requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
+      .then(() => {
+        handleOk();
+      });
   };
 
   const onRemoveInputFileClicked = (index) => {
@@ -243,12 +246,14 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
           </UploadBox>
         </UploadSection>
         <ArtifactsSection>
-          {inputFiles && inputFiles.map(({ name: input_name }, index) => (
-            <Artifact key={`${input_name}${Math.random()}`} title={input_name}>
-              <StyledText>{input_name}</StyledText>
-              <CloseOutlined color="lightGray" onClick={() => onRemoveInputFileClicked(index)} />
-            </Artifact>
-          ))}
+          <div>
+            {inputFiles && inputFiles.map(({ name: input_name }, index) => (
+              <Artifact key={`${input_name}${Math.random()}`} title={input_name}>
+                <StyledText>{input_name}</StyledText>
+                <CloseOutlined color="lightGray" onClick={() => onRemoveInputFileClicked(index)} />
+              </Artifact>
+            ))}
+          </div>
         </ArtifactsSection>
         <StyledButton
           size="middle"
