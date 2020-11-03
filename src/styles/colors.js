@@ -16,6 +16,7 @@ export default {
   gray40: '#9A99A2',
   gray80: '#7C7C7C',
   gray: '#707070',
+  grayText: '#696A6B',
   darkText: '#595657',
   black: '#404040',
   purple: '#BA83D5',

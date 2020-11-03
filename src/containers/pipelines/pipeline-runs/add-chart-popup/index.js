@@ -103,7 +103,7 @@ const PopupButton = styled(StyledButton)`
   margin: 1.25rem auto 0 auto;
 `;
 
-export const AxisItem = styled.div`
+const AxisItem = styled.div`
   background-color ${colors.white};
   color: ${colors.darkText};
   display: flex;

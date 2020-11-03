@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { requestPipelineRunConsoleOutput } from 'services';
 import { CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
+import { pipelineStates } from 'config/pipeline-status';
 import { StyledH2, StyledH5 } from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
@@ -41,7 +42,7 @@ const StyledConsoleOutput = styled.div`
 `;
 
 const ConsoleOutput = ({
-  pipelineInView, pipelineRunSelectedUuid, sequence, setDisplayTab,
+  pipelineInView, pipelineRunSelectedUuid, pipelineRunSelectedStatus, sequence, setDisplayTab,
 }) => {
   const [stdout, setStdout] = useState();
   const [stderr, setStderr] = useState();
@@ -67,7 +68,11 @@ const ConsoleOutput = ({
           Run #
           {sequence}
         </StyledH2>
-        <OverviewTabMenu displayTab={CONSOLE_OUTPUT_TAB} setDisplayTab={setDisplayTab} />
+        <OverviewTabMenu
+          displayTab={CONSOLE_OUTPUT_TAB}
+          setDisplayTab={setDisplayTab}
+          dataVisualizationReady={pipelineRunSelectedStatus === pipelineStates.COMPLETED}
+        />
       </header>
       <section>
         <StyledH5 color="black">stdout:</StyledH5>
@@ -84,6 +89,7 @@ const ConsoleOutput = ({
 ConsoleOutput.propTypes = {
   pipelineInView: PropTypes.string.isRequired,
   pipelineRunSelectedUuid: PropTypes.string.isRequired,
+  pipelineRunSelectedStatus: PropTypes.string.isRequired,
   sequence: PropTypes.number.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
 };

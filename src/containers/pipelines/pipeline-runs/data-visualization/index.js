@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
+import { pipelineStates } from 'config/pipeline-status';
 import { StyledH2, StyledButton } from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
@@ -39,8 +40,31 @@ const StyledDataVisualization = styled.div`
   }
 `;
 
-const DataVisualization = ({ pipelineInView, sequence, setDisplayTab }) => {
-  const [showAddChartPopup, setShowAddChartPopup] = useState(true);
+const AddChartButton = styled(StyledButton)`
+  &.ant-btn {
+    color: ${colors.grayText};
+    height: 30px;
+    font-weight: 300;
+    &:hover {
+      color: ${colors.lightBlue};
+    }
+    align-items: center;
+    span:before {
+      content: "+";
+      font-size: 30px;
+      font-size: 1.875rem;
+      display: inline-block;
+      margin-right: 4px;
+      margin-righT: 0.25rem;
+    }
+    span {
+      display: flex;
+    }
+  }
+`;
+
+const DataVisualization = ({ pipelineRunSelected, sequence, setDisplayTab }) => {
+  const [showAddChartPopup, setShowAddChartPopup] = useState(false);
 
   return (
     <>
@@ -50,9 +74,19 @@ const DataVisualization = ({ pipelineInView, sequence, setDisplayTab }) => {
             Run #
             {sequence}
           </StyledH2>
-          <OverviewTabMenu displayTab={DATA_VISUALIZATION_TAB} setDisplayTab={setDisplayTab} />
+          <OverviewTabMenu
+            displayTab={DATA_VISUALIZATION_TAB}
+            setDisplayTab={setDisplayTab}
+            dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+          />
         </header>
-        <StyledButton color="white" onClick={() => setShowAddChartPopup(true)}>+ Add A Chart</StyledButton>
+        <AddChartButton
+          color="white"
+          width={130}
+          onClick={() => setShowAddChartPopup(true)}
+        >
+          Add A Chart
+        </AddChartButton>
         <section>
           graph
         </section>
@@ -61,7 +95,7 @@ const DataVisualization = ({ pipelineInView, sequence, setDisplayTab }) => {
         <AddChartPopup
           handleOk={() => setShowAddChartPopup(false)}
           handleCancel={() => setShowAddChartPopup(false)}
-          artifacts={(pipelineInView && pipelineInView.artifacts) || [{ name: 'artifact.png' }, { name: 'data.csv' }]}
+          artifacts={pipelineRunSelected && pipelineRunSelected.artifacts}
         />
       )}
     </>
@@ -69,7 +103,7 @@ const DataVisualization = ({ pipelineInView, sequence, setDisplayTab }) => {
 };
 
 DataVisualization.propTypes = {
-  pipelineInView: PropTypes.string.isRequired,
+  pipelineRunSelected: PropTypes.string.isRequired,
   sequence: PropTypes.number.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
 };
