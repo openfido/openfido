@@ -251,7 +251,7 @@ def test_execute_pipeline(
         "master",
     )
 
-    assert run_mock.call_count == 6
+    assert run_mock.call_count == 7
     assert run_mock.call_args_list[0][0][0] == "docker pull python:3"
     assert (
         run_mock.call_args_list[1][0][0]
@@ -260,7 +260,8 @@ def test_execute_pipeline(
     assert run_mock.call_args_list[2][0][0] == "git checkout master"
     assert run_mock.call_args_list[3][0][0] == "mkdir input"
     assert run_mock.call_args_list[4][0][0] == "mkdir output"
-    assert run_mock.call_args_list[5][0][0].startswith("docker run --rm")
+    assert run_mock.call_args_list[5][0][0] == "chmod -R 777 ."
+    assert run_mock.call_args_list[6][0][0].startswith("docker run --rm")
 
     assert update_run_status_mock.call_count == 2
     assert update_run_status_mock.call_args_list[0] == call(RunStateEnum.RUNNING)
