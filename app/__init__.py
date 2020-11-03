@@ -29,6 +29,7 @@ CONFIG_VARS = (
     constants.S3_ENDPOINT_URL,
     constants.S3_REGION_NAME,
     constants.S3_BUCKET,
+    constants.S3_PRESIGNED_TIMEOUT,
 )
 
 
