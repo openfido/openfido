@@ -137,6 +137,8 @@ def execute_pipeline(
                     input_file["url"], join(inputdir, input_file["name"])
                 )
 
+            executor.run("chmod -R 777 .", tmpdir)
+
             # TODO because these processes can take a long long time to run it'd
             # be ideal to poll the output every interval to give viewers a sense
             # of whether the job is doing.
