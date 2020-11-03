@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
@@ -57,6 +59,21 @@ export default (state = DEFAULT_STATE, action) => {
         }
 
         return -1;
+      });
+
+      pipelineRuns.forEach((run) => {
+        if (run.states) {
+          run.states.sort((stateA, stateB) => {
+            const dateA = moment(stateA.created_at);
+            const dateB = moment(stateB.created_at);
+
+            if (dateA && dateB) {
+              return dateA - dateB;
+            }
+
+            return -1;
+          });
+        }
       });
 
       return {
