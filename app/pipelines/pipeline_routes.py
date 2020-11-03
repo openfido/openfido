@@ -23,12 +23,13 @@ pipeline_bp = Blueprint("pipelines", __name__)
 @verify_content_type_and_params(
     [
         "name",
-        "description",
         "docker_image_url",
         "repository_ssh_url",
         "repository_branch",
     ],
-    [],
+    [
+        "description",
+    ],
 )
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create():
@@ -88,7 +89,7 @@ def create():
         description: "Bad request"
     """
     name = request.json["name"]
-    description = request.json["description"]
+    description = request.json.get("description")
     docker_image_url = request.json["docker_image_url"]
     repository_ssh_url = request.json["repository_ssh_url"]
     repository_branch = request.json["repository_branch"]
