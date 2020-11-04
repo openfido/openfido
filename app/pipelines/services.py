@@ -5,7 +5,7 @@ from datetime import timedelta
 import requests
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
 from application_roles.decorators import ROLES_KEY
-from blob_utils import upload_stream, get_s3
+from blob_utils import upload_stream, create_url
 from flask import current_app
 from requests import HTTPError
 from werkzeug.utils import secure_filename
@@ -24,19 +24,6 @@ from .queries import (
     search_organization_pipeline_runs,
 )
 from ..utils import make_hash
-
-
-def _get_input_file_url(org_pipeline_uuid, input_file, s3_client):
-    """Generates presigned URL for input file."""
-
-    sname = secure_filename(input_file.name)
-    key = f"{org_pipeline_uuid}/{input_file.uuid}-{sname}"
-
-    return s3_client.generate_presigned_url(
-        ClientMethod="get_object",
-        Params={"Bucket": current_app.config[S3_BUCKET], "Key": key},
-        ExpiresIn=604800,
-    )
 
 
 def create_pipeline(organization_uuid, request_json):
@@ -223,9 +210,9 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         "inputs": [],
     }
 
-    s3_client = get_s3()
     for opf in org_pipeline_input_files:
-        url = _get_input_file_url(pipeline_uuid, opf, s3_client)
+        sname = secure_filename(opf.name)
+        url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
         new_pipeline["inputs"].append({"url": url, "name": opf.name})
 
     response = requests.post(
@@ -274,7 +261,6 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
     try:
         pipeline_runs = response.json()
         response.raise_for_status()
-        s3_client = get_s3()
 
         # update with org uuids
         for pr in pipeline_runs:
@@ -289,7 +275,8 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
 
             # generate download urls and add uuid
             for opf in org_pipeline_input_files:
-                url = _get_input_file_url(pipeline_uuid, opf, s3_client)
+                sname = secure_filename(opf.name)
+                url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
                 inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
             pr["inputs"] = inputs
@@ -327,7 +314,6 @@ def fetch_pipeline_run(
     try:
         pipeline_run = response.json()
         response.raise_for_status()
-        s3_client = get_s3()
 
         # update with org uuid
         opr = search_organization_pipeline_runs(
@@ -341,7 +327,8 @@ def fetch_pipeline_run(
 
         # generate download urls and add uuid
         for opf in org_pipeline_input_files:
-            url = _get_input_file_url(opr.uuid, opf, s3_client)
+            sname = secure_filename(opf.name)
+            url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
             inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
         pipeline_run["inputs"] = inputs
