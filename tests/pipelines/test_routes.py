@@ -444,11 +444,9 @@ def test_upload_input_file(
     assert len(organization_pipeline.organization_pipeline_input_files) == 1
 
 
-@patch("app.pipelines.services._get_input_file_url")
-@patch("app.pipelines.services.get_s3")
+@patch("app.pipelines.services.create_url")
 @responses.activate
 def test_create_pipeline_run(
-    mock_s3,
     mock_url,
     app,
     client,
@@ -456,7 +454,7 @@ def test_create_pipeline_run(
     organization_pipeline,
     organization_pipeline_input_file,
 ):
-    mock_s3.return_value = "mocked"
+
     mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
@@ -561,11 +559,9 @@ def test_create_pipeline_run_http_error(
     assert result.status_code == 503
 
 
-@patch("app.pipelines.services._get_input_file_url")
-@patch("app.pipelines.services.get_s3")
+@patch("app.pipelines.services.create_url")
 @responses.activate
 def test_list_pipeline_runs(
-    mock_s3,
     mock_url,
     app,
     client,
@@ -574,7 +570,7 @@ def test_list_pipeline_runs(
     organization_pipeline_run,
     organization_pipeline_input_file,
 ):
-    mock_s3.return_value = "mocked"
+
     mock_url.return_value = "http://somefileurl.com"
     json_response = [PIPELINE_RUN_RESPONSE_JSON]
 
@@ -646,11 +642,9 @@ def test_list_pipeline_runs_http_error(
     assert result.status_code == 503
 
 
-@patch("app.pipelines.services._get_input_file_url")
-@patch("app.pipelines.services.get_s3")
+@patch("app.pipelines.services.create_url")
 @responses.activate
 def test_pipeline_run(
-    mock_s3,
     mock_url,
     app,
     client,
@@ -659,7 +653,7 @@ def test_pipeline_run(
     organization_pipeline_run,
     organization_pipeline_input_file,
 ):
-    mock_s3.return_value = "mocked"
+
     mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 

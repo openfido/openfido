@@ -20,6 +20,7 @@ from .queries import (
     find_organization_pipeline,
     find_organization_pipelines,
     find_organization_pipeline_input_files,
+    find_organization_pipeline_run,
     search_organization_pipeline_input_files,
     search_organization_pipeline_runs,
 )
@@ -316,9 +317,7 @@ def fetch_pipeline_run(
         response.raise_for_status()
 
         # update with org uuid
-        opr = search_organization_pipeline_runs(
-            org_pipeline.id, [pipeline_run.get("uuid")]
-        )[0]
+        opr = find_organization_pipeline_run(org_pipeline.id, pipeline_run.get("uuid"))
         pipeline_run["uuid"] = opr.uuid
         org_pipeline_input_files = find_organization_pipeline_input_files(
             org_pipeline.id
