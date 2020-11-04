@@ -4,6 +4,7 @@ from app.pipelines.models import (
     OrganizationPipelineRun,
     db,
 )
+from sqlalchemy import and_, or_
 
 
 def find_organization_pipelines(organization_uuid):
@@ -41,16 +42,33 @@ def search_organization_pipeline_input_files(organization_pipeline_id, uuids):
 
 
 def find_organization_pipeline_run(organization_pipeline_id, uuid):
-    """ Find an Organization Pipeline Run """
+    """Find an Organization Pipeline Run
+    NOTE: or used for backward compatibility.
+    """
     return OrganizationPipelineRun.query.filter(
-        OrganizationPipelineRun.organization_pipeline_id == organization_pipeline_id,
-        OrganizationPipelineRun.pipeline_run_uuid == uuid,
+        and_(
+            OrganizationPipelineRun.organization_pipeline_id
+            == organization_pipeline_id,
+            or_(
+                OrganizationPipelineRun.pipeline_run_uuid == uuid,
+                OrganizationPipelineRun.uuid == uuid,
+            ),
+        )
     ).one_or_none()
 
 
 def search_organization_pipeline_runs(organization_pipeline_id, uuids):
-    """ Searches all Organization Pipeline Runs """
+    """Searches all Organization Pipeline Runs.
+    NOTE: or used for backward compatibility.
+
+    """
     return OrganizationPipelineRun.query.filter(
-        OrganizationPipelineRun.organization_pipeline_id == organization_pipeline_id,
-        OrganizationPipelineRun.pipeline_run_uuid.in_(uuids),
+        and_(
+            OrganizationPipelineRun.organization_pipeline_id
+            == organization_pipeline_id,
+            or_(
+                OrganizationPipelineRun.pipeline_run_uuid.in_(uuids),
+                OrganizationPipelineRun.uuid.in_(uuids),
+            ),
+        )
     ).all()

@@ -38,23 +38,18 @@ def create_pipeline(organization_uuid, request_json):
         json=request_json,
     )
 
-    try:
-        json_value = response.json()
-        response.raise_for_status()
+    json_value = response.json()
+    response.raise_for_status()
 
-        pipeline = OrganizationPipeline(
-            organization_uuid=organization_uuid,
-            pipeline_uuid=json_value["uuid"],
-        )
-        db.session.add(pipeline)
-        db.session.commit()
+    pipeline = OrganizationPipeline(
+        organization_uuid=organization_uuid,
+        pipeline_uuid=json_value["uuid"],
+    )
+    db.session.add(pipeline)
+    db.session.commit()
 
-        json_value["uuid"] = pipeline.uuid
-        return json_value
-    except ValueError as value_error:
-        raise HTTPError("Non JSON payload returned") from value_error
-    except HTTPError as http_error:
-        raise ValueError(json_value) from http_error
+    json_value["uuid"] = pipeline.uuid
+    return json_value
 
 
 def update_pipeline(organization_uuid, pipeline_uuid, request_json):
@@ -191,9 +186,6 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         org_pipeline.id, request_json.get("inputs", [])
     )
 
-    if not org_pipeline_input_files:
-        raise ValueError({"message": "missing organizational pipeline input files."})
-
     new_pipeline_run = OrganizationPipelineRun(
         organization_pipeline_id=org_pipeline.id,
         status_update_token=uuid.uuid4().hex,
@@ -207,8 +199,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     db.session.flush()
 
     new_pipeline = {
-        "callback_url": f"/v1/organizations/{organization_uuid}/pipelines/{pipeline_uuid}/runs/{new_pipeline_run.uuid}/state",
-        "inputs": [],
+        "inputs": []
     }
 
     for opf in org_pipeline_input_files:
@@ -317,7 +308,9 @@ def fetch_pipeline_run(
         response.raise_for_status()
 
         # update with org uuid
-        opr = find_organization_pipeline_run(org_pipeline.id, pipeline_run.get("uuid"))
+        opr = find_organization_pipeline_run(
+            org_pipeline.id, str(pipeline_run.get("uuid"))
+        )
         pipeline_run["uuid"] = opr.uuid
         org_pipeline_input_files = find_organization_pipeline_input_files(
             org_pipeline.id
