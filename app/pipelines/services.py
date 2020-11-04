@@ -19,28 +19,25 @@ from .models import (
 from .queries import (
     find_organization_pipeline,
     find_organization_pipelines,
+    find_organization_pipeline_input_files,
     search_organization_pipeline_input_files,
+    search_organization_pipeline_runs,
 )
 from ..utils import make_hash
 
 
-def _get_input_file_url(org_pipeline_uuid, input_file, s3_client=None):
+def _get_input_file_url(org_pipeline_uuid, input_file, s3_client):
     """Generates presigned URL for input file."""
-
-    if not s3_client:
-        s3_client = get_s3()
 
     sname = secure_filename(input_file.name)
     key = f"{org_pipeline_uuid}/{input_file.uuid}-{sname}"
 
     return s3_client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params={
-            'Bucket': current_app.config[S3_BUCKET],
-            'Key': key
-        },
-        ExpiresIn=604800
+        ClientMethod="get_object",
+        Params={"Bucket": current_app.config[S3_BUCKET], "Key": key},
+        ExpiresIn=604800,
     )
+
 
 def create_pipeline(organization_uuid, request_json):
     """ Create a new pipeline associated with an organization. """
@@ -209,9 +206,8 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline_input_files:
         raise ValueError({"message": "missing organizational pipeline input files."})
 
-
     new_pipeline_run = OrganizationPipelineRun(
-        organization_pipeline_id = org_pipeline.id,
+        organization_pipeline_id=org_pipeline.id,
         status_update_token=uuid.uuid4().hex,
         status_update_token_expires_at=datetime.now() + timedelta(days=7),
         share_token=uuid.uuid4().hex,
@@ -224,16 +220,16 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
 
     new_pipeline = {
         "callback_url": f"/v1/organizations/{organization_uuid}/pipelines/{pipeline_uuid}/runs/{new_pipeline_run.uuid}/state",
-        "inputs": []
+        "inputs": [],
     }
-    import pdb; pdb.set_trace()
+
     s3_client = get_s3()
     for opf in org_pipeline_input_files:
         url = _get_input_file_url(pipeline_uuid, opf, s3_client)
         new_pipeline["inputs"].append({"url": url, "name": opf.name})
 
     response = requests.post(
-        f"http://workflow_service:6001/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
         headers={
             "Content-Type": "application/json",
             ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
@@ -245,10 +241,18 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         created_pipeline = response.json()
         response.raise_for_status()
 
-        new_pipeline.uuid = new_pipeline.pipeline_run_uuid = created_pipeline.uuid
+        new_pipeline_run.uuid = (
+            new_pipeline_run.pipeline_run_uuid
+        ) = created_pipeline.get("uuid")
         db.session.commit()
 
-        return new_pipeline
+        created_pipeline.update(
+            {
+                "uuid": new_pipeline_run.uuid,
+            }
+        )
+
+        return created_pipeline
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
@@ -270,6 +274,25 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
     try:
         pipeline_runs = response.json()
         response.raise_for_status()
+        s3_client = get_s3()
+
+        # update with org uuids
+        for pr in pipeline_runs:
+            opr = search_organization_pipeline_runs(org_pipeline.id, [pr.get("uuid")])[
+                0
+            ]
+            pr["uuid"] = opr.uuid
+            org_pipeline_input_files = find_organization_pipeline_input_files(
+                org_pipeline.id
+            )
+            inputs = []
+
+            # generate download urls and add uuid
+            for opf in org_pipeline_input_files:
+                url = _get_input_file_url(pipeline_uuid, opf, s3_client)
+                inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+
+            pr["inputs"] = inputs
 
         return pipeline_runs
     except ValueError as value_error:
@@ -302,14 +325,32 @@ def fetch_pipeline_run(
     )
 
     try:
-        pipeline_runs = response.json()
+        pipeline_run = response.json()
         response.raise_for_status()
+        s3_client = get_s3()
 
-        return pipeline_runs
+        # update with org uuid
+        opr = search_organization_pipeline_runs(
+            org_pipeline.id, [pipeline_run.get("uuid")]
+        )[0]
+        pipeline_run["uuid"] = opr.uuid
+        org_pipeline_input_files = find_organization_pipeline_input_files(
+            org_pipeline.id
+        )
+        inputs = []
+
+        # generate download urls and add uuid
+        for opf in org_pipeline_input_files:
+            url = _get_input_file_url(opr.uuid, opf, s3_client)
+            inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+
+        pipeline_run["inputs"] = inputs
+
+        return pipeline_run
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(pipeline_runs) from http_error
+        raise ValueError(pipeline_run) from http_error
 
 
 def fetch_pipeline_run_console(

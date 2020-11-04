@@ -443,15 +443,21 @@ def test_upload_input_file(
     assert result.status_code == 200
     assert len(organization_pipeline.organization_pipeline_input_files) == 1
 
+
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run(
+    mock_s3,
+    mock_url,
     app,
     client,
     client_application,
     organization_pipeline,
     organization_pipeline_input_file,
 ):
-
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -555,8 +561,21 @@ def test_create_pipeline_run_http_error(
     assert result.status_code == 503
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
-def test_list_pipeline_runs(app, client, client_application, organization_pipeline):
+def test_list_pipeline_runs(
+    mock_s3,
+    mock_url,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+    organization_pipeline_input_file,
+):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = [PIPELINE_RUN_RESPONSE_JSON]
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -627,10 +646,21 @@ def test_list_pipeline_runs_http_error(
     assert result.status_code == 503
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_pipeline_run(
-    app, client, client_application, organization_pipeline, organization_pipeline_run
+    mock_s3,
+    mock_url,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+    organization_pipeline_input_file,
 ):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(

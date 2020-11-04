@@ -15,11 +15,17 @@ from app.pipelines.services import (
     fetch_pipeline_runs,
     fetch_pipeline_run,
     fetch_pipeline_run_console,
+    _get_input_file_url,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
 
-from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID, PIPELINE_RUN_INPUT_FILE_UUID
+from ..conftest import (
+    ORGANIZATION_UUID,
+    PIPELINE_UUID,
+    PIPELINE_RUN_UUID,
+    PIPELINE_RUN_INPUT_FILE_UUID,
+)
 
 PIPELINE_JSON = {
     "description": "a pipeline",
@@ -37,7 +43,7 @@ PIPELINE_RUN_RESPONSE_JSON = {
     "inputs": [
         {
             "name": f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
-            "url": "https://thisisstoredsomewhere.com",
+            "url": "http://somefileurl.com",
             "uuid": PIPELINE_RUN_INPUT_FILE_UUID,
         },
     ],
@@ -46,12 +52,28 @@ PIPELINE_RUN_RESPONSE_JSON = {
         {"created_at": "2020-10-28T22:01:48.951140", "state": "QUEUED"},
         {"created_at": "2020-10-28T22:01:48.955688", "state": "NOT_STARTED"},
     ],
-    "uuid": "35654b0b6f1044d0afcdf8bedaa0bd71",
+    "uuid": PIPELINE_RUN_UUID,
 }
 PIPELINE_RUN_CONSOLE_RESPONSE_JSON = {
     "std_out": "success messages",
     "std_err": "the error output...",
 }
+
+
+@patch("app.pipelines.services.secure_filename")
+@patch("app.pipelines.services.get_s3")
+def test_get_input_file_url(mock_s3, mock_sname, organization_pipeline_input_file):
+    expected_url = "http://someurl.com"
+    mock_s3.generate_presigned_url.return_value = "http://someurl.com"
+    mock_sname.return_value = "name"
+
+    url = _get_input_file_url(
+        ORGANIZATION_UUID, organization_pipeline_input_file, mock_s3
+    )
+
+    assert url == expected_url
+    assert not mock_s3.called
+    assert mock_sname.called
 
 
 @responses.activate
@@ -239,13 +261,15 @@ def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeli
     assert upload_stream_mock.called
     assert set(organization_pipeline.organization_pipeline_input_files) == {input_file}
 
+
+@patch("app.pipelines.services._get_input_file_url")
 @patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run(
-    mock_s3, app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
-    mock_s3.generate_presigned_url.return_value = "http://somefileurl.com"
+    mock_url.return_value = "http://somefileurl.com"
 
     pipeline = OrganizationPipeline.query.order_by(
         OrganizationPipeline.id.desc()
@@ -269,9 +293,13 @@ def test_create_pipeline_run(
     assert created_pipeline_run == json_response
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 def test_create_pipeline_run_invalid_org_and_input(
-    app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
+    mock_s3.side_effect = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_request = {"inputs": []}
 
     with pytest.raises(ValueError):
@@ -285,10 +313,14 @@ def test_create_pipeline_run_invalid_org_and_input(
         )
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run_missing_pipeline(
-    app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -307,10 +339,14 @@ def test_create_pipeline_run_missing_pipeline(
         )
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run_response_error(
-    app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(
@@ -327,10 +363,14 @@ def test_create_pipeline_run_response_error(
         )
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run_notfound_error(
-    app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     responses.add(
@@ -348,8 +388,19 @@ def test_create_pipeline_run_notfound_error(
         )
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
-def test_fetch_pipeline_runs(app, organization_pipeline):
+def test_fetch_pipeline_runs(
+    mock_s3,
+    mock_url,
+    app,
+    organization_pipeline,
+    organization_pipeline_run,
+    organization_pipeline_input_file,
+):
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     json_response = [PIPELINE_RUN_RESPONSE_JSON]
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -401,10 +452,20 @@ def test_fetch_pipeline_runs_notfound_error(app, organization_pipeline):
         )
 
 
+@patch("app.pipelines.services._get_input_file_url")
+@patch("app.pipelines.services.get_s3")
 @responses.activate
-def test_fetch_pipeline_run(app, organization_pipeline, organization_pipeline_run):
+def test_fetch_pipeline_run(
+    mock_s3,
+    mock_url,
+    app,
+    organization_pipeline,
+    organization_pipeline_run,
+    organization_pipeline_input_file,
+):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
-
+    mock_s3.return_value = "mocked"
+    mock_url.return_value = "http://somefileurl.com"
     responses.add(
         responses.GET,
         f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",

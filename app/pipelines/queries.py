@@ -38,3 +38,11 @@ def search_organization_pipeline_input_files(organization_pipeline_id, uuids):
         == organization_pipeline_id,
         OrganizationPipelineInputFile.uuid.in_(uuids),
     ).all()
+
+
+def search_organization_pipeline_runs(organization_pipeline_id, uuids):
+    """ Find Organization Pipeline Input Files """
+    return OrganizationPipelineRun.query.filter(
+        OrganizationPipelineRun.organization_pipeline_id == organization_pipeline_id,
+        OrganizationPipelineRun.pipeline_run_uuid.in_(uuids),
+    ).all()

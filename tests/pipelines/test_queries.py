@@ -4,6 +4,7 @@ from app.pipelines.queries import (
     find_organization_pipelines,
     find_organization_pipeline_input_files,
     search_organization_pipeline_input_files,
+    search_organization_pipeline_runs,
 )
 from app.pipelines.models import db
 
@@ -73,3 +74,14 @@ def test_find_organization_pipeline_input_files(
     assert find_organization_pipeline_input_files(organization_pipeline.id) == [
         organization_pipeline_input_file
     ]
+
+
+def test_search_organization_pipeline_runs(
+    app, organization_pipeline, organization_pipeline_run
+):
+
+    pipeline_run = search_organization_pipeline_runs(
+        organization_pipeline.id, [organization_pipeline_run.pipeline_run_uuid]
+    )
+
+    assert pipeline_run == [organization_pipeline_run]
