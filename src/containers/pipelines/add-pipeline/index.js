@@ -54,7 +54,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
           setLoading(false);
         });
     }
-  }, [formSubmitted, errors, currentOrg, fields, handleSuccess]);
+  }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading]);
 
   const validateField = (fieldName, fieldValue) => {
     let result;

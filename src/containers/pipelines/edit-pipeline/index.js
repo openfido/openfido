@@ -78,7 +78,7 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
           setLoading(false);
         });
     }
-  }, [formSubmitted, errors, currentOrg, fields, handleSuccess]);
+  }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading, pipelineItem.uuid]);
 
   const validateField = (fieldName, fieldValue) => {
     let result;
