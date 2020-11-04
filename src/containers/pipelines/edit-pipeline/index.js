@@ -55,21 +55,27 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
   });
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [hasBeenDeleted, setHasBeenDeleted] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
   useEffect(() => {
-    if (formSubmitted && !errors.length) {
-      requestUpdatePipeline(currentOrg, fields)
+    const formFields = { ...fields }; // TODO: remove when script is available
+    delete formFields.script;
+
+    if (formSubmitted && !errors.length && !loading) {
+      requestUpdatePipeline(currentOrg, pipelineItem.uuid, formFields)
         .then(() => {
           handleSuccess();
           setErrors({});
+          setLoading(false);
           setFormSubmitted(false);
         })
         .catch(() => {
           setFormSubmitted(false);
+          setLoading(false);
         });
     }
   }, [formSubmitted, errors, currentOrg, fields, handleSuccess]);
@@ -82,7 +88,7 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
         result = true; // optional
         break;
       case 'docker_image_url':
-        result = fieldValue && fieldValue.match(/^http(s)?:\/\/.+/i);
+        result = fieldValue && fieldValue.length > 0;
         break;
       case 'repository_ssh_url':
         result = fieldValue && fieldValue.match(/^https:\/\/.+/i);
