@@ -23,6 +23,7 @@ from application_roles.services import create_application
 
 ORGANIZATION_UUID = "4d96f0b6fe9a4872813b3fac7a675505"
 PIPELINE_UUID = "0" * 32
+ORGANIZATION_PIPELINE_RUN_UUID = "78d28062ef8746b1b81d39bb1c70eb7b"
 PIPELINE_RUN_UUID = "d6c42c749a1643aba0217c02e177625f"
 PIPELINE_RUN_INPUT_FILE_UUID = "1a393d3d847d41b4bbf006738bb576c5"
 USER_UUID = "ded3f053-d25e-4873-8e38-7fbf9c38"
@@ -88,6 +89,22 @@ def organization_pipeline_input_file(app, organization_pipeline):
 
 @pytest.fixture
 def organization_pipeline_run(app, organization_pipeline):
+    opr = OrganizationPipelineRun(
+        organization_pipeline_id=organization_pipeline.id,
+        pipeline_run_uuid=PIPELINE_RUN_UUID,
+        status_update_token=uuid.uuid4().hex,
+        status_update_token_expires_at=datetime.now() + timedelta(days=7),
+        share_token=uuid.uuid4().hex,
+        share_password_hash=None,
+        share_password_salt=None,
+    )
+    db.session.add(opr)
+    db.session.commit()
+
+    return opr
+
+@pytest.fixture
+def s3_client(app):
     opr = OrganizationPipelineRun(
         organization_pipeline_id=organization_pipeline.id,
         pipeline_run_uuid=PIPELINE_RUN_UUID,

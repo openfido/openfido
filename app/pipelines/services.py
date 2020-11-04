@@ -3,9 +3,9 @@ from datetime import datetime
 from datetime import timedelta
 
 import requests
-from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
+from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
 from application_roles.decorators import ROLES_KEY
-from blob_utils import upload_stream
+from blob_utils import upload_stream, get_s3
 from flask import current_app
 from requests import HTTPError
 from werkzeug.utils import secure_filename
@@ -23,6 +23,24 @@ from .queries import (
 )
 from ..utils import make_hash
 
+
+def _get_input_file_url(org_pipeline_uuid, input_file, s3_client=None):
+    """Generates presigned URL for input file."""
+
+    if not s3_client:
+        s3_client = get_s3()
+
+    sname = secure_filename(input_file.name)
+    key = f"{org_pipeline_uuid}/{input_file.uuid}-{sname}"
+
+    return s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': current_app.config[S3_BUCKET],
+            'Key': key
+        },
+        ExpiresIn=604800
+    )
 
 def create_pipeline(organization_uuid, request_json):
     """ Create a new pipeline associated with an organization. """
@@ -191,16 +209,31 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline_input_files:
         raise ValueError({"message": "missing organizational pipeline input files."})
 
-    # TODO: we will need to update the actual file URLs in a future ticket.
-    #       for now, lets stub these and callback url.
-    new_pipeline = {"callback_url": "https://www.example.com", "inputs": []}
-    url_stub = "https://thisisstoredsomewhere.com"
 
+    new_pipeline_run = OrganizationPipelineRun(
+        organization_pipeline_id = org_pipeline.id,
+        status_update_token=uuid.uuid4().hex,
+        status_update_token_expires_at=datetime.now() + timedelta(days=7),
+        share_token=uuid.uuid4().hex,
+        share_password_hash=None,
+        share_password_salt=None,
+    )
+
+    db.session.add(new_pipeline_run)
+    db.session.flush()
+
+    new_pipeline = {
+        "callback_url": f"/v1/organizations/{organization_uuid}/pipelines/{pipeline_uuid}/runs/{new_pipeline_run.uuid}/state",
+        "inputs": []
+    }
+    import pdb; pdb.set_trace()
+    s3_client = get_s3()
     for opf in org_pipeline_input_files:
-        new_pipeline["inputs"].append({"url": url_stub, "name": opf.name})
+        url = _get_input_file_url(pipeline_uuid, opf, s3_client)
+        new_pipeline["inputs"].append({"url": url, "name": opf.name})
 
     response = requests.post(
-        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
+        f"http://workflow_service:6001/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
         headers={
             "Content-Type": "application/json",
             ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
@@ -212,26 +245,10 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         created_pipeline = response.json()
         response.raise_for_status()
 
-        org_pipeline_run = OrganizationPipelineRun(
-            organization_pipeline_id=org_pipeline.id,
-            pipeline_run_uuid=created_pipeline["uuid"],
-            status_update_token=uuid.uuid4().hex,
-            status_update_token_expires_at=datetime.now() + timedelta(days=7),
-            share_token=uuid.uuid4().hex,
-            share_password_hash=None,
-            share_password_salt=None,
-        )
-        db.session.add(org_pipeline_run)
+        new_pipeline.uuid = new_pipeline.pipeline_run_uuid = created_pipeline.uuid
         db.session.commit()
 
-        # reshape input collection for client.
-        created_pipeline["inputs"] = []
-        for opf in org_pipeline_input_files:
-            created_pipeline["inputs"].append(
-                {"url": url_stub, "name": opf.name, "uuid": opf.uuid}
-            )
-
-        return created_pipeline
+        return new_pipeline
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:

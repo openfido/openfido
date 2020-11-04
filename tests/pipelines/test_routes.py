@@ -443,7 +443,6 @@ def test_upload_input_file(
     assert result.status_code == 200
     assert len(organization_pipeline.organization_pipeline_input_files) == 1
 
-
 @responses.activate
 def test_create_pipeline_run(
     app,
@@ -452,6 +451,7 @@ def test_create_pipeline_run(
     organization_pipeline,
     organization_pipeline_input_file,
 ):
+
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
 
     pipeline = OrganizationPipeline.query.order_by(
@@ -476,7 +476,7 @@ def test_create_pipeline_run(
     resp = result.json
 
     new_run = OrganizationPipelineRun.query.filter(
-        OrganizationPipelineRun.pipeline_run_uuid == resp["uuid"]
+        OrganizationPipelineRun.uuid == resp["uuid"]
     ).first()
 
     assert result.status_code == 200

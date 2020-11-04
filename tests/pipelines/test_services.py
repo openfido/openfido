@@ -239,12 +239,13 @@ def test_create_pipeline_input_file(upload_stream_mock, app, organization_pipeli
     assert upload_stream_mock.called
     assert set(organization_pipeline.organization_pipeline_input_files) == {input_file}
 
-
+@patch("app.pipelines.services.get_s3")
 @responses.activate
 def test_create_pipeline_run(
-    app, organization_pipeline, organization_pipeline_input_file
+    mock_s3, app, organization_pipeline, organization_pipeline_input_file
 ):
     json_response = dict(PIPELINE_RUN_RESPONSE_JSON)
+    mock_s3.generate_presigned_url.return_value = "http://somefileurl.com"
 
     pipeline = OrganizationPipeline.query.order_by(
         OrganizationPipeline.id.desc()
