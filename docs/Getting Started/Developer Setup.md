@@ -1,6 +1,6 @@
 # Developer Setup
 
-We will be running the OpenFIDO app, auth, and workflow servies on our local machine through `localhost` and serving them via [Docker](http://docker.com) containers.
+We will be running the OpenFIDO app, auth, and workflow services on our local machine through `localhost` and serving them via [Docker](http://docker.com) containers.
 
 Download the Docker Desktop client and run it on your machine.
 
@@ -14,11 +14,11 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     [OpenFIDO Front End Client](https://github.com/slacgismo/openfido-client) \
     OpenFIDO Utils (downloaded via other services)
 
-    The **OpenFIDO App Service** acts as a front end client to both the Workflow Service and the Auth Service
+    The **OpenFIDO App Service** acts as a front end client to both the Workflow Service and the Auth Service.
 
     The **OpenFIDO Client** will be accessing the API endpoints at the App Service as well as at the Auth Service, at different ports.
    
-    You will need to configure ports on the OpenFIDO Client to match what is being served by the Dockerfile and `docker run` on *App Service*. Read on!
+    You will need to configure **ports** on the OpenFIDO Client to match what is being served by the `docker-compose.yml` and `docker run` on *App Service*. Read on!
    
 1.  The *App Service* [`README.md`](https://github.com/slacgismo/openfido-app-service/blob/master/README.md) has clear instructions on how to run all the services via docker containers at once.
 
@@ -51,13 +51,13 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     
     **IMPORTANT: When prompted to enter a passphrase, please press "Enter" for an empty passphrase.**
     
-    Replace the file name that you had saved your ssh key on to the build command above at `<YOUR_ID_RSA_HERE>`.
+    Replace `<YOUR_ID_RSA_HERE>` with the file name that you had saved your ssh key on.
     
     Lastly, add this ssh key to your GitHub account that has access to `openfido-utils`.
     
-    Run the build command each time any major updates occur to the service models that require a rebuild.
+    Run the build command each time any major updates occur to the service that require a rebuild, such as changes to the `Pipfile`.
     
-1.  Next, you will need to run database migrations for all services via the App Service `docker-compose.yml` configurations.
+1.  Next, you will need to run database migrations on the containers for all services using `docker-compose.yml` on *App Service*.
 
     ```
     docker-compose run --rm auth_service flask db upgrade
@@ -79,9 +79,15 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     make up
     ```
    
-    which will generate these tokens for you . Make you sure copy the `API_TOKEN` outputted from the "react client" named key generator via this `make` command. Paste this copied key into your `config/index.js` on `openfido-client`. See instructions on the Generating API Keys document - section *React Client*.
+    which will generate these tokens for you.
     
-    You do not need to run this command again in order to generate more tokens. Just run `docker-compose up`
+    Make you sure copy the `API_TOKEN` outputted from the *"react client"* named key generator via this `make` command.
+    
+    Paste this copied key into your `config/index.js` on `openfido-client`.
+    
+    See instructions on the Generating API Keys document - section *React Client*.
+    
+    You do not need to run this command again, unless you need to regenerate API tokens. Just run `docker-compose up`
     
     ```
     docker-compose up
@@ -107,7 +113,7 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     
     By default, these are `6000` for `openfido-app-service`, `6001` for `openfido-workflow-service`, and `6002` for `openfido-auth-service`
     
-    **IMPORTANT: You will need to change the port for the `openfido-app-service` to something like `8080`. Browsers such as Chrome consider this port to be unsafe, and therefore, we cannot serve API responses via the browser at port `6000`.**
+    **IMPORTANT: You will need to change the port for the `openfido-app-service` to something like `8080` in development. Browsers such as Chrome consider this port to be unsafe, and therefore, we cannot serve API responses via the browser at port `6000`.**
     
     Change the port numbers in `openfido-client` at `config/index.js` in order to match what is being served by the `docker-compose.yml` and `docker run`.
 
