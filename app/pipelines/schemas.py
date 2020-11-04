@@ -59,6 +59,7 @@ class PipelineSchema(Schema):
     docker_image_url = fields.Str()
     repository_ssh_url = fields.Str()
     repository_branch = fields.Str()
+    repository_script = fields.Str()
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 

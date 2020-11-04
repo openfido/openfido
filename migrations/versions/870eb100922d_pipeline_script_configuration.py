@@ -1,7 +1,7 @@
 """pipeline script configuration
 
 Revision ID: 870eb100922d
-Revises: 9bb47f61b8cd
+Revises: 61429c72a7bf
 Create Date: 2020-11-02 20:20:27.568517
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '870eb100922d'
-down_revision = '9bb47f61b8cd'
+down_revision = '61429c72a7bf'
 branch_labels = None
 depends_on = None
 
