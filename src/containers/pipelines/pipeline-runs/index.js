@@ -3,13 +3,19 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { OVERVIEW_TAB, CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
+import {
+  OVERVIEW_TAB,
+  DATA_VISUALIZATION_TAB,
+  CONSOLE_OUTPUT_TAB,
+} from 'config/pipeline-runs';
+import { pipelineStates } from 'config/pipeline-status';
 import { getPipelineRuns } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
 import StartRunPopup from './start-run-popup';
 import OverviewTabMenu from './overview-tab-menu';
 import ConsoleOutput from './console-output';
+import DataVisualization from './data-visualization';
 import Overview from './overview';
 import RunsList from './runs-list';
 import FilesList from './files-list';
@@ -132,7 +138,11 @@ const PipelineRuns = () => {
             />
           </AllRunsSection>
           <OverviewSection>
-            <OverviewTabMenu displayTab={displayTab} setDisplayTab={setDisplayTab} />
+            <OverviewTabMenu
+              displayTab={displayTab}
+              setDisplayTab={setDisplayTab}
+              dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+            />
             {pipelineRunSelected && (
             <Overview
               pipelineRunSelected={pipelineRunSelected}
@@ -158,7 +168,16 @@ const PipelineRuns = () => {
       {displayTab === CONSOLE_OUTPUT_TAB && (
         <ConsoleOutput
           pipelineInView={pipelineInView}
-          pipelineRunSelectedUuid={pipelineRunSelected.uuid}
+          pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
+          pipelineRunSelectedStatus={pipelineRunSelected && pipelineRunSelected.status}
+          sequence={pipelineRunSelected && pipelineRunSelected.sequence}
+          setDisplayTab={setDisplayTab}
+        />
+      )}
+      {displayTab === DATA_VISUALIZATION_TAB && (
+        <DataVisualization
+          pipelineInView={pipelineInView}
+          pipelineRunSelected={pipelineRunSelected}
           sequence={pipelineRunSelected && pipelineRunSelected.sequence}
           setDisplayTab={setDisplayTab}
         />

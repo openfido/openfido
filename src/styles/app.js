@@ -204,7 +204,6 @@ export const StyledButton = styled(Button)`
   &.ant-btn-lg { 
     font-size: 18px;
     line-height: 21px;
-    font-weight: 500;
     padding: 8px 12px;
     padding: 0.5rem 0.75rem;
     height: 50px;

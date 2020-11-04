@@ -33,18 +33,20 @@ const StyledOverviewTabMenu = styled.ul`
   }
 `;
 
-const OverviewTabMenu = ({ displayTab, setDisplayTab }) => (
+const OverviewTabMenu = ({ displayTab, setDisplayTab, dataVisualizationReady }) => (
   <StyledOverviewTabMenu mode="horizontal">
     <li className={displayTab === OVERVIEW_TAB ? 'active' : ''}>
       <StyledButton type="text" size="middle" onClick={() => setDisplayTab(OVERVIEW_TAB)}>
         Overview
       </StyledButton>
     </li>
-    <li className={displayTab === DATA_VISUALIZATION_TAB ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(DATA_VISUALIZATION_TAB)}>
-        Data Visualization
-      </StyledButton>
-    </li>
+    {dataVisualizationReady && (
+      <li className={displayTab === DATA_VISUALIZATION_TAB ? 'active' : ''}>
+        <StyledButton type="text" size="middle" onClick={() => setDisplayTab(DATA_VISUALIZATION_TAB)}>
+          Data Visualization
+        </StyledButton>
+      </li>
+    )}
     <li className={displayTab === CONSOLE_OUTPUT_TAB ? 'active' : ''}>
       <StyledButton type="text" size="middle" onClick={() => setDisplayTab(CONSOLE_OUTPUT_TAB)}>
         Console Output
@@ -56,6 +58,11 @@ const OverviewTabMenu = ({ displayTab, setDisplayTab }) => (
 OverviewTabMenu.propTypes = {
   displayTab: PropTypes.string.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
+  dataVisualizationReady: PropTypes.bool,
+};
+
+OverviewTabMenu.defaultProps = {
+  dataVisualizationReady: false,
 };
 
 export default OverviewTabMenu;
