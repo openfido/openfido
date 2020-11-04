@@ -14,7 +14,7 @@ from app.workflows.models import WorkflowPipeline
 from app.workflows.queries import find_workflow, find_workflow_pipeline
 from marshmallow.exceptions import ValidationError
 
-from ..pipelines.test_services import VALID_CALLBACK_INPUT
+from ..pipelines.test_services import VALID_CALLBACK_INPUT, PIPELINE_JSON
 
 
 def _create_workflow_pipeline_json(pipeline, sources=[], dests=[]):
@@ -327,9 +327,7 @@ def test_update_workflow_pipeline_no_change(app, pipeline, workflow_pipeline):
 
 
 def test_update_workflow_pipeline_update_pipeline(app, pipeline, workflow_pipeline):
-    new_pipeline = create_pipeline(
-        "new p", "dest", "python", "https://example.com", "master"
-    )
+    new_pipeline = create_pipeline(PIPELINE_JSON)
     db.session.commit()
     new_json = _create_workflow_pipeline_json(workflow_pipeline.pipeline)
     new_json["pipeline_uuid"] = new_pipeline.uuid
