@@ -153,6 +153,7 @@ def start_pipeline_run(pipeline_run):
         pipeline.docker_image_url,
         pipeline.repository_ssh_url,
         pipeline.repository_branch,
+        pipeline.repository_script,
     )
 
     return pipeline_run
