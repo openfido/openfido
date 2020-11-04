@@ -4,6 +4,8 @@ Run the following commands from the `openfido-app-service` repository.
 
 Restart the app service after all keys have been generated.
 
+---
+
 ### React Client
 Generate an application key for react application to access the app service:
 
@@ -16,6 +18,7 @@ invoke create-application-key \
 
 Paste the resulting `API_TOKEN` into the `config/index.js` on `openfido-client`.
 
+---
 
 ### Worker
 
@@ -29,8 +32,9 @@ invoke create-application-key \
 | sed 's/^/WORKER_/' > .worker-env
 ```
 
-This access token will be outputted to the `.worker-env` file.
+> This access token will be outputted to the `.worker-env` file.
 
+---
 
 ### App Service as Client to Workflow Service
 
@@ -44,4 +48,4 @@ invoke create-application-key \
 | sed 's/^/WORKFLOW_/' > .env
 ```
 
-This access token will be outputted to the `.env` file.
+> This access token will be outputted to the `.env` file.
