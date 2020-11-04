@@ -44,7 +44,7 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
         db.Integer, db.ForeignKey("organization_pipeline.id"), nullable=False
     )
 
-    pipeline_run_uuid = db.Column(db.String(32), nullable=False)
+    pipeline_run_uuid = db.Column(db.String(32), nullable=True)
 
     post_processing_pipeline_run_uuid = db.Column(
         db.String(32), nullable=False, server_default=""

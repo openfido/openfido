@@ -3,9 +3,9 @@ from datetime import datetime
 from datetime import timedelta
 
 import requests
-from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
+from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
 from application_roles.decorators import ROLES_KEY
-from blob_utils import upload_stream
+from blob_utils import upload_stream, create_url
 from flask import current_app
 from requests import HTTPError
 from werkzeug.utils import secure_filename
@@ -19,7 +19,10 @@ from .models import (
 from .queries import (
     find_organization_pipeline,
     find_organization_pipelines,
+    find_organization_pipeline_input_files,
+    find_organization_pipeline_run,
     search_organization_pipeline_input_files,
+    search_organization_pipeline_runs,
 )
 from ..utils import make_hash
 
@@ -191,13 +194,27 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     if not org_pipeline_input_files:
         raise ValueError({"message": "missing organizational pipeline input files."})
 
-    # TODO: we will need to update the actual file URLs in a future ticket.
-    #       for now, lets stub these and callback url.
-    new_pipeline = {"callback_url": "https://www.example.com", "inputs": []}
-    url_stub = "https://thisisstoredsomewhere.com"
+    new_pipeline_run = OrganizationPipelineRun(
+        organization_pipeline_id=org_pipeline.id,
+        status_update_token=uuid.uuid4().hex,
+        status_update_token_expires_at=datetime.now() + timedelta(days=7),
+        share_token=uuid.uuid4().hex,
+        share_password_hash=None,
+        share_password_salt=None,
+    )
+
+    db.session.add(new_pipeline_run)
+    db.session.flush()
+
+    new_pipeline = {
+        "callback_url": f"/v1/organizations/{organization_uuid}/pipelines/{pipeline_uuid}/runs/{new_pipeline_run.uuid}/state",
+        "inputs": [],
+    }
 
     for opf in org_pipeline_input_files:
-        new_pipeline["inputs"].append({"url": url_stub, "name": opf.name})
+        sname = secure_filename(opf.name)
+        url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
+        new_pipeline["inputs"].append({"url": url, "name": opf.name})
 
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs",
@@ -212,24 +229,16 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         created_pipeline = response.json()
         response.raise_for_status()
 
-        org_pipeline_run = OrganizationPipelineRun(
-            organization_pipeline_id=org_pipeline.id,
-            pipeline_run_uuid=created_pipeline["uuid"],
-            status_update_token=uuid.uuid4().hex,
-            status_update_token_expires_at=datetime.now() + timedelta(days=7),
-            share_token=uuid.uuid4().hex,
-            share_password_hash=None,
-            share_password_salt=None,
-        )
-        db.session.add(org_pipeline_run)
+        new_pipeline_run.uuid = (
+            new_pipeline_run.pipeline_run_uuid
+        ) = created_pipeline.get("uuid")
         db.session.commit()
 
-        # reshape input collection for client.
-        created_pipeline["inputs"] = []
-        for opf in org_pipeline_input_files:
-            created_pipeline["inputs"].append(
-                {"url": url_stub, "name": opf.name, "uuid": opf.uuid}
-            )
+        created_pipeline.update(
+            {
+                "uuid": new_pipeline_run.uuid,
+            }
+        )
 
         return created_pipeline
     except ValueError as value_error:
@@ -253,6 +262,25 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
     try:
         pipeline_runs = response.json()
         response.raise_for_status()
+
+        # update with org uuids
+        for pr in pipeline_runs:
+            opr = search_organization_pipeline_runs(org_pipeline.id, [pr.get("uuid")])[
+                0
+            ]
+            pr["uuid"] = opr.uuid
+            org_pipeline_input_files = find_organization_pipeline_input_files(
+                org_pipeline.id
+            )
+            inputs = []
+
+            # generate download urls and add uuid
+            for opf in org_pipeline_input_files:
+                sname = secure_filename(opf.name)
+                url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
+                inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+
+            pr["inputs"] = inputs
 
         return pipeline_runs
     except ValueError as value_error:
@@ -285,14 +313,30 @@ def fetch_pipeline_run(
     )
 
     try:
-        pipeline_runs = response.json()
+        pipeline_run = response.json()
         response.raise_for_status()
 
-        return pipeline_runs
+        # update with org uuid
+        opr = find_organization_pipeline_run(org_pipeline.id, pipeline_run.get("uuid"))
+        pipeline_run["uuid"] = opr.uuid
+        org_pipeline_input_files = find_organization_pipeline_input_files(
+            org_pipeline.id
+        )
+        inputs = []
+
+        # generate download urls and add uuid
+        for opf in org_pipeline_input_files:
+            sname = secure_filename(opf.name)
+            url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
+            inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+
+        pipeline_run["inputs"] = inputs
+
+        return pipeline_run
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(pipeline_runs) from http_error
+        raise ValueError(pipeline_run) from http_error
 
 
 def fetch_pipeline_run_console(

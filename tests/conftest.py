@@ -89,6 +89,25 @@ def organization_pipeline_input_file(app, organization_pipeline):
 @pytest.fixture
 def organization_pipeline_run(app, organization_pipeline):
     opr = OrganizationPipelineRun(
+        uuid=PIPELINE_RUN_UUID,
+        organization_pipeline_id=organization_pipeline.id,
+        pipeline_run_uuid=PIPELINE_RUN_UUID,
+        status_update_token=uuid.uuid4().hex,
+        status_update_token_expires_at=datetime.now() + timedelta(days=7),
+        share_token=uuid.uuid4().hex,
+        share_password_hash=None,
+        share_password_salt=None,
+    )
+    db.session.add(opr)
+    db.session.commit()
+
+    return opr
+
+
+@pytest.fixture
+def organization_pipeline_run(app, organization_pipeline):
+    opr = OrganizationPipelineRun(
+        uuid=PIPELINE_RUN_UUID,
         organization_pipeline_id=organization_pipeline.id,
         pipeline_run_uuid=PIPELINE_RUN_UUID,
         status_update_token=uuid.uuid4().hex,
