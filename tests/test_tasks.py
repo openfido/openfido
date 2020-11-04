@@ -131,7 +131,7 @@ def test_execute_pipeline_no_openfido(
         "python:3",
         "https://github.com/example",
         "master",
-        "openfido.sh"
+        "openfido.sh",
     )
 
     assert run_mock.call_count == 3
@@ -174,7 +174,7 @@ def test_execute_pipeline_urlerror(
         "python:3",
         "https://github.com/example",
         "master",
-        "openfido.sh"
+        "openfido.sh",
     )
 
     assert update_run_status_mock.call_count == 2
@@ -209,7 +209,7 @@ def test_execute_pipeline_valueerror(
         "python:3",
         "https://github.com/example",
         "master",
-        "openfido.sh"
+        "openfido.sh",
     )
 
     assert update_run_status_mock.call_count == 2
@@ -252,7 +252,7 @@ def test_execute_pipeline(
         "python:3",
         "https://github.com/example",
         "master",
-        "script.sh"
+        "script.sh",
     )
 
     assert run_mock.call_count == 7
