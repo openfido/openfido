@@ -113,7 +113,7 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     
     By default, these are `6000` for `openfido-app-service`, `6001` for `openfido-workflow-service`, and `6002` for `openfido-auth-service`
     
-    **IMPORTANT: You will need to change the port for the `openfido-app-service` to something like `8080` in development. Browsers such as Chrome consider this port to be unsafe, and therefore, we cannot serve API responses via the browser at port `6000`.**
+    **IMPORTANT: You will need to change the port for the `openfido-app-service` to something like `8080` in development on the `docker-compose.yml`. Browsers such as Chrome consider this port to be unsafe, and therefore, we cannot serve API responses via the browser at port `6000`.**
     
     Change the port numbers in `openfido-client` at `config/index.js` in order to match what is being served by the `docker-compose.yml` and `docker run`.
 
