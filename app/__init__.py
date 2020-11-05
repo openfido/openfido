@@ -15,6 +15,7 @@ db = get_db()
 
 # Allow a specific set of environmental variables to be configurable:
 CONFIG_VARS = (
+    constants.FLASK_ENV,
     constants.SECRET_KEY,
     constants.SQLALCHEMY_DATABASE_URI,
     constants.S3_ACCESS_KEY_ID,
@@ -22,6 +23,7 @@ CONFIG_VARS = (
     constants.S3_ENDPOINT_URL,
     constants.S3_REGION_NAME,
     constants.S3_BUCKET,
+    constants.S3_PRESIGNED_TIMEOUT,
     constants.AUTH_HOSTNAME,
     constants.WORKFLOW_HOSTNAME,
     constants.WORKFLOW_API_TOKEN,

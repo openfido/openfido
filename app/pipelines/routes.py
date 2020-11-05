@@ -28,7 +28,7 @@ organization_pipeline_bp = Blueprint("organization-pipelines", __name__)
 @any_application_required
 @validate_organization()
 def create(organization_uuid):
-    """List all Organization Pipelines.
+    """Create a Organization Pipeline.
     ---
     tags:
       - pipelines

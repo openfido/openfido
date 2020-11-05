@@ -44,7 +44,7 @@ def create_pipeline(organization_uuid, request_json):
 
         pipeline = OrganizationPipeline(
             organization_uuid=organization_uuid,
-            pipeline_uuid=json_value["uuid"],
+            pipeline_uuid=json_value.get("uuid"),
         )
         db.session.add(pipeline)
         db.session.commit()
@@ -191,9 +191,6 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         org_pipeline.id, request_json.get("inputs", [])
     )
 
-    if not org_pipeline_input_files:
-        raise ValueError({"message": "missing organizational pipeline input files."})
-
     new_pipeline_run = OrganizationPipelineRun(
         organization_pipeline_id=org_pipeline.id,
         status_update_token=uuid.uuid4().hex,
@@ -206,10 +203,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     db.session.add(new_pipeline_run)
     db.session.flush()
 
-    new_pipeline = {
-        "callback_url": f"/v1/organizations/{organization_uuid}/pipelines/{pipeline_uuid}/runs/{new_pipeline_run.uuid}/state",
-        "inputs": [],
-    }
+    new_pipeline = {"inputs": []}
 
     for opf in org_pipeline_input_files:
         sname = secure_filename(opf.name)
@@ -317,7 +311,9 @@ def fetch_pipeline_run(
         response.raise_for_status()
 
         # update with org uuid
-        opr = find_organization_pipeline_run(org_pipeline.id, pipeline_run.get("uuid"))
+        opr = find_organization_pipeline_run(
+            org_pipeline.id, str(pipeline_run.get("uuid"))
+        )
         pipeline_run["uuid"] = opr.uuid
         org_pipeline_input_files = find_organization_pipeline_input_files(
             org_pipeline.id
