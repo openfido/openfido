@@ -91,7 +91,7 @@ const PipelineRuns = () => {
   const [displayTab, setDisplayTab] = useState(OVERVIEW_TAB);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
-  const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns);
+  const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 

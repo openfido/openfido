@@ -14,7 +14,7 @@ import {
 
 const DEFAULT_STATE = {
   pipelines: null,
-  pipelineRuns: null,
+  pipelineRuns: {},
   inputFiles: null,
   messages: {
     getPipelinesError: null,
@@ -52,7 +52,7 @@ export default (state = DEFAULT_STATE, action) => {
         },
       };
     case GET_PIPELINE_RUNS: {
-      const pipelineRuns = action.payload || [];
+      const { pipelineRuns = [], pipeline_uuid } = action.payload;
 
       pipelineRuns.sort((runA, runB) => {
         if (runA.sequence && runB.sequence) {
@@ -113,7 +113,10 @@ export default (state = DEFAULT_STATE, action) => {
 
       return {
         ...state,
-        pipelineRuns: action.payload,
+        pipelineRuns: {
+          ...state.pipelineRuns,
+          [pipeline_uuid]: pipelineRuns,
+        },
       };
     }
     case GET_PIPELINE_RUNS_FAILED:
