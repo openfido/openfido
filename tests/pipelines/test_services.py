@@ -276,7 +276,7 @@ def test_create_pipeline_run(
 
 
 @patch("app.pipelines.services.create_url")
-def test_create_pipeline_run_invalid_org_and_input(
+def test_create_pipeline_run_invalid_org(
     mock_url, app, organization_pipeline, organization_pipeline_input_file
 ):
     mock_url.return_value = "http://somefileurl.com"
@@ -284,13 +284,6 @@ def test_create_pipeline_run_invalid_org_and_input(
 
     with pytest.raises(ValueError):
         created_pipeline_run = create_pipeline_run("12345", "12345", json_request)
-
-    with pytest.raises(ValueError):
-        created_pipeline_run = create_pipeline_run(
-            organization_pipeline.organization_uuid,
-            organization_pipeline.uuid,
-            json_request,
-        )
 
 
 @patch("app.pipelines.services.create_url")

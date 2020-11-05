@@ -504,18 +504,6 @@ def test_create_pipeline_run_invalid_org_and_file(
 
     assert result.status_code == 404
 
-    result = client.post(
-        f"/v1/organizations/{organization_pipeline.organization_uuid}/pipelines/{organization_pipeline.uuid}/runs",
-        content_type="application/json",
-        json={"inputs": []},
-        headers={
-            "Authorization": f"Bearer {JWT_TOKEN}",
-            ROLES_KEY: client_application.api_key,
-        },
-    )
-
-    assert result.status_code == 400
-
 
 @patch("app.pipelines.routes.create_pipeline_run")
 @responses.activate

@@ -203,9 +203,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     db.session.add(new_pipeline_run)
     db.session.flush()
 
-    new_pipeline = {
-        "inputs": []
-    }
+    new_pipeline = {"inputs": []}
 
     for opf in org_pipeline_input_files:
         sname = secure_filename(opf.name)
