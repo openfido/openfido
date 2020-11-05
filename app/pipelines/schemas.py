@@ -8,8 +8,8 @@ from ..schemas import UUID
 class InputSchema(Schema):
     """ A pipeline run input. """
 
-    name = fields.Str()
-    url = fields.Url()
+    name = fields.Str(required=True)
+    url = fields.Url(required=True)
 
 
 class InputExportSchema(Schema):
@@ -23,7 +23,7 @@ class CreateRunSchema(Schema):
     """ Validation schema for create_run() """
 
     inputs = fields.Nested(InputSchema, many=True, required=True)
-    callback_url = fields.Url(required=True)
+    callback_url = fields.Url(missing="")
 
 
 class UpdateRunStateSchema(Schema):

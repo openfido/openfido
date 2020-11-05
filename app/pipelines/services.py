@@ -191,6 +191,9 @@ def update_pipeline_run_output(pipeline_uuid, std_out, std_err):
 
 
 def notify_callback(pipeline_run):
+    if not pipeline_run.callback_url:
+        return
+
     pipeline_uuid = pipeline_run.uuid
     url = pipeline_run.callback_url
     state = pipeline_run.pipeline_run_states[-1]
