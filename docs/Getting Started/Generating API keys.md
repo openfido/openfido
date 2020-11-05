@@ -32,7 +32,7 @@ invoke create-application-key \
 | sed 's/^/WORKER_/' > .worker-env
 ```
 
-> This access token will be outputted to the `.worker-env` file.
+This access token will be outputted to the `.worker-env` file.
 
 ---
 
@@ -48,4 +48,4 @@ invoke create-application-key \
 | sed 's/^/WORKFLOW_/' > .env
 ```
 
-> This access token will be outputted to the `.env` file.
+This access token will be outputted to the `.env` file.
