@@ -17,6 +17,7 @@ db = get_db()
 
 # Allow a specific set of environmental variables to be configurable:
 CONFIG_VARS = (
+    constants.FLASK_ENV,
     constants.SECRET_KEY,
     constants.SQLALCHEMY_DATABASE_URI,
     constants.CELERY_BROKER_URL,
