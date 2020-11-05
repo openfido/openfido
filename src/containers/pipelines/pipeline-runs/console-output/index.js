@@ -53,9 +53,9 @@ const ConsoleOutputContent = styled.div`
 const ConsoleOutput = ({
   pipelineInView, pipelineRunSelectedUuid, pipelineRunSelectedStatus, sequence, setDisplayTab,
 }) => {
-  const [stdout, setStdout] = useState('stdout');
+  const [stdout, setStdout] = useState();
   const [stderr, setStderr] = useState();
-  const [outputType, setOutputType] = useState();
+  const [outputType, setOutputType] = useState('stdout');
   // const [getConsoleOutputError, setGetConsoleOutputError] = useState();
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
