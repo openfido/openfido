@@ -38,18 +38,23 @@ def create_pipeline(organization_uuid, request_json):
         json=request_json,
     )
 
-    json_value = response.json()
-    response.raise_for_status()
+    try:
+        json_value = response.json()
+        response.raise_for_status()
 
-    pipeline = OrganizationPipeline(
-        organization_uuid=organization_uuid,
-        pipeline_uuid=json_value["uuid"],
-    )
-    db.session.add(pipeline)
-    db.session.commit()
+        pipeline = OrganizationPipeline(
+            organization_uuid=organization_uuid,
+            pipeline_uuid=json_value.get("uuid"),
+        )
+        db.session.add(pipeline)
+        db.session.commit()
 
-    json_value["uuid"] = pipeline.uuid
-    return json_value
+        json_value["uuid"] = pipeline.uuid
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
 
 
 def update_pipeline(organization_uuid, pipeline_uuid, request_json):
