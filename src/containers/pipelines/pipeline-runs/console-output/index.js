@@ -53,7 +53,7 @@ const ConsoleOutputContent = styled.div`
 const ConsoleOutput = ({
   pipelineInView, pipelineRunSelectedUuid, pipelineRunSelectedStatus, sequence, setDisplayTab,
 }) => {
-  const [stdout, setStdout] = useState();
+  const [stdout, setStdout] = useState('stdout');
   const [stderr, setStderr] = useState();
   const [outputType, setOutputType] = useState();
   // const [getConsoleOutputError, setGetConsoleOutputError] = useState();
