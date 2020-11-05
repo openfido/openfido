@@ -41,16 +41,15 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
 
     if (formSubmitted && !errors.length && !loading) {
       setLoading(true);
+      setFormSubmitted(false);
 
       requestCreatePipeline(currentOrg, formFields)
         .then(() => {
           handleSuccess();
           setErrors({});
           setLoading(false);
-          setFormSubmitted(false);
         })
         .catch(() => {
-          setFormSubmitted(false);
           setLoading(false);
         });
     }

@@ -67,16 +67,15 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
 
     if (formSubmitted && !errors.length && !loading) {
       setLoading(true);
+      setFormSubmitted(false);
 
       requestUpdatePipeline(currentOrg, pipelineItem && pipelineItem.uuid, formFields)
         .then(() => {
           handleSuccess();
           setErrors({});
           setLoading(false);
-          setFormSubmitted(false);
         })
         .catch(() => {
-          setFormSubmitted(false);
           setLoading(false);
         });
     }
