@@ -9,7 +9,7 @@ services:
     volumes:
       - ./uploads:/data:delegated
     ports:
-      - "10000:9000"
+      - "9000:9000"
   workflow_queue:
     build:
       context: ../openfido-workflow-service/
@@ -34,7 +34,6 @@ services:
       SECRET_KEY: local-dev-db
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
-      S3_BUCKET: workflow-service
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
@@ -53,7 +52,7 @@ services:
     command: celery -A app.worker worker -l DEBUG
     environment:
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
-      WORKER_API_SERVER: http://workflow_service:5001
+      WORKER_API_SERVER: http://workflow_service:5000
     env_file:
       - .worker-env
     volumes:
@@ -116,11 +115,11 @@ services:
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
       AUTH_HOSTNAME: http://auth_service:5000
-      WORKFLOW_HOSTNAME: http://workflow_service:6001
+      WORKFLOW_HOSTNAME: http://workflow_service:5000
     volumes:
       - .:/opt/app:delegated
     ports:
-      - "6000:5000"
+      - "6003:5000"
     depends_on:
       - app_db
       - auth_service

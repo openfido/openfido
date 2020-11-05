@@ -47,7 +47,7 @@ docker-compose which files to use, and where each project is:
     # Create an super admin user:
     docker-compose run --rm auth_service flask shell
     from app import models, services
-    u = services.create_user('admin2@example.com', '1234567890', 'admin', 'user')
+    u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
     u.is_system_admin = True
     models.db.session.commit()
 
