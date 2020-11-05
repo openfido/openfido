@@ -18,6 +18,6 @@ export default () => (
   <>
     <Profile />
     <Menu />
-    <StyledHelpLink href="http://docs.gridlabd.us/" target="_blank">Help</StyledHelpLink>
+    <StyledHelpLink href="http://docs.openfido.org.s3-website-us-east-1.amazonaws.com/ " target="_blank">Help</StyledHelpLink>
   </>
 );
