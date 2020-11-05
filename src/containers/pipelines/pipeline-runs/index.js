@@ -9,7 +9,7 @@ import {
   CONSOLE_OUTPUT_TAB,
 } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
-import { getPipelineRuns } from 'actions/pipelines';
+import { getPipelineRuns, getPipelines } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
 import StartRunPopup from './start-run-popup';
@@ -99,8 +99,14 @@ const PipelineRuns = () => {
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
 
   useEffect(() => {
+    if (!pipelines) {
+      dispatch(getPipelines(currentOrg));
+    }
+  }, [currentOrg, dispatch, pipelines]);
+
+  useEffect(() => {
     dispatch(getPipelineRuns(currentOrg, pipelineInView));
-  }, [currentOrg, pipelineInView, dispatch]);
+  }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
 
   useEffect(() => {
     if (pipelineRuns && pipelineRuns.length) {
