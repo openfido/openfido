@@ -14,6 +14,7 @@ from blob_utils import constants
 CONFIG_VARS = (
     "SECRET_KEY",
     "SQLALCHEMY_DATABASE_URI",
+    constants.FLASK_ENV,
     constants.S3_ACCESS_KEY_ID,
     constants.S3_SECRET_ACCESS_KEY,
     constants.S3_ENDPOINT_URL,
