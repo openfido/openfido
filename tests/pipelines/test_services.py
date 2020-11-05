@@ -261,8 +261,10 @@ def test_update_pipeline_run_state(app, monkeypatch, pipeline, mock_execute_pipe
     assert pipeline_run.run_state_enum() == RunStateEnum.RUNNING
 
 
-@patch('app.pipelines.services.urllib_request.urlopen')
-def test_update_pipeline_run_state_no_callback_url(urlopen_mock, app, monkeypatch, pipeline, mock_execute_pipeline):
+@patch("app.pipelines.services.urllib_request.urlopen")
+def test_update_pipeline_run_state_no_callback_url(
+    urlopen_mock, app, monkeypatch, pipeline, mock_execute_pipeline
+):
     pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
     pipeline_run.callback_url = ""
     db.session.commit()

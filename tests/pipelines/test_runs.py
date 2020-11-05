@@ -130,7 +130,9 @@ def test_create_run(client, pipeline, client_application, mock_execute_pipeline)
     }
 
 
-def test_create_run_without_callback_url(client, pipeline, client_application, mock_execute_pipeline):
+def test_create_run_without_callback_url(
+    client, pipeline, client_application, mock_execute_pipeline
+):
     db.session.commit()
     result = client.post(
         f"/v1/pipelines/{pipeline.uuid}/runs",
