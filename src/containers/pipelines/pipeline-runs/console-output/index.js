@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { requestPipelineRunConsoleOutput } from 'services';
 import { CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
-import { StyledH2, StyledH5 } from 'styles/app';
+import { StyledH2, StyledButton } from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
 
@@ -36,16 +36,26 @@ const StyledConsoleOutput = styled.div`
     font-size: 1.125rem;
     line-height: 21px;
     line-height: 1.3125rem;
-    padding: 42px 28px;
-    padding: 2.625rem 1.75rem;
+    white-space: pre-line;
   }
+`;
+
+const ConsoleOutputTypes = styled.div`
+  padding-top: 16px;
+  padding-top: 1rem;
+`;
+
+const ConsoleOutputContent = styled.div`
+  padding: 20px 28px;
+  padding: 1.25rem 1.75rem;
 `;
 
 const ConsoleOutput = ({
   pipelineInView, pipelineRunSelectedUuid, pipelineRunSelectedStatus, sequence, setDisplayTab,
 }) => {
-  const [stdout, setStdout] = useState();
+  const [stdout, setStdout] = useState('stdout');
   const [stderr, setStderr] = useState();
+  const [outputType, setOutputType] = useState();
   // const [getConsoleOutputError, setGetConsoleOutputError] = useState();
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -53,8 +63,8 @@ const ConsoleOutput = ({
   useEffect(() => {
     requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
       .then((response) => {
-        if ('stdout' in response.data) setStdout(response.data.stdout);
-        if ('stderr' in response.data) setStderr(response.data.stderr);
+        if ('std_out' in response.data) setStdout(response.data.std_out);
+        if ('std_err' in response.data) setStderr(response.data.std_err);
       })
       .catch(() => {
         // setGetConsoleOutputError(!err.response || err.response.data); // TODO: tell user output could not be gotten
@@ -75,11 +85,30 @@ const ConsoleOutput = ({
         />
       </header>
       <section>
-        <StyledH5 color="black">stdout:</StyledH5>
-        {stdout}
-        <br />
-        <StyledH5 color="black">stderr:</StyledH5>
-        {stderr}
+        <ConsoleOutputTypes>
+          <StyledButton
+            type="text"
+            size="large"
+            width={108}
+            onClick={() => setOutputType('stdout')}
+            textcolor={outputType === 'stdout' ? 'lightBlue' : 'black'}
+          >
+            stdout
+          </StyledButton>
+          <StyledButton
+            type="text"
+            size="large"
+            width={108}
+            onClick={() => setOutputType('stderr')}
+            textcolor={outputType === 'stderr' ? 'lightBlue' : 'black'}
+          >
+            stderr
+          </StyledButton>
+        </ConsoleOutputTypes>
+        <ConsoleOutputContent>
+          {outputType === 'stdout' && stdout}
+          {outputType === 'stderr' && stderr}
+        </ConsoleOutputContent>
       </section>
     </StyledConsoleOutput>
 

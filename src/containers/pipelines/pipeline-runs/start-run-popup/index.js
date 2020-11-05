@@ -105,7 +105,7 @@ const ArtifactsSection = styled.div`
   margin-bottom: 24px;
   margin-bottom: 1.5rem;
   max-height: 33vh;
-  overflow: scroll;
+  overflow: overlay;
 `;
 
 export const Artifact = styled.div`

@@ -66,7 +66,9 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
     delete formFields.script;
 
     if (formSubmitted && !errors.length && !loading) {
-      requestUpdatePipeline(currentOrg, pipelineItem.uuid, formFields)
+      setLoading(true);
+
+      requestUpdatePipeline(currentOrg, pipelineItem && pipelineItem.uuid, formFields)
         .then(() => {
           handleSuccess();
           setErrors({});
@@ -78,7 +80,7 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
           setLoading(false);
         });
     }
-  }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading, pipelineItem.uuid]);
+  }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading, pipelineItem && pipelineItem.uuid]);
 
   const validateField = (fieldName, fieldValue) => {
     let result;

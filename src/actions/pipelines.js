@@ -47,7 +47,10 @@ export const getPipelineRuns = (organization_uuid, pipeline_uuid) => (dispatch) 
     .then((response) => {
       dispatch({
         type: GET_PIPELINE_RUNS,
-        payload: response.data,
+        payload: {
+          pipelineRuns: response.data,
+          pipeline_uuid,
+        },
       });
     })
     .catch((err) => {

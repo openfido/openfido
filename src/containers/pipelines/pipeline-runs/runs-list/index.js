@@ -17,7 +17,7 @@ import {
 import colors from 'styles/colors';
 
 const RunMenu = styled(Menu)`
-  overflow: scroll;
+  overflow: overlay;
   height: 617px;
   &.ant-menu-vertical {
     border-right: 0;
