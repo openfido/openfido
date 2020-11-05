@@ -17,9 +17,7 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     The **OpenFIDO App Service** acts as a front end client to both the Workflow Service and the Auth Service.
 
     The **OpenFIDO Client** will be accessing the API endpoints at the App Service as well as at the Auth Service, at different ports.
-   
-    You will need to configure **ports** on the OpenFIDO Client to match what is being served by the `docker-compose.yml` and `docker run` on *App Service*. Read on!
-   
+
 1.  The *App Service* [`README.md`](https://github.com/slacgismo/openfido-app-service/blob/master/README.md) has clear instructions on how to run all the services via docker containers at once.
 
     At this time, however, we can make use of shortcuts in the [`Makefile`](https://github.com/slacgismo/openfido-app-service/blob/master/Makefile) to call processes, similarly to what is described in the README.
@@ -85,8 +83,6 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     
     Paste this copied key into your `config/index.js` on `openfido-client`.
     
-    See instructions on the Generating API Keys document - section *React Client*.
-    
     You do not need to run this command again, unless you need to regenerate API tokens. Just run `docker-compose up`
     
     ```
@@ -110,12 +106,6 @@ Ensure that you have `npm` and `yarn` installed for the OpenFIDO react client to
     The port numbers for `openfido-app-service_app_service` and `openfido-app-service_auth_service` are detailed in this output.
     
     Check to make sure that the `config/index.js` on `openfido-client` has `BASE_API_URL_AUTH_DEVELOPMENT` and `BASE_API_URL_APP_DEVELOPMENT` configured to point to these ports on `localhost`.
-    
-    By default, these are `6000` for `openfido-app-service`, `6001` for `openfido-workflow-service`, and `6002` for `openfido-auth-service`
-    
-    **IMPORTANT: You will need to change the port for the `openfido-app-service` to something like `8080` in development on the `docker-compose.yml`. Browsers such as Chrome consider this port to be unsafe, and therefore, we cannot serve API responses via the browser at port `6000`.**
-    
-    Change the port numbers in `openfido-client` at `config/index.js` in order to match what is being served by the `docker-compose.yml` and `docker run`.
 
 1.  Your services are up and running! If you ever need to restart manually, run `docker-compose stop` and then `docker-compose up` again.
 
