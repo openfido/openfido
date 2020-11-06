@@ -17,6 +17,15 @@ A_DESCRIPTION = "a description"
 A_DOCKER_IMAGE = "example/image"
 A_SSH_URL = "git@github.com:an_org/a_repo.git"
 A_BRANCH = "master"
+A_SCRIPT = "script.sh"
+PIPELINE_JSON = {
+    "name": A_NAME,
+    "description": A_DESCRIPTION,
+    "docker_image_url": A_DOCKER_IMAGE,
+    "repository_ssh_url": A_SSH_URL,
+    "repository_branch": A_BRANCH,
+    "repository_script": A_SCRIPT,
+}
 
 INVALID_CALLBACK_INPUT = {"inputs": [], "callback_url": "notaurl"}
 VALID_CALLBACK_INPUT = {"inputs": [], "callback_url": "http://example.com"}
@@ -24,35 +33,42 @@ VALID_CALLBACK_INPUT = {"inputs": [], "callback_url": "http://example.com"}
 
 def test_create_pipeline_version_no_name(app):
     # Can't create a pipeline without some kind of URL configuration.
-    with pytest.raises(ValueError):
-        services.create_pipeline("", A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH)
+    with pytest.raises(ValidationError):
+        pipeline_json = dict(PIPELINE_JSON)
+        pipeline_json["name"] = ""
+        services.create_pipeline(pipeline_json)
 
 
 def test_create_pipeline_version_no_docker(app):
     # Can't create a pipeline without some kind of URL configuration.
-    with pytest.raises(ValueError):
-        services.create_pipeline(A_NAME, A_DESCRIPTION, "", "", "")
+    with pytest.raises(ValidationError):
+        pipeline_json = dict(PIPELINE_JSON)
+        pipeline_json["docker_image_url"] = ""
+        services.create_pipeline(pipeline_json)
 
 
 def test_create_pipeline_version_no_ssh_url(app):
     # Can't create a pipeline without some kind of URL configuration.
-    with pytest.raises(ValueError):
-        services.create_pipeline(A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, "", "")
+    with pytest.raises(ValidationError):
+        pipeline_json = dict(PIPELINE_JSON)
+        pipeline_json["repository_ssh_url"] = ""
+        services.create_pipeline(pipeline_json)
 
 
 def test_create_pipeline(app):
-    pipeline = services.create_pipeline(
-        A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
-    )
+    pipeline = services.create_pipeline(PIPELINE_JSON)
     assert pipeline.name == A_NAME
     assert pipeline.description == A_DESCRIPTION
     assert pipeline.docker_image_url == A_DOCKER_IMAGE
     assert pipeline.repository_ssh_url == A_SSH_URL
     assert pipeline.repository_branch == A_BRANCH
+    assert pipeline.repository_script == A_SCRIPT
 
 
 def test_create_pipeline_no_description(app):
-    pipeline = services.create_pipeline(A_NAME, "", A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH)
+    pipeline_json = dict(PIPELINE_JSON)
+    pipeline_json["description"] = ""
+    pipeline = services.create_pipeline(pipeline_json)
     assert pipeline.name == A_NAME
     assert pipeline.docker_image_url == A_DOCKER_IMAGE
     assert pipeline.repository_ssh_url == A_SSH_URL
@@ -61,20 +77,17 @@ def test_create_pipeline_no_description(app):
 
 def test_update_pipeline_no_uuid(app):
     with pytest.raises(ValueError):
-        services.update_pipeline(
-            "baduuid", A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
-        )
+        services.update_pipeline("baduuid", PIPELINE_JSON)
 
 
 def test_update_pipeline(app, pipeline):
-    pipeline = services.update_pipeline(
-        pipeline.uuid, A_NAME, A_DESCRIPTION, A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH
-    )
+    pipeline = services.update_pipeline(pipeline.uuid, PIPELINE_JSON)
     assert pipeline.name == A_NAME
     assert pipeline.description == A_DESCRIPTION
     assert pipeline.docker_image_url == A_DOCKER_IMAGE
     assert pipeline.repository_ssh_url == A_SSH_URL
     assert pipeline.repository_branch == A_BRANCH
+    assert pipeline.repository_script == A_SCRIPT
 
 
 def test_delete_pipeline_no_record(app):

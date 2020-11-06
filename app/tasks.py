@@ -105,6 +105,7 @@ def execute_pipeline(
     docker_image_url,
     repository_ssh_url,
     repository_branch,
+    repository_script,
 ):
     def failed(err):
         try:
@@ -126,8 +127,8 @@ def execute_pipeline(
             executor.run(f"git clone {repository_ssh_url} gitrepo", tmpdir)
             executor.run(f"git checkout {repository_branch}", gitdir)
 
-            if not os.path.exists(join(gitdir, "openfido.sh")):
-                raise ValueError("Openfido.sh does not exist in repository")
+            if not os.path.exists(join(gitdir, repository_script)):
+                raise ValueError("Repository script does not exist in repository")
 
             executor.run("mkdir input", tmpdir)
             executor.run("mkdir output", tmpdir)
@@ -151,7 +152,7 @@ def execute_pipeline(
                     f"-e OPENFIDO_INPUT=/tmp/input "
                     f"-e OPENFIDO_OUTPUT=/tmp/output "
                     "-w /tmp/gitrepo "
-                    f"{docker_image_url} sh openfido.sh"
+                    f"{docker_image_url} sh {repository_script}"
                 ),
                 gitdir,
             )

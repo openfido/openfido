@@ -18,6 +18,7 @@ class Pipeline(CommonColumnsMixin, db.Model):
     docker_image_url = db.Column(db.String(2000), nullable=True)
     repository_ssh_url = db.Column(db.String(2000), nullable=True)
     repository_branch = db.Column(db.String(100), nullable=True)
+    repository_script = db.Column(db.String(4096), nullable=True)
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     pipeline_runs = db.relationship("PipelineRun", backref="pipeline", lazy="select")

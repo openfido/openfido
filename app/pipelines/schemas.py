@@ -9,21 +9,32 @@ class InputSchema(Schema):
     """ A pipeline run input. """
 
     name = fields.Str(required=True)
-    url = fields.Url(required=True)
+    url = fields.Url(required=True, require_tld=False)
 
 
 class InputExportSchema(Schema):
     """ A run input export schema. """
 
     name = fields.Str(attribute="filename")
-    url = fields.Url()
+    url = fields.Url(required=True)
+
+
+class CreatePipelineSchema(Schema):
+    """ Validation schema for create_pipeline() """
+
+    name = fields.Str(required=True, validate=validate.Length(min=1))
+    description = fields.Str(missing="")
+    docker_image_url = fields.Str(required=True, validate=validate.Length(min=1))
+    repository_ssh_url = fields.Str(required=True, validate=validate.Length(min=1))
+    repository_branch = fields.Str(missing="master")
+    repository_script = fields.Str(missing="openfido.sh")
 
 
 class CreateRunSchema(Schema):
     """ Validation schema for create_run() """
 
     inputs = fields.Nested(InputSchema, many=True, required=True)
-    callback_url = fields.Url(missing="")
+    callback_url = fields.Url(missing="", require_tld=True)
 
 
 class UpdateRunStateSchema(Schema):
@@ -48,6 +59,7 @@ class PipelineSchema(Schema):
     docker_image_url = fields.Str()
     repository_ssh_url = fields.Str()
     repository_branch = fields.Str()
+    repository_script = fields.Str()
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
