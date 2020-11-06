@@ -56,7 +56,7 @@ const ConsoleOutput = ({
   const [stdout, setStdout] = useState();
   const [stderr, setStderr] = useState();
   const [outputType, setOutputType] = useState('stdout');
-  // const [getConsoleOutputError, setGetConsoleOutputError] = useState();
+  const [getConsoleOutputError, setGetConsoleOutputError] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
@@ -65,11 +65,12 @@ const ConsoleOutput = ({
       .then((response) => {
         if ('std_out' in response.data) setStdout(response.data.std_out);
         if ('std_err' in response.data) setStderr(response.data.std_err);
+        setGetConsoleOutputError(null);
       })
-      .catch(() => {
-        // setGetConsoleOutputError(!err.response || err.response.data); // TODO: tell user output could not be gotten
+      .catch((err) => {
+        setGetConsoleOutputError(!err.response || err.response.data);
       });
-  });
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid]);
 
   return (
     <StyledConsoleOutput>
@@ -106,6 +107,7 @@ const ConsoleOutput = ({
           </StyledButton>
         </ConsoleOutputTypes>
         <ConsoleOutputContent>
+          {getConsoleOutputError && 'message' in getConsoleOutputError && getConsoleOutputError.message}
           {outputType === 'stdout' && stdout}
           {outputType === 'stderr' && stderr}
         </ConsoleOutputContent>
