@@ -140,17 +140,25 @@ def fetch_pipelines(organization_uuid):
 
     try:
         json_value = response.json()
+
         response.raise_for_status()
 
         for pipeline in json_value:
-            matching_pipelines = [
-                op.uuid
-                for op in organization_pipelines
-                if op.pipeline_uuid == pipeline["uuid"]
-            ]
-            if len(matching_pipelines) != 1:
-                raise ValueError("Unexpected response from workflow service")
-            pipeline["uuid"] = matching_pipelines[0]
+            for op in organization_pipelines:
+                matching_pipelines = []
+
+                if op.pipeline_uuid == pipeline["uuid"]:
+                    matching_pipelines = [op.uuid]
+
+                if len(matching_pipelines) != 1:
+                    raise ValueError("Unexpected response from workflow service")
+
+                pipeline["uuid"] = matching_pipelines[0]
+
+                pipeline_runs = fetch_pipeline_runs(organization_uuid, pipeline["uuid"])
+                if pipeline_runs and len(pipeline_runs) > 0:
+                    pipeline["last_pipeline_run"] = pipeline_runs[0]
+
         return json_value
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
@@ -262,7 +270,7 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
             opr = search_organization_pipeline_runs(org_pipeline.id, [pr.get("uuid")])[
                 0
             ]
-            pr["uuid"] = opr.uuid
+
             org_pipeline_input_files = find_organization_pipeline_input_files(
                 org_pipeline.id
             )

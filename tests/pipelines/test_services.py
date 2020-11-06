@@ -26,13 +26,6 @@ from ..conftest import (
     PIPELINE_RUN_INPUT_FILE_UUID,
 )
 
-PIPELINE_JSON = {
-    "description": "a pipeline",
-    "docker_image_url": "python:3",
-    "name": "pipeline 1",
-    "repository_branch": "master",
-    "repository_ssh_url": "https://github.com/PresencePG/presence-pipeline-example.git",
-}
 PIPELINE_RUN_JSON = {
     "inputs": [PIPELINE_RUN_INPUT_FILE_UUID],
 }
@@ -56,6 +49,14 @@ PIPELINE_RUN_RESPONSE_JSON = {
 PIPELINE_RUN_CONSOLE_RESPONSE_JSON = {
     "std_out": "success messages",
     "std_err": "the error output...",
+}
+PIPELINE_JSON = {
+    "description": "a pipeline",
+    "docker_image_url": "python:3",
+    "name": "pipeline 1",
+    "repository_branch": "master",
+    "repository_ssh_url": "https://github.com/PresencePG/presence-pipeline-example.git",
+    "last_pipeline_run": PIPELINE_RUN_RESPONSE_JSON,
 }
 
 
@@ -103,38 +104,45 @@ def test_create_pipeline(app):
     assert created_pipeline == json_response
 
 
-@patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines_bad_workflow_response(post_mock, app, organization_pipeline):
-    pipeline_list = [
-        {
-            "uuid": "nonexistant-organization-organization_pipeline-uuid",
-            "name": "name 1",
-        }
-    ]
-    post_mock().json.return_value = pipeline_list
+@responses.activate
+def test_fetch_pipelines_bad_workflow_response(app, organization_pipeline):
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/search",
+        status=500,
+    )
 
-    expected_result = [{"uuid": organization_pipeline.uuid, "name": "name 1"}]
-
-    # we got back bogus workflow service data, but we did make the API call:
     with pytest.raises(HTTPError):
         fetch_pipelines(ORGANIZATION_UUID)
 
-    post_mock.assert_called()
-    get_call = post_mock.call_args
-    assert get_call[0][0].startswith(app.config[WORKFLOW_HOSTNAME])
-    assert get_call[1]["headers"][ROLES_KEY] == app.config[WORKFLOW_API_TOKEN]
-    assert get_call[1]["json"] == {"uuids": [organization_pipeline.pipeline_uuid]}
 
-    post_mock().raise_for_status.assert_called()
-    post_mock().json.assert_called()
+@responses.activate
+def test_fetch_pipelines_no_matching_pipelines(app, organization_pipeline):
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/search",
+        json=[{"uuid": "12345"}],
+        status=200,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_pipelines(ORGANIZATION_UUID)
 
 
+@patch("app.pipelines.services.fetch_pipeline_runs")
 @patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines(post_mock, app, organization_pipeline):
+def test_fetch_pipelines(post_mock, mock_runs, app, organization_pipeline):
+    mock_runs.return_value = [PIPELINE_RUN_RESPONSE_JSON]
     pipeline_list = [{"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"}]
     post_mock().json.return_value = pipeline_list
 
-    expected_result = [{"uuid": organization_pipeline.uuid, "name": "name 1"}]
+    expected_result = [
+        {
+            "uuid": organization_pipeline.uuid,
+            "name": "name 1",
+            "last_pipeline_run": PIPELINE_RUN_RESPONSE_JSON,
+        }
+    ]
     assert fetch_pipelines(ORGANIZATION_UUID) == expected_result
     post_mock.assert_called()
     get_call = post_mock.call_args
@@ -144,6 +152,7 @@ def test_fetch_pipelines(post_mock, app, organization_pipeline):
 
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
+    mock_runs.assert_called()
 
 
 @responses.activate

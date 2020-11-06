@@ -97,8 +97,10 @@ def test_pipelines_bad_search(app, client, client_application):
     assert result.json == json_response
 
 
+@patch("app.pipelines.services.fetch_pipeline_runs")
 @responses.activate
-def test_pipelines(app, client, client_application, organization_pipeline):
+def test_pipelines(mock_runs, app, client, client_application, organization_pipeline):
+    mock_runs.return_value = [PIPELINE_RUN_RESPONSE_JSON]
     pipeline_json = dict(PIPELINE_JSON)
     pipeline_json.update(
         {
