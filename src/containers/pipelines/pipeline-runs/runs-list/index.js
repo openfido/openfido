@@ -19,12 +19,14 @@ import colors from 'styles/colors';
 const RunMenu = styled(Menu)`
   overflow: overlay;
   height: 617px;
+  margin-right: -8px;
   &.ant-menu-vertical {
     border-right: 0;
     > .ant-menu-item {
       height: auto;
       line-height: inherit;
       padding: 0;
+      overflow: visible;
     }
     .ant-menu-item-selected, .ant-menu-item-active {
       background-color: transparent;
@@ -33,6 +35,8 @@ const RunMenu = styled(Menu)`
 `;
 
 const RunItem = styled(Menu.Item)`
+  position: relative;
+  margin-right: 14px;
   > div {
     display: grid;
     align-items: center;
@@ -109,6 +113,16 @@ const StatusText = styled.mark`
   text-align: center;
 `;
 
+const Caret = styled.div`
+  width: 0; 
+  height: 0; 
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 14px solid ${({ bgcolor }) => (bgcolor in colors ? colors[bgcolor] : '')};
+  position: absolute;
+  right: -8px;
+`;
+
 const RunsList = ({
   openStartRunPopup, pipelineRuns, selectedRun, setSelectedRun,
 }) => (
@@ -143,6 +157,7 @@ const RunsList = ({
               {duration}
             </StyledText>
             )}
+            {selectedRun === run_uuid && <Caret bgcolor={statusLegend[status]} />}
           </div>
         </RunItem>
       ))}

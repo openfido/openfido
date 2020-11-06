@@ -26,12 +26,13 @@ const PipelineRunsGrid = styled(StyledGrid)`
   grid-gap: 1.25rem;
   max-width: 1028px;
   overflow: hidden;
-  padding: 12px 16px 20px 20px;
-  padding: 0.75rem 1rem 1.25rem 1rem;
+  padding: 12px 2px 20px 20px;
+  padding: 0.75rem 0.125rem 1.25rem 1rem;
   section {
     background-color: ${colors.white};
     padding: 20px 28px 20px 16px;
     padding: 1.25rem 1.75rem 1.25rem 1rem;
+    border-radius: 5px;
   }
 `;
 
