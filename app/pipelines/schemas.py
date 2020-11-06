@@ -9,21 +9,21 @@ class InputSchema(Schema):
     """ A pipeline run input. """
 
     name = fields.Str(required=True)
-    url = fields.Url(required=True)
+    url = fields.Url(required=True, require_tld=False)
 
 
 class InputExportSchema(Schema):
     """ A run input export schema. """
 
     name = fields.Str(attribute="filename")
-    url = fields.Url()
+    url = fields.Url(required=True)
 
 
 class CreateRunSchema(Schema):
     """ Validation schema for create_run() """
 
     inputs = fields.Nested(InputSchema, many=True, required=True)
-    callback_url = fields.Url(missing="")
+    callback_url = fields.Url(missing="", require_tld=True)
 
 
 class UpdateRunStateSchema(Schema):
