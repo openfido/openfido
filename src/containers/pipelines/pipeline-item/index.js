@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import {
+  statusLegend,
+  statusNameLegend,
+  statusPhraseLegend,
+} from 'config/pipeline-status';
 import EditOutlined from 'icons/EditOutlined';
 import {
   StyledGrid,
@@ -47,23 +52,28 @@ const EditColumn = styled.div`
 `;
 
 const PipelineItem = ({
-  uuid, name, updated_at, status, openPipelineEdit, viewPipelineRuns,
+  uuid, name, last_pipeline_run, openPipelineEdit, viewPipelineRuns,
 }) => {
-  const statusLegend = {
-    NOT_STARTED: 'skyBlue',
-    RUNNING: 'lightBlue',
-    COMPLETED: 'green',
-    FAILED: 'pink',
-  };
+  const lastPipelineRunState = (
+    last_pipeline_run
+      && last_pipeline_run.states
+      && last_pipeline_run.states.length
+      && last_pipeline_run.states[last_pipeline_run.states.length - 1]
+  );
+
+  const runStatus = lastPipelineRunState && lastPipelineRunState.state;
 
   return (
     <PipelineItemGrid gridTemplateColumns="1fr 48px 2fr 140px 40px" bgcolor="white">
       <StyledText size="xlarge" fontweight={700} color="black">
         {name}
       </StyledText>
-      <StatusLegend color={statusLegend[status]} />
+      <StatusLegend
+        color={statusLegend[runStatus]}
+        title={statusNameLegend[runStatus]}
+      />
       <StyledText size="middle" color="darkText">
-        {`Last run started ${moment.utc(updated_at).fromNow()}`}
+        {runStatus && `Last run ${statusPhraseLegend[runStatus]} ${moment.utc(lastPipelineRunState && lastPipelineRunState.created_at).fromNow()}`}
       </StyledText>
       <ViewRunsColumn>
         <StyledButton
@@ -85,8 +95,12 @@ const PipelineItem = ({
 PipelineItem.propTypes = {
   uuid: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  updated_at: PropTypes.string.isRequired,
-  status: PropTypes.string.isRequired,
+  last_pipeline_run: PropTypes.shape({
+    states: PropTypes.arrayOf(PropTypes.shape({
+      state: PropTypes.string.isRequired,
+      created_at: PropTypes.string.isRequired,
+    })),
+  }).isRequired,
   openPipelineEdit: PropTypes.func.isRequired,
   viewPipelineRuns: PropTypes.func.isRequired,
 };

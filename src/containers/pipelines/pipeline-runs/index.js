@@ -98,6 +98,12 @@ const PipelineRuns = () => {
 
   const pipelineRunSelected = pipelineRuns && pipelineRuns.find((run) => run.uuid === selectedRun);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
+  const pipelineRunStatus = (
+    pipelineRunSelected
+      && pipelineRunSelected.states
+      && pipelineRunSelected.states.length
+      && pipelineRunSelected.states[pipelineRunSelected.states.length - 1].state
+  );
 
   useEffect(() => {
     if (!pipelines) {
@@ -160,14 +166,14 @@ const PipelineRuns = () => {
             <FilesList
               title="Input Files"
               files={pipelineRunSelected && pipelineRunSelected.inputs}
-              pipelineRunSelected={pipelineRunSelected}
+              pipelineRunStatus={pipelineRunStatus}
             />
           </InputFilesSection>
           <ArtifactsSection>
             <FilesList
               title="Artifacts"
               files={pipelineRunSelected && pipelineRunSelected.artifacts}
-              pipelineRunSelected={pipelineRunSelected}
+              pipelineRunStatus={pipelineRunStatus}
             />
           </ArtifactsSection>
         </PipelineRunsGrid>
