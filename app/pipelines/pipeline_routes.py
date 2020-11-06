@@ -25,10 +25,11 @@ pipeline_bp = Blueprint("pipelines", __name__)
         "name",
         "docker_image_url",
         "repository_ssh_url",
-        "repository_branch",
     ],
     [
         "description",
+        "repository_branch",
+        "repository_script",
     ],
 )
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
@@ -88,20 +89,11 @@ def create():
       "400":
         description: "Bad request"
     """
-    name = request.json["name"]
-    description = request.json.get("description")
-    docker_image_url = request.json["docker_image_url"]
-    repository_ssh_url = request.json["repository_ssh_url"]
-    repository_branch = request.json["repository_branch"]
     try:
-        pipeline = create_pipeline(
-            name, description, docker_image_url, repository_ssh_url, repository_branch
-        )
-        db.session.commit()
-
+        pipeline = create_pipeline(request.json)
         return jsonify(PipelineSchema().dump(pipeline))
-    except ValueError:
-        return {"message": "Unable to create pipeline"}, 400
+    except ValidationError as ve:
+        return {"message": "Unable to create pipeline", "errors": ve.messages}, 400
 
 
 @pipeline_bp.route("/<pipeline_uuid>", methods=["GET"])
@@ -239,12 +231,14 @@ def list_pipelines():
 @verify_content_type_and_params(
     [
         "name",
-        "description",
         "docker_image_url",
         "repository_ssh_url",
-        "repository_branch",
     ],
-    [],
+    [
+        "description",
+        "repository_branch",
+        "repository_script",
+    ],
 )
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def update(pipeline_uuid):
@@ -304,25 +298,13 @@ def update(pipeline_uuid):
       "400":
         description: "Bad request"
     """
-    name = request.json["name"]
-    description = request.json["description"]
-    docker_image_url = request.json["docker_image_url"]
-    repository_ssh_url = request.json["repository_ssh_url"]
-    repository_branch = request.json["repository_branch"]
     try:
-        pipeline = update_pipeline(
-            pipeline_uuid,
-            name,
-            description,
-            docker_image_url,
-            repository_ssh_url,
-            repository_branch,
-        )
-        db.session.commit()
-
+        pipeline = update_pipeline(pipeline_uuid, request.json)
         return jsonify(PipelineSchema().dump(pipeline))
     except ValueError:
         return {"message": "Unable to update pipeline"}, 400
+    except ValidationError as ve:
+        return {"message": "Unable to update pipeline", "errors": ve.messages}, 400
 
 
 @pipeline_bp.route("/search", methods=["POST"])

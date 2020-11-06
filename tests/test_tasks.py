@@ -131,6 +131,7 @@ def test_execute_pipeline_no_openfido(
         "python:3",
         "https://github.com/example",
         "master",
+        "openfido.sh",
     )
 
     assert run_mock.call_count == 3
@@ -173,6 +174,7 @@ def test_execute_pipeline_urlerror(
         "python:3",
         "https://github.com/example",
         "master",
+        "openfido.sh",
     )
 
     assert update_run_status_mock.call_count == 2
@@ -207,6 +209,7 @@ def test_execute_pipeline_valueerror(
         "python:3",
         "https://github.com/example",
         "master",
+        "openfido.sh",
     )
 
     assert update_run_status_mock.call_count == 2
@@ -249,6 +252,7 @@ def test_execute_pipeline(
         "python:3",
         "https://github.com/example",
         "master",
+        "script.sh",
     )
 
     assert run_mock.call_count == 7
@@ -262,6 +266,7 @@ def test_execute_pipeline(
     assert run_mock.call_args_list[4][0][0] == "mkdir output"
     assert run_mock.call_args_list[5][0][0] == "chmod -R 777 ."
     assert run_mock.call_args_list[6][0][0].startswith("docker run --rm")
+    assert " script.sh" in run_mock.call_args_list[6][0][0]
 
     assert update_run_status_mock.call_count == 2
     assert update_run_status_mock.call_args_list[0] == call(RunStateEnum.RUNNING)

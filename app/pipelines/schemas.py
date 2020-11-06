@@ -19,6 +19,17 @@ class InputExportSchema(Schema):
     url = fields.Url()
 
 
+class CreatePipelineSchema(Schema):
+    """ Validation schema for create_pipeline() """
+
+    name = fields.Str(required=True, validate=validate.Length(min=1))
+    description = fields.Str(missing="")
+    docker_image_url = fields.Str(required=True, validate=validate.Length(min=1))
+    repository_ssh_url = fields.Str(required=True, validate=validate.Length(min=1))
+    repository_branch = fields.Str(missing="master")
+    repository_script = fields.Str(missing="openfido.sh")
+
+
 class CreateRunSchema(Schema):
     """ Validation schema for create_run() """
 
@@ -48,6 +59,7 @@ class PipelineSchema(Schema):
     docker_image_url = fields.Str()
     repository_ssh_url = fields.Str()
     repository_branch = fields.Str()
+    repository_script = fields.Str()
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 

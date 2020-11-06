@@ -21,7 +21,7 @@ from .models import (
     db,
 )
 from .queries import find_pipeline, find_pipeline_run, find_run_state_type
-from .schemas import CreateRunSchema, UpdateRunStateSchema
+from .schemas import CreateRunSchema, UpdateRunStateSchema, CreatePipelineSchema
 
 # make the request lib mockable for testing:
 urllib_request = urllib.request
@@ -44,66 +44,46 @@ def delete_pipeline(pipeline_uuid):
     db.session.commit()
 
 
-def _validate_pipeline_params(
-    name, description, docker_image_url, repository_ssh_url, repository_branch
-):
-    """ Deprecated - replace with marshmallow validation. """
-    if len(name) == 0 or len(description) == 0:
-        raise ValueError("name and description must be supplied.")
-    if len(docker_image_url) == 0:
-        raise ValueError("A docker image URL must be supplied.")
-    if len(repository_ssh_url) == 0 or len(repository_branch) == 0:
-        raise ValueError("A ssh URL must be supplied.")
-
-
-def create_pipeline(
-    name, description, docker_image_url, repository_ssh_url, repository_branch
-):
+def create_pipeline(pipeline_json):
     """Create a Pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
-    _validate_pipeline_params(
-        name, description, docker_image_url, repository_ssh_url, repository_branch
-    )
+    data = CreatePipelineSchema().load(pipeline_json)
 
     pipeline = Pipeline(
-        name=name,
-        description=description,
-        docker_image_url=docker_image_url,
-        repository_ssh_url=repository_ssh_url,
-        repository_branch=repository_branch,
+        name=data["name"],
+        description=data["description"],
+        docker_image_url=data["docker_image_url"],
+        repository_ssh_url=data["repository_ssh_url"],
+        repository_branch=data["repository_branch"],
+        repository_script=data["repository_script"],
     )
     db.session.add(pipeline)
+    db.session.commit()
 
     return pipeline
 
 
-def update_pipeline(
-    pipeline_uuid,
-    name,
-    description,
-    docker_image_url,
-    repository_ssh_url,
-    repository_branch,
-):
+def update_pipeline(pipeline_uuid, pipeline_json):
     """Update a Pipeline.
 
     Note: The db.session is not committed. Be sure to commit the session.
     """
-    _validate_pipeline_params(
-        name, description, docker_image_url, repository_ssh_url, repository_branch
-    )
+    data = CreatePipelineSchema().load(pipeline_json)
+
     pipeline = find_pipeline(pipeline_uuid)
     if pipeline is None:
         raise ValueError("no pipeline found")
 
-    pipeline.name = name
-    pipeline.description = description
-    pipeline.docker_image_url = docker_image_url
-    pipeline.repository_ssh_url = repository_ssh_url
-    pipeline.repository_branch = repository_branch
+    pipeline.name = data["name"]
+    pipeline.description = data["description"]
+    pipeline.docker_image_url = data["docker_image_url"]
+    pipeline.repository_ssh_url = data["repository_ssh_url"]
+    pipeline.repository_branch = data["repository_branch"]
+    pipeline.repository_script = data["repository_script"]
     db.session.add(pipeline)
+    db.session.commit()
 
     return pipeline
 
@@ -173,6 +153,7 @@ def start_pipeline_run(pipeline_run):
         pipeline.docker_image_url,
         pipeline.repository_ssh_url,
         pipeline.repository_branch,
+        pipeline.repository_script,
     )
 
     return pipeline_run
@@ -216,8 +197,7 @@ def update_pipeline_run_state(
 
     This method ensures that no invalid state transitions occur.
     """
-    schema = UpdateRunStateSchema()
-    data = schema.load(run_state_json)
+    data = UpdateRunStateSchema().load(run_state_json)
 
     pipeline_run = find_pipeline_run(pipeline_uuid)
     if pipeline_run is None:

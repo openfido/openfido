@@ -209,6 +209,24 @@ def test_remove_pipeline(
     assert find_pipeline(p1.uuid) is None
 
 
+def test_update_pipeline_bad_field(client, client_application):
+    db.session.commit()
+    params = {
+        "name": "updated pipeline",
+        "description": "updated description",
+        "docker_image_url": "updated url",
+        "repository_ssh_url": "",
+        "repository_branch": "updated branch",
+    }
+    result = client.put(
+        f"/v1/pipelines/noid",
+        content_type="application/json",
+        json=params,
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+
 def test_update_pipeline_bad_id(client, client_application):
     db.session.commit()
     params = {
