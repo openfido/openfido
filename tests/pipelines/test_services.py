@@ -51,6 +51,14 @@ def test_create_pipeline(app):
     assert pipeline.repository_branch == A_BRANCH
 
 
+def test_create_pipeline_no_description(app):
+    pipeline = services.create_pipeline(A_NAME, "", A_DOCKER_IMAGE, A_SSH_URL, A_BRANCH)
+    assert pipeline.name == A_NAME
+    assert pipeline.docker_image_url == A_DOCKER_IMAGE
+    assert pipeline.repository_ssh_url == A_SSH_URL
+    assert pipeline.repository_branch == A_BRANCH
+
+
 def test_update_pipeline_no_uuid(app):
     with pytest.raises(ValueError):
         services.update_pipeline(
