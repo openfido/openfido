@@ -51,7 +51,7 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
     docker_image_url: pipelineItem && pipelineItem.docker_image_url,
     repository_ssh_url: pipelineItem && pipelineItem.repository_ssh_url,
     repository_branch: pipelineItem && pipelineItem.repository_branch,
-    script: pipelineItem && pipelineItem.script,
+    repository_script: pipelineItem && pipelineItem.repository_script,
   });
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -62,14 +62,11 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
   useEffect(() => {
-    const formFields = { ...fields }; // TODO: remove when script is available
-    delete formFields.script;
-
     if (formSubmitted && !errors.length && !loading) {
       setLoading(true);
       setFormSubmitted(false);
 
-      requestUpdatePipeline(currentOrg, pipelineItem && pipelineItem.uuid, formFields)
+      requestUpdatePipeline(currentOrg, pipelineItem && pipelineItem.uuid, fields)
         .then(() => {
           handleSuccess();
           setErrors({});
@@ -94,8 +91,8 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
       case 'repository_ssh_url':
         result = fieldValue && fieldValue.match(/^https:\/\/.+/i);
         break;
-      case 'script':
-        result = fieldValue && fieldValue.match(/\.sh$/i);
+      case 'repository_script':
+        result = fieldValue && fieldValue.match(/^.+\.sh$/i);
         break;
       default:
         result = fieldValue && fieldValue.length > 0;
@@ -271,10 +268,10 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
               onChange={(e) => onFieldChanged(e, 'repository_branch')}
             />
           </label>
-          <label htmlFor="script">
+          <label htmlFor="repository_script">
             <StyledText
               display="block"
-              color={errors.script ? 'pink' : 'darkText'}
+              color={errors.repository_script ? 'pink' : 'darkText'}
             >
               Entrypoint Script (.sh)
             </StyledText>
@@ -282,11 +279,11 @@ const EditPipeline = ({ handleSuccess, handleCancel, pipelineItem }) => {
               type="text"
               bgcolor="white"
               size="large"
-              name="script"
-              id="script"
-              value={fields.script}
-              onBlur={(e) => onFieldBlur(e, 'script')}
-              onChange={(e) => onFieldChanged(e, 'script')}
+              name="repository_script"
+              id="repository_script"
+              value={fields.repository_script}
+              onBlur={(e) => onFieldBlur(e, 'repository_script')}
+              onChange={(e) => onFieldChanged(e, 'repository_script')}
             />
           </label>
           <Space direction="horizontal" size={24}>
@@ -334,6 +331,7 @@ EditPipeline.propTypes = {
     docker_image_url: PropTypes.string.isRequired,
     repository_ssh_url: PropTypes.string.isRequired,
     repository_branch: PropTypes.string.isRequired,
+    repository_script: PropTypes.string.isRequired,
   })).isRequired,
 };
 

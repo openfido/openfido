@@ -27,7 +27,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
     docker_image_url: '',
     repository_ssh_url: '',
     repository_branch: '',
-    script: 'openfido.sh',
+    repository_script: 'openfido.sh',
   });
   const [errors, setErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -36,14 +36,11 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
 
   useEffect(() => {
-    const formFields = { ...fields }; // TODO: remove when script is available
-    delete formFields.script;
-
     if (formSubmitted && !errors.length && !loading) {
       setLoading(true);
       setFormSubmitted(false);
 
-      requestCreatePipeline(currentOrg, formFields)
+      requestCreatePipeline(currentOrg, fields)
         .then(() => {
           handleSuccess();
           setErrors({});
@@ -68,8 +65,8 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
       case 'repository_ssh_url':
         result = fieldValue && fieldValue.match(/^https:\/\/.+/i);
         break;
-      case 'script':
-        result = fieldValue && fieldValue.match(/\.sh$/i);
+      case 'repository_script':
+        result = fieldValue && fieldValue.match(/^.+\.sh$/i);
         break;
       default:
         result = fieldValue && fieldValue.length > 0;
@@ -222,10 +219,10 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             onChange={(e) => onFieldChanged(e, 'repository_branch')}
           />
         </label>
-        <label htmlFor="script">
+        <label htmlFor="repository_script">
           <StyledText
             display="block"
-            color={errors.script ? 'pink' : 'darkText'}
+            color={errors.repository_script ? 'pink' : 'darkText'}
           >
             Entrypoint Script (.sh)
           </StyledText>
@@ -233,11 +230,11 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             type="text"
             bgcolor="white"
             size="large"
-            name="script"
-            id="script"
-            value={fields.script}
-            onBlur={(e) => onFieldBlur(e, 'script')}
-            onChange={(e) => onFieldChanged(e, 'script')}
+            name="repository_script"
+            id="repository_script"
+            value={fields.repository_script}
+            onBlur={(e) => onFieldBlur(e, 'repository_script')}
+            onChange={(e) => onFieldChanged(e, 'repository_script')}
           />
         </label>
         <Space direction="horizontal" size={24}>
