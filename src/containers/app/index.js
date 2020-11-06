@@ -21,6 +21,8 @@ const AppDropdown = styled(Dropdown)`
   top: 1.5rem;
   right: 16px;
   right: 1rem;
+  user-select: none;
+  z-index: 3;
   .anticon {
     border-radius: 50%;
     height: 14px;
@@ -79,16 +81,16 @@ const App = ({ children }) => {
         <Navigation />
       </StyledSider>
       <StyledContent>
+        <AppDropdown overlay={menu} trigger="click">
+          <div>
+            <StyledText color="darkText">
+              OpenFIDO
+            </StyledText>
+            <DownOutlined color="gray20" />
+          </div>
+        </AppDropdown>
         {children}
       </StyledContent>
-      <AppDropdown overlay={menu} trigger="click">
-        <div>
-          <StyledText color="darkText">
-            OpenFIDO
-          </StyledText>
-          <DownOutlined color="gray20" />
-        </div>
-      </AppDropdown>
     </StyledLayout>
   );
 };

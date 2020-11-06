@@ -30,11 +30,13 @@ export const StyledLayout = styled(Layout)`
 
 export const StyledSider = styled(Layout.Sider)`
   box-shadow: 1px 0px 3px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 `;
 
 export const StyledContent = styled(Layout.Content)`
   height: 100vh;
   background-color: ${colors.lightBg};
+  position: relative;
 `;
 
 export const StyledSection = styled.section`
