@@ -144,20 +144,20 @@ def fetch_pipelines(organization_uuid):
         response.raise_for_status()
 
         for pipeline in json_value:
-            for op in organization_pipelines:
-                matching_pipelines = []
+            matching_pipelines = []
 
+            for op in organization_pipelines:
                 if op.pipeline_uuid == pipeline["uuid"]:
                     matching_pipelines = [op.uuid]
 
-                if len(matching_pipelines) != 1:
-                    raise ValueError("Unexpected response from workflow service")
+            if len(matching_pipelines) != 1:
+                continue
 
-                pipeline["uuid"] = matching_pipelines[0]
+            pipeline["uuid"] = matching_pipelines[0]
 
-                pipeline_runs = fetch_pipeline_runs(organization_uuid, pipeline["uuid"])
-                if pipeline_runs and len(pipeline_runs) > 0:
-                    pipeline["last_pipeline_run"] = pipeline_runs[0]
+            pipeline_runs = fetch_pipeline_runs(organization_uuid, pipeline["uuid"])
+            if pipeline_runs and len(pipeline_runs) > 0:
+                pipeline["last_pipeline_run"] = pipeline_runs[-1]
 
         return json_value
     except ValueError as value_error:
