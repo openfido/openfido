@@ -270,7 +270,7 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
             opr = search_organization_pipeline_runs(org_pipeline.id, [pr.get("uuid")])[
                 0
             ]
-
+            pr["uuid"] = opr.uuid
             org_pipeline_input_files = find_organization_pipeline_input_files(
                 org_pipeline.id
             )
