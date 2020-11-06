@@ -23,7 +23,7 @@ services:
     volumes:
       - ${WORKFLOW_DIR:-.}/uploads:/data:delegated
     ports:
-      - "19000:9000"
+      - "9000:9000"
   workflow_service:
     build: ${WORKFLOW_DIR:-.}
     image: openfido/dev-workflow
