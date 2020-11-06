@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { statusLegend, statusNameLegend } from 'config/pipeline-status';
+import {
+  statusLegend,
+  statusNameLegend,
+  statusPhraseLegend,
+} from 'config/pipeline-status';
 import EditOutlined from 'icons/EditOutlined';
 import {
   StyledGrid,
@@ -57,17 +61,19 @@ const PipelineItem = ({
       && last_pipeline_run.states[last_pipeline_run.states.length - 1]
   );
 
+  const runStatus = lastPipelineRunState && lastPipelineRunState.state;
+
   return (
     <PipelineItemGrid gridTemplateColumns="1fr 48px 2fr 140px 40px" bgcolor="white">
       <StyledText size="xlarge" fontweight={700} color="black">
         {name}
       </StyledText>
       <StatusLegend
-        color={statusLegend[lastPipelineRunState && lastPipelineRunState.state]}
-        title={statusNameLegend[lastPipelineRunState && lastPipelineRunState.state]}
+        color={statusLegend[runStatus]}
+        title={statusNameLegend[runStatus]}
       />
       <StyledText size="middle" color="darkText">
-        {`Last run started ${moment.utc(lastPipelineRunState && lastPipelineRunState.created_at).fromNow()}`}
+        {runStatus && `Last run ${statusPhraseLegend[runStatus]} ${moment.utc(lastPipelineRunState && lastPipelineRunState.created_at).fromNow()}`}
       </StyledText>
       <ViewRunsColumn>
         <StyledButton

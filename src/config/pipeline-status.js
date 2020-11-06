@@ -25,6 +25,15 @@ export const statusLongNameLegend = {
   CANCELED: 'Canceled',
 };
 
+export const statusPhraseLegend = {
+  NOT_STARTED: 'not started',
+  QUEUED: 'queued',
+  RUNNING: 'started',
+  COMPLETED: 'completed',
+  FAILED: 'failed',
+  CANCELED: 'canceled',
+};
+
 export const pipelineStates = {
   NOT_STARTED: 'NOT_STARTED',
   QUEUED: 'QUEUED',
