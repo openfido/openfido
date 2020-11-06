@@ -73,46 +73,42 @@ const OverviewMeta = styled.div`
   position: relative;
 `;
 
-const FilesList = ({ title, files, pipelineRunSelected: run }) => {
-  const runStatus = run && run.states && run.states.length && run.states[run.states.length - 1].state;
-
-  return (
-    <StyledFilesList>
-      <StyledH3 color="black">
-        <span>{title}</span>
-        <span>Size</span>
-      </StyledH3>
-      {files && files.length ? (
-        <ul>
-          {files && files.map(({
-            uuid, name: file_name, url, size,
-          }) => (
-            <li key={uuid}>
-              <a href={url} rel="noopener noreferrer" target="_blank" title={file_name}>
-                <DownloadFilled />
-                {file_name}
-              </a>
-              <span>{size}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <ul>
-          <li>
-            <OverviewMeta>
-              <StyledText size="large" color="black" fontweight={500}>
-                {statusLongNameLegend[runStatus]}
-              </StyledText>
-              {runStatus === pipelineStates.RUNNING && (
-                <Spin indicator={<LoadingFilled spin />} />
-              )}
-            </OverviewMeta>
+const FilesList = ({ title, files, pipelineRunStatus }) => (
+  <StyledFilesList>
+    <StyledH3 color="black">
+      <span>{title}</span>
+      <span>Size</span>
+    </StyledH3>
+    {files && files.length ? (
+      <ul>
+        {files && files.map(({
+          uuid, name: file_name, url, size,
+        }) => (
+          <li key={uuid}>
+            <a href={url} rel="noopener noreferrer" target="_blank" title={file_name}>
+              <DownloadFilled />
+              {file_name}
+            </a>
+            <span>{size}</span>
           </li>
-        </ul>
-      )}
-    </StyledFilesList>
-  );
-};
+        ))}
+      </ul>
+    ) : (
+      <ul>
+        <li>
+          <OverviewMeta>
+            <StyledText size="large" color="black" fontweight={500}>
+              {statusLongNameLegend[pipelineRunStatus]}
+            </StyledText>
+            {pipelineRunStatus === pipelineStates.RUNNING && (
+            <Spin indicator={<LoadingFilled spin />} />
+            )}
+          </OverviewMeta>
+        </li>
+      </ul>
+    )}
+  </StyledFilesList>
+);
 
 FilesList.propTypes = {
   title: PropTypes.string.isRequired,
@@ -121,19 +117,11 @@ FilesList.propTypes = {
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
   })),
-  pipelineRunSelected: PropTypes.shape({
-    sequence: PropTypes.number.isRequired,
-    updated_at: PropTypes.string.isRequired,
-    created_at: PropTypes.string.isRequired,
-    states: PropTypes.arrayOf(PropTypes.shape({
-      state: PropTypes.string.isRequired,
-    })),
-  }),
+  pipelineRunStatus: PropTypes.string.isRequired,
 };
 
 FilesList.defaultProps = {
   files: [],
-  pipelineRunSelected: null,
 };
 
 export default FilesList;

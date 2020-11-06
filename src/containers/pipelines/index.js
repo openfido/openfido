@@ -112,14 +112,13 @@ const Pipelines = () => {
       {!showAddPipelines && !pipelineInEdit && (
         <PipelineItems direction="vertical" size={26}>
           {pipelines && pipelines.map(({
-            uuid, name, status, updated_at,
+            uuid, name, last_pipeline_run,
           }) => (
             <PipelineItem
               key={uuid}
               uuid={uuid}
               name={name}
-              status={status}
-              updated_at={updated_at}
+              last_pipeline_run={last_pipeline_run}
               openPipelineEdit={openPipelineEdit}
               viewPipelineRuns={viewPipelineRuns}
             />

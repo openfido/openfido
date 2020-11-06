@@ -47,13 +47,11 @@ const Overview = ({ pipelineRunSelected: run }) => {
   const checkPipelineRunStatus = (statuses = []) => {
     let result = false;
 
-    if (run && run.states && run.states.length) {
-      statuses.forEach((status) => {
-        if (runStatus === status) {
-          result = true;
-        }
-      });
-    }
+    statuses.forEach((status) => {
+      if (runStatus === status) {
+        result = true;
+      }
+    });
 
     return result;
   };
@@ -140,8 +138,6 @@ const Overview = ({ pipelineRunSelected: run }) => {
 Overview.propTypes = {
   pipelineRunSelected: PropTypes.shape({
     sequence: PropTypes.number.isRequired,
-    updated_at: PropTypes.string.isRequired,
-    created_at: PropTypes.string.isRequired,
     states: PropTypes.arrayOf(PropTypes.shape({
       state: PropTypes.string.isRequired,
     })),
