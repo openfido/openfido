@@ -55,7 +55,7 @@ class PipelineSchema(Schema):
 
     uuid = fields.Str()
     name = fields.Str()
-    description = fields.Str()
+    description = fields.Str(missing="")
     docker_image_url = fields.Str()
     repository_ssh_url = fields.Str()
     repository_branch = fields.Str()

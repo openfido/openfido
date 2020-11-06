@@ -65,6 +65,16 @@ def test_create_pipeline(app):
     assert pipeline.repository_script == A_SCRIPT
 
 
+def test_create_pipeline_no_description(app):
+    pipeline_json = dict(PIPELINE_JSON)
+    pipeline_json["description"] = ""
+    pipeline = services.create_pipeline(pipeline_json)
+    assert pipeline.name == A_NAME
+    assert pipeline.docker_image_url == A_DOCKER_IMAGE
+    assert pipeline.repository_ssh_url == A_SSH_URL
+    assert pipeline.repository_branch == A_BRANCH
+
+
 def test_update_pipeline_no_uuid(app):
     with pytest.raises(ValueError):
         services.update_pipeline("baduuid", PIPELINE_JSON)
