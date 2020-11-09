@@ -4,6 +4,7 @@ from app.pipelines.queries import (
     find_organization_pipelines,
     find_organization_pipeline_input_files,
     find_organization_pipeline_run,
+    find_latest_organization_pipeline_run,
     search_organization_pipeline_input_files,
     search_organization_pipeline_runs,
 )
@@ -78,6 +79,17 @@ def test_find_organization_pipeline_input_files(
 
 
 def test_find_organization_pipeline_run(
+    app, organization_pipeline, organization_pipeline_run
+):
+
+    pipeline_run = find_organization_pipeline_run(
+        organization_pipeline.id, organization_pipeline_run.pipeline_run_uuid
+    )
+
+    assert pipeline_run == organization_pipeline_run
+
+
+def test_find_latest_organization_pipeline_run(
     app, organization_pipeline, organization_pipeline_run
 ):
 

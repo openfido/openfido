@@ -57,6 +57,22 @@ def find_organization_pipeline_run(organization_pipeline_id, uuid):
     ).one_or_none()
 
 
+def find_latest_organization_pipeline_run(organization_pipeline_id):
+    """Find the latest Organization Pipeline Run for an Organization Pipeline. """
+    return (
+        OrganizationPipelineRun.query.join(OrganizationPipeline)
+        .filter(
+            and_(
+                OrganizationPipelineRun.organization_pipeline_id
+                == OrganizationPipeline.id,
+                OrganizationPipeline.is_deleted == False,
+            )
+        )
+        .order_by(OrganizationPipelineRun.created_at.desc())
+        .first()
+    )
+
+
 def search_organization_pipeline_runs(organization_pipeline_id, uuids):
     """Searches all Organization Pipeline Runs.
     NOTE: or used for backward compatibility.
