@@ -72,3 +72,10 @@ def search_organization_pipeline_runs(organization_pipeline_id, uuids):
             ),
         )
     ).all()
+
+def search_artifacat_charts(organization_pipeline_run_id):
+    """ Find Organization Pipeline Input Files """
+    return ArtifactChart.query.filter(
+        ArtifactChart.organization_pipeline_run_id
+        == organization_pipeline_run_id
+    ).all()
