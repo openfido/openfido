@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { addChart } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import {
   StyledH4,
   StyledInput,
   StyledModal,
-  StyledButton, StyledText,
+  StyledButton,
+  StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
+import SelectArtifactStep from './select-artifact-step';
+import AddImageStep from './add-image-step';
 import LinesImg from './images/lines.png';
 import MapImg from './images/map.png';
 
@@ -31,8 +36,6 @@ const Modal = styled(StyledModal)`
     border-radius: 3px;
     background-color: ${colors.lightBg};
     min-height: 404px;
-    display: flex;
-    justify-content: space-between;
   }
   input {
     width: 272px;
@@ -40,34 +43,11 @@ const Modal = styled(StyledModal)`
   img {
     max-height: 364px;
   }
-`;
-
-const ArtifactsList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 12px 0;
-  margin: 0.75rem 0;
-  li {
-    background-color: ${colors.white};
-    &:not(:last-child) {
-      border-bottom: 1px solid ${colors.lightGray};
-    }
-    button.ant-btn {
-      display: block;
-      padding: 16px 22px;
-      padding: 1rem 1.375rem;
-      font-weight: 400;
-      width: 100%;
-      text-align: left;
-      border-radius: 0;
-      transition: none;
-      &:active, &:focus {
-        border-left: 5px solid ${colors.blue};
-        background-color: ${colors.lightActiveHover};
-        padding-left: 17px;
-        padding-left: 1.0625rem;
-      }
-    }
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 360px;
   }
 `;
 
@@ -149,44 +129,36 @@ const AxesList = styled.div`
   justify-content: space-between;
 `;
 
-const AddChartPopup = ({ handleOk, handleCancel, artifacts }) => {
-  const [selectedArtifact, setSelectedArtifact] = useState(null);
+const AddChartPopup = ({
+  handleOk, handleCancel, pipeline_uuid, pipeline_run_uuid, artifacts,
+}) => {
   const [step, setStep] = useState(1);
+  const [selectedArtifact, setSelectedArtifact] = useState(null);
+  const [chartType, setChartType] = useState(null);
+  const [chartConfig, setChartConfig] = useState(null);
+
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+  const dispatch = useDispatch();
 
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
 
-  const onAddChartClicked = () => {
+  const onAddChartClicked = (title) => {
+    dispatch(
+      addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
+    );
+
     handleOk();
+  };
+
+  const onArtifactSelected = () => {
+    if (selectedArtifact) {
+      setStep(2);
+    }
   };
 
   const onXAxisRemoveClicked = () => {
 
   };
-
-  const selectArtifact = (
-    <>
-      <div>
-        <StyledH4 color="darkText">Select an artifact</StyledH4>
-        <ArtifactsList>
-          {artifacts && artifacts.map((artifact) => (
-            <li>
-              <StyledButton
-                type="text"
-                size="large"
-                textcolor="lightBlue"
-                onClick={() => setSelectedArtifact(artifact)}
-              >
-                {artifact.name}
-              </StyledButton>
-            </li>
-          ))}
-        </ArtifactsList>
-      </div>
-      <PopupButton size="middle" color="blue" width={108} onClick={() => setStep(2)}>
-        Next
-      </PopupButton>
-    </>
-  );
 
   const selectChartType = (
     <>
@@ -216,19 +188,7 @@ const AddChartPopup = ({ handleOk, handleCancel, artifacts }) => {
     </>
   );
 
-  const addImage = (
-    <>
-      <StyledInput size="middle" placeholder="Edit Name of Image" bgcolor="white" />
-      {selectedArtifact && selectedArtifact.url && (
-        <img src={selectedArtifact.url} alt={selectedArtifact.name} />
-      )}
-      <PopupButton size="middle" color="blue" width={108} onClick={onAddChartClicked}>
-        Add Chart
-      </PopupButton>
-    </>
-  );
-
-  const addChart = (
+  const AddChart = (
     <>
       <StyledInput size="middle" placeholder="Edit Name of Chart" bgcolor="white" />
       <section>
@@ -276,10 +236,22 @@ const AddChartPopup = ({ handleOk, handleCancel, artifacts }) => {
       style={{ position: 'fixed', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
       title={step === 2 && isImage ? 'Add an Image' : 'Add a Chart'}
     >
-      {step === 1 && selectArtifact}
-      {step === 2 && isImage && addImage}
+      {step === 1 && (
+        <SelectArtifactStep
+          artifacts={artifacts}
+          selectedArtifact={selectedArtifact}
+          setSelectedArtifact={setSelectedArtifact}
+          onNextClicked={onArtifactSelected}
+        />
+      )}
+      {step === 2 && isImage && (
+        <AddImageStep
+          selectedArtifact={selectedArtifact}
+          onNextClicked={onAddChartClicked}
+        />
+      )}
       {step === 2 && !isImage && selectChartType}
-      {step === 3 && !isImage && addChart}
+      {step === 3 && !isImage && AddChart}
     </Modal>
   );
 };
@@ -287,7 +259,13 @@ const AddChartPopup = ({ handleOk, handleCancel, artifacts }) => {
 AddChartPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  artifacts: PropTypes.arrayOf(PropTypes.string).isRequired,
+  pipeline_uuid: PropTypes.string.isRequired,
+  pipeline_run_uuid: PropTypes.string.isRequired,
+  artifacts: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    uuid: PropTypes.string.isRequired,
+  })).isRequired,
 };
 
 export default AddChartPopup;

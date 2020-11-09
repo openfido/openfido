@@ -4,8 +4,13 @@ import styled from 'styled-components';
 
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
-import { StyledH2, StyledButton } from 'styles/app';
+import {
+  StyledH2,
+  StyledH4,
+  StyledButton,
+} from 'styles/app';
 import colors from 'styles/colors';
+import { useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 
@@ -35,8 +40,8 @@ const StyledDataVisualization = styled.div`
     font-size: 1.125rem;
     line-height: 21px;
     line-height: 1.3125rem;
-    padding: 42px 28px;
-    padding: 2.625rem 1.75rem;
+    padding: 24px 28px;
+    padding: 1.5rem 1.75rem;
   }
 `;
 
@@ -63,8 +68,12 @@ const AddChartButton = styled(StyledButton)`
   }
 `;
 
-const DataVisualization = ({ pipelineRunSelected, sequence, setDisplayTab }) => {
+const DataVisualization = ({
+  pipelineInView, pipelineRunSelected, sequence, setDisplayTab,
+}) => {
   const [showAddChartPopup, setShowAddChartPopup] = useState(false);
+
+  const charts = useSelector((state) => state.charts.charts[pipelineRunSelected && pipelineRunSelected.uuid]);
 
   return (
     <>
@@ -87,15 +96,27 @@ const DataVisualization = ({ pipelineRunSelected, sequence, setDisplayTab }) => 
         >
           Add A Chart
         </AddChartButton>
-        <section>
-          graph
-        </section>
+        {charts && charts.map(({ artifact, title }) => (
+          <section>
+            <StyledH4>{title}</StyledH4>
+            <img src={artifact.url} alt={artifact.name} width="100%" />
+          </section>
+        ))}
       </StyledDataVisualization>
       {showAddChartPopup && (
         <AddChartPopup
           handleOk={() => setShowAddChartPopup(false)}
           handleCancel={() => setShowAddChartPopup(false)}
-          artifacts={pipelineRunSelected && pipelineRunSelected.artifacts}
+          pipeline_uuid={pipelineInView}
+          pipeline_run_uuid={pipelineRunSelected && pipelineRunSelected.uuid}
+          artifacts={[
+            ...pipelineRunSelected && pipelineRunSelected.artifacts,
+            {
+              name: 'sample-image-artifact.png',
+              uuid: 'some-uuidhere',
+              url: 'http://localhost:9000/workflow-service/holy-cross-60-min.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio_access_key%2F20201109%2F%2Fs3%2Faws4_request&X-Amz-Date=20201109T205631Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=e1b8c3e4e4935cd35232407dff64d3bc3c0e65b87918f3e6c84279987e18b2e4',
+            },
+          ]}
         />
       )}
     </>
@@ -103,7 +124,16 @@ const DataVisualization = ({ pipelineRunSelected, sequence, setDisplayTab }) => 
 };
 
 DataVisualization.propTypes = {
-  pipelineRunSelected: PropTypes.string.isRequired,
+  pipelineInView: PropTypes.string.isRequired,
+  pipelineRunSelected: PropTypes.shape({
+    uuid: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    artifacts: PropTypes.arrayOf(PropTypes.shape({
+      uuid: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+    })).isRequired,
+  }).isRequired,
   sequence: PropTypes.number.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
 };
