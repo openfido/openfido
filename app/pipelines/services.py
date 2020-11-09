@@ -146,19 +146,26 @@ def fetch_pipelines(organization_uuid):
 
         for pipeline in json_value:
             matching_pipelines = []
+            org_pipeline = None
 
             for op in organization_pipelines:
                 if op.pipeline_uuid == pipeline["uuid"]:
                     matching_pipelines = [op.uuid]
+                    org_pipeline_id = op.id
 
             if len(matching_pipelines) != 1:
                 continue
 
             pipeline["uuid"] = matching_pipelines[0]
+            latest_pipeline_run = find_latest_organization_pipeline_run(org_pipeline_id)
 
-            pipeline_runs = fetch_pipeline_runs(organization_uuid, pipeline["uuid"])
-            if pipeline_runs and len(pipeline_runs) > 0:
-                pipeline["last_pipeline_run"] = pipeline_runs[-1]
+            if latest_pipeline_run:
+                pipeline_run = fetch_pipeline_run(
+                    organization_uuid, pipeline["uuid"], latest_pipeline_run.uuid
+                )
+
+                if pipeline_run:
+                    pipeline["last_pipeline_run"] = pipeline_run
 
         return json_value
     except ValueError as value_error:
@@ -268,7 +275,9 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
 
         # update with org uuids
         for pr in pipeline_runs:
-            opr = find_latest_organization_pipeline_run(org_pipeline.id, pr.get("uuid"))
+            opr = search_organization_pipeline_runs(org_pipeline.id, [pr.get("uuid")])[
+                0
+            ]
             pr["uuid"] = opr.uuid
             org_pipeline_input_files = find_organization_pipeline_input_files(
                 org_pipeline.id

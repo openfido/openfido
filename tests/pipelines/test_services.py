@@ -116,11 +116,11 @@ def test_fetch_pipelines_bad_workflow_response(app, organization_pipeline):
         fetch_pipelines(ORGANIZATION_UUID)
 
 
-@patch("app.pipelines.services.fetch_pipeline_runs")
+@patch("app.pipelines.services.fetch_pipeline_run")
 @patch("app.pipelines.services.requests.post")
 def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipeline):
 
-    mock_runs.return_value = [PIPELINE_RUN_RESPONSE_JSON]
+    mock_runs.return_value = None
     pipeline_list = [
         {"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"},
         {"uuid": "12345", "name": "name 2"},
@@ -131,7 +131,6 @@ def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipelin
         {
             "uuid": organization_pipeline.uuid,
             "name": "name 1",
-            "last_pipeline_run": PIPELINE_RUN_RESPONSE_JSON,
         },
         {"uuid": "12345", "name": "name 2"},
     ]
@@ -145,15 +144,29 @@ def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipelin
 
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
-    mock_runs.assert_called()
+    assert not mock_runs.called
 
 
-@patch("app.pipelines.services.fetch_pipeline_runs")
+@patch("app.pipelines.services.fetch_pipeline_run")
 @patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines(post_mock, mock_runs, app, organization_pipeline):
-    mock_runs.return_value = [PIPELINE_RUN_RESPONSE_JSON]
-    pipeline_list = [{"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"}]
+@responses.activate
+def test_fetch_pipelines(
+    post_mock, mock_runs, app, organization_pipeline, organization_pipeline_run
+):
+    mock_runs.return_value = PIPELINE_RUN_RESPONSE_JSON
+    pipeline_list = [
+        {
+            "uuid": organization_pipeline.pipeline_uuid,
+            "name": "name 1",
+            "last_pipeline_run": PIPELINE_RUN_RESPONSE_JSON,
+        }
+    ]
     post_mock().json.return_value = pipeline_list
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=PIPELINE_RUN_RESPONSE_JSON,
+    )
 
     expected_result = [
         {

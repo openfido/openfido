@@ -97,16 +97,24 @@ def test_pipelines_bad_search(app, client, client_application):
     assert result.json == json_response
 
 
-@patch("app.pipelines.services.fetch_pipeline_runs")
+@patch("app.pipelines.services.fetch_pipeline_run")
 @responses.activate
-def test_pipelines(mock_runs, app, client, client_application, organization_pipeline):
-    mock_runs.return_value = [PIPELINE_RUN_RESPONSE_JSON]
+def test_pipelines(
+    mock_runs,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_runs.return_value = PIPELINE_RUN_RESPONSE_JSON
     pipeline_json = dict(PIPELINE_JSON)
     pipeline_json.update(
         {
             "created_at": "2020-10-08T12:20:36.564095",
             "updated_at": "2020-10-08T12:20:36.564100",
             "uuid": organization_pipeline.pipeline_uuid,
+            "last_pipeline_run": PIPELINE_RUN_RESPONSE_JSON,
         }
     )
     json_response = [pipeline_json]
@@ -124,6 +132,7 @@ def test_pipelines(mock_runs, app, client, client_application, organization_pipe
             ROLES_KEY: client_application.api_key,
         },
     )
+
     assert result.status_code == 200
     json_response[0]["uuid"] = organization_pipeline.uuid
     assert result.json == json_response
