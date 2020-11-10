@@ -83,6 +83,7 @@ const ConsoleOutput = ({
           displayTab={CONSOLE_OUTPUT_TAB}
           setDisplayTab={setDisplayTab}
           dataVisualizationReady={pipelineRunSelectedStatus === pipelineStates.COMPLETED}
+          consoleOutputReady={!!pipelineRunSelectedUuid}
         />
       </header>
       <section>

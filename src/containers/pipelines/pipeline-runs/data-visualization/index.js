@@ -78,6 +78,7 @@ const DataVisualization = ({ pipelineRunSelected, sequence, setDisplayTab }) => 
             displayTab={DATA_VISUALIZATION_TAB}
             setDisplayTab={setDisplayTab}
             dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+            consoleOutputReady={!!pipelineRunSelected}
           />
         </header>
         <AddChartButton
