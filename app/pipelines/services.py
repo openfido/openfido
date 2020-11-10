@@ -199,12 +199,13 @@ def create_pipeline_input_file(organization_pipeline, filename, stream):
 def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     """Creates OrganizationPipelineRuns for a pipline."""
     org_pipeline = find_organization_pipeline(organization_uuid, pipeline_uuid)
+    input_file_uuids = request_json.get("inputs", [])
 
     if not org_pipeline:
         raise ValueError({"message": "organizational_pipeline_uuid not found"})
 
     org_pipeline_input_files = search_organization_pipeline_input_files(
-        org_pipeline.id, request_json.get("inputs", [])
+        org_pipeline.id, input_file_uuids
     )
 
     new_pipeline_run = OrganizationPipelineRun(
@@ -214,6 +215,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         share_token=uuid.uuid4().hex,
         share_password_hash=None,
         share_password_salt=None,
+        pipeline_run_input_file_uuids=",".join(input_file_uuids),
     )
 
     db.session.add(new_pipeline_run)
@@ -282,13 +284,16 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
             org_pipeline_input_files = find_organization_pipeline_input_files(
                 org_pipeline.id
             )
+
             inputs = []
+            associated_input_files = opr.pipeline_run_input_file_uuids.split(",")
 
             # generate download urls and add uuid
             for opf in org_pipeline_input_files:
-                sname = secure_filename(opf.name)
-                url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
-                inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+                if opf.uuid in opr.pipeline_run_input_file_uuids:
+                    sname = secure_filename(opf.name)
+                    url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
+                    inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
             pr["inputs"] = inputs
 
@@ -335,12 +340,14 @@ def fetch_pipeline_run(
             org_pipeline.id
         )
         inputs = []
+        associated_input_files = opr.pipeline_run_input_file_uuids.split(",")
 
         # generate download urls and add uuid
         for opf in org_pipeline_input_files:
-            sname = secure_filename(opf.name)
-            url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
-            inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
+            if opf.uuid in opr.pipeline_run_input_file_uuids:
+                sname = secure_filename(opf.name)
+                url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
+                inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
         pipeline_run["inputs"] = inputs
 

@@ -50,6 +50,8 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
         db.String(32), nullable=False, server_default=""
     )
 
+    pipeline_run_input_file_uuids = db.Column(db.String(), server_default="")
+
     status_update_token = db.Column(db.String(32), nullable=False)
     status_update_token_expires_at = db.Column(db.DateTime, nullable=False)
 
