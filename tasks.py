@@ -62,3 +62,38 @@ def create_application_key(c, name, permission):
         application = create_application(name, SystemPermissionEnum[permission])
         db.session.commit()
         print(f"API_TOKEN={application.api_key}")
+
+
+@task
+def run_worker(c, input_directory, docker_image, repository_url, repository_branch, repository_script):
+    """ Run a pipeline repository locally. This runs a repository with sample
+    data provided in `input_directory` using the same logic used by the workflow
+    server's celery task.
+    """
+    from app.tasks import execute_pipeline
+    from unittest.mock import patch
+    import logging
+    import os
+    import sys
+
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+    logger = logging.getLogger("run_task")
+
+    @patch('app.tasks.get_task_logger')
+    @patch('app.tasks.RunExecutor._make_request')
+    def fake_execute(make_request_mock, task_logger_mock):
+        def note_call(*args, **kwargs):
+            print(args)
+            return None
+
+        task_logger_mock.return_value = logger
+        make_request_mock().side_effect = note_call
+
+        execute_pipeline('pipeline-uuid',
+                         'pipeline-run-uuid',
+                         [{ "name": f, "url": f"file://{input_directory}/{f}" } for f in os.listdir(input_directory)],
+                         docker_image,
+                         repository_url,
+                         repository_branch,
+                         repository_script)
+    fake_execute()

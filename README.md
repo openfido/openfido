@@ -75,6 +75,14 @@ update its status (generated in the instructions above).
 
 Endpoints have been documented with [swagger](https://swagger.io/blog/news/whats-new-in-openapi-3-0/), which is configured to be easily explored in the default `run.py` configuration. When the flask server is running visit http://localhost:5000/apidocs to see documentation and interact with the API directly.
 
+## Workers
+
+You can use the `run-worker` invoke task to test repositories. For instance, you
+can test the anticipation integration by uploading the 'inputs' of the run to an
+input directory and executing the following command:
+
+    invoke run-worker $PWD/inputs 'slacgrip/master:200527' https://github.com/PresencePG/grip-anticipation-pipeline.git master openfido.sh
+
 ## Configuration
 
 Common settings used by both server and workers:

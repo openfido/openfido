@@ -219,6 +219,41 @@ def test_execute_pipeline_valueerror(
 
 @patch("app.tasks.RunExecutor.update_run_output")
 @patch("app.tasks.RunExecutor.update_run_status")
+@patch("app.tasks.RunExecutor.run")
+@patch("os.path.exists")
+@patch("app.tasks.urllib_request.urlretrieve")
+def test_execute_pipeline_unexpectederror(
+    retrieve_mock,
+    exists_mock,
+    run_mock,
+    update_run_status_mock,
+    update_run_output_mock,
+    app,
+):
+    run_mock.side_effect = FileNotFoundError()
+
+    execute_pipeline(
+        "uuid",
+        "run_uuid",
+        [
+            {
+                "name": "afile.pdf",
+                "url": "https://example.com",
+            }
+        ],
+        "python:3",
+        "https://github.com/example",
+        "master",
+        "openfido.sh",
+    )
+
+    assert update_run_status_mock.call_count == 2
+    assert update_run_status_mock.call_args_list[0] == call(RunStateEnum.RUNNING)
+    assert update_run_status_mock.call_args_list[1] == call(RunStateEnum.FAILED)
+
+
+@patch("app.tasks.RunExecutor.update_run_output")
+@patch("app.tasks.RunExecutor.update_run_status")
 @patch("app.tasks.RunExecutor.upload_artifact")
 @patch("app.tasks.RunExecutor.run")
 @patch("os.path.exists")
