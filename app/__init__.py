@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from application_roles.model_utils import get_db
 
 from .pipelines import models as pipeline_models
+from .workflows import models as workflow_models
 from . import constants
 
 from .pipelines.routes import organization_pipeline_bp
