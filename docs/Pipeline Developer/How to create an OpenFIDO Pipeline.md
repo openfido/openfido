@@ -19,10 +19,14 @@ Here is a quick `.sh` template to get you started:
 **openfido.sh**
 
 ```
-#!/bin/sh
+#!/bin/bash
 
+# nounset: undefined variable outputs error message, and forces an exit
+set -u
 # errexit: abort script at first error
 set -e
+# print command to stdout before executing it:
+set -x
 
 echo "OPENFIDO_INPUT = $OPENFIDO_INPUT"
 echo "OPENFIDO_OUTPUT = $OPENFIDO_OUTPUT"

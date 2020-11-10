@@ -1,5 +1,9 @@
 # Example Pipeline
 
+[Sample Pipeline Worker](https://github.com/PresencePG/presence-pipeline-example)
+
+This repository illustrates the structure expected of a git repository that is used in OpenFIDO to execute a Pipeline. See its README.md for more information and requirements of a pipeline repository.
+
 [GRIP Anticipation Pipeline](https://github.com/PresencePG/grip-anticipation-pipeline)
 
 The GRIP Anticipation Pipeline repository contains plugin files that are necessary for the OpenFIDO app and workflow services to create and run a pipeline of this nature via a workflow pipeline or as a standalone pipeline.
