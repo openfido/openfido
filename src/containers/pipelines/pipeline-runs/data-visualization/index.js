@@ -120,14 +120,7 @@ const DataVisualization = ({
           handleCancel={() => setShowAddChartPopup(false)}
           pipeline_uuid={pipelineInView}
           pipeline_run_uuid={pipelineRunSelected && pipelineRunSelected.uuid}
-          artifacts={[
-            ...pipelineRunSelected && pipelineRunSelected.artifacts,
-            {
-              name: 'sample-image-artifact.png',
-              uuid: 'some-uuidhere',
-              url: 'http://localhost:9000/workflow-service/holy-cross-60-min.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minio_access_key%2F20201109%2F%2Fs3%2Faws4_request&X-Amz-Date=20201109T205631Z&X-Amz-Expires=432000&X-Amz-SignedHeaders=host&X-Amz-Signature=e1b8c3e4e4935cd35232407dff64d3bc3c0e65b87918f3e6c84279987e18b2e4',
-            },
-          ]}
+          artifacts={pipelineRunSelected && pipelineRunSelected.artifacts}
         />
       )}
     </>
