@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { getCharts } from 'actions/charts';
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
 import {
@@ -10,7 +11,7 @@ import {
   StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 
@@ -73,7 +74,17 @@ const DataVisualization = ({
 }) => {
   const [showAddChartPopup, setShowAddChartPopup] = useState(false);
 
-  const charts = useSelector((state) => state.charts.charts[pipelineRunSelected && pipelineRunSelected.uuid]);
+  const currentOrg = useSelector((state) => state.user.currentOrg);
+  const charts = useSelector((state) => state.charts.charts);
+  const dispatch = useDispatch();
+
+  const pipelineRunCharts = charts && charts[pipelineRunSelected && pipelineRunSelected.uuid];
+
+  useEffect(() => {
+    if (!charts) {
+      dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
+    }
+  }, [currentOrg, pipelineInView, pipelineRunSelected]);
 
   return (
     <>
@@ -96,7 +107,7 @@ const DataVisualization = ({
         >
           Add A Chart
         </AddChartButton>
-        {charts && charts.map(({ artifact, title }) => (
+        {pipelineRunCharts && pipelineRunCharts.map(({ artifact, title }) => (
           <section>
             <StyledH4>{title}</StyledH4>
             <img src={artifact.url} alt={artifact.name} width="100%" />

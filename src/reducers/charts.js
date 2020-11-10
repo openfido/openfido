@@ -1,11 +1,14 @@
 import {
   ADD_CHART,
   ADD_CHART_FAILED,
+  GET_CHARTS,
+  GET_CHARTS_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
-  charts: {},
+  charts: null,
   messages: {
+    getChartsError: null,
     addChartError: null,
   },
 };
@@ -14,6 +17,20 @@ export default (state = DEFAULT_STATE, action) => {
   if (action.error) return state;
 
   switch (action.type) {
+    case GET_CHARTS: {
+      return {
+        ...state,
+        charts: action.payload || [],
+      };
+    }
+    case GET_CHARTS_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getChartsError: action.payload,
+        },
+      };
     case ADD_CHART: {
       const { pipeline_run_uuid, chart } = action.payload; // TODO: formatted graph data
 
