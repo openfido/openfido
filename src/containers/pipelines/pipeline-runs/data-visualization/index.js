@@ -84,7 +84,7 @@ const DataVisualization = ({
     if (!charts) {
       dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
     }
-  }, [currentOrg, pipelineInView, pipelineRunSelected]);
+  }, [currentOrg, pipelineInView, pipelineRunSelected, dispatch, charts]);
 
   return (
     <>

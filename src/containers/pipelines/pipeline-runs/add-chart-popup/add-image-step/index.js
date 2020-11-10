@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Space } from 'antd';
-import styled from 'styled-components';
 
-import { StyledButton, StyledInput } from 'styles/app';
-
-const PopupButton = styled(StyledButton)`
-  margin: 20px auto 0 auto;
-  margin: 1.25rem auto 0 auto;
-`;
+import { PopupButton } from 'styles/pipeline-runs';
+import { StyledInput } from 'styles/app';
 
 const AddImageStep = ({ selectedArtifact, onNextClicked }) => {
   const [title, setTitle] = useState('');

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { PopupButton } from 'styles/pipeline-runs';
 import { StyledButton, StyledH4 } from 'styles/app';
 import colors from 'styles/colors';
 
@@ -32,11 +33,6 @@ const ArtifactsList = styled.ul`
       }
     }
   }
-`;
-
-const PopupButton = styled(StyledButton)`
-  margin: 20px auto 0 auto;
-  margin: 1.25rem auto 0 auto;
 `;
 
 const SelectArtifactStep = ({

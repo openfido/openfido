@@ -3,20 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { chartTypes } from 'config/charts';
 import { addChart } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
-import {
-  StyledH4,
-  StyledInput,
-  StyledModal,
-  StyledButton,
-  StyledText,
-} from 'styles/app';
+import { StyledModal } from 'styles/app';
 import colors from 'styles/colors';
 import SelectArtifactStep from './select-artifact-step';
 import AddImageStep from './add-image-step';
-import LinesImg from './images/lines.png';
-import MapImg from './images/map.png';
+import SelectChartTypeStep from './select-chart-type-step';
+import ConfigChartStep from './config-chart-step';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -51,84 +46,6 @@ const Modal = styled(StyledModal)`
   }
 `;
 
-const ChartTypesList = styled.ul`
-  list-style-type: none;
-  padding: 0;
-  margin: 12px 0;
-  margin: 0.75rem 0;
-  display: flex;
-  justify-content: space-between;
-  li {
-   button.ant-btn {
-     width: 178px;
-     height: 178px;
-     padding: 28px 8px;
-     padding: 1.75rem 0.5rem;
-     flex-wrap: wrap;
-     border: 3px solid ${colors.white};
-     border-radius: 2px;
-     &, &:hover {
-       background-color: ${colors.white};
-     }
-     &:active, &:focus {
-       border: 3px solid ${colors.lightBlue};
-       background-color: ${colors.white};
-     }
-   }
-  }
-`;
-
-const PopupButton = styled(StyledButton)`
-  margin: 20px auto 0 auto;
-  margin: 1.25rem auto 0 auto;
-`;
-
-const AxisItem = styled.div`
-  background-color ${colors.white};
-  color: ${colors.darkText};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px 4px 12px;
-  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
-  margin-top: 16px;
-  margin-top: 1rem;
-  font-size: 16px;
-  line-height: 19px;
-  width: 261px;
-  height: 48px;
-  max-height: 48px;
-  cursor: pointer;
-  position: relative;
-  span:first-child {
-    margin-right: 8px;
-    margin-right: 0.5rem;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .anticon {
-    position: static;
-    float: right;
-    svg {
-      width: 18px;
-      width: 1.125rem;
-      height: 18px;
-      height: 1.125rem;
-    }
-  }
-  &:hover {
-    .anticon svg line {
-      stroke: ${colors.gray20};
-    }
-  }
-`;
-
-const AxesList = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
 const AddChartPopup = ({
   handleOk, handleCancel, pipeline_uuid, pipeline_run_uuid, artifacts,
 }) => {
@@ -143,9 +60,11 @@ const AddChartPopup = ({
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
 
   const onAddChartClicked = (title) => {
-    dispatch(
-      addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
-    );
+    if (selectedArtifact && chartType && chartConfig) {
+      dispatch(
+        addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
+      );
+    }
 
     handleOk();
   };
@@ -153,76 +72,19 @@ const AddChartPopup = ({
   const onArtifactSelected = () => {
     if (selectedArtifact) {
       setStep(2);
+
+      if (isImage) {
+        setChartType(chartTypes.IMAGE_CHART);
+        setChartConfig({});
+      }
     }
   };
 
-  const onXAxisRemoveClicked = () => {
-
+  const onChartTypeSelected = () => {
+    if (chartType) {
+      setStep(3);
+    }
   };
-
-  const selectChartType = (
-    <>
-      <StyledH4 color="darkText">Select an artifact</StyledH4>
-      <ChartTypesList>
-        <li>
-          <StyledButton type="text" size="middle" textcolor="darkText">
-            Line Chart
-            <img src={LinesImg} alt="Line" />
-          </StyledButton>
-        </li>
-        <li>
-          <StyledButton type="text" size="middle" textcolor="darkText">
-            Bar Chart
-          </StyledButton>
-        </li>
-        <li>
-          <StyledButton type="text" size="middle" textcolor="darkText">
-            Map Chart
-            <img src={MapImg} alt="Map" />
-          </StyledButton>
-        </li>
-      </ChartTypesList>
-      <PopupButton size="middle" color="blue" width={108} onClick={() => setStep(3)}>
-        Next
-      </PopupButton>
-    </>
-  );
-
-  const AddChart = (
-    <>
-      <StyledInput size="middle" placeholder="Edit Name of Chart" bgcolor="white" />
-      <section>
-        graph
-      </section>
-      <AxesList>
-        <div>
-          <strong>
-            X-axis
-          </strong>
-          <AxisItem title="DateTime">
-            <StyledText>DateTime</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-        </div>
-        <div>
-          <strong>
-            Y-axis
-          </strong>
-          <AxisItem title="DateTime">
-            <StyledText>L1</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-          <AxisItem title="DateTime">
-            <StyledText>L2</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-        </div>
-      </AxesList>
-      <PopupButton size="middle" color="blue" width={108} onClick={onAddChartClicked}>
-        Add Chart
-      </PopupButton>
-    </>
-  );
 
   return (
     <Modal
@@ -250,8 +112,19 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && selectChartType}
-      {step === 3 && !isImage && AddChart}
+      {step === 2 && !isImage && (
+        <SelectChartTypeStep
+          setChartType={setChartType}
+          onNextClicked={onChartTypeSelected}
+        />
+      )}
+      {step === 3 && !isImage && (
+        <ConfigChartStep
+          setChartConfig={setChartConfig}
+          chartType={chartType}
+          onNextClicked={onAddChartClicked}
+        />
+      )}
     </Modal>
   );
 };
