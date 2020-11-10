@@ -93,7 +93,7 @@ const ConsoleOutput = ({
             size="large"
             width={108}
             onClick={() => setOutputType('stdout')}
-            textcolor={outputType === 'stdout' ? 'lightBlue' : 'black'}
+            textcolor={outputType === 'stdout' ? 'lightBlue' : 'gray'}
           >
             stdout
           </StyledButton>
@@ -102,7 +102,7 @@ const ConsoleOutput = ({
             size="large"
             width={108}
             onClick={() => setOutputType('stderr')}
-            textcolor={outputType === 'stderr' ? 'lightBlue' : 'black'}
+            textcolor={outputType === 'stderr' ? 'lightBlue' : 'gray'}
           >
             stderr
           </StyledButton>
