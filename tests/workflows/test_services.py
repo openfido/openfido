@@ -1,13 +1,10 @@
 from unittest.mock import patch
 
-import io
 import pytest
 import responses
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 from app.workflows.models import (
     OrganizationWorkflow,
-    OrganizationWorkflowPipeline,
-    OrganizationWorkflowPipelineRun,
 )
 from app.workflows.services import (
     create_workflow,

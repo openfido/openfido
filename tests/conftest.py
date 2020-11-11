@@ -81,6 +81,17 @@ def organization_pipeline(app):
 
 
 @pytest.fixture
+def organization_workflow(app):
+    ow = OrganizationWorkflow(
+        organization_uuid=ORGANIZATION_UUID, workflow_uuid=WORKFLOW_UUID
+    )
+    db.session.add(ow)
+    db.session.commit()
+
+    return ow
+
+
+@pytest.fixture
 def organization_pipeline_input_file(
     app, organization_pipeline, organization_pipeline_run
 ):

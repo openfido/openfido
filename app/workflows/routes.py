@@ -5,7 +5,7 @@ from requests import HTTPError
 
 from app.utils import validate_organization, any_application_required
 
-from .services import (
+from app.workflows.services import (
     create_workflow,
     fetch_workflows,
 )
@@ -72,10 +72,10 @@ def create(organization_uuid):
     """
     try:
         return jsonify(create_workflow(organization_uuid, request.json))
-    except ValueError as value_error:
-        return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
 
 
 @organization_workflow_bp.route("/<organization_uuid>/workflows", methods=["GET"])
@@ -119,7 +119,7 @@ def workflows(organization_uuid):
     """
     try:
         return jsonify(fetch_workflows(organization_uuid))
-    except ValueError as value_error:
-        return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400

@@ -1,19 +1,16 @@
-import uuid
-
 import requests
-from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
-from application_roles.decorators import ROLES_KEY
-from blob_utils import upload_stream, create_url
+
 from flask import current_app
 from requests import HTTPError
 
-from .models import (
+from application_roles.decorators import ROLES_KEY
+from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
+
+from app.workflows.models import (
     OrganizationWorkflow,
-    OrganizationWorkflowPipeline,
-    OrganizationWorkflowPipelineRun,
     db,
 )
-from .queries import (
+from app.workflows.queries import (
     find_organization_workflows,
 )
 
@@ -70,11 +67,10 @@ def fetch_workflows(organization_uuid):
 
         for workflow in json_value:
             matching_workflows = []
-            org_workflow = None
 
-            for ow in organization_workflows:
-                if ow.workflow_uuid == workflow["uuid"]:
-                    matching_workflows = [ow.uuid]
+            for org_w in organization_workflows:
+                if org_w.workflow_uuid == workflow["uuid"]:
+                    matching_workflows = [org_w.uuid]
 
             if len(matching_workflows) != 1:
                 continue

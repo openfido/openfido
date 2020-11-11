@@ -1,12 +1,12 @@
-import io
 from unittest.mock import patch
+
+import responses
 
 from app.constants import (
     AUTH_HOSTNAME,
 )
 from application_roles.services import create_application
 from app.utils import ApplicationsEnum
-import responses
 from app.constants import WORKFLOW_HOSTNAME
 from app.workflows.models import (
     OrganizationWorkflow,
@@ -19,7 +19,6 @@ from requests import HTTPError
 from ..conftest import (
     JWT_TOKEN,
     ORGANIZATION_UUID,
-    USER_UUID,
     WORKFLOW_UUID,
 )
 from .test_services import (
