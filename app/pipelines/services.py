@@ -215,7 +215,6 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         share_token=uuid.uuid4().hex,
         share_password_hash=None,
         share_password_salt=None,
-        pipeline_run_input_file_uuids=",".join(input_file_uuids),
     )
 
     db.session.add(new_pipeline_run)
@@ -244,6 +243,13 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         new_pipeline_run.uuid = (
             new_pipeline_run.pipeline_run_uuid
         ) = created_pipeline.get("uuid")
+
+        db.session.add(new_pipeline_run)
+
+        for opf in org_pipeline_input_files:
+            opf.organization_pipeline_run_uuid = new_pipeline_run.uuid
+            db.session.add(opf)
+
         db.session.commit()
 
         created_pipeline.update(
@@ -286,11 +292,10 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
             )
 
             inputs = []
-            associated_input_files = opr.pipeline_run_input_file_uuids.split(",")
 
             # generate download urls and add uuid
             for opf in org_pipeline_input_files:
-                if opf.uuid in opr.pipeline_run_input_file_uuids:
+                if opf.organization_pipeline_run_uuid == opr.uuid:
                     sname = secure_filename(opf.name)
                     url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
                     inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
@@ -340,11 +345,10 @@ def fetch_pipeline_run(
             org_pipeline.id
         )
         inputs = []
-        associated_input_files = opr.pipeline_run_input_file_uuids.split(",")
 
         # generate download urls and add uuid
         for opf in org_pipeline_input_files:
-            if opf.uuid in opr.pipeline_run_input_file_uuids:
+            if opf.organization_pipeline_run_uuid == opr.uuid:
                 sname = secure_filename(opf.name)
                 url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
                 inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})

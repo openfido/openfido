@@ -30,6 +30,8 @@ class OrganizationPipelineInputFile(CommonColumnsMixin, db.Model):
 
     name = db.Column(db.String(200), nullable=False, server_default="")
 
+    organization_pipeline_run_uuid = db.Column(db.String(32), nullable=True)
+
     organization_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("organization_pipeline.id"), nullable=False
     )
@@ -49,8 +51,6 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
     post_processing_pipeline_run_uuid = db.Column(
         db.String(32), nullable=False, server_default=""
     )
-
-    pipeline_run_input_file_uuids = db.Column(db.String(), server_default="")
 
     status_update_token = db.Column(db.String(32), nullable=False)
     status_update_token_expires_at = db.Column(db.DateTime, nullable=False)
