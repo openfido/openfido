@@ -79,6 +79,7 @@ def organization_pipeline_input_file(app, organization_pipeline):
         uuid=PIPELINE_RUN_INPUT_FILE_UUID,
         organization_pipeline_id=organization_pipeline.id,
         name=f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
+        organization_pipeline_run_uuid=PIPELINE_RUN_UUID,
     )
     db.session.add(opif)
     db.session.commit()
@@ -97,7 +98,6 @@ def organization_pipeline_run(app, organization_pipeline):
         share_token=uuid.uuid4().hex,
         share_password_hash=None,
         share_password_salt=None,
-        pipeline_run_input_file_uuids=f"{PIPELINE_RUN_INPUT_FILE_UUID}",
     )
     db.session.add(opr)
     db.session.commit()
