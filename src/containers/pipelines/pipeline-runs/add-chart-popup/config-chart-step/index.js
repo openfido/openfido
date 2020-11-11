@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Dropdown, Space } from 'antd';
 import styled from 'styled-components';
 
 import CloseOutlined from 'icons/CloseOutlined';
 import { PopupButton } from 'styles/pipeline-runs';
-import { StyledInput, StyledText } from 'styles/app';
+import {
+  StyledInput, StyledText, StyledMenu, StyledMenuItem, StyledButton,
+} from 'styles/app';
 import colors from 'styles/colors';
+import TimeSeriesChart from '../../time-series-chart';
+
+const ConfigChartForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  section {
+    border-radius: 6px;
+    background-color: ${colors.white};
+    min-height: 231px;
+    padding: 2rem 0 0 1rem;
+  }
+  > button {
+    margin: 24px auto 0 auto;
+    margin: 1.5rem auto 0 auto;
+  }
+  min-height: 570px;
+`;
 
 const AxisItem = styled.div`
   background-color ${colors.white};
@@ -51,47 +72,126 @@ const AxisItem = styled.div`
 const AxesList = styled.div`
   display: flex;
   justify-content: space-between;
+  > div {
+    width: 261px;
+  }
 `;
 
 const ConfigChartStep = ({ onNextClicked, chartType }) => {
-  const onXAxisRemoveClicked = () => {
+  const [xAxis, setXAxis] = useState([]);
+  const [yAxis, setYAxis] = useState([]);
 
+  const Y_AXIS_LIMIT = 5;
+
+  const addAxis = (axis, setAxis, item) => {
+    if (axis.length < Y_AXIS_LIMIT) {
+      const axes = axis.filter((axisItem) => axisItem !== item);
+      axes.push(item);
+      setAxis(axes);
+    }
   };
 
+  const removeAxis = (axis, setAxis, item) => {
+    const axes = axis.filter((axisItem) => axisItem !== item);
+    setAxis(axes);
+  };
+
+  const xAxisMenu = (
+    <StyledMenu>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(xAxis, setXAxis, 'DateTime')}
+      >
+        <span>DateTime</span>
+      </StyledMenuItem>
+    </StyledMenu>
+  );
+
+  const yAxisMenu = (
+    <StyledMenu>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(yAxis, setYAxis, 'DateTime')}
+      >
+        <span>DateTime</span>
+      </StyledMenuItem>
+    </StyledMenu>
+  );
+
   return (
-    <form>
-      <StyledInput size="middle" placeholder="Edit Name of Chart" bgcolor="white" />
-      <section>
-        {chartType}
-      </section>
-      <AxesList>
-        <div>
-          <strong>
-            X-axis
-          </strong>
-          <AxisItem title="DateTime">
-            <StyledText>DateTime</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-        </div>
-        <div>
-          <strong>
-            Y-axis
-          </strong>
-          <AxisItem title="DateTime">
-            <StyledText>L1</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-          <AxisItem title="DateTime">
-            <StyledText>L2</StyledText>
-            <CloseOutlined color="lightGray" onClick={() => onXAxisRemoveClicked()} />
-          </AxisItem>
-        </div>
-      </AxesList>
+    <ConfigChartForm>
+      <Space direction="vertical" size={16}>
+        <StyledInput size="middle" placeholder="Edit Name of Chart" bgcolor="white" />
+        <section>
+          <TimeSeriesChart type={chartType} height={231} />
+        </section>
+        <AxesList>
+          <div>
+            <Space size={8}>
+              <strong>
+                X-axis
+              </strong>
+              <Dropdown overlay={xAxisMenu}>
+                <StyledButton type="text" size="small" color="transparent">
+                  + Add Column
+                </StyledButton>
+              </Dropdown>
+            </Space>
+            {xAxis && xAxis.map((axisItem, axisIndex) => (
+              <AxisItem title="DateTime">
+                <Space size={25}>
+                  <StyledText color="lightGray" fontweight="500">
+                    {`Column ${axisIndex + 1}`}
+                  </StyledText>
+                  {axisItem}
+                </Space>
+                <CloseOutlined color="lightGray" onClick={() => removeAxis(xAxis, setXAxis, axisItem)} />
+              </AxisItem>
+            ))}
+            {!xAxis.length && (
+              <AxisItem>
+                <StyledText color="lightGray">Add X-axis</StyledText>
+              </AxisItem>
+            )}
+          </div>
+          <div>
+            <Space size={8}>
+              <strong>
+                Y-axis
+              </strong>
+              <Dropdown overlay={yAxisMenu}>
+                <StyledButton type="text" size="small" color="transparent">
+                  + Add Column
+                </StyledButton>
+              </Dropdown>
+            </Space>
+            {yAxis && yAxis.map((axisItem, axisIndex) => (
+              <AxisItem title="DateTime">
+                <Space size={25}>
+                  <StyledText color="lightGray" fontweight="500">
+                    {`Column ${axisIndex + 1}`}
+                  </StyledText>
+                  {axisItem}
+                </Space>
+                <CloseOutlined color="lightGray" onClick={() => removeAxis(yAxis, setYAxis, axisItem)} />
+              </AxisItem>
+            ))}
+            {!yAxis.length && (
+              <AxisItem>
+                <StyledText color="lightGray">Add Y-axis</StyledText>
+              </AxisItem>
+            )}
+          </div>
+        </AxesList>
+      </Space>
       <PopupButton size="middle" color="blue" width={108} onClick={onNextClicked}>
         Add Chart
       </PopupButton>
-    </form>
+    </ConfigChartForm>
   );
 };
 

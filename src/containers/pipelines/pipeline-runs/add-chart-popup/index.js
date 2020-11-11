@@ -23,8 +23,8 @@ const Modal = styled(StyledModal)`
     margin-bottom: 32px;
   }
   .anticon-close-outlined {
-    top: 18px;
-    right: 18px;
+    top: 8px;
+    right: 12px;
   }
   .ant-modal-body {
     padding: 20px 32px 24px 36px;
@@ -92,7 +92,7 @@ const AddChartPopup = ({
       footer={null}
       onOk={handleOk}
       onCancel={handleCancel}
-      closeIcon={<CloseOutlined />}
+      closeIcon={<CloseOutlined color="darkText" />}
       width={690}
       maskStyle={{ position: 'absolute', top: '82px', left: '250px' }}
       style={{ position: 'absolute', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}

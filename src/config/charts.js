@@ -6,6 +6,8 @@ export const chartTypes = {
   IMAGE_CHART: 'IMAGE_CHART',
 };
 
+// todo: to csv.
+// strings.
 export const mockData = [
   {
     timestamp: moment('2017-01-01 00:00:00').unix(),

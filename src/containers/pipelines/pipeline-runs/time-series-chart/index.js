@@ -18,7 +18,7 @@ import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
-const TimeSeriesChart = ({ type }) => {
+const TimeSeriesChart = ({ type, height }) => {
   const dataComponents = [];
 
   switch (type) {
@@ -41,11 +41,11 @@ const TimeSeriesChart = ({ type }) => {
   return (
     <ResponsiveContainer
       width="100%"
-      height={264}
+      height={height}
     >
       <ComposedChart
-        width={1000}
-        height={264}
+        width="100%"
+        height={height}
         data={mockData}
         margin={{
           bottom: 16,
@@ -115,6 +115,11 @@ const TimeSeriesChart = ({ type }) => {
 
 TimeSeriesChart.propTypes = {
   type: PropTypes.string.isRequired,
+  height: PropTypes.number,
+};
+
+TimeSeriesChart.defaultProps = {
+  height: 264,
 };
 
 export default TimeSeriesChart;
