@@ -678,7 +678,9 @@ def test_create_artifact_chart(app, organization_pipeline, organization_pipeline
 
 
 @responses.activate
-def test_create_artifact_chart_no_config(app, organization_pipeline, organization_pipeline_run):
+def test_create_artifact_chart_no_config(
+    app, organization_pipeline, organization_pipeline_run
+):
     responses.add(
         responses.GET,
         f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
