@@ -52,15 +52,14 @@ const AddChartPopup = ({
   const [step, setStep] = useState(1);
   const [selectedArtifact, setSelectedArtifact] = useState(null);
   const [chartType, setChartType] = useState(null);
-  const [chartConfig, setChartConfig] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
 
-  const onAddChartClicked = (title) => {
-    if (selectedArtifact && chartType && chartConfig) {
+  const onAddChartClicked = (title, chartConfig = null) => {
+    if (selectedArtifact && chartType) {
       dispatch(
         addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
       );
@@ -75,7 +74,6 @@ const AddChartPopup = ({
 
       if (isImage) {
         setChartType(chartTypes.IMAGE_CHART);
-        setChartConfig({});
       }
     }
   };
@@ -120,7 +118,6 @@ const AddChartPopup = ({
       )}
       {step === 3 && !isImage && (
         <ConfigChartStep
-          setChartConfig={setChartConfig}
           chartType={chartType}
           onNextClicked={onAddChartClicked}
         />

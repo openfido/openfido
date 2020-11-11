@@ -8,7 +8,7 @@ import { chartTypes } from 'config/charts';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
-  StyledH3,
+  StyledH4,
   StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
@@ -45,7 +45,7 @@ const StyledDataVisualization = styled.div`
     line-height: 1.3125rem;
     padding: 18px 20px;
     padding: 1.125rem 1.5rem;
-    h3 {
+    h4 {
       margin-bottom: 40px;
       margin-bottom: 2.5rem;
     }
@@ -115,16 +115,16 @@ const DataVisualization = ({
           Add A Chart
         </AddChartButton>
         <section>
-          <StyledH3 color="black">Load Profile by Composition</StyledH3>
+          <StyledH4 color="gray">Load Profile by Composition</StyledH4>
           <TimeSeriesChart type={chartTypes.LINE_CHART} />
         </section>
         <section>
-          <StyledH3 color="black">Load Profile by Composition</StyledH3>
+          <StyledH4 color="gray">Load Profile by Composition</StyledH4>
           <TimeSeriesChart type={chartTypes.BAR_CHART} />
         </section>
         {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
           <section>
-            <StyledH3 color="black">{title}</StyledH3>
+            <StyledH4 color="black">{title}</StyledH4>
             <img src={artifact.url} alt={artifact.name} width="100%" />
           </section>
         ))}

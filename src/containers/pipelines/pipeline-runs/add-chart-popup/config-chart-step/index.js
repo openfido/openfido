@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Dropdown, Space } from 'antd';
 import styled from 'styled-components';
 
+import { XAXIS, YAXIS, AXES_LIMIT } from 'config/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { PopupButton } from 'styles/pipeline-runs';
 import {
@@ -77,14 +78,22 @@ const AxesList = styled.div`
   }
 `;
 
-const ConfigChartStep = ({ onNextClicked, chartType }) => {
+const ConfigChartStep = ({
+  onNextClicked, chartType,
+}) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
+  const [title, setTitle] = useState('');
 
-  const Y_AXIS_LIMIT = 5;
+  const onAddChartClicked = () => {
+    onNextClicked(title, {
+      [XAXIS]: xAxis,
+      [YAXIS]: yAxis,
+    });
+  };
 
   const addAxis = (axis, setAxis, item) => {
-    if (axis.length < Y_AXIS_LIMIT) {
+    if (axis.length < AXES_LIMIT) {
       const axes = axis.filter((axisItem) => axisItem !== item);
       axes.push(item);
       setAxis(axes);
@@ -102,9 +111,41 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
         bordercolor="lightBg"
         hoverbgcolor="darkGray"
         hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'DateTime')}
+        onClick={() => addAxis(xAxis, setXAxis, 'datetime')}
       >
-        <span>DateTime</span>
+        <span>datetime</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(xAxis, setXAxis, 'L1')}
+      >
+        <span>L1</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(xAxis, setXAxis, 'L2')}
+      >
+        <span>L2</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(xAxis, setXAxis, 'L3')}
+      >
+        <span>L3</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(xAxis, setXAxis, 'L4')}
+      >
+        <span>L4</span>
       </StyledMenuItem>
     </StyledMenu>
   );
@@ -115,9 +156,41 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
         bordercolor="lightBg"
         hoverbgcolor="darkGray"
         hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'DateTime')}
+        onClick={() => addAxis(yAxis, setYAxis, 'datetime')}
       >
-        <span>DateTime</span>
+        <span>datetime</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(yAxis, setYAxis, 'L1')}
+      >
+        <span>L1</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(yAxis, setYAxis, 'L2')}
+      >
+        <span>L2</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(yAxis, setYAxis, 'L3')}
+      >
+        <span>L3</span>
+      </StyledMenuItem>
+      <StyledMenuItem
+        bordercolor="lightBg"
+        hoverbgcolor="darkGray"
+        hovercolor="white"
+        onClick={() => addAxis(yAxis, setYAxis, 'L4')}
+      >
+        <span>L4</span>
       </StyledMenuItem>
     </StyledMenu>
   );
@@ -125,7 +198,13 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
   return (
     <ConfigChartForm>
       <Space direction="vertical" size={16}>
-        <StyledInput size="middle" placeholder="Edit Name of Chart" bgcolor="white" />
+        <StyledInput
+          size="middle"
+          placeholder="Edit Name of Chart"
+          bgcolor="white"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <section>
           <TimeSeriesChart type={chartType} height={231} />
         </section>
@@ -142,7 +221,7 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
               </Dropdown>
             </Space>
             {xAxis && xAxis.map((axisItem, axisIndex) => (
-              <AxisItem title="DateTime">
+              <AxisItem key={axisItem} title={axisItem}>
                 <Space size={25}>
                   <StyledText color="lightGray" fontweight="500">
                     {`Column ${axisIndex + 1}`}
@@ -170,7 +249,7 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
               </Dropdown>
             </Space>
             {yAxis && yAxis.map((axisItem, axisIndex) => (
-              <AxisItem title="DateTime">
+              <AxisItem key={axisItem} title={axisItem}>
                 <Space size={25}>
                   <StyledText color="lightGray" fontweight="500">
                     {`Column ${axisIndex + 1}`}
@@ -188,7 +267,7 @@ const ConfigChartStep = ({ onNextClicked, chartType }) => {
           </div>
         </AxesList>
       </Space>
-      <PopupButton size="middle" color="blue" width={108} onClick={onNextClicked}>
+      <PopupButton size="middle" color="blue" width={108} onClick={onAddChartClicked}>
         Add Chart
       </PopupButton>
     </ConfigChartForm>

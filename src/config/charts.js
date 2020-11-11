@@ -6,6 +6,11 @@ export const chartTypes = {
   IMAGE_CHART: 'IMAGE_CHART',
 };
 
+export const XAXIS = 'x-axis';
+export const YAXIS = 'y-axis';
+
+export const AXES_LIMIT = 4;
+
 // todo: to csv.
 // strings.
 export const mockData = [
