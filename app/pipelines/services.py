@@ -247,7 +247,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         db.session.add(new_pipeline_run)
 
         for opf in org_pipeline_input_files:
-            opf.organization_pipeline_run_uuid = new_pipeline_run.uuid
+            opf.organization_pipeline_run_id = new_pipeline_run.id
             db.session.add(opf)
 
         db.session.commit()
@@ -295,7 +295,7 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
 
             # generate download urls and add uuid
             for opf in org_pipeline_input_files:
-                if opf.organization_pipeline_run_uuid == opr.uuid:
+                if opf.organization_pipeline_run_id == opr.id:
                     sname = secure_filename(opf.name)
                     url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
                     inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
@@ -348,7 +348,7 @@ def fetch_pipeline_run(
 
         # generate download urls and add uuid
         for opf in org_pipeline_input_files:
-            if opf.organization_pipeline_run_uuid == opr.uuid:
+            if opf.organization_pipeline_run_id == opr.id:
                 sname = secure_filename(opf.name)
                 url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
                 inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})

@@ -81,23 +81,14 @@ def organization_pipeline(app):
 
 
 @pytest.fixture
-def organization_workflow(app):
-    ow = OrganizationWorkflow(
-        organization_uuid=ORGANIZATION_UUID, workflow_uuid=WORKFLOW_UUID
-    )
-    db.session.add(ow)
-    db.session.commit()
-
-    return ow
-
-
-@pytest.fixture
-def organization_pipeline_input_file(app, organization_pipeline):
+def organization_pipeline_input_file(
+    app, organization_pipeline, organization_pipeline_run
+):
     opif = OrganizationPipelineInputFile(
         uuid=PIPELINE_RUN_INPUT_FILE_UUID,
         organization_pipeline_id=organization_pipeline.id,
         name=f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
-        organization_pipeline_run_uuid=PIPELINE_RUN_UUID,
+        organization_pipeline_run_id=organization_pipeline_run.id,
     )
     db.session.add(opif)
     db.session.commit()

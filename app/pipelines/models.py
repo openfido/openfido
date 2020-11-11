@@ -30,7 +30,9 @@ class OrganizationPipelineInputFile(CommonColumnsMixin, db.Model):
 
     name = db.Column(db.String(200), nullable=False, server_default="")
 
-    organization_pipeline_run_uuid = db.Column(db.String(32), nullable=True)
+    organization_pipeline_run_id = db.Column(
+        db.Integer, db.ForeignKey("organization_pipeline_run.id"), nullable=True
+    )
 
     organization_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("organization_pipeline.id"), nullable=False
