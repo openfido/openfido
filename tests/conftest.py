@@ -18,6 +18,12 @@ from app.pipelines.models import (
     OrganizationPipelineInputFile,
     db,
 )
+from app.workflows.models import (
+    OrganizationWorkflow,
+    OrganizationWorkflowPipeline,
+    OrganizationWorkflowPipelineRun,
+    db,
+)
 from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
@@ -76,14 +82,14 @@ def organization_pipeline(app):
 
 @pytest.fixture
 def organization_workflow(app):
-    ow = OrganizationPipeline(
-        organization_uuid=ORGANIZATION_UUID,
-        pipeline_uuid=WORKFLOW_UUID
+    ow = OrganizationWorkflow(
+        organization_uuid=ORGANIZATION_UUID, workflow_uuid=WORKFLOW_UUID
     )
     db.session.add(ow)
     db.session.commit()
 
     return ow
+
 
 @pytest.fixture
 def organization_pipeline_input_file(app, organization_pipeline):

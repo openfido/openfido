@@ -18,7 +18,9 @@ class OrganizationWorkflowPipeline(CommonColumnsMixin, db.Model):
 
     __tablename__ = "organization_workflow_pipeline"
 
-    organization_workflow_uuid = db.Column(db.String(32), nullable=False, server_default="")
+    organization_workflow_uuid = db.Column(
+        db.String(32), nullable=False, server_default=""
+    )
     organization_pipeline_id = db.Column(
         db.Integer, db.ForeignKey("organization_pipeline.id"), nullable=False
     )

@@ -67,6 +67,8 @@ def create(organization_uuid):
                   type: string
       "400":
         description: "Bad request"
+      "503":
+        description: "Http error"
     """
     try:
         return jsonify(create_workflow(organization_uuid, request.json))
@@ -90,44 +92,30 @@ def workflows(organization_uuid):
         description: Requires key type REACT_CLIENT
         schema:
           type: string
-    requestBody:
-      description: "Workflow name and description."
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              description:
-                type: string
     responses:
       "200":
         description: "Updated OrganizationWorkflow"
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                uuid:
-                  type: string
-                name:
-                  type: string
-                description:
-                  type: string
-                docker_image_url:
-                  type: string
-                repository_ssh_url:
-                  type: string
-                repository_branch:
-                  type: string
-                created_at:
-                  type: string
-                updated_at:
-                  type: string
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
       "400":
         description: "Bad request"
+      "503":
+        description: "Http error"
     """
     try:
         return jsonify(fetch_workflows(organization_uuid))
@@ -135,4 +123,3 @@ def workflows(organization_uuid):
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
-

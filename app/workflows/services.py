@@ -66,6 +66,7 @@ def fetch_workflows(organization_uuid):
         json_value = response.json()
 
         response.raise_for_status()
+        valid_workflows = []
 
         for workflow in json_value:
             matching_workflows = []
@@ -79,8 +80,9 @@ def fetch_workflows(organization_uuid):
                 continue
 
             workflow["uuid"] = matching_workflows[0]
+            valid_workflows.append(workflow)
 
-        return json_value
+        return valid_workflows
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
