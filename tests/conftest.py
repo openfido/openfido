@@ -74,34 +74,19 @@ def organization_pipeline(app):
 
 
 @pytest.fixture
-def organization_pipeline_input_file(app, organization_pipeline):
+def organization_pipeline_input_file(
+    app, organization_pipeline, organization_pipeline_run
+):
     opif = OrganizationPipelineInputFile(
         uuid=PIPELINE_RUN_INPUT_FILE_UUID,
         organization_pipeline_id=organization_pipeline.id,
         name=f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
+        organization_pipeline_run_id=organization_pipeline_run.id,
     )
     db.session.add(opif)
     db.session.commit()
 
     return opif
-
-
-@pytest.fixture
-def organization_pipeline_run(app, organization_pipeline):
-    opr = OrganizationPipelineRun(
-        uuid=PIPELINE_RUN_UUID,
-        organization_pipeline_id=organization_pipeline.id,
-        pipeline_run_uuid=PIPELINE_RUN_UUID,
-        status_update_token=uuid.uuid4().hex,
-        status_update_token_expires_at=datetime.now() + timedelta(days=7),
-        share_token=uuid.uuid4().hex,
-        share_password_hash=None,
-        share_password_salt=None,
-    )
-    db.session.add(opr)
-    db.session.commit()
-
-    return opr
 
 
 @pytest.fixture

@@ -8,7 +8,12 @@ from application_roles.services import create_application
 from app.utils import ApplicationsEnum
 import responses
 from app.constants import WORKFLOW_HOSTNAME
-from app.pipelines.models import OrganizationPipeline, OrganizationPipelineRun, db
+from app.pipelines.models import (
+    OrganizationPipeline,
+    OrganizationPipelineRun,
+    OrganizationPipelineInputFile,
+    db,
+)
 from app.pipelines.queries import find_organization_pipelines
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
@@ -19,12 +24,14 @@ from ..conftest import (
     USER_UUID,
     PIPELINE_UUID,
     PIPELINE_RUN_UUID,
+    PIPELINE_RUN_INPUT_FILE_UUID,
 )
 from .test_services import (
     PIPELINE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
     PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
+    PIPELINE_RUN_INPUT_FILE_JSON,
 )
 
 
@@ -569,7 +576,6 @@ def test_list_pipeline_runs(
     organization_pipeline_run,
     organization_pipeline_input_file,
 ):
-
     mock_url.return_value = "http://somefileurl.com"
     json_response = [PIPELINE_RUN_RESPONSE_JSON]
 
