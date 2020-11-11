@@ -33,7 +33,9 @@ const StyledOverviewTabMenu = styled.ul`
   }
 `;
 
-const OverviewTabMenu = ({ displayTab, setDisplayTab, dataVisualizationReady }) => (
+const OverviewTabMenu = ({
+  displayTab, setDisplayTab, dataVisualizationReady, consoleOutputReady,
+}) => (
   <StyledOverviewTabMenu mode="horizontal">
     <li className={displayTab === OVERVIEW_TAB ? 'active' : ''}>
       <StyledButton type="text" size="middle" onClick={() => setDisplayTab(OVERVIEW_TAB)}>
@@ -47,11 +49,13 @@ const OverviewTabMenu = ({ displayTab, setDisplayTab, dataVisualizationReady }) 
         </StyledButton>
       </li>
     )}
-    <li className={displayTab === CONSOLE_OUTPUT_TAB ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(CONSOLE_OUTPUT_TAB)}>
-        Console Output
-      </StyledButton>
-    </li>
+    {consoleOutputReady && (
+      <li className={displayTab === CONSOLE_OUTPUT_TAB ? 'active' : ''}>
+        <StyledButton type="text" size="middle" onClick={() => setDisplayTab(CONSOLE_OUTPUT_TAB)}>
+          Console Output
+        </StyledButton>
+      </li>
+    )}
   </StyledOverviewTabMenu>
 );
 
@@ -59,10 +63,12 @@ OverviewTabMenu.propTypes = {
   displayTab: PropTypes.string.isRequired,
   setDisplayTab: PropTypes.func.isRequired,
   dataVisualizationReady: PropTypes.bool,
+  consoleOutputReady: PropTypes.bool,
 };
 
 OverviewTabMenu.defaultProps = {
   dataVisualizationReady: false,
+  consoleOutputReady: false,
 };
 
 export default OverviewTabMenu;

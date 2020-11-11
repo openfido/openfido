@@ -155,6 +155,7 @@ const PipelineRuns = () => {
               displayTab={displayTab}
               setDisplayTab={setDisplayTab}
               dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+              consoleOutputReady={!!pipelineRunSelected}
             />
             {pipelineRunSelected && (
             <Overview

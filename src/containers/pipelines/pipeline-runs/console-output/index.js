@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { requestPipelineRunConsoleOutput } from 'services';
-import { CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
+import { CONSOLE_OUTPUT_TAB, STDOUT, STDERR } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
 import { StyledH2, StyledButton } from 'styles/app';
 import colors from 'styles/colors';
@@ -55,7 +55,7 @@ const ConsoleOutput = ({
 }) => {
   const [stdout, setStdout] = useState();
   const [stderr, setStderr] = useState();
-  const [outputType, setOutputType] = useState('stdout');
+  const [outputType, setOutputType] = useState(STDOUT);
   const [getConsoleOutputError, setGetConsoleOutputError] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
@@ -63,8 +63,8 @@ const ConsoleOutput = ({
   useEffect(() => {
     requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
       .then((response) => {
-        if ('std_out' in response.data) setStdout(response.data.std_out);
-        if ('std_err' in response.data) setStderr(response.data.std_err);
+        if (STDOUT in response.data) setStdout(response.data[STDOUT]);
+        if (STDERR in response.data) setStderr(response.data[STDERR]);
         setGetConsoleOutputError(null);
       })
       .catch((err) => {
@@ -83,6 +83,7 @@ const ConsoleOutput = ({
           displayTab={CONSOLE_OUTPUT_TAB}
           setDisplayTab={setDisplayTab}
           dataVisualizationReady={pipelineRunSelectedStatus === pipelineStates.COMPLETED}
+          consoleOutputReady={!!pipelineRunSelectedUuid}
         />
       </header>
       <section>
@@ -91,8 +92,8 @@ const ConsoleOutput = ({
             type="text"
             size="large"
             width={108}
-            onClick={() => setOutputType('stdout')}
-            textcolor={outputType === 'stdout' ? 'lightBlue' : 'black'}
+            onClick={() => setOutputType(STDOUT)}
+            textcolor={outputType === STDOUT ? 'lightBlue' : 'gray'}
           >
             stdout
           </StyledButton>
@@ -100,16 +101,16 @@ const ConsoleOutput = ({
             type="text"
             size="large"
             width={108}
-            onClick={() => setOutputType('stderr')}
-            textcolor={outputType === 'stderr' ? 'lightBlue' : 'black'}
+            onClick={() => setOutputType(STDERR)}
+            textcolor={outputType === STDERR ? 'lightBlue' : 'gray'}
           >
             stderr
           </StyledButton>
         </ConsoleOutputTypes>
         <ConsoleOutputContent>
           {getConsoleOutputError && 'message' in getConsoleOutputError && getConsoleOutputError.message}
-          {outputType === 'stdout' && stdout}
-          {outputType === 'stderr' && stderr}
+          {outputType === STDOUT && stdout}
+          {outputType === STDERR && stderr}
         </ConsoleOutputContent>
       </section>
     </StyledConsoleOutput>
