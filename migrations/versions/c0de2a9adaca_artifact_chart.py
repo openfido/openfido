@@ -1,7 +1,7 @@
 """artifact_chart
 
 Revision ID: c0de2a9adaca
-Revises: bbfac1d325be
+Revises: a0e54652a189
 Create Date: 2020-11-09 00:28:59.033914
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c0de2a9adaca'
-down_revision = 'bbfac1d325be'
+down_revision = 'a0e54652a189'
 branch_labels = None
 depends_on = None
 
@@ -30,7 +30,7 @@ def upgrade():
         sa.Column("chart_config", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
-        
+
 
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKeyConstraint(

@@ -2,19 +2,12 @@ import io
 from unittest.mock import patch
 
 import responses
-<<<<<<< HEAD
-from app.constants import AUTH_HOSTNAME, WORKFLOW_HOSTNAME
+from app.constants import WORKFLOW_HOSTNAME, AUTH_HOSTNAME
 from app.pipelines.models import (
-    OrganizationPipeline,
-    OrganizationPipelineRun,
     ArtifactChart,
-=======
-from app.constants import WORKFLOW_HOSTNAME
-from app.pipelines.models import (
     OrganizationPipeline,
     OrganizationPipelineRun,
     OrganizationPipelineInputFile,
->>>>>>> master
     db,
 )
 from app.pipelines.queries import find_organization_pipelines
@@ -28,12 +21,8 @@ from ..conftest import (
     JWT_TOKEN,
     ORGANIZATION_UUID,
     PIPELINE_RUN_UUID,
-<<<<<<< HEAD
     PIPELINE_UUID,
     USER_UUID,
-=======
-    PIPELINE_RUN_INPUT_FILE_UUID,
->>>>>>> master
 )
 from .test_services import (
     CHART_JSON,
@@ -42,11 +31,8 @@ from .test_services import (
     PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
-<<<<<<< HEAD
-=======
     PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
     PIPELINE_RUN_INPUT_FILE_JSON,
->>>>>>> master
 )
 
 
