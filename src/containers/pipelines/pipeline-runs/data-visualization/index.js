@@ -7,13 +7,14 @@ import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
-  StyledH4,
+  StyledH3,
   StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
+import LineChart from '../time-series-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -34,16 +35,16 @@ const StyledDataVisualization = styled.div`
     margin-top: 16px;
     margin-top: 1rem;
     background-color: ${colors.white};
-    color: ${colors.black};
+    color: ${colors.gray10};
     border-radius: 6px;
     max-width: 972px;
     font-size: 18px;
     font-size: 1.125rem;
     line-height: 21px;
     line-height: 1.3125rem;
-    padding: 24px 28px;
-    padding: 1.5rem 1.75rem;
-    h4 {
+    padding: 18px 20px;
+    padding: 1.125rem 1.5rem;
+    h3 {
       margin-bottom: 40px;
       margin-bottom: 2.5rem;
     }
@@ -65,7 +66,7 @@ const AddChartButton = styled(StyledButton)`
       font-size: 1.875rem;
       display: inline-block;
       margin-right: 4px;
-      margin-righT: 0.25rem;
+      margin-right: 0.25rem;
     }
     span {
       display: flex;
@@ -112,9 +113,13 @@ const DataVisualization = ({
         >
           Add A Chart
         </AddChartButton>
+        <section>
+          <StyledH3 color="black">Load Profile by Composition</StyledH3>
+          <LineChart />
+        </section>
         {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
           <section>
-            <StyledH4 color="gray">{title}</StyledH4>
+            <StyledH3 color="black">{title}</StyledH3>
             <img src={artifact.url} alt={artifact.name} width="100%" />
           </section>
         ))}
