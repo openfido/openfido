@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { getCharts } from 'actions/charts';
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
+import { chartTypes } from 'config/charts';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
@@ -14,7 +15,7 @@ import colors from 'styles/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
-import LineChart from '../time-series-chart';
+import TimeSeriesChart from '../time-series-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -115,7 +116,11 @@ const DataVisualization = ({
         </AddChartButton>
         <section>
           <StyledH3 color="black">Load Profile by Composition</StyledH3>
-          <LineChart />
+          <TimeSeriesChart type={chartTypes.LINE_CHART} />
+        </section>
+        <section>
+          <StyledH3 color="black">Load Profile by Composition</StyledH3>
+          <TimeSeriesChart type={chartTypes.BAR_CHART} />
         </section>
         {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
           <section>
