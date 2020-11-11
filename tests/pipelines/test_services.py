@@ -675,3 +675,28 @@ def test_create_artifact_chart(app, organization_pipeline, organization_pipeline
         "updated_at": chart.updated_at.isoformat(),
     }
     assert chart.organization_pipeline_run == organization_pipeline_run
+
+
+@responses.activate
+def test_create_artifact_chart_no_config(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    chart_json = dict(CHART_JSON)
+    del chart_json["chart_config"]
+    chart_json_result = create_artifact_chart(organization_pipeline_run, chart_json)
+    chart = ArtifactChart.query.first()
+
+    assert chart_json_result == {
+        "uuid": chart.uuid,
+        "name": chart.name,
+        "artifact": FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0],
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": {},
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
+    assert chart.organization_pipeline_run == organization_pipeline_run

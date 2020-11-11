@@ -25,4 +25,4 @@ class CreateArtifactChart(Schema):
         required=True,
         validate=validate.Length(min=1, max=ArtifactChart.chart_type_code.type.length),
     )
-    chart_config = fields.Field(required=True)
+    chart_config = fields.Field(missing={})
