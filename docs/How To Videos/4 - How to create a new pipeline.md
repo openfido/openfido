@@ -4,7 +4,7 @@
 
 Create your first pipeline. click on "Get Started".
 
-Enter in a Pipeline name, as well as a description.
+Enter a Pipeline name, as well as a description.
 
 Grab the names for the docker hub image or repository that you will use as the base docker image for your pipeline, as well as the GitHub repository that contains code for your pipeline.
 
