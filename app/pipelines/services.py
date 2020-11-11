@@ -293,7 +293,7 @@ def create_artifact_chart(organization_pipeline_run, chart_json):
     Raises a ValidationError if chart_json is not valid.
     Raises a ValueError if an Artifact cannot be found on the workflow service.
 
-    Returns JSON appropriate  to the 'create artifact chart' endpoint.
+    Returns JSON appropriate to the 'create artifact chart' endpoint.
     """
     data = CreateArtifactChart().load(chart_json)
 
@@ -311,6 +311,10 @@ def create_artifact_chart(organization_pipeline_run, chart_json):
 
 
 def fetch_artifact_charts(organization_pipeline_run):
+    """ Fetch all ArtifactChart records associatedwith an OrganizationPipelineRun.
+
+    Returns JSON appropriate to the 'fetch artifact charts' endpoint.
+    """
     results = []
     for chart in organization_pipeline_run.artifact_charts:
         artifact = _fetch_artifact(organization_pipeline_run, chart.artifact_uuid)
