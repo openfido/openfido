@@ -1,23 +1,24 @@
 import logging
 
 from flask import Blueprint, jsonify, request
+
+from app.utils import any_application_required, validate_organization
+from marshmallow.exceptions import ValidationError
 from requests import HTTPError
 
-from app.utils import validate_organization, any_application_required
-
+from .queries import find_organization_pipeline, find_organization_pipeline_run
 from .services import (
-    fetch_pipelines,
+    create_artifact_chart,
     create_pipeline,
-    update_pipeline,
-    delete_pipeline,
     create_pipeline_input_file,
-    fetch_pipeline_run,
-    fetch_pipeline_runs,
     create_pipeline_run,
+    delete_pipeline,
+    fetch_pipeline_run,
     fetch_pipeline_run_console,
+    fetch_pipeline_runs,
+    fetch_pipelines,
+    update_pipeline,
 )
-
-from .queries import find_organization_pipeline
 
 logger = logging.getLogger("organization-pipelines")
 
@@ -556,15 +557,15 @@ def pipeline_run_console(
 
 
 @organization_pipeline_bp.route(
-    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/chart",
-    methods=["GET"],
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/charts",
+    methods=["POST"],
 )
 @any_application_required
 @validate_organization()
-def get_artifact_charts(
+def create_chart(
     organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
 ):
-    """Fetch Organization Pipeline Run Charts
+    """Create an Artifact Chart for an Organization Pipeline Run
     ---
     tags:
       - pipeline run charts
@@ -591,7 +592,7 @@ def get_artifact_charts(
                 type: string
     responses:
       "200":
-        description: "Get an Organization Pipeline Run's Charts"
+        description: "Created"
         content:
           application/json:
             schema:
@@ -632,18 +633,18 @@ def get_artifact_charts(
         return {"message": "No such pipeline found"}, 400
 
     organization_pipeline_run = find_organization_pipeline_run(
-      organization_pipeline.id,
-      organization_pipeline_run_uuid
+        organization_pipeline.id, organization_pipeline_run_uuid
     )
 
     if not organization_pipeline_run:
         return {"message": "No such pipeline run found"}, 400
 
     try:
-        return jsonify(
-            search_artifacat_charts(organization_pipeline_run.id)
-        )
+        artifact_chart = create_artifact_chart(organization_pipeline_run, request.json)
+        return jsonify(artifact_chart)
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
+    except ValidationError as validation_err:
+        return {"message": "Validation error", "errors": validation_err.messages}, 400

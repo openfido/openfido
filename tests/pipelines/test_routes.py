@@ -1,30 +1,35 @@
 import io
 from unittest.mock import patch
 
-from app.constants import (
-    AUTH_HOSTNAME,
-)
-from application_roles.services import create_application
-from app.utils import ApplicationsEnum
 import responses
-from app.constants import WORKFLOW_HOSTNAME
-from app.pipelines.models import OrganizationPipeline, OrganizationPipelineRun, db
+from app.constants import AUTH_HOSTNAME, WORKFLOW_HOSTNAME
+from app.pipelines.models import (
+    OrganizationPipeline,
+    OrganizationPipelineRun,
+    ArtifactChart,
+    db,
+)
 from app.pipelines.queries import find_organization_pipelines
+from app.utils import ApplicationsEnum
 from application_roles.decorators import ROLES_KEY
+from application_roles.services import create_application
+from marshmallow.exceptions import ValidationError
 from requests import HTTPError
 
 from ..conftest import (
     JWT_TOKEN,
     ORGANIZATION_UUID,
-    USER_UUID,
-    PIPELINE_UUID,
     PIPELINE_RUN_UUID,
+    PIPELINE_UUID,
+    USER_UUID,
 )
 from .test_services import (
+    CHART_JSON,
+    FINISHED_PIPELINE_RUN_RESPONSE_JSON,
     PIPELINE_JSON,
+    PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
-    PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
 )
 
 
@@ -883,3 +888,143 @@ def test_pipeline_run_console(
 
     assert result.status_code == 200
     assert result.json == json_response
+
+
+@responses.activate
+def test_create_chart_no_organization_pipeline(
+    app, client, client_application, organization_pipeline
+):
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{'0' * 32}/runs/{'0' * 32}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+
+
+@responses.activate
+def test_create_chart_no_organization_pipeline_run(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{'0' * 32}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.create_artifact_chart")
+@responses.activate
+def test_create_chart_value_error(
+    create_chart_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    create_chart_mock.side_effect = ValueError("an error")
+
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.create_artifact_chart")
+@responses.activate
+def test_create_chart_validation_error(
+    create_chart_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    create_chart_mock.side_effect = ValidationError("an error")
+
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.create_artifact_chart")
+@responses.activate
+def test_create_chart_http_error(
+    create_chart_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    create_chart_mock.side_effect = HTTPError("an error")
+
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_create_chart(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    result = client.post(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts",
+        content_type="application/json",
+        json=CHART_JSON,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    chart = ArtifactChart.query.first()
+
+    assert result.status_code == 200
+    assert result.json == {
+        "uuid": chart.uuid,
+        "name": chart.name,
+        "artifact": FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0],
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": chart.chart_config,
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
