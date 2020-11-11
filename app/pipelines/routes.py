@@ -13,6 +13,7 @@ from .services import (
     create_pipeline_input_file,
     create_pipeline_run,
     delete_pipeline,
+    fetch_artifact_charts,
     fetch_pipeline_run,
     fetch_pipeline_run_console,
     fetch_pipeline_runs,
@@ -648,3 +649,80 @@ def create_chart(
         return {"message": http_error.args[0]}, 503
     except ValidationError as validation_err:
         return {"message": "Validation error", "errors": validation_err.messages}, 400
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/charts",
+    methods=["GET"],
+)
+@any_application_required
+@validate_organization()
+def get_charts(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Get a list of Artifact Charts associated with an Organization Pipeline Run
+    ---
+    tags:
+      - pipeline run charts
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Found"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  name:
+                    type: string
+                  chart_type_code:
+                    type: string
+                  artifact:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                      name:
+                        type: string
+                      url:
+                        type: string
+                  chart_config:
+                    type: object
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+
+    organization_pipeline_run = find_organization_pipeline_run(
+        organization_pipeline.id, organization_pipeline_run_uuid
+    )
+
+    if not organization_pipeline_run:
+        return {"message": "No such pipeline run found"}, 400
+
+    try:
+        return jsonify(fetch_artifact_charts(organization_pipeline_run))
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503

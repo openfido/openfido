@@ -259,6 +259,34 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         raise ValueError(created_pipeline) from http_error
 
 
+def _fetch_artifact(organization_pipeline_run, artifact_uuid):
+    pipeline_run = fetch_pipeline_run(
+        organization_pipeline_run.organization_pipeline.organization_uuid,
+        organization_pipeline_run.organization_pipeline.uuid,
+        organization_pipeline_run.uuid,
+    )
+    artifact = next(
+        (a for a in pipeline_run["artifacts"] if a["uuid"] == artifact_uuid),
+        None,
+    )
+    if artifact is None:
+        raise ValueError("Could not find artifact in Pipeline")
+
+    return artifact
+
+
+def _serialize_artifact_chart(chart, artifact):
+    return {
+        "uuid": chart.uuid,
+        "name": chart.name,
+        "artifact": artifact,
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": chart.chart_config,
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
+
+
 def create_artifact_chart(organization_pipeline_run, chart_json):
     """Create an Artifact Chart for a OrganizationPipelineRun.
 
@@ -269,18 +297,7 @@ def create_artifact_chart(organization_pipeline_run, chart_json):
     """
     data = CreateArtifactChart().load(chart_json)
 
-    pipeline_run = fetch_pipeline_run(
-        organization_pipeline_run.organization_pipeline.organization_uuid,
-        organization_pipeline_run.organization_pipeline.uuid,
-        organization_pipeline_run.uuid,
-    )
-    artifact = next(
-        (a for a in pipeline_run["artifacts"] if a["uuid"] == data["artifact_uuid"]),
-        None,
-    )
-    if artifact is None:
-        raise ValueError("Could not find artifact in Pipeline")
-
+    artifact = _fetch_artifact(organization_pipeline_run, data["artifact_uuid"])
     chart = ArtifactChart(
         name=data["name"],
         artifact_uuid=data["artifact_uuid"],
@@ -290,15 +307,15 @@ def create_artifact_chart(organization_pipeline_run, chart_json):
     organization_pipeline_run.artifact_charts.append(chart)
     db.session.commit()
 
-    return {
-        "uuid": chart.uuid,
-        "name": chart.name,
-        "artifact": artifact,
-        "chart_type_code": chart.chart_type_code,
-        "chart_config": chart.chart_config,
-        "created_at": chart.created_at.isoformat(),
-        "updated_at": chart.updated_at.isoformat(),
-    }
+    return _serialize_artifact_chart(chart, artifact)
+
+
+def fetch_artifact_charts(organization_pipeline_run):
+    results = []
+    for chart in organization_pipeline_run.artifact_charts:
+        artifact = _fetch_artifact(organization_pipeline_run, chart.artifact_uuid)
+        results.append(_serialize_artifact_chart(chart, artifact))
+    return results
 
 
 def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
