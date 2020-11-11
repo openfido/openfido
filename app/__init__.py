@@ -8,9 +8,11 @@ from application_roles.model_utils import get_db
 
 from .pipelines import models as pipeline_models
 from .workflows import models as workflow_models
+
 from . import constants
 
 from .pipelines.routes import organization_pipeline_bp
+from .workflows.routes import organization_workflow_bp
 
 db = get_db()
 
@@ -55,6 +57,7 @@ def create_app(config=None):
     migrate = Migrate(app, db)
 
     app.register_blueprint(organization_pipeline_bp, url_prefix="/v1/organizations")
+    app.register_blueprint(organization_workflow_bp, url_prefix="/v1/organizations")
 
     @app.route("/healthcheck")
     def healthcheck():

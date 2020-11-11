@@ -1,6 +1,4 @@
 import uuid
-from datetime import datetime
-from datetime import timedelta
 
 import requests
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
@@ -8,24 +6,16 @@ from application_roles.decorators import ROLES_KEY
 from blob_utils import upload_stream, create_url
 from flask import current_app
 from requests import HTTPError
-from werkzeug.utils import secure_filename
 
 from .models import (
-    OrganizationPipeline,
-    OrganizationPipelineInputFile,
-    OrganizationPipelineRun,
+    OrganizationWorkflow,
+    OrganizationWorkflowPipeline,
+    OrganizationWorkflowPipelineRun,
     db,
 )
 from .queries import (
-    find_organization_pipeline,
-    find_organization_pipelines,
-    find_organization_pipeline_input_files,
-    find_organization_pipeline_run,
-    find_latest_organization_pipeline_run,
-    search_organization_pipeline_input_files,
-    search_organization_pipeline_runs,
+    find_organization_workflows,
 )
-from ..utils import make_hash
 
 
 def create_workflow(organization_uuid, request_json):
@@ -43,14 +33,53 @@ def create_workflow(organization_uuid, request_json):
         json_value = response.json()
         response.raise_for_status()
 
-        pipeline = OrganizationPipeline(
+        workflow = OrganizationWorkflow(
             organization_uuid=organization_uuid,
-            pipeline_uuid=json_value.get("uuid"),
+            workflow_uuid=json_value.get("uuid"),
         )
-        db.session.add(pipeline)
+        db.session.add(workflow)
         db.session.commit()
 
-        json_value["uuid"] = pipeline.uuid
+        json_value["uuid"] = workflow.uuid
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
+
+
+def fetch_workflows(organization_uuid):
+    """Fetch all Organization Workflows. """
+
+    organization_workflows = find_organization_workflows(organization_uuid)
+
+    response = requests.post(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/search",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json={"uuids": [op.workflow_uuid for op in organization_workflows]},
+    )
+
+    try:
+        json_value = response.json()
+
+        response.raise_for_status()
+
+        for workflow in json_value:
+            matching_workflows = []
+            org_workflow = None
+
+            for ow in organization_workflows:
+                if ow.workflow_uuid == workflow["uuid"]:
+                    matching_workflows = [ow.uuid]
+
+            if len(matching_workflows) != 1:
+                continue
+
+            workflow["uuid"] = matching_workflows[0]
+
         return json_value
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
