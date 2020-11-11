@@ -163,9 +163,5 @@ def execute_pipeline(
                 executor.upload_artifact(f, join(outputdir, f))
 
         executor.update_run_status(RunStateEnum.COMPLETED)
-    except ValueError as v_e:
-        failed(v_e)
-    except urllib.error.URLError as url_e:
-        failed(url_e)
-    # TODO may need a more generic exception handling here, or possibly
-    # configure signal handling (errors) with celery itself.
+    except Exception as exc:
+        failed(exc)
