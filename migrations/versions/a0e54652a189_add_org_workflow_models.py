@@ -1,7 +1,7 @@
 """add_org_workflow_models
 
 Revision ID: a0e54652a189
-Revises: e53a1b7d4c64
+Revises: cffe83c29d00
 Create Date: 2020-11-10 16:15:02.067607
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'a0e54652a189'
-down_revision = 'e53a1b7d4c64'
+down_revision = 'cffe83c29d00'
 branch_labels = None
 depends_on = None
 
