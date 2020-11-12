@@ -33,20 +33,3 @@ const CustomXAxisTick = (props) => {
 };
 
 export default CustomXAxisTick;
-
-/*
-{textAnchor: "middle", verticalAnchor: "start", fontSize: 10, style: {…}, stroke: "none", …}
-fill: "#AFAFAF"
-fontSize: 10
-height: 30
-index: 2
-payload: {coordinate: 646.6666666666666, value: 1483344000, index: 2, offset: 0, tickCoord: 646.6666666666666, …}
-stroke: "none"
-style: {fontWeight: "500", fill: "#AFAFAF"}
-textAnchor: "middle"
-verticalAnchor: "start"
-visibleTicksCount: 4
-width: 832
-x: 646.6666666666666
-y: 246
- */
