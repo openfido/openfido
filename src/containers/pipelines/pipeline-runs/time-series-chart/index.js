@@ -90,10 +90,7 @@ const TimeSeriesChart = ({
               interval="preserveStart"
               domain={['auto', 'auto']}
               fontSize={10}
-              style={{ fontWeight: '500', fill: colors.gray10 }}/*
-          label={{
-            'L1': 'DateTime', position: 'insideBottom', offset: -32, fill: colors.gray,
-          }} */
+              style={{ fontWeight: '500', fill: colors.gray10 }}
               tickLine={false}
               tickSize={0}
               tick={CustomXAxisTick}
@@ -106,10 +103,7 @@ const TimeSeriesChart = ({
               key={`xAxis${axis}`}
               dataKey={axis}
               fontSize={10}
-              style={{ fontWeight: '500', fill: colors.gray10 }}/*
-          label={{
-            'L1': 'DateTime', position: 'insideBottom', offset: -32, fill: colors.gray,
-          }} */
+              style={{ fontWeight: '500', fill: colors.gray10 }}
               tickLine={false}
               tickSize={0}
               stroke={colors.gray10}
