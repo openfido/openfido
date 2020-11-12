@@ -8,6 +8,7 @@ from app.pipelines.models import (
     OrganizationPipeline,
     OrganizationPipelineRun,
     ArtifactChart,
+    db,
 )
 from app.pipelines.services import (
     create_artifact_chart,
@@ -15,6 +16,7 @@ from app.pipelines.services import (
     create_pipeline_input_file,
     create_pipeline_run,
     delete_pipeline,
+    fetch_artifact_charts,
     fetch_pipeline_run,
     fetch_pipeline_run_console,
     fetch_pipeline_runs,
@@ -714,3 +716,58 @@ def test_create_artifact_chart_no_config(
         "updated_at": chart.updated_at.isoformat(),
     }
     assert chart.organization_pipeline_run == organization_pipeline_run
+
+
+@responses.activate
+def test_fetch_artifact_charts_no_chart_found(
+    app, organization_pipeline, organization_pipeline_run
+):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid="noid",
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    with pytest.raises(ValueError):
+        fetch_artifact_charts(organization_pipeline_run)
+
+
+@responses.activate
+def test_fetch_artifact_charts(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid=FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"],
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    chart_json_result = fetch_artifact_charts(organization_pipeline_run)
+
+    assert chart_json_result == [
+        {
+            "uuid": chart.uuid,
+            "name": chart.name,
+            "artifact": FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0],
+            "chart_type_code": chart.chart_type_code,
+            "chart_config": chart.chart_config,
+            "created_at": chart.created_at.isoformat(),
+            "updated_at": chart.updated_at.isoformat(),
+        }
+    ]
