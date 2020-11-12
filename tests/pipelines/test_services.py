@@ -150,12 +150,26 @@ def test_fetch_pipelines_bad_workflow_response(app, organization_pipeline):
 
 @patch("app.pipelines.services.fetch_pipeline_run")
 @patch("app.pipelines.services.requests.post")
-def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipeline):
-
+def test_fetch_pipelines_bad_workflow_json(
+    post_mock, mock_runs, app, organization_pipeline
+):
     mock_runs.return_value = None
     pipeline_list = [
         {"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"},
         {"uuid": "12345", "name": "name 2"},
+    ]
+    post_mock().json.return_value = pipeline_list
+
+    with pytest.raises(ValueError):
+        fetch_pipelines(ORGANIZATION_UUID)
+
+
+@patch("app.pipelines.services.fetch_pipeline_run")
+@patch("app.pipelines.services.requests.post")
+def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipeline):
+    mock_runs.return_value = None
+    pipeline_list = [
+        {"uuid": organization_pipeline.pipeline_uuid, "name": "name 1"},
     ]
     post_mock().json.return_value = pipeline_list
 
@@ -164,7 +178,6 @@ def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipelin
             "uuid": organization_pipeline.uuid,
             "name": "name 1",
         },
-        {"uuid": "12345", "name": "name 2"},
     ]
 
     assert fetch_pipelines(ORGANIZATION_UUID) == expected_result

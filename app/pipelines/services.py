@@ -119,7 +119,7 @@ def delete_pipeline(organization_uuid, organization_pipeline_uuid):
 
 
 def fetch_pipelines(organization_uuid):
-    """Find OrganizationPipelines for an organization.
+    """Find all OrganizationPipelines for an organization.
 
     Note: assumes that the organization_uuid has already been verified (by
     validate_organization() mixin)
@@ -146,34 +146,42 @@ def fetch_pipelines(organization_uuid):
 
         response.raise_for_status()
 
+        # Match up the pipelines returned in the json_value with the
+        # organization_pipelines in organization_pipelines - they should match
+        # exactly. If they don't, throw an error.
         for pipeline in json_value:
-            matching_pipelines = []
-            org_pipeline = None
+            organization_pipeline = next(
+                (
+                    op
+                    for op in organization_pipelines
+                    if op.pipeline_uuid == pipeline["uuid"]
+                )
+            )
 
-            for op in organization_pipelines:
-                if op.pipeline_uuid == pipeline["uuid"]:
-                    matching_pipelines = [op.uuid]
-                    org_pipeline_id = op.id
+            pipeline["uuid"] = organization_pipeline.uuid
+            latest_pipeline_run = find_latest_organization_pipeline_run(
+                organization_pipeline.id
+            )
 
-            if len(matching_pipelines) != 1:
+            if not latest_pipeline_run:
                 continue
 
-            pipeline["uuid"] = matching_pipelines[0]
-            latest_pipeline_run = find_latest_organization_pipeline_run(org_pipeline_id)
+            pipeline_run = fetch_pipeline_run(
+                organization_uuid, organization_pipeline.uuid, latest_pipeline_run.uuid
+            )
 
-            if latest_pipeline_run:
-                pipeline_run = fetch_pipeline_run(
-                    organization_uuid, pipeline["uuid"], latest_pipeline_run.uuid
-                )
-
-                if pipeline_run:
-                    pipeline["last_pipeline_run"] = pipeline_run
+            if pipeline_run:
+                pipeline["last_pipeline_run"] = pipeline_run
 
         return json_value
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(json_value) from http_error
+    except StopIteration as stop_iteration:
+        raise ValueError(
+            "Unable to match Pipeline to OrganizationPipeline"
+        ) from stop_iteration
 
 
 def create_pipeline_input_file(organization_pipeline, filename, stream):
