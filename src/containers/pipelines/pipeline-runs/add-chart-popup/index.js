@@ -94,8 +94,8 @@ const AddChartPopup = ({
       onCancel={handleCancel}
       closeIcon={<CloseOutlined />}
       width={690}
-      maskStyle={{ top: '82px', left: '250px' }}
-      style={{ position: 'fixed', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
+      maskStyle={{ position: 'absolute', top: '82px', left: '250px' }}
+      style={{ position: 'absolute', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
       title={step === 2 && isImage ? 'Add an Image' : 'Add a Chart'}
     >
       {step === 1 && (

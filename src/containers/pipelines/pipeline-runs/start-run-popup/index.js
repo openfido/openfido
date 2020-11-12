@@ -213,7 +213,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
       closeIcon={<CloseOutlined color="darkText" />}
       width={690}
       maskStyle={{ top: '82px', left: '250px' }}
-      style={{ position: 'fixed', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
+      style={{ position: 'absolute', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
       title="Start a run"
     >
       <StyledForm onSubmit={onStartRunClicked}>
