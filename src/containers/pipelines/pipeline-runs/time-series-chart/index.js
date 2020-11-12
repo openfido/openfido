@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
@@ -27,10 +27,17 @@ const TimeSeriesChart = ({
   const axesComponents = [];
   const dataComponents = [];
 
-  requestArtifact(artifact)
-    .then(() => {
-      // parse csv data
-    });
+  const [chartData, setChartData] = useState(null);
+
+  useEffect(() => {
+    if (!chartData) {
+      requestArtifact(artifact)
+        .then(() => {
+          // parse csv data
+          setChartData([]);
+        });
+    }
+  }, [chartData, artifact]);
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     config[YAXIS].forEach((axis, index) => {

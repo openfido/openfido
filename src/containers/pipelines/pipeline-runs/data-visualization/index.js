@@ -117,7 +117,7 @@ const DataVisualization = ({
         {pipelineRunCharts && pipelineRunCharts.map(({
           artifact, name: title, chart_type_code, chart_config,
         }) => (
-          <section>
+          <section key={`${title}${artifact && artifact.uuid}${chart_type_code}`}>
             <StyledH4 color="black">{title}</StyledH4>
             {chart_type_code === chartTypes.IMAGE_CHART && (
               <img src={artifact.url} alt={artifact.name} width="100%" />
