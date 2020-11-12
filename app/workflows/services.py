@@ -11,6 +11,7 @@ from app.workflows.models import (
     db,
 )
 from app.workflows.queries import (
+    find_organization_workflow,
     find_organization_workflows,
 )
 
@@ -79,6 +80,63 @@ def fetch_workflows(organization_uuid):
             valid_workflows.append(workflow)
 
         return valid_workflows
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
+
+
+def fetch_workflow(organization_uuid, workflow_uuid):
+    """Fetch a Organization Workflow. """
+
+    organization_workflow = find_organization_workflow(organization_uuid, workflow_uuid)
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        workflow = response.json()
+        response.raise_for_status()
+
+        return workflow
+
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(workflow) from http_error
+
+
+def update_workflow(organization_uuid, workflow_uuid, request_json):
+    """Update an Organization Workflow. """
+
+    organization_workflow = find_organization_workflow(organization_uuid, workflow_uuid)
+
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
+
+    if "name" not in request_json or "description" not in request_json:
+        raise ValueError("Name and Description are required.")
+
+    response = requests.put(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json=request_json,
+    )
+
+    try:
+        workflow = response.json()
+        response.raise_for_status()
+
+        return workflow
+
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:

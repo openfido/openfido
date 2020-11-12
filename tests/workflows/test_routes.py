@@ -196,3 +196,138 @@ def test_create_workflow(app, client, client_application):
     ).first()
     json_response["uuid"] = workflow.uuid
     assert result.json == json_response
+
+
+@patch("app.workflows.routes.fetch_workflow")
+@responses.activate
+def test_get_workflow_backend_500(
+    mock_get, app, client, client_application, organization_workflow
+):
+    mock_get.side_effect = HTTPError("something is wrong")
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.workflows.routes.fetch_workflow")
+@responses.activate
+def test_get_workflow_backend_error(
+    mock_get, app, client, client_application, organization_workflow
+):
+    message = {"message": "error"}
+    mock_get.side_effect = ValueError(message)
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_get_workflow(app, client, client_application, organization_workflow):
+    json_response = dict(WORKFLOW_JSON)
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 200
+
+    workflow = OrganizationWorkflow.query.order_by(
+        OrganizationWorkflow.id.desc()
+    ).first()
+    json_response["uuid"] = workflow.workflow_uuid
+    assert result.json == json_response
+
+
+@patch("app.workflows.routes.update_workflow")
+@responses.activate
+def test_update_workflow_backend_500(
+    mock_update, app, client, client_application, organization_workflow
+):
+    mock_update.side_effect = HTTPError("something is wrong")
+    updates = {"name": "123", "description": "456"}
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        json=updates,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.workflows.routes.update_workflow")
+@responses.activate
+def test_update_workflow_backend_error(
+    mock_update, app, client, client_application, organization_workflow
+):
+    message = {"message": "error"}
+    updates = {"name": "123", "description": "456"}
+    mock_update.side_effect = ValueError(message)
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        json=updates,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_get_workflow(app, client, client_application, organization_workflow):
+    json_response = dict(WORKFLOW_JSON)
+    updates = {"name": "123", "description": "456"}
+    json_response.update(updates)
+
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json=json_response,
+    )
+
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        json=updates,
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 200
+
+    workflow = OrganizationWorkflow.query.order_by(
+        OrganizationWorkflow.id.desc()
+    ).first()
+    json_response["uuid"] = workflow.workflow_uuid
+    assert result.json == json_response
