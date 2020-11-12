@@ -2,11 +2,12 @@ import io
 from unittest.mock import patch
 
 import responses
-from app.constants import AUTH_HOSTNAME, WORKFLOW_HOSTNAME
+from app.constants import WORKFLOW_HOSTNAME, AUTH_HOSTNAME
 from app.pipelines.models import (
+    ArtifactChart,
     OrganizationPipeline,
     OrganizationPipelineRun,
-    ArtifactChart,
+    OrganizationPipelineInputFile,
     db,
 )
 from app.pipelines.queries import find_organization_pipelines
@@ -30,6 +31,8 @@ from .test_services import (
     PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
     PIPELINE_RUN_JSON,
     PIPELINE_RUN_RESPONSE_JSON,
+    PIPELINE_RUN_CONSOLE_RESPONSE_JSON,
+    PIPELINE_RUN_INPUT_FILE_JSON,
 )
 
 
@@ -574,7 +577,6 @@ def test_list_pipeline_runs(
     organization_pipeline_run,
     organization_pipeline_input_file,
 ):
-
     mock_url.return_value = "http://somefileurl.com"
     json_response = [PIPELINE_RUN_RESPONSE_JSON]
 

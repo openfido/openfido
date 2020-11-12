@@ -37,16 +37,15 @@ from ..conftest import (
 PIPELINE_RUN_JSON = {
     "inputs": [PIPELINE_RUN_INPUT_FILE_UUID],
 }
+PIPELINE_RUN_INPUT_FILE_JSON = {
+    "name": f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
+    "url": "http://somefileurl.com",
+    "uuid": PIPELINE_RUN_INPUT_FILE_UUID,
+}
 PIPELINE_RUN_RESPONSE_JSON = {
     "artifacts": [],
     "created_at": "2020-10-28T22:01:48.950370",
-    "inputs": [
-        {
-            "name": f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
-            "url": "http://somefileurl.com",
-            "uuid": PIPELINE_RUN_INPUT_FILE_UUID,
-        },
-    ],
+    "inputs": [PIPELINE_RUN_INPUT_FILE_JSON],
     "sequence": 1,
     "states": [
         {"created_at": "2020-10-28T22:01:48.951140", "state": "QUEUED"},

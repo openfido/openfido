@@ -18,6 +18,12 @@ from app.pipelines.models import (
     OrganizationPipelineInputFile,
     db,
 )
+from app.workflows.models import (
+    OrganizationWorkflow,
+    OrganizationWorkflowPipeline,
+    OrganizationWorkflowPipelineRun,
+    db,
+)
 from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
@@ -25,6 +31,7 @@ ORGANIZATION_UUID = "4d96f0b6fe9a4872813b3fac7a675505"
 PIPELINE_UUID = "0" * 32
 PIPELINE_RUN_UUID = "d6c42c749a1643aba0217c02e177625f"
 PIPELINE_RUN_INPUT_FILE_UUID = "1a393d3d847d41b4bbf006738bb576c5"
+WORKFLOW_UUID = "da9917748b2f4d71bc82426579b7565c"
 USER_UUID = "ded3f053-d25e-4873-8e38-7fbf9c38"
 JWT_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZGVkM2YwNTMtZDI1ZS00ODczLThlMzgtN2ZiZjljMzgiLCJleHAiOjE2MDMyOTQ3MzYsIm1heC1leHAiOjE2MDU3MTM5MzYsImlzcyI6ImFwcCIsImlhdCI6MTYwMjA4NTEzNn0.YRVky4oynBJRF6XhchCvDzeEqUOxAaki-xPTnXmAd3Y"
 
@@ -74,11 +81,25 @@ def organization_pipeline(app):
 
 
 @pytest.fixture
-def organization_pipeline_input_file(app, organization_pipeline):
+def organization_workflow(app):
+    ow = OrganizationWorkflow(
+        organization_uuid=ORGANIZATION_UUID, workflow_uuid=WORKFLOW_UUID
+    )
+    db.session.add(ow)
+    db.session.commit()
+
+    return ow
+
+
+@pytest.fixture
+def organization_pipeline_input_file(
+    app, organization_pipeline, organization_pipeline_run
+):
     opif = OrganizationPipelineInputFile(
         uuid=PIPELINE_RUN_INPUT_FILE_UUID,
         organization_pipeline_id=organization_pipeline.id,
         name=f"{PIPELINE_UUID}organization_pipeline_input_file.csv",
+        organization_pipeline_run_id=organization_pipeline_run.id,
     )
     db.session.add(opif)
     db.session.commit()
