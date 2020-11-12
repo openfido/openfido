@@ -120,13 +120,21 @@ const DataVisualization = ({
           <section>
             <StyledH4 color="black">{title}</StyledH4>
             {chart_type_code === chartTypes.IMAGE_CHART && (
-            <img src={artifact.url} alt={artifact.name} width="100%" />
+              <img src={artifact.url} alt={artifact.name} width="100%" />
             )}
             {chart_type_code === chartTypes.LINE_CHART && (
-            <TimeSeriesChart type={chart_type_code} config={chart_config} />
+              <TimeSeriesChart
+                type={chart_type_code}
+                config={chart_config}
+                artifact={artifact}
+              />
             )}
             {chart_type_code === chartTypes.BAR_CHART && (
-            <TimeSeriesChart type={chart_type_code} config={chart_config} />
+              <TimeSeriesChart
+                type={chart_type_code}
+                config={chart_config}
+                artifact={artifact}
+              />
             )}
           </section>
         ))}

@@ -86,7 +86,7 @@ const AxesList = styled.div`
 `;
 
 const ConfigChartStep = ({
-  onNextClicked, chartType,
+  selectedArtifact, chartType, onNextClicked,
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
@@ -222,7 +222,12 @@ const ConfigChartStep = ({
           className={titleError && 'invalid'}
         />
         <section>
-          <TimeSeriesChart type={chartType} config={chartConfig} height={231} />
+          <TimeSeriesChart
+            type={chartType}
+            config={chartConfig}
+            artifact={selectedArtifact}
+            height={231}
+          />
         </section>
         <AxesList>
           <div>
@@ -291,6 +296,11 @@ const ConfigChartStep = ({
 };
 
 ConfigChartStep.propTypes = {
+  selectedArtifact: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    uuid: PropTypes.string.isRequired,
+  }).isRequired,
   onNextClicked: PropTypes.func.isRequired,
   chartType: PropTypes.string.isRequired,
 };

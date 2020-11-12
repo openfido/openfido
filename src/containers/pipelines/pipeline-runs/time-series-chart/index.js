@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from 'recharts';
 
+import { requestArtifact } from 'services';
 import {
   chartTypes, mockData, chartFills, chartStrokes, XAXIS, YAXIS,
 } from 'config/charts';
@@ -20,14 +21,21 @@ import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
-const TimeSeriesChart = ({ type, config, height }) => {
+const TimeSeriesChart = ({
+  type, config, height, artifact,
+}) => {
   const axesComponents = [];
   const dataComponents = [];
+
+  requestArtifact(artifact)
+    .then(() => {
+      // parse csv data
+    });
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     config[YAXIS].forEach((axis, index) => {
       switch (true) {
-        case /.\d/.test(axis): // tariff
+        case /.\d/.test(axis): // tariff - Energy Used (kWh)
           axesComponents.push((
             <YAxis
               key={`yAxis${axis}`}
@@ -59,10 +67,10 @@ const TimeSeriesChart = ({ type, config, height }) => {
       }
 
       switch (type) {
-        case chartTypes.LINE_CHART:
+        case chartTypes.LINE_CHART: // TODO: toggle Area
           dataComponents.push(<Area key={`area${axis}`} dataKey={axis} dot={false} fill={chartFills[index]} stroke={chartStrokes[index]} />);
           break;
-        case chartTypes.BAR_CHART:
+        case chartTypes.BAR_CHART: // TODO: bar column legend
           dataComponents.push(<Bar key={`bar${axis}`} dataKey={axis} dot={false} fill={chartFills[index]} stroke={chartStrokes[index]} />);
           break;
         default:
@@ -154,6 +162,11 @@ TimeSeriesChart.propTypes = {
   config: PropTypes.shape({
     [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  artifact: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    uuid: PropTypes.string.isRequired,
   }).isRequired,
   height: PropTypes.number,
 };

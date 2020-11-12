@@ -118,6 +118,7 @@ const AddChartPopup = ({
       )}
       {step === 3 && !isImage && (
         <ConfigChartStep
+          selectedArtifact={selectedArtifact}
           chartType={chartType}
           onNextClicked={onAddChartClicked}
         />
