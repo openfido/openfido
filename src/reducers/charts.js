@@ -18,9 +18,14 @@ export default (state = DEFAULT_STATE, action) => {
 
   switch (action.type) {
     case GET_CHARTS: {
+      const { pipeline_run_uuid, charts } = action.payload; // TODO: formatted graph data
+
       return {
         ...state,
-        charts: action.payload || [],
+        charts: {
+          ...state.charts,
+          [pipeline_run_uuid]: charts,
+        },
       };
     }
     case GET_CHARTS_FAILED:

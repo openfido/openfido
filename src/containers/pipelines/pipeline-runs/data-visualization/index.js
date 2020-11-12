@@ -43,6 +43,10 @@ const StyledDataVisualization = styled.div`
     line-height: 1.3125rem;
     padding: 24px 28px;
     padding: 1.5rem 1.75rem;
+    h4 {
+      margin-bottom: 40px;
+      margin-bottom: 2.5rem;
+    }
   }
 `;
 
@@ -108,9 +112,9 @@ const DataVisualization = ({
         >
           Add A Chart
         </AddChartButton>
-        {pipelineRunCharts && pipelineRunCharts.map(({ artifact, title }) => (
+        {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
           <section>
-            <StyledH4>{title}</StyledH4>
+            <StyledH4 color="gray">{title}</StyledH4>
             <img src={artifact.url} alt={artifact.name} width="100%" />
           </section>
         ))}
