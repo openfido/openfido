@@ -13,29 +13,103 @@ import {
   Tooltip,
 } from 'recharts';
 
-import { chartTypes, mockData } from 'config/charts';
+import {
+  chartTypes, mockData, chartFills, chartStrokes, XAXIS, YAXIS,
+} from 'config/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
-const TimeSeriesChart = ({ type, height }) => {
+const TimeSeriesChart = ({ type, config, height }) => {
+  const axesComponents = [];
   const dataComponents = [];
 
-  switch (type) {
-    case chartTypes.LINE_CHART:
-      dataComponents.push(<Area dataKey="L4" dot={false} fill={colors.chartBlue} stroke={colors.chartBlue} />);
-      dataComponents.push(<Area dataKey="L3" dot={false} fill={colors.chartGray} stroke={colors.chartGrayStroke} />);
-      dataComponents.push(<Area dataKey="L2" dot={false} fill={colors.chartGreen} stroke={colors.chartGreen} />);
-      dataComponents.push(<Area dataKey="L1" dot={false} fill={colors.chartYellow} stroke={colors.chartYellow} />);
-      break;
-    case chartTypes.BAR_CHART:
-      dataComponents.push(<Bar dataKey="L4" dot={false} fill={colors.chartBlue} stroke={colors.chartBlue} />);
-      dataComponents.push(<Bar dataKey="L3" dot={false} fill={colors.chartGray} stroke={colors.chartGrayStroke} />);
-      dataComponents.push(<Bar dataKey="L2" dot={false} fill={colors.chartGreen} stroke={colors.chartGreen} />);
-      dataComponents.push(<Bar dataKey="L1" dot={false} fill={colors.chartYellow} stroke={colors.chartYellow} />);
-      break;
-    default:
-      break;
+  if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
+    config[YAXIS].forEach((axis, index) => {
+      switch (true) {
+        case /.\d/.test(axis): // tariff
+          axesComponents.push((
+            <YAxis
+              key={`yAxis${axis}`}
+              type="number"
+              interval="preserveStartEnd"
+              fontSize={12}
+              style={{ fontWeight: '500', fill: colors.gray10 }}
+              angle={-90}
+              tickLine={false}
+              tickSize={0}
+              tickCount={5}
+              tick={CustomYAxisTick}
+              stroke={colors.gray10}
+            >
+              <Label
+                angle={-90}
+                value="Energy Used (kWh)"
+                position="insideLeft"
+                offset={-16}
+                style={{
+                  textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
+                }}
+              />
+            </YAxis>
+          ));
+          break;
+        default:
+          break;
+      }
+
+      switch (type) {
+        case chartTypes.LINE_CHART:
+          dataComponents.push(<Area key={`area${axis}`} dataKey={axis} dot={false} fill={chartFills[index]} stroke={chartStrokes[index]} />);
+          break;
+        case chartTypes.BAR_CHART:
+          dataComponents.push(<Bar key={`bar${axis}`} dataKey={axis} dot={false} fill={chartFills[index]} stroke={chartStrokes[index]} />);
+          break;
+        default:
+          break;
+      }
+    });
+
+    config[XAXIS].forEach((axis) => {
+      switch (axis) {
+        case 'datetime':
+          axesComponents.push((
+            <XAxis
+              key={`xAxis${axis}`}
+              dataKey={axis}
+              scale="time"
+              type="number"
+              interval="preserveStart"
+              domain={['auto', 'auto']}
+              fontSize={10}
+              style={{ fontWeight: '500', fill: colors.gray10 }}/*
+          label={{
+            'L1': 'DateTime', position: 'insideBottom', offset: -32, fill: colors.gray,
+          }} */
+              tickLine={false}
+              tickSize={0}
+              tick={CustomXAxisTick}
+            />
+          ));
+          break;
+        default:
+          axesComponents.push((
+            <XAxis
+              key={`xAxis${axis}`}
+              dataKey={axis}
+              fontSize={10}
+              style={{ fontWeight: '500', fill: colors.gray10 }}/*
+          label={{
+            'L1': 'DateTime', position: 'insideBottom', offset: -32, fill: colors.gray,
+          }} */
+              tickLine={false}
+              tickSize={0}
+              stroke={colors.gray10}
+            />
+          ));
+          break;
+      }
+    });
   }
 
   return (
@@ -54,44 +128,7 @@ const TimeSeriesChart = ({ type, height }) => {
         }}
       >
         <CartesianGrid stroke="rgba(112, 112, 112, 0.2)" vertical={false} />
-        <XAxis
-          dataKey="timestamp"
-          scale="time"
-          type="number"
-          interval="preserveStart"
-          domain={['auto', 'auto']}
-          fontSize={10}
-          style={{ fontWeight: '500', fill: colors.gray10 }}/*
-          label={{
-            'L1': 'DateTime', position: 'insideBottom', offset: -32, fill: colors.gray,
-          }} */
-          tickLine={false}
-          tickSize={0}
-          tick={CustomXAxisTick}
-          stroke={colors.gray10}
-        />
-        <YAxis
-          type="number"
-          interval="preserveStartEnd"
-          fontSize={12}
-          style={{ fontWeight: '500', fill: colors.gray10 }}
-          angle={-90}
-          tickLine={false}
-          tickSize={0}
-          tickCount={5}
-          tick={CustomYAxisTick}
-          stroke={colors.gray10}
-        >
-          <Label
-            angle={-90}
-            value="Energy Used (kWh)"
-            position="insideLeft"
-            offset={-16}
-            style={{
-              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-            }}
-          />
-        </YAxis>
+        {axesComponents}
         {dataComponents}
         <Tooltip
           labelFormatter={(value) => moment.unix(value).format('M/D/YYYY h:mm:ss A')}
@@ -115,6 +152,10 @@ const TimeSeriesChart = ({ type, height }) => {
 
 TimeSeriesChart.propTypes = {
   type: PropTypes.string.isRequired,
+  config: PropTypes.shape({
+    [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
+    [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
   height: PropTypes.number,
 };
 

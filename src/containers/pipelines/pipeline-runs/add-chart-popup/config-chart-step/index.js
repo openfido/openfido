@@ -85,11 +85,13 @@ const ConfigChartStep = ({
   const [yAxis, setYAxis] = useState([]);
   const [title, setTitle] = useState('');
 
+  const chartConfig = {
+    [XAXIS]: xAxis,
+    [YAXIS]: yAxis,
+  };
+
   const onAddChartClicked = () => {
-    onNextClicked(title, {
-      [XAXIS]: xAxis,
-      [YAXIS]: yAxis,
-    });
+    onNextClicked(title, chartConfig);
   };
 
   const addAxis = (axis, setAxis, item) => {
@@ -206,7 +208,7 @@ const ConfigChartStep = ({
           onChange={(e) => setTitle(e.target.value)}
         />
         <section>
-          <TimeSeriesChart type={chartType} height={231} />
+          <TimeSeriesChart type={chartType} config={chartConfig} height={231} />
         </section>
         <AxesList>
           <div>
