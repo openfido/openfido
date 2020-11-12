@@ -73,14 +73,15 @@ const OverviewSection = styled.section`
 const InputFilesSection = styled.section`
   grid-column: 2;
   grid-row: 2;
-  width: 318px;
+  width: 314px;
   min-height: 429px;
+  padding: 0;
 `;
 
 const ArtifactsSection = styled.section`
   grid-column: 3;
   grid-row: 2;
-  width: 318px;
+  width: 314px;
   min-height: 429px;
 `;
 

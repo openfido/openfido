@@ -11,6 +11,8 @@ const ArtifactsList = styled.ul`
   padding: 0;
   margin: 12px 0;
   margin: 0.75rem 0;
+  overflow-y: overlay;
+  max-height: min(250px, calc(50vh - 60px));
   li {
     background-color: ${colors.white};
     &:not(:last-child) {

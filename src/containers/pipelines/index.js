@@ -91,11 +91,9 @@ const Pipelines = () => {
           </h1>
         </div>
       </StyledTitle>
-      <Space direction="vertical" size={16}>
-        {showGetStartedPopup && (
-          <CreatePipelinePopup handleOk={openAddPipelines} />
-        )}
-      </Space>
+      {showGetStartedPopup && (
+        <CreatePipelinePopup handleOk={openAddPipelines} />
+      )}
       {showAddPipelines && (
       <AddPipeline
         handleSuccess={handleAddPipelineSuccess}

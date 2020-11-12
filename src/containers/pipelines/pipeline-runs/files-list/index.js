@@ -19,14 +19,17 @@ const StyledFilesList = styled.div`
   h3 {
     margin-left: 0.25rem;
     margin-top: 1rem;
+    margin-right: 0.75rem;
     display: flex;
     justify-content: space-between;
   }
   ul {
     list-style-type: none;
     padding: 0;
-    margin: 16px 0;
-    margin: 1rem 0;
+    margin: 16px -28px;
+    margin: 1rem -1.75rem 0 0;
+    overflow-y: overlay;
+    max-height: 336px;
     li {
       display: flex;
       justify-content: space-between;
@@ -34,8 +37,8 @@ const StyledFilesList = styled.div`
       font-size: 1rem;
       line-height: 19px;
       line-height: 1.195rem;
-      padding: 12px 0 12px 4px;
-      padding: 0.75rem 0 0.75rem 0.25rem;
+      padding: 12px 2.75rem 12px 4px;
+      padding: 0.75rem 2.75rem 0.75rem 0.25rem;
       color: ${colors.gray};
       white-space: nowrap;
       a {
