@@ -62,11 +62,9 @@ def find_latest_organization_pipeline_run(organization_pipeline_id):
     return (
         OrganizationPipelineRun.query.join(OrganizationPipeline)
         .filter(
-            and_(
-                OrganizationPipelineRun.organization_pipeline_id
-                == OrganizationPipeline.id,
-                OrganizationPipeline.is_deleted == False,
-            )
+            OrganizationPipelineRun.organization_pipeline_id
+            == organization_pipeline_id,
+            OrganizationPipeline.is_deleted == False,
         )
         .order_by(OrganizationPipelineRun.created_at.desc())
         .first()
