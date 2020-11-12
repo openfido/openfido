@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { Dropdown, Space } from 'antd';
 import styled from 'styled-components';
 
-import { XAXIS, YAXIS, AXES_LIMIT } from 'config/charts';
+import {
+  XAXIS, YAXIS, AXES_LIMIT, CHART_TITLE_LENGTH_LIMIT,
+} from 'config/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { PopupButton } from 'styles/pipeline-runs';
 import {
@@ -16,6 +18,7 @@ const ConfigChartForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 570px;
   section {
     border-radius: 6px;
     background-color: ${colors.white};
@@ -26,7 +29,11 @@ const ConfigChartForm = styled.div`
     margin: 24px auto 0 auto;
     margin: 1.5rem auto 0 auto;
   }
-  min-height: 570px;
+  input.invalid {
+    &::placeholder {
+      color: ${colors.pink};
+    }
+  }
 `;
 
 const AxisItem = styled.div`
@@ -84,6 +91,7 @@ const ConfigChartStep = ({
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
   const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState(false);
 
   const chartConfig = {
     [XAXIS]: xAxis,
@@ -91,7 +99,12 @@ const ConfigChartStep = ({
   };
 
   const onAddChartClicked = () => {
-    onNextClicked(title, chartConfig);
+    if (title && title.length && title.length < CHART_TITLE_LENGTH_LIMIT) {
+      onNextClicked(title, chartConfig);
+      setTitleError(false);
+    } else {
+      setTitleError(true);
+    }
   };
 
   const addAxis = (axis, setAxis, item) => {
@@ -206,6 +219,7 @@ const ConfigChartStep = ({
           bgcolor="white"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className={titleError && 'invalid'}
         />
         <section>
           <TimeSeriesChart type={chartType} config={chartConfig} height={231} />

@@ -120,11 +120,12 @@ FilesList.propTypes = {
     name: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
   })),
-  pipelineRunStatus: PropTypes.string.isRequired,
+  pipelineRunStatus: PropTypes.string,
 };
 
 FilesList.defaultProps = {
   files: [],
+  pipelineRunStatus: null,
 };
 
 export default FilesList;

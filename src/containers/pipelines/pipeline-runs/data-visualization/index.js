@@ -114,18 +114,20 @@ const DataVisualization = ({
         >
           Add A Chart
         </AddChartButton>
-        <section>
-          <StyledH4 color="gray">Load Profile by Composition</StyledH4>
-          <TimeSeriesChart type={chartTypes.LINE_CHART} />
-        </section>
-        <section>
-          <StyledH4 color="gray">Load Profile by Composition</StyledH4>
-          <TimeSeriesChart type={chartTypes.BAR_CHART} />
-        </section>
-        {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
+        {pipelineRunCharts && pipelineRunCharts.map(({
+          artifact, name: title, chart_type_code, chart_config,
+        }) => (
           <section>
             <StyledH4 color="black">{title}</StyledH4>
+            {chart_type_code === chartTypes.IMAGE_CHART && (
             <img src={artifact.url} alt={artifact.name} width="100%" />
+            )}
+            {chart_type_code === chartTypes.LINE_CHART && (
+            <TimeSeriesChart type={chart_type_code} config={chart_config} />
+            )}
+            {chart_type_code === chartTypes.BAR_CHART && (
+            <TimeSeriesChart type={chart_type_code} config={chart_config} />
+            )}
           </section>
         ))}
       </StyledDataVisualization>

@@ -118,7 +118,6 @@ const TimeSeriesChart = ({ type, config, height }) => {
       height={height}
     >
       <ComposedChart
-        width="100%"
         height={height}
         data={mockData}
         margin={{

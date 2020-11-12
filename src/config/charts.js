@@ -26,6 +26,8 @@ export const chartStrokes = [
   colors.chartYellow,
 ];
 
+export const CHART_TITLE_LENGTH_LIMIT = 128;
+
 // todo: to csv.
 // strings.
 export const mockData = [
