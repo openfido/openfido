@@ -304,7 +304,7 @@ def test_update_workflow_backend_error(
 
 
 @responses.activate
-def test_get_workflow(app, client, client_application, organization_workflow):
+def test_update_workflow(app, client, client_application, organization_workflow):
     json_response = dict(WORKFLOW_JSON)
     updates = {"name": "123", "description": "456"}
     json_response.update(updates)

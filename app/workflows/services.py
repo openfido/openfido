@@ -140,4 +140,4 @@ def update_workflow(organization_uuid, workflow_uuid, request_json):
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(json_value) from http_error
+        raise ValueError(workflow) from http_error
