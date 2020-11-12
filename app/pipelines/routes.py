@@ -656,7 +656,7 @@ def create_chart(
     methods=["GET"],
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def get_charts(
     organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
 ):

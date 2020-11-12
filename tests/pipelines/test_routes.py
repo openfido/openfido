@@ -1143,7 +1143,6 @@ def test_get_charts(
 
     result = client.get(
         f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts",
-        content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
