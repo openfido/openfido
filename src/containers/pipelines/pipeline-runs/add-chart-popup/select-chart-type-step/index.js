@@ -44,7 +44,7 @@ const SelectChartTypeStep = ({ onNextClicked, setChartType }) => {
 
   return (
     <form>
-      <StyledH4 color="darkText">Select an artifact</StyledH4>
+      <StyledH4 color="darkText">Select a chart type</StyledH4>
       <ChartTypesList>
         <li>
           <StyledButton type="text" size="middle" textcolor="darkText" onClick={() => setChartType(chartTypes.LINE_CHART)}>
