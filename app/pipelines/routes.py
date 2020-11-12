@@ -1,23 +1,24 @@
 import logging
 
 from flask import Blueprint, jsonify, request
+
+from app.utils import any_application_required, validate_organization
+from marshmallow.exceptions import ValidationError
 from requests import HTTPError
 
-from app.utils import validate_organization, any_application_required
-
+from .queries import find_organization_pipeline, find_organization_pipeline_run
 from .services import (
-    fetch_pipelines,
+    create_artifact_chart,
     create_pipeline,
-    update_pipeline,
-    delete_pipeline,
     create_pipeline_input_file,
-    fetch_pipeline_run,
-    fetch_pipeline_runs,
     create_pipeline_run,
+    delete_pipeline,
+    fetch_pipeline_run,
     fetch_pipeline_run_console,
+    fetch_pipeline_runs,
+    fetch_pipelines,
+    update_pipeline,
 )
-
-from .queries import find_organization_pipeline
 
 logger = logging.getLogger("organization-pipelines")
 
@@ -553,3 +554,97 @@ def pipeline_run_console(
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/charts",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization()
+def create_chart(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Create an Artifact Chart for an Organization Pipeline Run
+    ---
+    tags:
+      - pipeline run charts
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        schema:
+          type: string
+    requestBody:
+      description: "Pipeline Run Chart and Configuration."
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              artifact_uuid:
+                type: string
+              chart_type_code:
+                type: string
+              chart_config:
+                type: string
+    responses:
+      "200":
+        description: "Created"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                chart_type_code:
+                  type: string
+                artifact:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                    name:
+                      type: string
+                    url:
+                      type: string
+                chart_config:
+                  type: object
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+
+    organization_pipeline_run = find_organization_pipeline_run(
+        organization_pipeline.id, organization_pipeline_run_uuid
+    )
+
+    if not organization_pipeline_run:
+        return {"message": "No such pipeline run found"}, 400
+
+    try:
+        artifact_chart = create_artifact_chart(organization_pipeline_run, request.json)
+        return jsonify(artifact_chart)
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+    except ValidationError as validation_err:
+        return {"message": "Validation error", "errors": validation_err.messages}, 400

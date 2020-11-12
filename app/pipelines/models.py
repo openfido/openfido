@@ -1,4 +1,4 @@
-from application_roles.model_utils import get_db, CommonColumnsMixin
+from application_roles.model_utils import CommonColumnsMixin, get_db
 
 db = get_db()
 
@@ -66,6 +66,28 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
         backref="organization_pipeline_run",
         lazy="immediate",
     )
+
+    artifact_charts = db.relationship(
+        "ArtifactChart",
+        backref="organization_pipeline_run",
+        lazy="select",
+    )
+
+
+class ArtifactChart(CommonColumnsMixin, db.Model):
+    """ A pipeline run within an organization """
+
+    __tablename__ = "artifact_chart"
+
+    name = db.Column(db.String(128), nullable=False)
+
+    organization_pipeline_run_id = db.Column(
+        db.Integer, db.ForeignKey("organization_pipeline_run.id"), nullable=False
+    )
+
+    artifact_uuid = db.Column(db.String(32), nullable=False)
+    chart_type_code = db.Column(db.String(20), nullable=False)
+    chart_config = db.Column(db.JSON(), nullable=False)
 
 
 class PostProcessingState(CommonColumnsMixin, db.Model):

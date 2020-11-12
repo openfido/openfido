@@ -1,16 +1,19 @@
 import uuid
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-import requests
-from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME, S3_BUCKET
-from application_roles.decorators import ROLES_KEY
-from blob_utils import upload_stream, create_url
 from flask import current_app
-from requests import HTTPError
 from werkzeug.utils import secure_filename
 
+import requests
+from app.constants import S3_BUCKET, WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
+from application_roles.decorators import ROLES_KEY
+from blob_utils import create_url, upload_stream
+from requests import HTTPError
+
+from ..utils import make_hash
+from .schemas import CreateArtifactChart
 from .models import (
+    ArtifactChart,
     OrganizationPipeline,
     OrganizationPipelineInputFile,
     OrganizationPipelineRun,
@@ -18,14 +21,13 @@ from .models import (
 )
 from .queries import (
     find_organization_pipeline,
-    find_organization_pipelines,
     find_organization_pipeline_input_files,
     find_organization_pipeline_run,
+    find_organization_pipelines,
     find_latest_organization_pipeline_run,
     search_organization_pipeline_input_files,
     search_organization_pipeline_runs,
 )
-from ..utils import make_hash
 
 
 def create_pipeline(organization_uuid, request_json):
@@ -263,6 +265,48 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(created_pipeline) from http_error
+
+
+def create_artifact_chart(organization_pipeline_run, chart_json):
+    """Create an Artifact Chart for a OrganizationPipelineRun.
+
+    Raises a ValidationError if chart_json is not valid.
+    Raises a ValueError if an Artifact cannot be found on the workflow service.
+
+    Returns JSON appropriate  to the 'create artifact chart' endpoint.
+    """
+    data = CreateArtifactChart().load(chart_json)
+
+    pipeline_run = fetch_pipeline_run(
+        organization_pipeline_run.organization_pipeline.organization_uuid,
+        organization_pipeline_run.organization_pipeline.uuid,
+        organization_pipeline_run.uuid,
+    )
+    artifact = next(
+        (a for a in pipeline_run["artifacts"] if a["uuid"] == data["artifact_uuid"]),
+        None,
+    )
+    if artifact is None:
+        raise ValueError("Could not find artifact in Pipeline")
+
+    chart = ArtifactChart(
+        name=data["name"],
+        artifact_uuid=data["artifact_uuid"],
+        chart_type_code=data["chart_type_code"],
+        chart_config=data["chart_config"],
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    return {
+        "uuid": chart.uuid,
+        "name": chart.name,
+        "artifact": artifact,
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": chart.chart_config,
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
 
 
 def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
