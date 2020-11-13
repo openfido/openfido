@@ -15,7 +15,7 @@ import {
 
 import { requestArtifact } from 'services';
 import {
-  chartTypes, mockData, chartFills, chartStrokes, XAXIS, YAXIS,
+  chartTypes, chartFills, chartStrokes, XAXIS, YAXIS,
 } from 'config/charts';
 import { parseCsvData } from 'util/charts';
 import colors from 'styles/colors';
@@ -52,8 +52,6 @@ const TimeSeriesChart = ({
 
         if (sendChartData) sendChartData(data);
       };
-
-      parseCsvData(mockData, useChartData); // TODO: remove mock CSV data
 
       requestArtifact(artifact)
         .then((response) => {
