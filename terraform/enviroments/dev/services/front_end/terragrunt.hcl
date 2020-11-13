@@ -11,16 +11,3 @@ terraform {
     ]
   }
 }
-
-// Dependency's for this terraform
-dependency "vpc" {
-  config_path = "../../vpc"
-}
-
-// Input values
-inputs = {
-  vpc_id              = dependency.vpc.outputs.vpc_id
-  vpc_default_sg      = dependency.vpc.outputs.vpc_default_sg
-  vpc_public_subnets  = dependency.vpc.outputs.vpc_public_subnets
-  vpc_private_subnets = dependency.vpc.outputs.vpc_private_subnets
-}

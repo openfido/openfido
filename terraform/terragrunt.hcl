@@ -6,11 +6,11 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config  = {
-    bucket         = "openfido-remote-state"
-    dynamodb_table = "openfido-remote-state-lock"
+    bucket         = "openfido-${get_env("TF_VAR_environment")}-remote-state"
+    dynamodb_table = "openfido-${get_env("TF_VAR_environment")}-remote-state-lock"
     key            = "${path_relative_to_include()}/terraform.tfstate"
-    region         = "us-east-1"
-    profile        = "openfido"
+    region         = get_env("TF_VAR_aws_region")
+    profile        = get_env("TF_VAR_aws_profile")
     encrypt        = true
   }
 }

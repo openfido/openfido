@@ -1,5 +1,5 @@
 module "cf" {
-  source = "../../../../../../../Presence/tf-module-cf"
+  source = "git@github.com:PresencePG/presence-devops-module-cloudfront.git?ref=0.1.0"
 
   environment         = local.env
   tags                = local.tags

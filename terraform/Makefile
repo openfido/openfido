@@ -5,6 +5,15 @@
 arg1 := $(word 1,$(MAKECMDGOALS))
 
 export TF_VAR_environment=$(arg1)
+export TF_VAR_aws_region=us-east-1
+export TF_VAR_aws_profile=openfido-$(arg1)
+
+# ******************** Domains ******************** #
+openfido: export TF_VAR_environment=prod
+openfido: export TF_VAR_aws_profile=openfido-prod
+openfido:
+	@echo "Running "$c" on openfido.org"
+	cd domains/openfido/; terragrunt $c
 
 ## ********** Environments where it can run ********** #
 dev stage prod:
@@ -27,6 +36,7 @@ destroy:
 	@echo "Running destroy-all on $(arg1)"
 	cd enviroments/$(arg1)/; terragrunt destroy-all
 
+# ******************** Environments ******************** #
 # ********** vpc ********** #
 vpc:
 	@echo "Running "$c" on $(arg1) vpc"
