@@ -110,11 +110,15 @@ const ConfigChartStep = ({
     }
   };
 
-  const addAxis = (axis, setAxis, item) => {
+  const addAxis = (axis, setAxis, item, replace) => {
     if (axis.length < AXES_LIMIT) {
-      const axes = axis.filter((axisItem) => axisItem !== item);
-      axes.push(item);
-      setAxis(axes);
+      if (replace) {
+        setAxis([item]);
+      } else {
+        const axes = axis.filter((axisItem) => axisItem !== item);
+        axes.push(item);
+        setAxis(axes);
+      }
     }
   };
 
@@ -130,7 +134,7 @@ const ConfigChartStep = ({
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
           hovercolor="white"
-          onClick={() => addAxis(xAxis, setXAxis, axis)}
+          onClick={() => addAxis(xAxis, setXAxis, axis, true)}
         >
           <span>{axis}</span>
         </StyledMenuItem>
@@ -185,12 +189,9 @@ const ConfigChartStep = ({
                 </StyledButton>
               </Dropdown>
             </Space>
-            {xAxis && xAxis.map((axisItem, axisIndex) => (
+            {xAxis && xAxis.map((axisItem) => (
               <AxisItem key={axisItem} title={axisItem}>
                 <Space size={25}>
-                  <StyledText color="lightGray" fontweight="500">
-                    {`Column ${axisIndex + 1}`}
-                  </StyledText>
                   {axisItem}
                 </Space>
                 <CloseOutlined color="lightGray" onClick={() => removeAxis(xAxis, setXAxis, axisItem)} />
