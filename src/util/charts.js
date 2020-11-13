@@ -14,8 +14,8 @@ export const parseCsvData = (data, callback) => {
       const rowData = { ...row };
 
       Object.keys(rowData).forEach((column) => {
-        if (rowData[column].match(/^\d+$/)) { // number type
-          rowData[column] = parseInt(rowData[column], 10);
+        if (rowData[column].match(/^-?[0-9]+([,.][0-9]+)?$/)) { // number type
+          rowData[column] = parseFloat(rowData[column]);
           if (!(column in chartTypes)) chartTypes[column] = 'number'; // interpolate type and scale from first row
           if (!(column in chartScale)) chartScale[column] = 'linear';
         } else if (moment(rowData[column]).isValid()) { // datetime type

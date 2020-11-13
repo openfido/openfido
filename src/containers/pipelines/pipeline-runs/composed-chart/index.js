@@ -33,11 +33,17 @@ const TimeSeriesChart = ({
   const [computedChartScales, setComputedChartScales] = useState({});
 
   const axesFormatter = (value) => {
-    if (value.toString().length === 10) {
+    const valueString = value.toString();
+
+    if (valueString.length === 10) {
       const dataValue = moment.unix(value);
       if (dataValue.isValid()) {
         return moment.unix(value).format('M/D/YYYY h:mm:ss A');
       }
+    }
+
+    if (valueString.match(/^-?[0-9]+([,.][0-9]+)?$/)) {
+      return parseFloat(value).toFixed(4);
     }
 
     return value;
@@ -159,7 +165,7 @@ const TimeSeriesChart = ({
           key="yAxisNumber"
           type="number"
           scale={computedChartScales[allNumberYAxes[0]] || 'auto'}
-          interval="preserveStartEnd"
+          interval={0}
           yAxisId="number"
           fontSize={12}
           style={{ fontWeight: '500', fill: colors.gray10 }}
@@ -167,8 +173,9 @@ const TimeSeriesChart = ({
           tickLine={false}
           tickSize={0}
           tickCount={5}
-          tick={CustomYAxisTick}
+          tick={<CustomYAxisTick isNumber />}
           stroke={colors.gray10}
+          allowDecimals
         >
           <Label
             angle={-90}

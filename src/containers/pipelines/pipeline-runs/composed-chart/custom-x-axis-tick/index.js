@@ -14,21 +14,16 @@ const CustomXAxisTick = (props) => {
 
   const rectWidth = width / visibleTicksCount;
 
-  const showMonth = payload && (
-    !moment.unix(payload.value).startOf('month').diff(tickValue)
-      || !moment.unix(payload.value).endOf('month').diff(tickValue)
-  );
+  const dateOffset = isTimestamp ? 28 : 22;
 
-  const dateOffset = showMonth ? 28 : 22;
-
-  const dateFontSize = showMonth ? 10 : 12;
+  const dateFontSize = isTimestamp ? 10 : 12;
 
   return [
-    showMonth && isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontWeight={300} fontSize={12}>{tickValue.format('MMM')}</Text>
+    isTimestamp && (
+      <Text textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontWeight={300} fontSize={12}>{tickValue.format('MMM D')}</Text>
     ),
     isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x} y={y + dateOffset} style={style} fontSize={dateFontSize}>{tickValue.format('D')}</Text>
+      <Text textAnchor="middle" fill={fill} x={x} y={y + dateOffset} style={style} fontSize={dateFontSize}>{tickValue.format('h:mm A')}</Text>
     ),
     !isTimestamp && (
       <Text textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>{tickValue}</Text>
