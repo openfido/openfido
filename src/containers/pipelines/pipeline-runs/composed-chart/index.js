@@ -46,7 +46,7 @@ const TimeSeriesChart = ({
 
       requestArtifact(artifact)
         .then((response) => {
-          parseCsvData(response.data);
+          parseCsvData(response.data, useChartData);
         });
     }
   }, [computedChartData, artifact, sendChartData]);
