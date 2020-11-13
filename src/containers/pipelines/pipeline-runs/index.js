@@ -159,9 +159,9 @@ const PipelineRuns = () => {
               consoleOutputReady={!!pipelineRunSelected}
             />
             {pipelineRunSelected && (
-            <Overview
-              pipelineRunSelected={pipelineRunSelected}
-            />
+              <Overview
+                pipelineRunSelected={pipelineRunSelected}
+              />
             )}
           </OverviewSection>
           <InputFilesSection>

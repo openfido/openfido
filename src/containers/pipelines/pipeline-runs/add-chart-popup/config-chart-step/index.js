@@ -85,6 +85,11 @@ const AxesList = styled.div`
   }
 `;
 
+const ColumnMenu = styled(StyledMenu)`
+  max-height: 200px;
+  overflow-y: scroll;
+`;
+
 const ConfigChartStep = ({
   selectedArtifact, chartType, onNextClicked,
 }) => {
@@ -128,7 +133,7 @@ const ConfigChartStep = ({
   };
 
   const xAxisMenu = (
-    <StyledMenu>
+    <ColumnMenu>
       {listAxesFromData.map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
@@ -139,11 +144,11 @@ const ConfigChartStep = ({
           <span>{axis}</span>
         </StyledMenuItem>
       ))}
-    </StyledMenu>
+    </ColumnMenu>
   );
 
   const yAxisMenu = (
-    <StyledMenu>
+    <ColumnMenu>
       {listAxesFromData.map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
@@ -154,7 +159,7 @@ const ConfigChartStep = ({
           <span>{axis}</span>
         </StyledMenuItem>
       ))}
-    </StyledMenu>
+    </ColumnMenu>
   );
 
   return (
