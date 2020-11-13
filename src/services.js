@@ -144,5 +144,5 @@ export const requestOrganizationPipelineRunCharts = (organization_uuid, pipeline
 );
 
 export const requestArtifact = ({ url }) => (
-  ApiClient.get(url)
+  fetch(url)
 );
