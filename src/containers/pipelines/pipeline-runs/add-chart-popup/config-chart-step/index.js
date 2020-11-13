@@ -90,6 +90,7 @@ const ConfigChartStep = ({
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
+  const [listAxesFromData, setListAxesFromData] = useState([]);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState(false);
 
@@ -97,6 +98,8 @@ const ConfigChartStep = ({
     [XAXIS]: xAxis,
     [YAXIS]: yAxis,
   };
+
+  const sendChartData = (data) => data && data.length && setListAxesFromData(Object.keys(data[0]));
 
   const onAddChartClicked = () => {
     if (title && title.length && title.length < CHART_TITLE_LENGTH_LIMIT) {
@@ -122,91 +125,31 @@ const ConfigChartStep = ({
 
   const xAxisMenu = (
     <StyledMenu>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'datetime')}
-      >
-        <span>datetime</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'L1')}
-      >
-        <span>L1</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'L2')}
-      >
-        <span>L2</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'L3')}
-      >
-        <span>L3</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(xAxis, setXAxis, 'L4')}
-      >
-        <span>L4</span>
-      </StyledMenuItem>
+      {listAxesFromData.map((axis) => (
+        <StyledMenuItem
+          bordercolor="lightBg"
+          hoverbgcolor="darkGray"
+          hovercolor="white"
+          onClick={() => addAxis(xAxis, setXAxis, axis)}
+        >
+          <span>{axis}</span>
+        </StyledMenuItem>
+      ))}
     </StyledMenu>
   );
 
   const yAxisMenu = (
     <StyledMenu>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'datetime')}
-      >
-        <span>datetime</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'L1')}
-      >
-        <span>L1</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'L2')}
-      >
-        <span>L2</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'L3')}
-      >
-        <span>L3</span>
-      </StyledMenuItem>
-      <StyledMenuItem
-        bordercolor="lightBg"
-        hoverbgcolor="darkGray"
-        hovercolor="white"
-        onClick={() => addAxis(yAxis, setYAxis, 'L4')}
-      >
-        <span>L4</span>
-      </StyledMenuItem>
+      {listAxesFromData.map((axis) => (
+        <StyledMenuItem
+          bordercolor="lightBg"
+          hoverbgcolor="darkGray"
+          hovercolor="white"
+          onClick={() => addAxis(yAxis, setYAxis, axis)}
+        >
+          <span>{axis}</span>
+        </StyledMenuItem>
+      ))}
     </StyledMenu>
   );
 
@@ -226,6 +169,7 @@ const ConfigChartStep = ({
             type={chartType}
             config={chartConfig}
             artifact={selectedArtifact}
+            sendChartData={sendChartData}
             height={231}
           />
         </section>

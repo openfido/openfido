@@ -23,23 +23,29 @@ import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
 const TimeSeriesChart = ({
-  type, config, height, artifact,
+  type, config, height, artifact, sendChartData,
 }) => {
   const axesComponents = [];
   const dataComponents = [];
 
   const [chartData, setChartData] = useState(null);
 
+  const useChartData = (data) => {
+    setChartData(data);
+
+    if (sendChartData) sendChartData(data);
+  };
+
   useEffect(() => {
     if (!chartData) {
-      parseCsvData(mockData, setChartData); // TODO: remove mock CSV data
+      parseCsvData(mockData, useChartData); // TODO: remove mock CSV data
 
       requestArtifact(artifact)
         .then((response) => {
-          setChartData(parseCsvData(response.data));
+          parseCsvData(response.data, useChartData);
         });
     }
-  }, [chartData, artifact]);
+  }, [chartData, artifact, useChartData]);
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     config[YAXIS].forEach((axis, index) => {
@@ -172,10 +178,12 @@ TimeSeriesChart.propTypes = {
     uuid: PropTypes.string.isRequired,
   }).isRequired,
   height: PropTypes.number,
+  sendChartData: PropTypes.func,
 };
 
 TimeSeriesChart.defaultProps = {
   height: 264,
+  sendChartData: null,
 };
 
 export default TimeSeriesChart;
