@@ -86,10 +86,15 @@ def fetch_workflows(organization_uuid):
         raise ValueError(json_value) from http_error
 
 
-def fetch_workflow(organization_uuid, workflow_uuid):
+def fetch_workflow(organization_uuid, organization_workflow_uuid):
     """Fetch a Organization Workflow. """
 
-    organization_workflow = find_organization_workflow(organization_uuid, workflow_uuid)
+    organization_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
 
     response = requests.get(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
@@ -103,6 +108,7 @@ def fetch_workflow(organization_uuid, workflow_uuid):
         workflow = response.json()
         response.raise_for_status()
 
+        workflow["uuid"] = organization_workflow_uuid
         return workflow
 
     except ValueError as value_error:
@@ -111,10 +117,12 @@ def fetch_workflow(organization_uuid, workflow_uuid):
         raise ValueError(workflow) from http_error
 
 
-def update_workflow(organization_uuid, workflow_uuid, request_json):
+def update_workflow(organization_uuid, organization_workflow_uuid, request_json):
     """Update an Organization Workflow. """
 
-    organization_workflow = find_organization_workflow(organization_uuid, workflow_uuid)
+    organization_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
 
     if not organization_workflow:
         raise ValueError("Organization Workflow not found.")
@@ -135,9 +143,35 @@ def update_workflow(organization_uuid, workflow_uuid, request_json):
         workflow = response.json()
         response.raise_for_status()
 
+        workflow["uuid"] = organization_workflow.uuid
+
         return workflow
 
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
         raise ValueError(workflow) from http_error
+
+
+def delete_workflow(organization_uuid, organization_workflow_uuid):
+    """Delete a Organization Workflow. """
+
+    organization_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
+
+    response = requests.delete(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    response.raise_for_status()
+
+    organization_workflow.is_deleted = True
+    db.session.commit()

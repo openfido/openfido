@@ -253,12 +253,10 @@ def test_get_workflow(app, client, client_application, organization_workflow):
             ROLES_KEY: client_application.api_key,
         },
     )
-    assert result.status_code == 200
 
-    workflow = OrganizationWorkflow.query.order_by(
-        OrganizationWorkflow.id.desc()
-    ).first()
-    json_response["uuid"] = workflow.workflow_uuid
+    json_response["uuid"] = organization_workflow.uuid
+
+    assert result.status_code == 200
     assert result.json == json_response
 
 
@@ -324,10 +322,68 @@ def test_update_workflow(app, client, client_application, organization_workflow)
             ROLES_KEY: client_application.api_key,
         },
     )
-    assert result.status_code == 200
 
-    workflow = OrganizationWorkflow.query.order_by(
-        OrganizationWorkflow.id.desc()
-    ).first()
-    json_response["uuid"] = workflow.workflow_uuid
+    json_response["uuid"] = organization_workflow.uuid
+
+    assert result.status_code == 200
     assert result.json == json_response
+
+
+@responses.activate
+def test_delete_workflow_invalid_org_workflow(
+    app, client, client_application, organization_workflow
+):
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/1234",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@responses.activate
+def test_delete_workflow_invalid_workflow(
+    app, client, client_application, organization_workflow
+):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json={"not": "found"},
+        status=404,
+    )
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_delete_workflow(app, client, client_application, organization_workflow):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json={},
+    )
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/workflows/{organization_workflow.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 200
+    assert result.json == {}

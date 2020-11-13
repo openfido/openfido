@@ -8,6 +8,7 @@ from app.workflows.models import (
 )
 from app.workflows.services import (
     create_workflow,
+    delete_workflow,
     fetch_workflow,
     fetch_workflows,
     update_workflow,
@@ -124,15 +125,24 @@ def test_fetch_workflows_no_workflows(post_mock, app, organization_workflow):
 
 @responses.activate
 def test_fetch_workflow(app, organization_workflow):
+    json_response = WORKFLOW_JSON
     responses.add(
         responses.GET,
         f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{WORKFLOW_UUID}",
         json=WORKFLOW_JSON,
     )
 
+    json_response["uuid"] = organization_workflow.uuid
+
     assert (
         fetch_workflow(ORGANIZATION_UUID, organization_workflow.uuid) == WORKFLOW_JSON
     )
+
+
+@responses.activate
+def test_fetch_workflow_missing_workflow(app, organization_workflow):
+    with pytest.raises(ValueError):
+        fetch_workflow("12345", organization_workflow.uuid)
 
 
 @responses.activate
@@ -174,10 +184,8 @@ def test_update_workflow(app, organization_workflow):
     updated_workflow = update_workflow(
         ORGANIZATION_UUID, organization_workflow.uuid, updates
     )
-    organization_pipeline = OrganizationWorkflow.query.order_by(
-        OrganizationWorkflow.id.desc()
-    ).first()
-    json_response["uuid"] = updated_workflow.get("uuid")
+
+    json_response["uuid"] = organization_workflow.uuid
     assert updated_workflow == json_response
 
 
@@ -223,3 +231,39 @@ def test_update_workflow_not_found(app, organization_workflow):
 
     with pytest.raises(ValueError):
         update_workflow(ORGANIZATION_UUID, organization_workflow.uuid, updates)
+
+
+def test_delete_workflow_not_found(app, organization_workflow):
+    with pytest.raises(ValueError):
+        delete_workflow(ORGANIZATION_UUID, "1234")
+
+
+@responses.activate
+def test_delete_workflow_not_found_workflow(app, organization_workflow):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json={"error": "not found"},
+        status=404,
+    )
+
+    with pytest.raises(HTTPError):
+        delete_workflow(ORGANIZATION_UUID, organization_workflow.uuid)
+
+
+@responses.activate
+def test_delete_workflow(app, organization_workflow):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}",
+        json={},
+        status=200,
+    )
+
+    delete_workflow(ORGANIZATION_UUID, organization_workflow.uuid)
+
+    org_workflow = OrganizationWorkflow.query.filter(
+        OrganizationWorkflow.uuid == organization_workflow.uuid
+    ).one()
+
+    assert org_workflow.is_deleted
