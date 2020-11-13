@@ -12,7 +12,7 @@ const ArtifactsList = styled.ul`
   margin: 12px 0;
   margin: 0.75rem 0;
   overflow-y: overlay;
-  max-height: min(250px, calc(50vh - 60px));
+  max-height: min(242px, calc(50vh - 60px));
   li {
     background-color: ${colors.white};
     &:not(:last-child) {
@@ -58,7 +58,6 @@ const SelectArtifactStep = ({
                 textcolor="lightBlue"
                 className={selectedArtifact === artifact ? 'selected' : ''}
                 onClick={() => setSelectedArtifact(artifact)}
-                onBlur={(e) => e.preventDefault()}
               >
                 {artifact.name}
               </StyledButton>

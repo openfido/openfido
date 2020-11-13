@@ -23,8 +23,8 @@ const Modal = styled(StyledModal)`
     margin-bottom: 32px;
   }
   .anticon-close-outlined {
-    top: 18px;
-    right: 18px;
+    top: 8px;
+    right: 12px;
   }
   .ant-modal-body {
     padding: 20px 32px 24px 36px;
@@ -52,15 +52,14 @@ const AddChartPopup = ({
   const [step, setStep] = useState(1);
   const [selectedArtifact, setSelectedArtifact] = useState(null);
   const [chartType, setChartType] = useState(null);
-  const [chartConfig, setChartConfig] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
 
-  const onAddChartClicked = (title) => {
-    if (selectedArtifact && chartType && chartConfig) {
+  const onAddChartClicked = (title, chartConfig = null) => {
+    if (selectedArtifact && chartType) {
       dispatch(
         addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
       );
@@ -75,7 +74,6 @@ const AddChartPopup = ({
 
       if (isImage) {
         setChartType(chartTypes.IMAGE_CHART);
-        setChartConfig({});
       }
     }
   };
@@ -92,7 +90,7 @@ const AddChartPopup = ({
       footer={null}
       onOk={handleOk}
       onCancel={handleCancel}
-      closeIcon={<CloseOutlined />}
+      closeIcon={<CloseOutlined color="darkText" />}
       width={690}
       maskStyle={{ position: 'absolute', top: '82px', left: '250px' }}
       style={{ position: 'absolute', top: '179px', left: 'calc(((100vw - 690px + 250px) / 2))' }}
@@ -114,13 +112,14 @@ const AddChartPopup = ({
       )}
       {step === 2 && !isImage && (
         <SelectChartTypeStep
+          chartType={chartType}
           setChartType={setChartType}
           onNextClicked={onChartTypeSelected}
         />
       )}
       {step === 3 && !isImage && (
         <ConfigChartStep
-          setChartConfig={setChartConfig}
+          selectedArtifact={selectedArtifact}
           chartType={chartType}
           onNextClicked={onAddChartClicked}
         />

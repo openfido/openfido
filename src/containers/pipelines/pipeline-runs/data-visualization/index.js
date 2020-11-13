@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { getCharts } from 'actions/charts';
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
+import { chartTypes } from 'config/charts';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
@@ -14,6 +15,7 @@ import colors from 'styles/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
+import TimeSeriesChart from '../composed-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -34,15 +36,15 @@ const StyledDataVisualization = styled.div`
     margin-top: 16px;
     margin-top: 1rem;
     background-color: ${colors.white};
-    color: ${colors.black};
+    color: ${colors.gray10};
     border-radius: 6px;
     max-width: 972px;
     font-size: 18px;
     font-size: 1.125rem;
     line-height: 21px;
     line-height: 1.3125rem;
-    padding: 24px 28px;
-    padding: 1.5rem 1.75rem;
+    padding: 18px 20px;
+    padding: 1.125rem 1.5rem;
     h4 {
       margin-bottom: 40px;
       margin-bottom: 2.5rem;
@@ -65,7 +67,7 @@ const AddChartButton = styled(StyledButton)`
       font-size: 1.875rem;
       display: inline-block;
       margin-right: 4px;
-      margin-righT: 0.25rem;
+      margin-right: 0.25rem;
     }
     span {
       display: flex;
@@ -112,10 +114,28 @@ const DataVisualization = ({
         >
           Add A Chart
         </AddChartButton>
-        {pipelineRunCharts && pipelineRunCharts.map(({ artifact, name: title }) => (
-          <section>
-            <StyledH4 color="gray">{title}</StyledH4>
-            <img src={artifact.url} alt={artifact.name} width="100%" />
+        {pipelineRunCharts && pipelineRunCharts.map(({
+          artifact, name: title, chart_type_code, chart_config,
+        }) => (
+          <section key={`${title}${artifact && artifact.uuid}${chart_type_code}`}>
+            <StyledH4 color="black">{title}</StyledH4>
+            {chart_type_code === chartTypes.IMAGE_CHART && (
+              <img src={artifact.url} alt={artifact.name} width="100%" />
+            )}
+            {chart_type_code === chartTypes.LINE_CHART && (
+              <TimeSeriesChart
+                type={chart_type_code}
+                config={chart_config}
+                artifact={artifact}
+              />
+            )}
+            {chart_type_code === chartTypes.BAR_CHART && (
+              <TimeSeriesChart
+                type={chart_type_code}
+                config={chart_config}
+                artifact={artifact}
+              />
+            )}
           </section>
         ))}
       </StyledDataVisualization>

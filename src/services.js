@@ -142,3 +142,7 @@ export const requestCreatePipelineRunArtifact = (organization_uuid, pipeline_uui
 export const requestOrganizationPipelineRunCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, appToken)
 );
+
+export const requestArtifact = ({ url }) => (
+  window.fetch(url)
+);

@@ -12,6 +12,7 @@ export default {
   grey: '#E0E0E0',
   lightGray: '#D2D2D2',
   darkGray: '#A9A9A9',
+  gray10: '#AFAFAF',
   gray20: '#AAAAAA',
   gray40: '#9A99A2',
   gray80: '#7C7C7C',
@@ -32,4 +33,9 @@ export default {
   orangeRed: '#F76D42',
   orange: '#FFD151',
   pink: '#F27F58',
+  chartYellow: '#FFDC7C',
+  chartGreen: '#7AC3A2',
+  chartGray: '#F2F2F2',
+  chartGrayStroke: '#DADADA',
+  chartBlue: '#2A7AB7',
 };
