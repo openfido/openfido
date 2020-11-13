@@ -12,7 +12,7 @@ const CustomXAxisTick = (props) => {
 
   const showTickRect = index !== (visibleTicksCount - 1) && index % 2;
 
-  const rectWidth = width / visibleTicksCount + 8;
+  const rectWidth = width / visibleTicksCount;
 
   const showMonth = payload && (
     !moment.unix(payload.value).startOf('month').diff(tickValue)
