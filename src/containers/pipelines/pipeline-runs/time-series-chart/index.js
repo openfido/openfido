@@ -17,6 +17,7 @@ import { requestArtifact } from 'services';
 import {
   chartTypes, mockData, chartFills, chartStrokes, XAXIS, YAXIS,
 } from 'config/charts';
+import { parseCsvData } from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
@@ -31,10 +32,11 @@ const TimeSeriesChart = ({
 
   useEffect(() => {
     if (!chartData) {
+      parseCsvData(mockData, setChartData); // TODO: remove mock CSV data
+
       requestArtifact(artifact)
-        .then(() => {
-          // parse csv data
-          setChartData([]);
+        .then((response) => {
+          setChartData(parseCsvData(response.data));
         });
     }
   }, [chartData, artifact]);
@@ -128,7 +130,7 @@ const TimeSeriesChart = ({
     >
       <ComposedChart
         height={height}
-        data={mockData}
+        data={chartData}
         margin={{
           bottom: 16,
           left: 32,

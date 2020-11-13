@@ -1,4 +1,3 @@
-import moment from 'moment';
 import colors from 'styles/colors';
 
 export const chartTypes = {
@@ -28,105 +27,12 @@ export const chartStrokes = [
 
 export const CHART_TITLE_LENGTH_LIMIT = 128;
 
-// todo: to csv.
-// strings.
-export const mockData = [
-  {
-    datetime: moment('2017-01-01 00:00:00').unix(),
-    L1: 3352,
-    L2: 1298,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-01 12:00:00').unix(),
-    L1: 3652,
-    L2: 8298,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-02 00:00:00').unix(),
-    L1: 5652,
-    L2: 9098,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-02 12:00:00').unix(),
-    L1: 12352,
-    L2: 1898,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-03 00:00:00').unix(),
-    L1: 3352,
-    L2: 298,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-03 12:00:00').unix(),
-    L1: 3652,
-    L2: 998,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-04 00:00:00').unix(),
-    L1: 552,
-    L2: 3298,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-04 12:00:00').unix(),
-    L1: 12352,
-    L2: 10098,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-05 00:00:00').unix(),
-    L1: 3352,
-    L2: 4998,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-05 12:00:00').unix(),
-    L1: 8652,
-    L2: 1008,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-06 00:00:00').unix(),
-    L1: 7652,
-    L2: 4898,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-06 12:00:00').unix(),
-    L1: 13352,
-    L2: 8298,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-07 00:00:00').unix(),
-    L1: 10352,
-    L2: 14398,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-  {
-    datetime: moment('2017-01-07 12:00:00').unix(),
-    L1: 552,
-    L2: 3988,
-    L3: Math.round(Math.random() * 20000 + 500),
-    L4: Math.round(Math.random() * 20000 + 500),
-  },
-];
+export const mockData = `datetime,type,subtype,L1,L2,L3
+"2017-01-01 00:00:00","energy","high",32,203,398
+"2017-01-01 12:00:00","energy","low",422,778,891
+"2017-01-02 00:00:00","energy","medium",12432,203,387
+"2017-01-02 12:00:00","energy","high",2152,3778,5891
+"2017-01-03 00:00:00","energy","medium",9432,203,387
+"2017-01-03 12:00:00","energy","medium",552,978,8891
+"2017-01-04 00:00:00","energy","high",132,2033,4387
+"2017-01-04 12:00:00","energy","low",21352,34778,7891`;
