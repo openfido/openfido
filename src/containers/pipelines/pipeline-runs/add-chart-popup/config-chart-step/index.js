@@ -53,13 +53,6 @@ const AxisItem = styled.div`
   max-height: 48px;
   cursor: pointer;
   position: relative;
-  span:first-child {
-    margin-right: 8px;
-    margin-right: 0.5rem;
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .anticon {
     position: static;
     float: right;
@@ -88,6 +81,20 @@ const AxesList = styled.div`
 const ColumnMenu = styled(StyledMenu)`
   max-height: 200px;
   overflow-y: scroll;
+`;
+
+const ColumnLabel = styled(StyledText)`
+  margin-right: 24px;
+  margin-right: 1.5rem;
+  white-space: pre;
+`;
+
+const ColumnName = styled.span`
+  margin-right: 8px;
+  margin-right: 0.5rem;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ConfigChartStep = ({
@@ -196,9 +203,7 @@ const ConfigChartStep = ({
             </Space>
             {xAxis && xAxis.map((axisItem) => (
               <AxisItem key={axisItem} title={axisItem}>
-                <Space size={25}>
-                  {axisItem}
-                </Space>
+                <ColumnName>{axisItem}</ColumnName>
                 <CloseOutlined color="lightGray" onClick={() => removeAxis(xAxis, setXAxis, axisItem)} />
               </AxisItem>
             ))}
@@ -221,12 +226,10 @@ const ConfigChartStep = ({
             </Space>
             {yAxis && yAxis.map((axisItem, axisIndex) => (
               <AxisItem key={axisItem} title={axisItem}>
-                <Space size={25}>
-                  <StyledText color="lightGray" fontweight="500">
-                    {`Column ${axisIndex + 1}`}
-                  </StyledText>
-                  {axisItem}
-                </Space>
+                <ColumnLabel color="lightGray" fontweight={500} className="columnLabel">
+                  {`Column ${axisIndex + 1}`}
+                </ColumnLabel>
+                <ColumnName className="columnName">{axisItem}</ColumnName>
                 <CloseOutlined color="lightGray" onClick={() => removeAxis(yAxis, setYAxis, axisItem)} />
               </AxisItem>
             ))}
