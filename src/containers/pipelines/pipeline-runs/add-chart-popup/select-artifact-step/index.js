@@ -58,7 +58,6 @@ const SelectArtifactStep = ({
                 textcolor="lightBlue"
                 className={selectedArtifact === artifact ? 'selected' : ''}
                 onClick={() => setSelectedArtifact(artifact)}
-                onBlur={(e) => e.preventDefault()}
               >
                 {artifact.name}
               </StyledButton>

@@ -112,6 +112,7 @@ const AddChartPopup = ({
       )}
       {step === 2 && !isImage && (
         <SelectChartTypeStep
+          chartType={chartType}
           setChartType={setChartType}
           onNextClicked={onChartTypeSelected}
         />

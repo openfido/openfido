@@ -53,10 +53,9 @@ const TimeSeriesChart = ({
         if (sendChartData) sendChartData(data);
       };
 
-      requestArtifact(artifact)
-        .then((response) => {
-          parseCsvData(response.data, useChartData);
-        });
+      requestArtifact(artifact) // uses fetch
+        .then((response) => response.text())
+        .then((data) => parseCsvData(data, useChartData));
     }
   }, [computedChartData, artifact, sendChartData]);
 

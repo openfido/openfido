@@ -31,7 +31,7 @@ const ChartTypesList = styled.ul`
      &, &:hover {
        background-color: ${colors.white};
      }
-     &:active, &:focus {
+     &:active, &:focus, &.selected {
        border: 3px solid ${colors.lightBlue};
        background-color: ${colors.white};
      }
@@ -39,7 +39,7 @@ const ChartTypesList = styled.ul`
   }
 `;
 
-const SelectChartTypeStep = ({ onNextClicked, setChartType }) => {
+const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
   const onChartTypeSelected = () => onNextClicked();
 
   return (
@@ -47,13 +47,25 @@ const SelectChartTypeStep = ({ onNextClicked, setChartType }) => {
       <StyledH4 color="darkText">Select a chart type</StyledH4>
       <ChartTypesList>
         <li>
-          <StyledButton type="text" size="middle" textcolor="darkText" onClick={() => setChartType(chartTypes.LINE_CHART)}>
+          <StyledButton
+            type="text"
+            size="middle"
+            textcolor="darkText"
+            className={chartType === chartTypes.LINE_CHART ? 'selected' : ''}
+            onClick={() => setChartType(chartTypes.LINE_CHART)}
+          >
             Line Chart
             <img src={LinesImg} alt="Line" />
           </StyledButton>
         </li>
         <li>
-          <StyledButton type="text" size="middle" textcolor="darkText" onClick={() => setChartType(chartTypes.BAR_CHART)}>
+          <StyledButton
+            type="text"
+            size="middle"
+            textcolor="darkText"
+            className={chartType === chartTypes.BAR_CHART ? 'selected' : ''}
+            onClick={() => setChartType(chartTypes.BAR_CHART)}
+          >
             Bar Chart
             <img src={BarsImg} alt="Bar" />
           </StyledButton>
@@ -68,6 +80,7 @@ const SelectChartTypeStep = ({ onNextClicked, setChartType }) => {
 
 SelectChartTypeStep.propTypes = {
   onNextClicked: PropTypes.func.isRequired,
+  chartType: PropTypes.string.isRequired,
   setChartType: PropTypes.func.isRequired,
 };
 
