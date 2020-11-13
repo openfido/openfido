@@ -80,7 +80,7 @@ const AxesList = styled.div`
 
 const ColumnMenu = styled(StyledMenu)`
   max-height: 200px;
-  overflow-y: scroll;
+  overflow-y: overlay;
 `;
 
 const ColumnLabel = styled(StyledText)`
@@ -92,7 +92,7 @@ const ColumnLabel = styled(StyledText)`
 const ColumnName = styled.span`
   margin-right: 8px;
   margin-right: 0.5rem;
-  white-space: pre;
+  white-space: pre
   overflow: hidden;
   text-overflow: ellipsis;
 `;
