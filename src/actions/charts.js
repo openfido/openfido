@@ -14,7 +14,10 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
     .then((response) => {
       dispatch({
         type: GET_CHARTS,
-        payload: response.data,
+        payload: {
+          pipeline_run_uuid,
+          charts: response.data,
+        },
       });
     })
     .catch((err) => {
