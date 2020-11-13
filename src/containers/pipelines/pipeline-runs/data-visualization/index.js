@@ -15,7 +15,7 @@ import colors from 'styles/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
-import TimeSeriesChart from '../time-series-chart';
+import TimeSeriesChart from '../composed-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;

@@ -12,7 +12,7 @@ import {
   StyledInput, StyledText, StyledMenu, StyledMenuItem, StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
-import TimeSeriesChart from '../../time-series-chart';
+import TimeSeriesChart from '../../composed-chart';
 
 const ConfigChartForm = styled.div`
   display: flex;
