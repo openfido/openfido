@@ -4,13 +4,14 @@ from flask import Blueprint, jsonify, request, current_app
 from requests import HTTPError
 
 from app.utils import validate_organization, any_application_required
-
 from app.workflows.services import (
     create_workflow,
     delete_workflow,
     fetch_workflow,
     fetch_workflows,
     update_workflow,
+    create_workflow_pipeline,
+    fetch_workflow_pipelines,
 )
 
 logger = logging.getLogger("organization-workflows")
@@ -252,6 +253,138 @@ def workflow_delete(organization_uuid, organization_workflow_uuid):
     try:
         delete_workflow(organization_uuid, organization_workflow_uuid)
         return {}, 200
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+
+
+@organization_workflow_bp.route(
+    "/v1/organizations/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization()
+def workflow_pipeline_create(organization_uuid, organization_workflow_uuid):
+    """Create a Organization Workflow Pipeline
+    ---
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    requestBody:
+      description: "Create a Organization Workflow Pipeline"
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              pipeline_uuid:
+                type: string
+              source_workflow_pipelines:
+                type: array
+                items:
+                  type: string
+              destination_workflow_pipelines:
+                type: array
+                items:
+                  type: string
+    responses:
+      "200":
+        description: "Updated OrganizationWorkflow"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pipeline_uuid:
+                  type: string
+                source_workflow_pipelines:
+                  type: array
+                  items:
+                      type: string
+                destination_workflow_pipelines:
+                  type: array
+                  items:
+                    type: string
+                uuid:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+    try:
+        return jsonify(
+            create_workflow_pipeline(
+                organization_uuid, organization_workflow_uuid, request.json
+            )
+        )
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+
+
+@organization_workflow_bp.route(
+    "/v1/organizations/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
+    methods=["GET"],
+)
+@any_application_required
+@validate_organization()
+def workflow_pipelines(organization_uuid, organization_workflow_uuid):
+    """Get Organization Workflow Pipelines.
+    ---
+    tags:
+      - workflows
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Get Organization Workflow Pipelines."
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  pipeline_uuid:
+                    type: string
+                  source_workflow_pipelines:
+                    type: array
+                    items:
+                        type: string
+                  destination_workflow_pipelines:
+                    type: array
+                    items:
+                      type: string
+                  uuid:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+    try:
+        return jsonify(fetch_workflow_pipelines(organization_uuid))
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
     except ValueError as value_error:

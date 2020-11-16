@@ -18,7 +18,10 @@ from requests import HTTPError
 
 from ..conftest import (
     ORGANIZATION_UUID,
+    ORGANIZATION_WORKFLOW_PIPELINE_UUID,
+    PIPELINE_UUID,
     WORKFLOW_UUID,
+    WORKFLOW_PIPELINE_UUID,
 )
 
 WORKFLOW_JSON = {
@@ -27,6 +30,15 @@ WORKFLOW_JSON = {
     "name": "My Workflow",
     "updated_at": "2020-11-11T03:19:32.401973",
     "uuid": WORKFLOW_UUID,
+}
+
+WORKFLOW_PIPELINE_JSON = {
+    "created_at": "2020-11-11T03:19:32.401965",
+    "updated_at": "2020-11-11T03:19:32.401973",
+    "pipeline_uuid": ORGANIZATION_WORKFLOW_PIPELINE_UUID,
+    "source_workflow_pipelines": [],
+    "destination_workflow_pipelines": [],
+    "uuid": ORGANIZATION_WORKFLOW_PIPELINE_UUID,
 }
 
 

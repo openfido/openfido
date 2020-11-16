@@ -8,11 +8,14 @@ from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 
 from app.workflows.models import (
     OrganizationWorkflow,
+    OrganizationWorkflowPipeline,
     db,
 )
+from app.pipelines.queries import find_organization_pipeline
 from app.workflows.queries import (
     find_organization_workflow,
     find_organization_workflows,
+    find_organization_workflow_pipelines,
 )
 
 
@@ -154,7 +157,7 @@ def update_workflow(organization_uuid, organization_workflow_uuid, request_json)
 
 
 def delete_workflow(organization_uuid, organization_workflow_uuid):
-    """Delete a Organization Workflow. """
+    """Delete an Organization Workflow. """
 
     organization_workflow = find_organization_workflow(
         organization_uuid, organization_workflow_uuid
@@ -175,3 +178,135 @@ def delete_workflow(organization_uuid, organization_workflow_uuid):
 
     organization_workflow.is_deleted = True
     db.session.commit()
+
+
+def create_workflow_pipeline(
+    organization_uuid, organization_workflow_uuid, request_json
+):
+    """Creates an Organization Workflow Pipeline."""
+
+    organization_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
+
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, request_json.get("pipeline_uuid")
+    )
+
+    if not org_pipeline:
+        raise ValueError("Organization Pipeline not found.")
+
+    # org workflow pipelines
+    src_org_workflow_pipelines = request_json.get("source_workflow_pipelines", [])
+    src_pipelines = search_organization_workflow_pipelines(
+        organization_workflow_uuid, src_org_workflow_pipelines
+    )
+
+    dest_org_workflow_pipelines = request_json.get("destination_workflow_pipelines", [])
+    dest_pipelines = search_organization_workflow_pipelines(
+        organization_workflow_uuid, dest_org_workflow_pipelines
+    )
+
+    # workflow pipelines
+    src_workflow_pipelines = [sp.workflow_pipeline_uuid for pipe in src_pipelines]
+    dest_workflow_pipelines = [sp.workflow_pipeline_uuid for pipe in dest_pipelines]
+
+    response = requests.post(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}/pipelines",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json={
+            "pipeline_uuid": org_pipeline.pipeline_uuid,
+            "source_workflow_pipelines": src_workflow_pipelines,
+            "dest_workflow_pipelines": dest_workflow_pipelines,
+        },
+    )
+
+    try:
+        json_value = response.json()
+
+        response.raise_for_status()
+
+        new_org_workflow_pipeline = OrganizationWorkflowPipeline(
+            organization_workflow_uuid=organization_workflow_uuid,
+            organization_pipeline_id=org_pipeline.id,
+            workflow_pipeline_uuid=json_value.get("uuid"),
+        )
+
+        db.session.add(new_org_workflow_pipeline)
+        db.session.commit()
+
+        json_value["uuid"] = new_org_workflow_pipeline.uuid
+        json_value["pipeline_uuid"] = org_pipeline
+        json_value["source_workflow_pipelines"] = src_org_workflow_pipelines
+        json_value["destination_workflow_pipelines"] = dest_org_workflow_pipelines
+
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error
+
+
+def fetch_workflow_pipelines(
+    organization_uuid, organization_workflow_uuid, request_json
+):
+    """Creates an Organization Workflow Pipeline."""
+
+    organization_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}/pipelines",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        json_value = response.json()
+
+        response.raise_for_status()
+        valid_workflows = []
+
+        # map workflow pipelines to org workflow pipeline uuids
+        org_workflow_pipelines = {
+            ow_p.workflow_pipeline_uuid: ow_p.uuid
+            for ow_p in find_organization_workflow_pipelines(
+                organization_workflow_uuid, org_pipeline.id
+            )
+        }
+
+        # map workflow pipelines to org workflow pipeline uuids
+        org_pipelines = {
+            o_p.pipeline_uuid: o_p.uuid
+            for o_p in find_organization_pipelines(organization_workflow_uuid)
+        }
+
+        for workflow in json_value:
+            workflow["uuid"] = org_workflow_pipelines[workflow["uuid"]]
+            workflow["pipeline_uuid"] = org_pipelines[workflow["pipeline_uuid"]]
+            workflow["source_workflow_pipelines"] = [
+                org_workflow_pipelines[uuid]
+                for uuid in workflow["source_workflow_pipelines"]
+            ]
+            workflow["destination_workflow_pipelines"] = [
+                org_workflow_pipelines[uuid]
+                for uuid in workflow["source_workflow_pipelines"]
+            ]
+
+        return json_value
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(json_value) from http_error

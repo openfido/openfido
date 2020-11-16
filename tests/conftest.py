@@ -28,10 +28,12 @@ from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
 ORGANIZATION_UUID = "4d96f0b6fe9a4872813b3fac7a675505"
+ORGANIZATION_WORKFLOW_PIPELINE_UUID = "d2830dff5d164b1fa5448ef041def206"
 PIPELINE_UUID = "0" * 32
 PIPELINE_RUN_UUID = "d6c42c749a1643aba0217c02e177625f"
 PIPELINE_RUN_INPUT_FILE_UUID = "1a393d3d847d41b4bbf006738bb576c5"
 WORKFLOW_UUID = "da9917748b2f4d71bc82426579b7565c"
+WORKFLOW_PIPELINE_UUID = "85ca9cdcfc6645d3a2e41fac10061bff"
 USER_UUID = "ded3f053-d25e-4873-8e38-7fbf9c38"
 JWT_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZGVkM2YwNTMtZDI1ZS00ODczLThlMzgtN2ZiZjljMzgiLCJleHAiOjE2MDMyOTQ3MzYsIm1heC1leHAiOjE2MDU3MTM5MzYsImlzcyI6ImFwcCIsImlhdCI6MTYwMjA4NTEzNn0.YRVky4oynBJRF6XhchCvDzeEqUOxAaki-xPTnXmAd3Y"
 
@@ -89,6 +91,20 @@ def organization_workflow(app):
     db.session.commit()
 
     return ow
+
+
+@pytest.fixture
+def organization_workflow_pipepine(app, organization_pipeline, organization_workflow):
+    ow_pipeline = OrganizationWorkflowPipeline(
+        uuid=ORGANIZATION_WORKFLOW_PIPELINE_UUID,
+        organization_workflow_uuid=ORGANIZATION_WORKFLOW_PIPELINE_UUID,
+        organization_pipeline_id=organization_pipeline.id,
+        workflow_pipeline_uuid=WORKFLOW_PIPELINE_UUID,
+    )
+    db.session.add(ow_pipeline)
+    db.session.commit()
+
+    return ow_pipeline
 
 
 @pytest.fixture
