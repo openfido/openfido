@@ -50,19 +50,22 @@ const TimeSeriesChart = ({
   };
 
   useEffect(() => {
-    if (!computedChartData) {
-      const useChartData = (data, types, scales) => {
-        setComputedChartData(data);
-        setComputedChartTypes(types);
-        setComputedChartScales(scales);
+    if (computedChartData) return;
 
-        if (sendChartData) sendChartData(data);
-      };
+    requestArtifact(artifact)
+      .then((response) => response.text())
+      .then((data) => parseCsvData(data))
+      .then(({ chartData, chartTypes: dataTypes, chartScale }) => {
+        setComputedChartData(chartData);
+        setComputedChartTypes(dataTypes);
+        setComputedChartScales(chartScale);
 
-      requestArtifact(artifact) // uses fetch
-        .then((response) => response.text())
-        .then((data) => parseCsvData(data, useChartData));
-    }
+        if (sendChartData) sendChartData(chartData);
+      })
+      .catch((err) => {
+        console.log('this is where we can recover');
+        console.log(err);
+      });
   }, [computedChartData, artifact, sendChartData]);
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
@@ -191,6 +194,7 @@ const TimeSeriesChart = ({
     }
 
     config[XAXIS].forEach((axis) => {
+      // TODO add a label for the YAxis.
       if (axis in computedChartTypes && axis in computedChartScales) {
         switch (computedChartTypes[axis]) {
           case 'time':
