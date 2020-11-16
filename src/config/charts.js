@@ -1,6 +1,6 @@
 import colors from 'styles/colors';
 
-export const chartTypes = {
+export const CHART_TYPES = {
   LINE_CHART: 'LINE_CHART',
   BAR_CHART: 'BAR_CHART',
   IMAGE_CHART: 'IMAGE_CHART',

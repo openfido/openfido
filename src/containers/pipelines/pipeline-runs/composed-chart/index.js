@@ -13,24 +13,18 @@ import {
   Tooltip,
 } from 'recharts';
 
-import { requestArtifact } from 'services';
 import {
-  chartTypes, chartFills, chartStrokes, XAXIS, YAXIS,
+  CHART_TYPES, chartFills, chartStrokes, XAXIS, YAXIS,
 } from 'config/charts';
-import { parseCsvData } from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
 const TimeSeriesChart = ({
-  type, config, height, artifact, sendChartData,
+  type, config, height, chartData, chartTypes, chartScales,
 }) => {
   const axesComponents = [];
   const dataComponents = [];
-
-  const [computedChartData, setComputedChartData] = useState(null);
-  const [computedChartTypes, setComputedChartTypes] = useState({});
-  const [computedChartScales, setComputedChartScales] = useState({});
 
   const axesFormatter = (value) => {
     const valueString = value.toString();
@@ -49,33 +43,14 @@ const TimeSeriesChart = ({
     return value;
   };
 
-  useEffect(() => {
-    if (computedChartData) return;
-
-    requestArtifact(artifact)
-      .then((response) => response.text())
-      .then((data) => parseCsvData(data))
-      .then(({ chartData, chartTypes: dataTypes, chartScale }) => {
-        setComputedChartData(chartData);
-        setComputedChartTypes(dataTypes);
-        setComputedChartScales(chartScale);
-
-        if (sendChartData) sendChartData(chartData);
-      })
-      .catch((err) => {
-        console.log('this is where we can recover');
-        console.log(err);
-      });
-  }, [computedChartData, artifact, sendChartData]);
-
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     const allNumberYAxes = [];
 
     config[YAXIS].forEach((axis, index) => {
-      const isNumberType = computedChartTypes[axis] === 'number';
+      const isNumberType = chartTypes[axis] === 'number';
 
-      if (axis in computedChartTypes && axis in computedChartScales) {
-        switch (computedChartTypes[axis]) {
+      if (axis in chartTypes && axis in chartScales) {
+        switch (chartTypes[axis]) {
           case 'number':
             allNumberYAxes.push(axis);
             break;
@@ -84,7 +59,7 @@ const TimeSeriesChart = ({
               <YAxis
                 key={`yAxis${axis}`}
                 yAxisId={`${axis}${index}`}
-                scale={computedChartScales[axis] || 'time'}
+                scale={chartScales[axis] || 'time'}
                 type="number"
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
@@ -133,7 +108,7 @@ const TimeSeriesChart = ({
       const yAxisId = isNumberType ? 'number' : `${axis}${index}`;
 
       switch (type) {
-        case chartTypes.LINE_CHART: // TODO: toggle Area
+        case CHART_TYPES.LINE_CHART: // TODO: toggle Area
           dataComponents.push((
             <Area
               key={`area${axis}`}
@@ -145,7 +120,7 @@ const TimeSeriesChart = ({
             />
           ));
           break;
-        case chartTypes.BAR_CHART: // TODO: bar column legend
+        case CHART_TYPES.BAR_CHART: // TODO: bar column legend
           dataComponents.push((
             <Bar
               key={`bar${axis}`}
@@ -167,7 +142,7 @@ const TimeSeriesChart = ({
         <YAxis
           key="yAxisNumber"
           type="number"
-          scale={computedChartScales[allNumberYAxes[0]] || 'auto'}
+          scale={chartScales[allNumberYAxes[0]] || 'auto'}
           interval={0}
           yAxisId="number"
           fontSize={12}
@@ -195,8 +170,8 @@ const TimeSeriesChart = ({
 
     config[XAXIS].forEach((axis) => {
       // TODO add a label for the YAxis.
-      if (axis in computedChartTypes && axis in computedChartScales) {
-        switch (computedChartTypes[axis]) {
+      if (axis in chartTypes && axis in chartScales) {
+        switch (chartTypes[axis]) {
           case 'time':
             axesComponents.push((
               <XAxis
@@ -259,7 +234,7 @@ const TimeSeriesChart = ({
     >
       <ComposedChart
         height={height}
-        data={computedChartData}
+        data={chartData}
         margin={{
           bottom: 16,
           left: 32,
@@ -296,18 +271,14 @@ TimeSeriesChart.propTypes = {
     [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  artifact: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    uuid: PropTypes.string.isRequired,
-  }).isRequired,
   height: PropTypes.number,
-  sendChartData: PropTypes.func,
+  chartData: PropTypes.any.isRequired,
+  chartTypes: PropTypes.any.isRequired,
+  chartScales: PropTypes.any.isRequired,
 };
 
 TimeSeriesChart.defaultProps = {
   height: 264,
-  sendChartData: null,
 };
 
 export default TimeSeriesChart;

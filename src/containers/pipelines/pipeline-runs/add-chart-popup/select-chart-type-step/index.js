@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { chartTypes } from 'config/charts';
+import { CHART_TYPES } from 'config/charts';
 import { PopupButton } from 'styles/pipeline-runs';
 import { StyledButton, StyledH4 } from 'styles/app';
 import colors from 'styles/colors';
@@ -51,8 +51,8 @@ const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
             type="text"
             size="middle"
             textcolor="darkText"
-            className={chartType === chartTypes.LINE_CHART ? 'selected' : ''}
-            onClick={() => setChartType(chartTypes.LINE_CHART)}
+            className={chartType === CHART_TYPES.LINE_CHART ? 'selected' : ''}
+            onClick={() => setChartType(CHART_TYPES.LINE_CHART)}
           >
             Line Chart
             <img src={LinesImg} alt="Line" />
@@ -63,8 +63,8 @@ const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
             type="text"
             size="middle"
             textcolor="darkText"
-            className={chartType === chartTypes.BAR_CHART ? 'selected' : ''}
-            onClick={() => setChartType(chartTypes.BAR_CHART)}
+            className={chartType === CHART_TYPES.BAR_CHART ? 'selected' : ''}
+            onClick={() => setChartType(CHART_TYPES.BAR_CHART)}
           >
             Bar Chart
             <img src={BarsImg} alt="Bar" />

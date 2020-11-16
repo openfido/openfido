@@ -3,13 +3,42 @@ import {
   GET_CHARTS_FAILED,
   ADD_CHART,
   ADD_CHART_FAILED,
+  PROCESS_ARTIFACT,
 } from 'actions';
 import {
   requestOrganizationPipelineRunCharts,
   requestCreatePipelineRunArtifact,
+  requestArtifact,
 } from 'services';
+import { parseCsvData } from 'util/charts';
+
+export const processArtifact = (artifact) => (dispatch, getState) => {
+  const { chartDatum } = getState().charts;
+  if (artifact.url in chartDatum) return;
+
+  requestArtifact(artifact)
+    .then((response) => response.text())
+    .then((data) => parseCsvData(data))
+    .then(({ chartData, chartTypes, chartScale }) => {
+      dispatch({
+        type: PROCESS_ARTIFACT,
+        artifact,
+        chartData,
+        chartTypes,
+        chartScale,
+      });
+    })
+    .catch(() => {
+      dispatch({
+        artifact,
+        type: PROCESS_ARTIFACT,
+        data: null,
+      });
+    });
+};
 
 export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
+  // TODO try to fetch the chart data
   requestOrganizationPipelineRunCharts(organization_uuid, pipeline_uuid, pipeline_run_uuid)
     .then((response) => {
       dispatch({
