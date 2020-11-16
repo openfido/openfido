@@ -15,8 +15,8 @@ import {
 import { requestArtifact } from 'services';
 import {
   chartTypes,
-  dataTypes,
-  dataScales,
+  DATA_TYPES,
+  DATA_SCALES,
   chartFills,
   chartStrokes,
   XAXIS,
@@ -65,9 +65,9 @@ const ComposedCsvChart = ({
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     const axesByType = {
-      [dataTypes.NUMBER]: [],
-      [dataTypes.TIME]: [],
-      [dataTypes.CATEGORY]: [],
+      [DATA_TYPES.NUMBER]: [],
+      [DATA_TYPES.TIME]: [],
+      [DATA_TYPES.CATEGORY]: [],
     };
 
     config[YAXIS].forEach((axis, index) => {
@@ -105,13 +105,13 @@ const ComposedCsvChart = ({
       }
     });
 
-    if (axesByType[dataTypes.NUMBER].length) { // use axesByType to get number y-axis
+    if (axesByType[DATA_TYPES.NUMBER].length) { // use axesByType to get number y-axis
       axesComponents.push((
         <YAxis
           key="yAxisNumber"
-          yAxisId={dataTypes.NUMBER}
-          type={dataTypes.NUMBER}
-          scale={computedChartScales[axesByType[dataTypes.NUMBER][0]] || dataScales.AUTO} // scale by first 'number' column scale setting
+          yAxisId={DATA_TYPES.NUMBER}
+          type={DATA_TYPES.NUMBER}
+          scale={computedChartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
           interval={0}
           fontSize={12}
           style={{ fontWeight: 500, fill: colors.gray10 }}
@@ -124,7 +124,7 @@ const ComposedCsvChart = ({
         >
           <Label
             angle={-90}
-            value={axesByType[dataTypes.NUMBER].join(', ')}
+            value={axesByType[DATA_TYPES.NUMBER].join(', ')}
             position="insideLeft"
             offset={-16}
             style={{
@@ -135,13 +135,13 @@ const ComposedCsvChart = ({
       ));
     }
 
-    if (axesByType[dataTypes.TIME].length) { // use axesByType to get time y-axis
+    if (axesByType[DATA_TYPES.TIME].length) { // use axesByType to get time y-axis
       axesComponents.push((
         <YAxis
           key="yAxisTime"
-          yAxisId={dataTypes.TIME}
-          type={dataTypes.NUMBER}
-          scale={dataScales.TIME}
+          yAxisId={DATA_TYPES.TIME}
+          type={DATA_TYPES.NUMBER}
+          scale={DATA_SCALES.TIME}
           interval="preserveStartEnd"
           domain={['auto', 'auto']}
           fontSize={12}
@@ -155,12 +155,12 @@ const ComposedCsvChart = ({
       ));
     }
 
-    if (axesByType[dataTypes.CATEGORY].length) { // use axesByType to get category y-axis
+    if (axesByType[DATA_TYPES.CATEGORY].length) { // use axesByType to get category y-axis
       axesComponents.push((
         <YAxis
           key="yAxisCategory"
-          yAxisId={dataTypes.CATEGORY}
-          type={dataTypes.CATEGORY}
+          yAxisId={DATA_TYPES.CATEGORY}
+          type={DATA_TYPES.CATEGORY}
           interval="preserveStartEnd"
           fontSize={12}
           style={{ fontWeight: 500, fill: colors.gray10 }}
@@ -173,7 +173,7 @@ const ComposedCsvChart = ({
         >
           <Label
             angle={-90}
-            value={axesByType[dataTypes.CATEGORY].join(', ')}
+            value={axesByType[DATA_TYPES.CATEGORY].join(', ')}
             position="insideLeft"
             offset={-16}
             style={{
@@ -187,13 +187,13 @@ const ComposedCsvChart = ({
     config[XAXIS].forEach((axis) => { // currently only 1 x-axis allowed to be picked, in config-chart-step component
       if (axis in computedChartTypes && axis in computedChartScales) {
         switch (computedChartTypes[axis]) {
-          case dataTypes.TIME:
+          case DATA_TYPES.TIME:
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type={dataTypes.NUMBER}
-                scale={dataTypes.TIME}
+                type={DATA_TYPES.NUMBER}
+                scale={DATA_TYPES.TIME}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
                 fontSize={10}
@@ -205,12 +205,12 @@ const ComposedCsvChart = ({
               />
             ));
             break;
-          case dataTypes.NUMBER:
+          case DATA_TYPES.NUMBER:
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type={dataTypes.NUMBER}
+                type={DATA_TYPES.NUMBER}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
                 fontSize={10}
@@ -222,7 +222,7 @@ const ComposedCsvChart = ({
               />
             ));
             break;
-          case dataTypes.CATEGORY:
+          case DATA_TYPES.CATEGORY:
           default:
             axesComponents.push((
               <XAxis

@@ -6,13 +6,13 @@ export const chartTypes = {
   IMAGE_CHART: 'IMAGE_CHART',
 };
 
-export const dataTypes = {
+export const DATA_TYPES = {
   NUMBER: 'number',
   TIME: 'time',
   CATEGORY: 'category',
 };
 
-export const dataScales = {
+export const DATA_SCALES = {
   TIME: 'time',
   LINEAR: 'linear',
   AUTO: 'auto',
