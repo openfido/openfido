@@ -98,7 +98,7 @@ const ColumnName = styled.span`
 `;
 
 const ConfigChartStep = ({
-  selectedArtifact, chartType, onNextClicked, chartData, chartTypes, chartScales
+  selectedArtifact, chartType, onNextClicked, chartData, chartTypes, chartScales,
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
@@ -255,9 +255,9 @@ ConfigChartStep.propTypes = {
   }).isRequired,
   onNextClicked: PropTypes.func.isRequired,
   chartType: PropTypes.string.isRequired,
-  chartData: PropTypes.any.isRequired,
-  chartTypes: PropTypes.any.isRequired,
-  chartScales: PropTypes.any.isRequired,
+  chartData: PropTypes.arrayOf({ }).isRequired,
+  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default ConfigChartStep;

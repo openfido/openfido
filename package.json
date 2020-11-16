@@ -62,7 +62,10 @@
     "deploy-production": "AWS_PROFILE=openfido-production NODE_ENV=production node ./scripts/deploy.js"
   },
   "eslintConfig": {
-    "extends": ["airbnb", "plugin:jest/recommended"],
+    "extends": [
+      "airbnb",
+      "plugin:jest/recommended"
+    ],
     "globals": {
       "window": true
     },

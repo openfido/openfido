@@ -89,9 +89,9 @@ const AddChartPopup = ({
     }
   };
 
-  const chartData = selectedArtifact?.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
-  const chartTypes = selectedArtifact?.url in chartDatum && chartDatum[selectedArtifact.url].chartTypes;
-  const chartScales = selectedArtifact?.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
+  const chartData = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
+  const chartTypes = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartTypes;
+  const chartScales = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
 
   return (
     <Modal

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import {
@@ -272,9 +272,9 @@ TimeSeriesChart.propTypes = {
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   height: PropTypes.number,
-  chartData: PropTypes.any.isRequired,
-  chartTypes: PropTypes.any.isRequired,
-  chartScales: PropTypes.any.isRequired,
+  chartData: PropTypes.arrayOf({ }).isRequired,
+  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 TimeSeriesChart.defaultProps = {
