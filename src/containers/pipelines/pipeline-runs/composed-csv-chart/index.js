@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -12,17 +11,25 @@ import {
   Label,
   Tooltip,
 } from 'recharts';
+import moment from 'moment';
 
 import { requestArtifact } from 'services';
 import {
-  chartTypes, chartFills, chartStrokes, XAXIS, YAXIS,
+  chartTypes,
+  chartFills,
+  chartStrokes,
+  XAXIS,
+  YAXIS,
 } from 'config/charts';
-import { parseCsvData } from 'util/charts';
+import {
+  parseCsvData,
+  getLimitedDataPointsForGraph,
+} from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
-const TimeSeriesChart = ({
+const ComposedCsvChart = ({
   type, config, height, artifact, sendChartData,
 }) => {
   const axesComponents = [];
@@ -35,7 +42,7 @@ const TimeSeriesChart = ({
   const axesFormatter = (value) => {
     const valueString = value.toString();
 
-    if (valueString.length === 10) {
+    if (valueString.length === 10) { // will try to parse is a number of length 10
       const dataValue = moment.unix(value);
       if (dataValue.isValid()) {
         return moment.unix(value).format('M/D/YYYY h:mm:ss A');
@@ -52,7 +59,13 @@ const TimeSeriesChart = ({
   useEffect(() => {
     if (!computedChartData) {
       const useChartData = (data, types, scales) => {
-        setComputedChartData(data);
+        const limitedDataSet = getLimitedDataPointsForGraph({
+          data,
+          minIndex: 0,
+          maxIndex: data.length - 1,
+        });
+
+        setComputedChartData(limitedDataSet);
         setComputedChartTypes(types);
         setComputedChartScales(scales);
 
@@ -286,7 +299,7 @@ const TimeSeriesChart = ({
   );
 };
 
-TimeSeriesChart.propTypes = {
+ComposedCsvChart.propTypes = {
   type: PropTypes.string.isRequired,
   config: PropTypes.shape({
     [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -301,9 +314,9 @@ TimeSeriesChart.propTypes = {
   sendChartData: PropTypes.func,
 };
 
-TimeSeriesChart.defaultProps = {
+ComposedCsvChart.defaultProps = {
   height: 264,
   sendChartData: null,
 };
 
-export default TimeSeriesChart;
+export default ComposedCsvChart;

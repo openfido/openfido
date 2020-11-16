@@ -12,7 +12,7 @@ import {
   StyledInput, StyledText, StyledMenu, StyledMenuItem, StyledButton,
 } from 'styles/app';
 import colors from 'styles/colors';
-import TimeSeriesChart from '../../composed-chart';
+import ComposedCsvChart from '../../composed-csv-chart';
 
 const ConfigChartForm = styled.div`
   display: flex;
@@ -92,7 +92,7 @@ const ColumnLabel = styled(StyledText)`
 const ColumnName = styled.span`
   margin-right: 8px;
   margin-right: 0.5rem;
-  white-space: pre
+  white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
@@ -181,7 +181,7 @@ const ConfigChartStep = ({
           className={titleError && 'invalid'}
         />
         <section>
-          <TimeSeriesChart
+          <ComposedCsvChart
             type={chartType}
             config={chartConfig}
             artifact={selectedArtifact}
