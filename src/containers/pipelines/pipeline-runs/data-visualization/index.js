@@ -97,7 +97,7 @@ const DataVisualization = ({
     if (!pipelineRunCharts) return;
 
     pipelineRunCharts.map(({ artifact }) => dispatch(processArtifact(artifact)));
-  }, [pipelineRunCharts]);
+  }, [pipelineRunCharts, dispatch]);
 
   return (
     <>
