@@ -138,7 +138,7 @@ const ConfigChartStep = ({
 
   const xAxisMenu = (
     <ColumnMenu>
-      {chartData && Object.keys(chartData[0]).map((axis) => (
+      {chartData && chartData.length && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
@@ -148,12 +148,15 @@ const ConfigChartStep = ({
           <span>{axis}</span>
         </StyledMenuItem>
       ))}
+      {(!chartData || !chartData.length) && (
+        <StyledText color="darkGray">No options available.</StyledText>
+      )}
     </ColumnMenu>
   );
 
   const yAxisMenu = (
     <ColumnMenu>
-      {chartData && Object.keys(chartData[0]).map((axis) => (
+      {chartData && chartData.length && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
@@ -163,6 +166,9 @@ const ConfigChartStep = ({
           <span>{axis}</span>
         </StyledMenuItem>
       ))}
+      {(!chartData || !chartData.length) && (
+        <StyledText color="darkGray">No options available.</StyledText>
+      )}
     </ColumnMenu>
   );
 
