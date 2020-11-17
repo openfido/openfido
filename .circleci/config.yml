@@ -53,12 +53,15 @@ jobs:
       repo:
         type: string
         default: openfido/dev-app
+      tag:
+        type: string
+        default: master
     steps:
       - setup_remote_docker:
           version: 18.09.3
       - aws-ecr/build-and-push-image:
-          tag: "master"
           extra-build-args: "--ssh default"
+          tag: << parameters.repo >>
           repo: << parameters.repo >>
           account-url: << parameters.ecr-url >>
           aws-access-key-id: << parameters.access-key >>
@@ -109,6 +112,7 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
+          tag: $CIRCLE_TAG
           repo: openfido/prod-app
           ecr-url: PROD_AWS_ECR_ACCOUNT_URL
           access-key: PROD_AWS_ACCESS_KEY_ID
