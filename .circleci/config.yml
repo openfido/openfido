@@ -89,7 +89,7 @@ workflows:
           extra-build-args: "--ssh default"
           account-url: PROD_AWS_ECR_ACCOUNT_URL
           aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
-          aws-secret-access-key: PROD_AWS_ECR_ACCOUNT_URL
+          aws-secret-access-key: PROD_AWS_SECRET_ACCESS_KEY
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image
@@ -103,4 +103,4 @@ workflows:
           service-name: 'openfido-prod-app-service'
           container-image-name-updates: 'container=openfido-prod-app-task,tag=$CIRCLE_TAG'
           aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
-          aws-secret-access-key: PROD_AWS_ECR_ACCOUNT_URL
+          aws-secret-access-key: PROD_AWS_SECRET_ACCESS_KEY
