@@ -79,9 +79,6 @@ workflows:
           filters:
             branches:
               only: /master/
-          access-key: AWS_ACCESS_KEY_ID
-          secret-key: AWS_SECRET_ACCESS_KEY
-          ecr-url: AWS_ECR_ACCOUNT_URL
       - aws-ecs/deploy-service-update:
           requires:
             - build-docker
