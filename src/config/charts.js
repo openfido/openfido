@@ -6,6 +6,18 @@ export const CHART_TYPES = {
   IMAGE_CHART: 'IMAGE_CHART',
 };
 
+export const DATA_TYPES = {
+  NUMBER: 'number',
+  TIME: 'time',
+  CATEGORY: 'category',
+};
+
+export const DATA_SCALES = {
+  TIME: 'time',
+  LINEAR: 'linear',
+  AUTO: 'auto',
+};
+
 export const XAXIS = 'x-axis';
 export const YAXIS = 'y-axis';
 

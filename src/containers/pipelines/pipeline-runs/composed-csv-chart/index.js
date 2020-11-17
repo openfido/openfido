@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -14,98 +13,36 @@ import {
 } from 'recharts';
 
 import {
-  CHART_TYPES, chartFills, chartStrokes, XAXIS, YAXIS,
+  CHART_TYPES,
+  DATA_TYPES,
+  DATA_SCALES,
+  chartFills,
+  chartStrokes,
+  XAXIS,
+  YAXIS,
 } from 'config/charts';
+import { axesFormatter } from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
-const TimeSeriesChart = ({
+const ComposedCsvChart = ({
   type, config, height, chartData, chartTypes, chartScales,
 }) => {
   const axesComponents = [];
   const dataComponents = [];
 
-  const axesFormatter = (value) => {
-    const valueString = value.toString();
-
-    if (valueString.length === 10) {
-      const dataValue = moment.unix(value);
-      if (dataValue.isValid()) {
-        return moment.unix(value).format('M/D/YYYY h:mm:ss A');
-      }
-    }
-
-    if (valueString.match(/^-?[0-9]+([,.][0-9]+)?$/)) {
-      return parseFloat(value).toFixed(4);
-    }
-
-    return value;
-  };
-
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
-    const allNumberYAxes = [];
+    const axesByType = {
+      [DATA_TYPES.NUMBER]: [],
+      [DATA_TYPES.TIME]: [],
+      [DATA_TYPES.CATEGORY]: [],
+    };
 
     config[YAXIS].forEach((axis, index) => {
-      const isNumberType = chartTypes[axis] === 'number';
-
-      if (axis in chartTypes && axis in chartScales) {
-        switch (chartTypes[axis]) {
-          case 'number':
-            allNumberYAxes.push(axis);
-            break;
-          case 'time':
-            axesComponents.push((
-              <YAxis
-                key={`yAxis${axis}`}
-                yAxisId={`${axis}${index}`}
-                scale={chartScales[axis] || 'time'}
-                type="number"
-                interval="preserveStartEnd"
-                domain={['auto', 'auto']}
-                fontSize={12}
-                style={{ fontWeight: '500', fill: colors.gray10 }}
-                tickLine={false}
-                tickSize={0}
-                tickCount={5}
-                tick={<CustomYAxisTick isTimestamp />}
-              />
-            ));
-            break;
-          case 'category':
-          default:
-            axesComponents.push((
-              <YAxis
-                key={`yAxis${axis}`}
-                yAxisId={`${axis}${index}`}
-                type="category"
-                domain={['high', 'low']}
-                interval="preserveStartEnd"
-                fontSize={12}
-                style={{ fontWeight: '500', fill: colors.gray10 }}
-                angle={-90}
-                tickLine={false}
-                tickSize={0}
-                tickCount={5}
-                tick={CustomYAxisTick}
-                stroke={colors.gray10}
-              >
-                <Label
-                  angle={-90}
-                  value={axis}
-                  position="insideLeft"
-                  offset={-16}
-                  style={{
-                    textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-                  }}
-                />
-              </YAxis>
-            ));
-            break;
-        }
+      if (axis in chartTypes) {
+        axesByType[chartTypes[axis]].push(axis);
       }
-
-      const yAxisId = isNumberType ? 'number' : `${axis}${index}`;
 
       switch (type) {
         case CHART_TYPES.LINE_CHART: // TODO: toggle Area
@@ -113,7 +50,7 @@ const TimeSeriesChart = ({
             <Area
               key={`area${axis}`}
               dataKey={axis}
-              yAxisId={yAxisId}
+              yAxisId={chartTypes[axis]}
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
@@ -125,7 +62,7 @@ const TimeSeriesChart = ({
             <Bar
               key={`bar${axis}`}
               dataKey={axis}
-              yAxisId={yAxisId}
+              yAxisId={chartTypes[axis]}
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
@@ -137,27 +74,26 @@ const TimeSeriesChart = ({
       }
     });
 
-    if (allNumberYAxes.length) {
+    if (axesByType[DATA_TYPES.NUMBER].length) { // use axesByType to get number y-axis
       axesComponents.push((
         <YAxis
           key="yAxisNumber"
-          type="number"
-          scale={chartScales[allNumberYAxes[0]] || 'auto'}
+          yAxisId={DATA_TYPES.NUMBER}
+          type={DATA_TYPES.NUMBER}
+          scale={chartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
           interval={0}
-          yAxisId="number"
           fontSize={12}
-          style={{ fontWeight: '500', fill: colors.gray10 }}
+          style={{ fontWeight: 500, fill: colors.gray10 }}
           angle={-90}
           tickLine={false}
           tickSize={0}
           tickCount={5}
           tick={<CustomYAxisTick isNumber />}
           stroke={colors.gray10}
-          allowDecimals
         >
           <Label
             angle={-90}
-            value={allNumberYAxes.join(', ')}
+            value={axesByType[DATA_TYPES.NUMBER].join(', ')}
             position="insideLeft"
             offset={-16}
             style={{
@@ -168,33 +104,82 @@ const TimeSeriesChart = ({
       ));
     }
 
-    config[XAXIS].forEach((axis) => {
-      // TODO add a label for the YAxis.
+    if (axesByType[DATA_TYPES.TIME].length) { // use axesByType to get time y-axis
+      axesComponents.push((
+        <YAxis
+          key="yAxisTime"
+          yAxisId={DATA_TYPES.TIME}
+          type={DATA_TYPES.NUMBER}
+          scale={DATA_SCALES.TIME}
+          interval="preserveStartEnd"
+          domain={['auto', 'auto']}
+          fontSize={12}
+          style={{ fontWeight: 500, fill: colors.gray10 }}
+          tickLine={false}
+          tickSize={0}
+          tickCount={5}
+          stroke={colors.gray10}
+          tick={<CustomYAxisTick isTimestamp />}
+        />
+      ));
+    }
+
+    if (axesByType[DATA_TYPES.CATEGORY].length) { // use axesByType to get category y-axis
+      axesComponents.push((
+        <YAxis
+          key="yAxisCategory"
+          yAxisId={DATA_TYPES.CATEGORY}
+          type={DATA_TYPES.CATEGORY}
+          interval="preserveStartEnd"
+          fontSize={12}
+          style={{ fontWeight: 500, fill: colors.gray10 }}
+          angle={-90}
+          tickLine={false}
+          tickSize={0}
+          tickCount={5}
+          stroke={colors.gray10}
+          tick={CustomYAxisTick}
+        >
+          <Label
+            angle={-90}
+            value={axesByType[DATA_TYPES.CATEGORY].join(', ')}
+            position="insideLeft"
+            offset={-16}
+            style={{
+              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
+            }}
+          />
+        </YAxis>
+      ));
+    }
+
+    config[XAXIS].forEach((axis) => { // currently only 1 x-axis allowed to be picked, in config-chart-step component
       if (axis in chartTypes && axis in chartScales) {
         switch (chartTypes[axis]) {
-          case 'time':
+          case DATA_TYPES.TIME:
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type="number"
-                scale="time"
+                type={DATA_TYPES.NUMBER}
+                scale={DATA_SCALES.TIME}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
                 fontSize={10}
                 style={{ fontWeight: '500', fill: colors.gray10 }}
                 tickLine={false}
                 tickSize={0}
+                stroke={colors.gray10}
                 tick={<CustomXAxisTick isTimestamp />}
               />
             ));
             break;
-          case 'number':
+          case DATA_TYPES.NUMBER:
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type="number"
+                type={DATA_TYPES.NUMBER}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
                 fontSize={10}
@@ -206,7 +191,7 @@ const TimeSeriesChart = ({
               />
             ));
             break;
-          case 'category':
+          case DATA_TYPES.CATEGORY:
           default:
             axesComponents.push((
               <XAxis
@@ -265,7 +250,7 @@ const TimeSeriesChart = ({
   );
 };
 
-TimeSeriesChart.propTypes = {
+ComposedCsvChart.propTypes = {
   type: PropTypes.string.isRequired,
   config: PropTypes.shape({
     [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -277,8 +262,8 @@ TimeSeriesChart.propTypes = {
   chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-TimeSeriesChart.defaultProps = {
+ComposedCsvChart.defaultProps = {
   height: 264,
 };
 
-export default TimeSeriesChart;
+export default ComposedCsvChart;
