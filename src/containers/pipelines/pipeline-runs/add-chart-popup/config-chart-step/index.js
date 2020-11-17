@@ -98,11 +98,10 @@ const ColumnName = styled.span`
 `;
 
 const ConfigChartStep = ({
-  selectedArtifact, chartType, onNextClicked,
+  selectedArtifact, chartType, onNextClicked, chartData, chartTypes, chartScales,
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
-  const [listAxesFromData, setListAxesFromData] = useState([]);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState(false);
 
@@ -110,8 +109,6 @@ const ConfigChartStep = ({
     [XAXIS]: xAxis,
     [YAXIS]: yAxis,
   };
-
-  const sendChartData = (data) => data && data.length && setListAxesFromData(Object.keys(data[0]));
 
   const onAddChartClicked = () => {
     if (title && title.length && title.length < CHART_TITLE_LENGTH_LIMIT) {
@@ -141,7 +138,7 @@ const ConfigChartStep = ({
 
   const xAxisMenu = (
     <ColumnMenu>
-      {listAxesFromData.map((axis) => (
+      {chartData && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
@@ -156,7 +153,7 @@ const ConfigChartStep = ({
 
   const yAxisMenu = (
     <ColumnMenu>
-      {listAxesFromData.map((axis) => (
+      {chartData && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
@@ -185,8 +182,10 @@ const ConfigChartStep = ({
             type={chartType}
             config={chartConfig}
             artifact={selectedArtifact}
-            sendChartData={sendChartData}
             height={231}
+            chartData={chartData}
+            chartTypes={chartTypes}
+            chartScales={chartScales}
           />
         </section>
         <AxesList>
@@ -256,6 +255,9 @@ ConfigChartStep.propTypes = {
   }).isRequired,
   onNextClicked: PropTypes.func.isRequired,
   chartType: PropTypes.string.isRequired,
+  chartData: PropTypes.arrayOf({ }).isRequired,
+  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default ConfigChartStep;

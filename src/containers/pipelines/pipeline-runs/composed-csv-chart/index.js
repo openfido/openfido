@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
   ResponsiveContainer,
@@ -12,9 +12,8 @@ import {
   Tooltip,
 } from 'recharts';
 
-import { requestArtifact } from 'services';
 import {
-  chartTypes,
+  CHART_TYPES,
   DATA_TYPES,
   DATA_SCALES,
   chartFills,
@@ -22,46 +21,16 @@ import {
   XAXIS,
   YAXIS,
 } from 'config/charts';
-import {
-  parseCsvData,
-  getLimitedDataPointsForGraph,
-  axesFormatter,
-} from 'util/charts';
+import { axesFormatter } from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
 const ComposedCsvChart = ({
-  type, config, height, artifact, sendChartData,
+  type, config, height, chartData, chartTypes, chartScales,
 }) => {
   const axesComponents = [];
   const dataComponents = [];
-
-  const [computedChartData, setComputedChartData] = useState(null);
-  const [computedChartTypes, setComputedChartTypes] = useState({});
-  const [computedChartScales, setComputedChartScales] = useState({});
-
-  useEffect(() => {
-    if (!computedChartData) {
-      const useChartData = (data, types, scales) => {
-        const limitedDataSet = getLimitedDataPointsForGraph({
-          data,
-          minIndex: 0,
-          maxIndex: data.length - 1,
-        });
-
-        setComputedChartData(limitedDataSet);
-        setComputedChartTypes(types);
-        setComputedChartScales(scales);
-
-        if (sendChartData) sendChartData(data);
-      };
-
-      requestArtifact(artifact) // uses fetch
-        .then((response) => response.text())
-        .then((data) => parseCsvData(data, useChartData));
-    }
-  }, [computedChartData, artifact, sendChartData]);
 
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     const axesByType = {
@@ -71,29 +40,29 @@ const ComposedCsvChart = ({
     };
 
     config[YAXIS].forEach((axis, index) => {
-      if (axis in computedChartTypes) {
-        axesByType[computedChartTypes[axis]].push(axis);
+      if (axis in chartTypes) {
+        axesByType[chartTypes[axis]].push(axis);
       }
 
       switch (type) {
-        case chartTypes.LINE_CHART: // TODO: toggle Area
+        case CHART_TYPES.LINE_CHART: // TODO: toggle Area
           dataComponents.push((
             <Area
               key={`area${axis}`}
               dataKey={axis}
-              yAxisId={computedChartTypes[axis]}
+              yAxisId={chartTypes[axis]}
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
             />
           ));
           break;
-        case chartTypes.BAR_CHART: // TODO: bar column legend
+        case CHART_TYPES.BAR_CHART: // TODO: bar column legend
           dataComponents.push((
             <Bar
               key={`bar${axis}`}
               dataKey={axis}
-              yAxisId={computedChartTypes[axis]}
+              yAxisId={chartTypes[axis]}
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
@@ -111,7 +80,7 @@ const ComposedCsvChart = ({
           key="yAxisNumber"
           yAxisId={DATA_TYPES.NUMBER}
           type={DATA_TYPES.NUMBER}
-          scale={computedChartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
+          scale={chartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
           interval={0}
           fontSize={12}
           style={{ fontWeight: 500, fill: colors.gray10 }}
@@ -185,8 +154,8 @@ const ComposedCsvChart = ({
     }
 
     config[XAXIS].forEach((axis) => { // currently only 1 x-axis allowed to be picked, in config-chart-step component
-      if (axis in computedChartTypes && axis in computedChartScales) {
-        switch (computedChartTypes[axis]) {
+      if (axis in chartTypes && axis in chartScales) {
+        switch (chartTypes[axis]) {
           case DATA_TYPES.TIME:
             axesComponents.push((
               <XAxis
@@ -250,7 +219,7 @@ const ComposedCsvChart = ({
     >
       <ComposedChart
         height={height}
-        data={computedChartData}
+        data={chartData}
         margin={{
           bottom: 16,
           left: 32,
@@ -287,18 +256,14 @@ ComposedCsvChart.propTypes = {
     [XAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
-  artifact: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    uuid: PropTypes.string.isRequired,
-  }).isRequired,
   height: PropTypes.number,
-  sendChartData: PropTypes.func,
+  chartData: PropTypes.arrayOf({ }).isRequired,
+  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 ComposedCsvChart.defaultProps = {
   height: 264,
-  sendChartData: null,
 };
 
 export default ComposedCsvChart;

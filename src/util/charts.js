@@ -3,41 +3,48 @@ import { parse } from '@fast-csv/parse';
 
 import { DATA_TYPES, DATA_SCALES } from 'config/charts';
 
-export const parseCsvData = (data, callback) => {
+const DATE_FORMATS = [
+  'YYYY-MM-DDTHH:mm:ssZ',
+];
+
+export const toUnixTime = (str) => moment(str, DATE_FORMATS).unix();
+export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
+
+export const parseCsvData = (data) => {
   const chartData = [];
   const chartTypes = {};
   const chartScale = {};
 
-  const csvDataStream = parse({ headers: true })
-    .on('error', () => {
-      // TODO: error state if necessary
-    })
-    .on('data', (row) => {
-      const rowData = { ...row };
+  return new Promise((resolve, reject) => {
+    const csvDataStream = parse({ headers: true })
+      .on('error', reject)
+      .on('data', (row) => {
+        const rowData = { ...row };
 
-      Object.keys(rowData).forEach((column) => {
-        if (rowData[column].match(/^-?[0-9]+([,.][0-9]+)?$/)) { // number type
-          rowData[column] = parseFloat(rowData[column]);
-          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
-          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
-        } else if (moment(rowData[column]).isValid()) { // datetime type
-          rowData[column] = moment(rowData[column]).unix(); // TODO: missing case where datetime might be a number '2017'
-          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
-          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.TIME;
-        } else {
-          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
-          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
-        }
+        Object.keys(rowData).forEach((column) => {
+          if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
+            rowData[column] = parseFloat(rowData[column]);
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
+            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
+          } else if (validDateString(rowData[column])) { // datetime type
+            rowData[column] = toUnixTime(rowData[column]);
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
+            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.TIME;
+          } else {
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
+            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
+          }
+        });
+
+        chartData.push(rowData);
+      })
+      .on('end', () => {
+        resolve({ chartData, chartTypes, chartScale });
       });
 
-      chartData.push(rowData);
-    })
-    .on('end', () => {
-      callback(chartData, chartTypes, chartScale);
-    });
-
-  csvDataStream.write(data);
-  csvDataStream.end();
+    csvDataStream.write(data);
+    csvDataStream.end();
+  });
 };
 
 export const TOTAL_GRAPH_POINTS = 800;

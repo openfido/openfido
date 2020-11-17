@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { getCharts } from 'actions/charts';
+import { getCharts, processArtifact } from 'actions/charts';
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
-import { chartTypes } from 'config/charts';
+import { CHART_TYPES } from 'config/charts';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
@@ -82,15 +82,22 @@ const DataVisualization = ({
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const charts = useSelector((state) => state.charts.charts);
+  const chartDatum = useSelector((state) => state.charts.chartDatum);
   const dispatch = useDispatch();
 
   const pipelineRunCharts = charts && charts[pipelineRunSelected && pipelineRunSelected.uuid];
 
   useEffect(() => {
-    if (!charts) {
-      dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
-    }
+    if (charts) return;
+
+    dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
   }, [currentOrg, pipelineInView, pipelineRunSelected, dispatch, charts]);
+
+  useEffect(() => {
+    if (!pipelineRunCharts) return;
+
+    pipelineRunCharts.map(({ artifact }) => dispatch(processArtifact(artifact)));
+  }, [pipelineRunCharts, dispatch]);
 
   return (
     <>
@@ -119,21 +126,27 @@ const DataVisualization = ({
         }) => (
           <section key={`${title}${artifact && artifact.uuid}${chart_type_code}`}>
             <StyledH4 color="black">{title}</StyledH4>
-            {chart_type_code === chartTypes.IMAGE_CHART && (
+            {chart_type_code === CHART_TYPES.IMAGE_CHART && (
               <img src={artifact.url} alt={artifact.name} width="100%" />
             )}
-            {chart_type_code === chartTypes.LINE_CHART && (
+            {chart_type_code === CHART_TYPES.LINE_CHART && artifact.url in chartDatum && (
               <ComposedCsvChart
                 type={chart_type_code}
                 config={chart_config}
                 artifact={artifact}
+                chartData={chartDatum[artifact.url].chartData}
+                chartTypes={chartDatum[artifact.url].chartTypes}
+                chartScales={chartDatum[artifact.url].chartScales}
               />
             )}
-            {chart_type_code === chartTypes.BAR_CHART && (
+            {chart_type_code === CHART_TYPES.BAR_CHART && artifact.url in chartDatum && (
               <ComposedCsvChart
                 type={chart_type_code}
                 config={chart_config}
                 artifact={artifact}
+                chartData={chartDatum[artifact.url].chartData}
+                chartTypes={chartDatum[artifact.url].chartTypes}
+                chartScales={chartDatum[artifact.url].chartScales}
               />
             )}
           </section>

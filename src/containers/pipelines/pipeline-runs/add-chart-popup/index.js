@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { chartTypes } from 'config/charts';
+import { CHART_TYPES } from 'config/charts';
 import { addChart } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { StyledModal } from 'styles/app';
@@ -12,6 +12,10 @@ import SelectArtifactStep from './select-artifact-step';
 import AddImageStep from './add-image-step';
 import SelectChartTypeStep from './select-chart-type-step';
 import ConfigChartStep from './config-chart-step';
+
+const NoGraphingOption = styled.div`
+  margin: auto;
+`;
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -54,6 +58,7 @@ const AddChartPopup = ({
   const [chartType, setChartType] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const chartDatum = useSelector((state) => state.charts.chartDatum);
   const dispatch = useDispatch();
 
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
@@ -73,7 +78,7 @@ const AddChartPopup = ({
       setStep(2);
 
       if (isImage) {
-        setChartType(chartTypes.IMAGE_CHART);
+        setChartType(CHART_TYPES.IMAGE_CHART);
       }
     }
   };
@@ -83,6 +88,10 @@ const AddChartPopup = ({
       setStep(3);
     }
   };
+
+  const chartData = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
+  const chartTypes = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartTypes;
+  const chartScales = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
 
   return (
     <Modal
@@ -110,18 +119,27 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && (
+      {step === 2 && !isImage && !chartTypes && (
+        <NoGraphingOption title={chartData}>No graphing options are available for this file.</NoGraphingOption>
+      )}
+      {step === 2 && !isImage && chartTypes && (
         <SelectChartTypeStep
           chartType={chartType}
           setChartType={setChartType}
           onNextClicked={onChartTypeSelected}
+          chartData={chartData}
+          chartTypes={chartTypes}
+          chartScales={chartScales}
         />
       )}
-      {step === 3 && !isImage && (
+      {step === 3 && !isImage && chartData && (
         <ConfigChartStep
           selectedArtifact={selectedArtifact}
           chartType={chartType}
           onNextClicked={onAddChartClicked}
+          chartData={chartData}
+          chartTypes={chartTypes}
+          chartScales={chartScales}
         />
       )}
     </Modal>

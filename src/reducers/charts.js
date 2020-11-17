@@ -3,6 +3,7 @@ import {
   ADD_CHART_FAILED,
   GET_CHARTS,
   GET_CHARTS_FAILED,
+  PROCESS_ARTIFACT,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -11,12 +12,26 @@ const DEFAULT_STATE = {
     getChartsError: null,
     addChartError: null,
   },
+  chartDatum: {},
 };
 
 export default (state = DEFAULT_STATE, action) => {
   if (action.error) return state;
 
   switch (action.type) {
+    case PROCESS_ARTIFACT: {
+      return {
+        ...state,
+        chartDatum: {
+          ...state.chartDatum,
+          [action.artifact.url]: {
+            chartData: action.chartData,
+            chartTypes: action.chartTypes,
+            chartScales: action.chartScale,
+          },
+        },
+      };
+    }
     case GET_CHARTS: {
       const { pipeline_run_uuid, charts } = action.payload; // TODO: formatted graph data
 
