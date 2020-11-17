@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
-  aws-ecr: circleci/aws-ecr@6.12.2
-  aws-ecs: circleci/aws-ecs@1.3.0
+  aws-ecr: circleci/aws-ecr@6.14.0
+  aws-ecs: circleci/aws-ecs@1.4.0
 jobs:
   test:
     docker:
@@ -35,35 +35,72 @@ jobs:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
-  build-docker:
-    docker:
-      - image: circleci/python:3.8
-    environment:
-      DOCKER_BUILDKIT: "1"
-    steps:
-      - setup_remote_docker:
-          version: 18.09.3
-      - aws-ecr/build-and-push-image:
-          tag: "$CIRCLE_BRANCH"
-          repo: openfido/dev-app
-          extra-build-args: "--ssh default"
 workflows:
-  test_build_and_push:
+  pullrequests:
     jobs:
-      - test
-      - build-docker:
+      - test:
+          filters:
+            branches:
+              ignore: /master/
+  dev:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /master/
+      - aws-ecr/build-and-push-image:
           requires:
             - test
           filters:
             branches:
-              only: master
+              only: /master/
+          tag: "master"
+          repo: openfido/dev-app
+          extra-build-args: "--ssh default"
       - aws-ecs/deploy-service-update:
           requires:
-            - build-docker
+            - aws-ecr/build-and-push-image
           filters:
             branches:
-              only: master
+              only: /master/
           family: 'openfido-dev-app-task'
           cluster-name: 'openfido-dev-ecs-cluster'
           service-name: 'openfido-dev-app-service'
           container-image-name-updates: 'container=openfido-dev-app-task,tag=master'
+
+  prod:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
+            branches:
+              ignore: /.*/
+      - aws-ecr/build-and-push-image:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
+            branches:
+              ignore: /.*/
+          tag: "$CIRCLE_TAG"
+          repo: openfido/prod-app
+          extra-build-args: "--ssh default"
+          account-url: PROD_AWS_ECR_ACCOUNT_URL
+          aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: PROD_AWS_ECR_ACCOUNT_URL
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
+            branches:
+              ignore: /.*/
+          family: 'openfido-dev-app-task'
+          cluster-name: 'openfido-prod-ecs-cluster'
+          service-name: 'openfido-prod-app-service'
+          container-image-name-updates: 'container=openfido-prod-app-task,tag=$CIRCLE_TAG'
+          aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: PROD_AWS_ECR_ACCOUNT_URL
