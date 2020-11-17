@@ -1,6 +1,8 @@
 import moment from 'moment';
 import { parse } from '@fast-csv/parse';
 
+import { DATA_TYPES, DATA_SCALES } from 'config/charts';
+
 export const parseCsvData = (data, callback) => {
   const chartData = [];
   const chartTypes = {};
@@ -16,15 +18,15 @@ export const parseCsvData = (data, callback) => {
       Object.keys(rowData).forEach((column) => {
         if (rowData[column].match(/^-?[0-9]+([,.][0-9]+)?$/)) { // number type
           rowData[column] = parseFloat(rowData[column]);
-          if (!(column in chartTypes)) chartTypes[column] = 'number'; // interpolate type and scale from first row
-          if (!(column in chartScale)) chartScale[column] = 'linear';
+          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
+          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
         } else if (moment(rowData[column]).isValid()) { // datetime type
           rowData[column] = moment(rowData[column]).unix(); // TODO: missing case where datetime might be a number '2017'
-          if (!(column in chartTypes)) chartTypes[column] = 'time';
-          if (!(column in chartScale)) chartScale[column] = 'time';
+          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
+          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.TIME;
         } else {
-          if (!(column in chartTypes)) chartTypes[column] = 'category';
-          if (!(column in chartScale)) chartScale[column] = 'linear';
+          if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
+          if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
         }
       });
 
@@ -79,4 +81,21 @@ export const getLimitedDataPointsForGraph = ({
   limitedDataSet.push(timeSubsetData[timeSubsetData.length - 1]);
 
   return limitedDataSet;
+};
+
+export const axesFormatter = (value) => {
+  const valueString = value.toString();
+
+  if (valueString.length === 10) { // will try to parse is a number of length 10
+    const dataValue = moment.unix(value);
+    if (dataValue.isValid()) {
+      return moment.unix(value).format('M/D/YYYY h:mm:ss A');
+    }
+  }
+
+  if (valueString.match(/^-?[0-9]+([,.][0-9]+)?$/)) {
+    return parseFloat(value).toFixed(4);
+  }
+
+  return value;
 };
