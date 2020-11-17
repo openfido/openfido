@@ -20,15 +20,15 @@ const CustomXAxisTick = (props) => {
 
   return [
     isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontWeight={300} fontSize={12}>{tickValue.format('MMM D')}</Text>
+      <Text key="date" textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontWeight={300} fontSize={12}>{tickValue.format('MMM D')}</Text>
     ),
     isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x} y={y + dateOffset} style={style} fontSize={dateFontSize}>{tickValue.format('h:mm A')}</Text>
+      <Text key="time" textAnchor="middle" fill={fill} x={x} y={y + dateOffset} style={style} fontSize={dateFontSize}>{tickValue.format('h:mm A')}</Text>
     ),
     !isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>{tickValue}</Text>
+      <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>{tickValue}</Text>
     ),
-    showTickRect && <Rectangle fill="rgba(196, 196, 196, 0.1)" fillOpacity={0.1} x={x} y={0} width={rectWidth} height={y - 2} style={style} />,
+    showTickRect && <Rectangle key="tickrect" fill="rgba(196, 196, 196, 0.1)" fillOpacity={0.1} x={x} y={0} width={rectWidth} height={y - 2} style={style} />,
   ];
 };
 

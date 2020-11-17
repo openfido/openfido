@@ -257,9 +257,9 @@ ComposedCsvChart.propTypes = {
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   height: PropTypes.number,
-  chartData: PropTypes.arrayOf({ }).isRequired,
-  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  chartTypes: PropTypes.objectOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 ComposedCsvChart.defaultProps = {
