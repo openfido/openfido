@@ -50,13 +50,16 @@ jobs:
       ecr-url:
         type: env_var_name
         default: AWS_ECR_ACCOUNT_URL
+      repo:
+        type: string
+        default: openfido/dev-app
     steps:
       - setup_remote_docker:
           version: 18.09.3
       - aws-ecr/build-and-push-image:
           tag: "master"
-          repo: openfido/dev-app
           extra-build-args: "--ssh default"
+          repo: << parameters.repo >>
           account-url: << parameters.ecr-url >>
           aws-access-key-id: << parameters.access-key >>
           aws-secret-access-key: << parameters.secret-key >>
@@ -106,9 +109,10 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
+          repo: openfido/prod-app
+          ecr-url: PROD_AWS_ECR_ACCOUNT_URL
           access-key: PROD_AWS_ACCESS_KEY_ID
           secret-key: PROD_AWS_SECRET_ACCESS_KEY
-          ecr-url: PROD_AWS_ECR_ACCOUNT_URL
       - aws-ecs/deploy-service-update:
           requires:
             - build-docker
@@ -117,7 +121,7 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
-          family: 'openfido-dev-app-task'
+          family: 'openfido-prod-app-task'
           cluster-name: 'openfido-prod-ecs-cluster'
           service-name: 'openfido-prod-app-service'
           container-image-name-updates: 'container=openfido-prod-app-task,tag=$CIRCLE_TAG'
