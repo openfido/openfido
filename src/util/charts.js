@@ -22,7 +22,7 @@ export const parseCsvData = (data) => {
         const rowData = { ...row };
 
         Object.keys(rowData).forEach((column) => {
-          if (rowData[column].match(/^-?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
+          if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
             rowData[column] = parseFloat(rowData[column]);
             if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
             if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;

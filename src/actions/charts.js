@@ -28,11 +28,13 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
         chartScale,
       });
     })
-    .catch(() => {
+    .catch((err) => {
       dispatch({
         artifact,
         type: PROCESS_ARTIFACT,
-        data: null,
+        chartData: err.message,
+        chartTypes: null,
+        chartScale: null,
       });
     });
 };

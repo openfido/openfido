@@ -119,10 +119,10 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && !chartData && (
-        <NoGraphingOption>No graphing options are available for this file.</NoGraphingOption>
+      {step === 2 && !isImage && !chartTypes && (
+        <NoGraphingOption title={chartData}>No graphing options are available for this file.</NoGraphingOption>
       )}
-      {step === 2 && !isImage && chartData && (
+      {step === 2 && !isImage && chartTypes && (
         <SelectChartTypeStep
           chartType={chartType}
           setChartType={setChartType}
