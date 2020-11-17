@@ -35,6 +35,31 @@ jobs:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
+  build-docker:
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      DOCKER_BUILDKIT: "1"
+    parameters:
+      access-key:
+        type: env_var_name
+        default: AWS_ACCESS_KEY_ID
+      secret-key:
+        type: env_var_name
+        default: AWS_SECRET_ACCESS_KEY
+      ecr-url:
+        type: env_var_name
+        default: AWS_ECR_ACCOUNT_URL
+    steps:
+      - setup_remote_docker:
+          version: 18.09.3
+      - aws-ecr/build-and-push-image:
+          tag: "master"
+          repo: openfido/dev-app
+          extra-build-args: "--ssh default"
+          account-url: << parameters.ecr-url >>
+          aws-access-key-id: << parameters.access-key >>
+          aws-secret-access-key: << parameters.secret-key >>
 workflows:
   pullrequests:
     jobs:
@@ -48,18 +73,18 @@ workflows:
           filters:
             branches:
               only: /master/
-      - aws-ecr/build-and-push-image:
+      - build-docker:
           requires:
             - test
           filters:
             branches:
               only: /master/
-          tag: "master"
-          repo: openfido/dev-app
-          extra-build-args: "--ssh default"
+          access-key: AWS_ACCESS_KEY_ID
+          secret-key: AWS_SECRET_ACCESS_KEY
+          ecr-url: AWS_ECR_ACCOUNT_URL
       - aws-ecs/deploy-service-update:
           requires:
-            - aws-ecr/build-and-push-image
+            - build-docker
           filters:
             branches:
               only: /master/
@@ -76,7 +101,7 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
-      - aws-ecr/build-and-push-image:
+      - build-docker:
           requires:
             - test
           filters:
@@ -84,15 +109,12 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
-          tag: "$CIRCLE_TAG"
-          repo: openfido/prod-app
-          extra-build-args: "--ssh default"
-          account-url: PROD_AWS_ECR_ACCOUNT_URL
-          aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
-          aws-secret-access-key: PROD_AWS_SECRET_ACCESS_KEY
+          access-key: PROD_AWS_ACCESS_KEY_ID
+          secret-key: PROD_AWS_SECRET_ACCESS_KEY
+          ecr-url: PROD_AWS_ECR_ACCOUNT_URL
       - aws-ecs/deploy-service-update:
           requires:
-            - aws-ecr/build-and-push-image
+            - build-docker
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)+/
