@@ -34,6 +34,7 @@ PIPELINE_RUN_UUID = "d6c42c749a1643aba0217c02e177625f"
 PIPELINE_RUN_INPUT_FILE_UUID = "1a393d3d847d41b4bbf006738bb576c5"
 WORKFLOW_UUID = "da9917748b2f4d71bc82426579b7565c"
 WORKFLOW_PIPELINE_UUID = "85ca9cdcfc6645d3a2e41fac10061bff"
+WORKFLOW_PIPELINE_RESPONSE_UUID = "943a00bfb92c4d0ea65ccc8d12f372b2"
 USER_UUID = "ded3f053-d25e-4873-8e38-7fbf9c38"
 JWT_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZGVkM2YwNTMtZDI1ZS00ODczLThlMzgtN2ZiZjljMzgiLCJleHAiOjE2MDMyOTQ3MzYsIm1heC1leHAiOjE2MDU3MTM5MzYsImlzcyI6ImFwcCIsImlhdCI6MTYwMjA4NTEzNn0.YRVky4oynBJRF6XhchCvDzeEqUOxAaki-xPTnXmAd3Y"
 
@@ -94,20 +95,6 @@ def organization_workflow(app):
 
 
 @pytest.fixture
-def organization_workflow_pipepine(app, organization_pipeline, organization_workflow):
-    ow_pipeline = OrganizationWorkflowPipeline(
-        uuid=ORGANIZATION_WORKFLOW_PIPELINE_UUID,
-        organization_workflow_uuid=ORGANIZATION_WORKFLOW_PIPELINE_UUID,
-        organization_pipeline_id=organization_pipeline.id,
-        workflow_pipeline_uuid=WORKFLOW_PIPELINE_UUID,
-    )
-    db.session.add(ow_pipeline)
-    db.session.commit()
-
-    return ow_pipeline
-
-
-@pytest.fixture
 def organization_pipeline_input_file(
     app, organization_pipeline, organization_pipeline_run
 ):
@@ -139,6 +126,19 @@ def organization_pipeline_run(app, organization_pipeline):
     db.session.commit()
 
     return opr
+
+
+@pytest.fixture
+def organization_workflow_pipeline(app, organization_pipeline, organization_workflow):
+    ow_pipeline = OrganizationWorkflowPipeline(
+        organization_workflow_uuid=organization_workflow.uuid,
+        organization_pipeline_id=organization_pipeline.id,
+        workflow_pipeline_uuid=WORKFLOW_PIPELINE_UUID,
+    )
+    db.session.add(ow_pipeline)
+    db.session.commit()
+
+    return ow_pipeline
 
 
 @pytest.fixture

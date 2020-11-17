@@ -11,7 +11,10 @@ from app.workflows.models import (
     OrganizationWorkflowPipeline,
     db,
 )
-from app.pipelines.queries import find_organization_pipeline
+from app.pipelines.queries import (
+    find_organization_pipeline,
+    find_organization_pipelines,
+)
 from app.workflows.queries import (
     find_organization_workflow,
     find_organization_workflows,
@@ -199,20 +202,26 @@ def create_workflow_pipeline(
     if not org_pipeline:
         raise ValueError("Organization Pipeline not found.")
 
+    associated_org_workflow_pipelines = find_organization_workflow_pipelines(
+        organization_workflow_uuid, org_pipeline.id
+    )
+
+    org_workflow_pipelines = {
+        ow_p.uuid: ow_p.workflow_pipeline_uuid
+        for ow_p in associated_org_workflow_pipelines
+    }
+
     # org workflow pipelines
     src_org_workflow_pipelines = request_json.get("source_workflow_pipelines", [])
-    src_pipelines = search_organization_workflow_pipelines(
-        organization_workflow_uuid, src_org_workflow_pipelines
-    )
-
     dest_org_workflow_pipelines = request_json.get("destination_workflow_pipelines", [])
-    dest_pipelines = search_organization_workflow_pipelines(
-        organization_workflow_uuid, dest_org_workflow_pipelines
-    )
 
     # workflow pipelines
-    src_workflow_pipelines = [sp.workflow_pipeline_uuid for pipe in src_pipelines]
-    dest_workflow_pipelines = [sp.workflow_pipeline_uuid for pipe in dest_pipelines]
+    src_workflow_pipelines = [
+        org_workflow_pipelines[sp_uuid] for sp_uuid in src_org_workflow_pipelines
+    ]
+    dest_workflow_pipelines = [
+        org_workflow_pipelines[dp_uuid] for dp_uuid in dest_org_workflow_pipelines
+    ]
 
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}/pipelines",
@@ -242,7 +251,7 @@ def create_workflow_pipeline(
         db.session.commit()
 
         json_value["uuid"] = new_org_workflow_pipeline.uuid
-        json_value["pipeline_uuid"] = org_pipeline
+        json_value["pipeline_uuid"] = org_pipeline.uuid
         json_value["source_workflow_pipelines"] = src_org_workflow_pipelines
         json_value["destination_workflow_pipelines"] = dest_org_workflow_pipelines
 
@@ -253,10 +262,8 @@ def create_workflow_pipeline(
         raise ValueError(json_value) from http_error
 
 
-def fetch_workflow_pipelines(
-    organization_uuid, organization_workflow_uuid, request_json
-):
-    """Creates an Organization Workflow Pipeline."""
+def fetch_workflow_pipelines(organization_uuid, organization_workflow_uuid):
+    """Fetches all Organization Workflow Pipelines."""
 
     organization_workflow = find_organization_workflow(
         organization_uuid, organization_workflow_uuid
@@ -279,31 +286,35 @@ def fetch_workflow_pipelines(
         response.raise_for_status()
         valid_workflows = []
 
-        # map workflow pipelines to org workflow pipeline uuids
-        org_workflow_pipelines = {
-            ow_p.workflow_pipeline_uuid: ow_p.uuid
-            for ow_p in find_organization_workflow_pipelines(
-                organization_workflow_uuid, org_pipeline.id
-            )
-        }
-
-        # map workflow pipelines to org workflow pipeline uuids
+        # map workflow pipelines to org pipeline ids and uuids
         org_pipelines = {
-            o_p.pipeline_uuid: o_p.uuid
-            for o_p in find_organization_pipelines(organization_workflow_uuid)
+            o_p.pipeline_uuid: (
+                o_p.id,
+                o_p.uuid,
+            )
+            for o_p in find_organization_pipelines(organization_uuid)
         }
 
         for workflow in json_value:
+            org_pipeline_id, org_pipeline_uuid = org_pipelines[
+                workflow["pipeline_uuid"]
+            ]
+
+            # map workflow pipelines to org workflow pipeline uuids
+            associated_org_workflow_pipelines = find_organization_workflow_pipelines(
+                organization_workflow_uuid, org_pipeline_id
+            )
+
+            org_workflow_pipelines = {
+                ow_p.workflow_pipeline_uuid: ow_p.uuid
+                for ow_p in associated_org_workflow_pipelines
+            }
+
             workflow["uuid"] = org_workflow_pipelines[workflow["uuid"]]
-            workflow["pipeline_uuid"] = org_pipelines[workflow["pipeline_uuid"]]
-            workflow["source_workflow_pipelines"] = [
-                org_workflow_pipelines[uuid]
-                for uuid in workflow["source_workflow_pipelines"]
-            ]
-            workflow["destination_workflow_pipelines"] = [
-                org_workflow_pipelines[uuid]
-                for uuid in workflow["source_workflow_pipelines"]
-            ]
+            workflow["pipeline_uuid"] = org_pipeline_uuid
+
+            for key in ["source_workflow_pipelines", "destination_workflow_pipelines"]:
+                workflow[key] = [org_workflow_pipelines[uuid] for uuid in workflow[key]]
 
         return json_value
     except ValueError as value_error:

@@ -260,7 +260,7 @@ def workflow_delete(organization_uuid, organization_workflow_uuid):
 
 
 @organization_workflow_bp.route(
-    "/v1/organizations/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
+    "/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
     methods=["POST"],
 )
 @any_application_required
@@ -336,7 +336,7 @@ def workflow_pipeline_create(organization_uuid, organization_workflow_uuid):
 
 
 @organization_workflow_bp.route(
-    "/v1/organizations/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
+    "/<organization_uuid>/workflows/<organization_workflow_uuid>/pipelines",
     methods=["GET"],
 )
 @any_application_required
@@ -384,7 +384,9 @@ def workflow_pipelines(organization_uuid, organization_workflow_uuid):
         description: "Http error"
     """
     try:
-        return jsonify(fetch_workflow_pipelines(organization_uuid))
+        return jsonify(
+            fetch_workflow_pipelines(organization_uuid, organization_workflow_uuid)
+        )
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
     except ValueError as value_error:

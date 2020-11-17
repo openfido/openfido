@@ -25,9 +25,10 @@ def find_organization_workflow(organization_uuid, organization_workflow_uuid):
 def find_organization_workflow_pipelines(
     organization_workflow_uuid, organization_pipeline_id
 ):
-    """Fetches all OrganizationWorkflowPipelines associated with an organization. """
+    """Fetches all OrganizationWorkflowPipelines associated with an organization pipeline. """
     return OrganizationWorkflowPipeline.query.filter(
-        OrganizationWorkflowPipeline.organization_workflow_uuid == organization_uuid,
+        OrganizationWorkflowPipeline.organization_workflow_uuid
+        == organization_workflow_uuid,
         OrganizationPipeline.id == organization_pipeline_id,
         OrganizationWorkflowPipeline.is_deleted == False,
     )
