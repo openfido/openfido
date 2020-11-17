@@ -15,7 +15,7 @@ import colors from 'styles/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
-import TimeSeriesChart from '../composed-chart';
+import ComposedCsvChart from '../composed-csv-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -123,14 +123,14 @@ const DataVisualization = ({
               <img src={artifact.url} alt={artifact.name} width="100%" />
             )}
             {chart_type_code === chartTypes.LINE_CHART && (
-              <TimeSeriesChart
+              <ComposedCsvChart
                 type={chart_type_code}
                 config={chart_config}
                 artifact={artifact}
               />
             )}
             {chart_type_code === chartTypes.BAR_CHART && (
-              <TimeSeriesChart
+              <ComposedCsvChart
                 type={chart_type_code}
                 config={chart_config}
                 artifact={artifact}
