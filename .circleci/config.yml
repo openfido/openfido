@@ -35,6 +35,7 @@ jobs:
           command: pipenv run invoke style
       - run:
           command: pipenv run invoke lint --fail-under=9
+
   build-docker:
     docker:
       - image: circleci/python:3.8
@@ -43,13 +44,13 @@ jobs:
     parameters:
       access-key:
         type: env_var_name
-        default: AWS_ACCESS_KEY_ID
+        default: STAGE_ACCESS_KEY_ID
       secret-key:
         type: env_var_name
-        default: AWS_SECRET_ACCESS_KEY
+        default: STAGE_SECRET_ACCESS_KEY
       ecr-url:
         type: env_var_name
-        default: AWS_ECR_ACCOUNT_URL
+        default: STAGE_ECR_ACCOUNT_URL
       repo:
         type: string
         default: openfido/dev-app
@@ -114,9 +115,9 @@ workflows:
               ignore: /.*/
           tag: $CIRCLE_TAG
           repo: openfido/prod-app
-          ecr-url: PROD_AWS_ECR_ACCOUNT_URL
-          access-key: PROD_AWS_ACCESS_KEY_ID
-          secret-key: PROD_AWS_SECRET_ACCESS_KEY
+          ecr-url: PROD_ECR_ACCOUNT_URL
+          access-key: PROD_ACCESS_KEY_ID
+          secret-key: PROD_SECRET_ACCESS_KEY
       - aws-ecs/deploy-service-update:
           requires:
             - build-docker
@@ -129,5 +130,5 @@ workflows:
           cluster-name: 'openfido-prod-ecs-cluster'
           service-name: 'openfido-prod-app-service'
           container-image-name-updates: 'container=openfido-prod-app-task,tag=$CIRCLE_TAG'
-          aws-access-key-id: "$PROD_AWS_ACCESS_KEY_ID"
-          aws-secret-access-key: "$PROD_AWS_SECRET_ACCESS_KEY"
+          aws-access-key-id: "$PROD_ACCESS_KEY_ID"
+          aws-secret-access-key: "$PROD_SECRET_ACCESS_KEY"
