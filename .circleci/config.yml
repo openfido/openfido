@@ -129,5 +129,5 @@ workflows:
           cluster-name: 'openfido-prod-ecs-cluster'
           service-name: 'openfido-prod-app-service'
           container-image-name-updates: 'container=openfido-prod-app-task,tag=$CIRCLE_TAG'
-          aws-access-key-id: PROD_AWS_ACCESS_KEY_ID
-          aws-secret-access-key: PROD_AWS_SECRET_ACCESS_KEY
+          aws-access-key-id: $PROD_AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $PROD_AWS_SECRET_ACCESS_KEY
