@@ -85,7 +85,7 @@ const ComposedCsvChart = ({
           yAxisId={DATA_TYPES.NUMBER}
           type={DATA_TYPES.NUMBER}
           scale={chartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
-          interval={0}
+          interval="preserveStartEnd"
           fontSize={12}
           style={{ fontWeight: 500, fill: colors.gray10 }}
           angle={-90}
@@ -229,6 +229,7 @@ const ComposedCsvChart = ({
           bottom: 16,
           left: 32,
           right: 32,
+          top: 32,
         }}
       >
         <CartesianGrid stroke="rgba(112, 112, 112, 0.2)" vertical={false} />
