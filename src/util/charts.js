@@ -90,10 +90,10 @@ export const getLimitedDataPointsForGraph = ({
   return limitedDataSet;
 };
 
-export const axesFormatter = (value) => {
+export const axesFormatter = (value, isTimestamp) => {
   const valueString = value.toString();
 
-  if (valueString.length === 10) { // will try to parse is a number of length 10
+  if (isTimestamp && valueString.length === 10) {
     const dataValue = moment.unix(value);
     if (dataValue.isValid()) {
       return moment.unix(value).format('M/D/YYYY h:mm:ss A');

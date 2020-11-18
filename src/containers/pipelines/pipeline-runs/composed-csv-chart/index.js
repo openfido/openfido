@@ -32,6 +32,8 @@ const ComposedCsvChart = ({
   const axesComponents = [];
   const dataComponents = [];
 
+  let hasTimeXAxis = false; // used for axesFormatter in util/charts
+
   if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
     const axesByType = {
       [DATA_TYPES.NUMBER]: [],
@@ -54,6 +56,7 @@ const ComposedCsvChart = ({
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
+              formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
             />
           ));
           break;
@@ -66,6 +69,7 @@ const ComposedCsvChart = ({
               dot={false}
               fill={chartFills[index]}
               stroke={chartStrokes[index]}
+              formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
             />
           ));
           break;
@@ -157,6 +161,7 @@ const ComposedCsvChart = ({
       if (axis in chartTypes && axis in chartScales) {
         switch (chartTypes[axis]) {
           case DATA_TYPES.TIME:
+            hasTimeXAxis = true;
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
@@ -230,8 +235,7 @@ const ComposedCsvChart = ({
         {axesComponents}
         {dataComponents}
         <Tooltip
-          labelFormatter={axesFormatter}
-          formatter={axesFormatter}
+          labelFormatter={(value) => axesFormatter(value, hasTimeXAxis)}
           contentStyle={{
             fontSize: 12,
             fontWeight: 400,
