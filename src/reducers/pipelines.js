@@ -1,5 +1,6 @@
 import moment from 'moment';
 
+import { createdAtSort } from 'util/data';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   GET_PIPELINES,
@@ -38,6 +39,13 @@ export default (state = DEFAULT_STATE, action) => {
         return -1;
       });
 
+      pipelines.forEach((pipeline) => {
+        const { last_pipeline_run = {} } = pipeline;
+        const { states = [] } = last_pipeline_run;
+
+        states.sort(createdAtSort);
+      });
+
       return {
         ...state,
         pipelines: action.payload,
@@ -65,19 +73,6 @@ export default (state = DEFAULT_STATE, action) => {
       pipelineRuns.forEach((run, index) => {
         const { states } = run;
 
-        if (states) {
-          states.sort((stateA, stateB) => {
-            const dateA = moment(stateA.created_at);
-            const dateB = moment(stateB.created_at);
-
-            if (dateA && dateB) {
-              return dateA - dateB;
-            }
-
-            return -1;
-          });
-        }
-
         let status = null;
         let startedAt = null;
         let completedAt = null;
@@ -86,6 +81,8 @@ export default (state = DEFAULT_STATE, action) => {
         let duration = null;
 
         if (states && states.length) {
+          states.sort(createdAtSort);
+
           status = states[states.length - 1].state;
           startedAt = states.find((stateItem) => stateItem.state === pipelineStates.RUNNING);
           completedAt = states.find((stateItem) => (
