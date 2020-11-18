@@ -1,5 +1,6 @@
 import ApiClient from 'util/api-client';
 import config from 'config';
+import mime from 'mime';
 
 const { baseUrl, appToken } = config.api;
 
@@ -115,7 +116,12 @@ export const requestDeletePipeline = (organization_uuid, pipeline_uuid) => (
 );
 
 export const requestUploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (
-  ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/input_files?name=${file_name}`, file_content, appToken)
+  ApiClient.post(
+    `${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/input_files?name=${file_name}`,
+    file_content,
+    appToken,
+    mime.getType(file_name),
+  )
 );
 
 export const requestStartPipelineRun = (organization_uuid, pipeline_uuid, inputs) => (
