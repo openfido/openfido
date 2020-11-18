@@ -46,8 +46,8 @@ const StyledDataVisualization = styled.div`
     padding: 18px 20px;
     padding: 1.125rem 1.5rem;
     h4 {
-      margin-bottom: 40px;
-      margin-bottom: 2.5rem;
+      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
     }
   }
 `;

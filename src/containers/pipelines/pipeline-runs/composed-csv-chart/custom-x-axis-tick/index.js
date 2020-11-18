@@ -12,7 +12,7 @@ const CustomXAxisTick = (props) => {
 
   const showTickRect = index !== (visibleTicksCount - 1) && index % 2;
 
-  const rectWidth = width / visibleTicksCount;
+  const rectWidth = width / (visibleTicksCount - 1);
 
   const dateOffset = isTimestamp ? 28 : 22;
 
@@ -28,7 +28,9 @@ const CustomXAxisTick = (props) => {
     !isTimestamp && (
       <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>{tickValue}</Text>
     ),
-    showTickRect && <Rectangle key="tickrect" fill="rgba(196, 196, 196, 0.1)" fillOpacity={0.1} x={x} y={0} width={rectWidth} height={y - 2} style={style} />,
+    showTickRect && ( // y position is based off of chart container margin-top. height as well.
+      <Rectangle key="tickrect" fill="rgba(196, 196, 196, 0.1)" fillOpacity={0.1} x={x} y={32} width={rectWidth} height={y - 34} style={style} />
+    ),
   ];
 };
 
