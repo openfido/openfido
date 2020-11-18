@@ -1,7 +1,9 @@
 version: 2.1
+
 orbs:
   node: circleci/node@2.1.1
   aws-static-site-deploy: realself/aws-static-site-deploy@1.0.1
+
 jobs:
   build:
     docker:
@@ -30,7 +32,7 @@ workflows:
           filters:
             branches:
               only: /master/
-      - aws-static-site-deploy:
+      - aws-static-site-deploy/copy-site:
           requires:
             - build
           filters:
@@ -50,7 +52,7 @@ workflows:
               only: /v[0-9]+(\.[0-9]+)+/
             branches:
               ignore: /.*/
-      - aws-static-site-deploy:
+      - aws-static-site-deploy/copy-site:
           requires:
             - build
           filters:
