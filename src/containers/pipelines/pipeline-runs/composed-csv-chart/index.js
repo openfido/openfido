@@ -34,7 +34,7 @@ const ComposedCsvChart = ({
 
   let hasTimeXAxis = false; // used for axesFormatter in util/charts
 
-  if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
+  if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes && chartTypes && chartScales) {
     const axesByType = {
       [DATA_TYPES.NUMBER]: [],
       [DATA_TYPES.TIME]: [],

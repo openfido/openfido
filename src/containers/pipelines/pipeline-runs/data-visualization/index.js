@@ -88,7 +88,7 @@ const DataVisualization = ({
   const pipelineRunCharts = charts && charts[pipelineRunSelected && pipelineRunSelected.uuid];
 
   useEffect(() => {
-    if (charts) return;
+    if (charts && pipelineRunSelected && pipelineRunSelected.uuid in charts) return;
 
     dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
   }, [currentOrg, pipelineInView, pipelineRunSelected, dispatch, charts]);
