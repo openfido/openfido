@@ -1,9 +1,6 @@
 version: 2.1
-
 orbs:
   node: circleci/node@2.1.1
-  aws-s3: circleci/aws-s3@2.0.0
-
 jobs:
   build:
     docker:
@@ -24,73 +21,15 @@ jobs:
           name: Build
           command: |
             npm run build
-
-  deploy:
-    docker:
-      - image: cimg/base:stable
-    parameters:
-      access-key:
-        description: "Value of AWS_ACCESS_KEY_ID"
-        type: env_var_name
-        default: $STAGE_ACCESS_KEY_ID
-      secret-key:
-        description: "Value of AWS_SECRET_ACCESS_KEY"
-        type: env_var_name
-        default: $STAGE_SECRET_ACCESS_KEY
-      to:
-        description: "A URI to an S3 bucket, i.e. 's3://the-name-my-bucket'"
-        type: env_var_name
-        default: $STAGE_S3_URL
-      from:
-        description: "A local *directory* path to sync with S3"
-        type: string
-        default: './build'
-      distribution-id:
-        description: "Cloudfront Distribution Id for cache invalidation."
-        type: env_var_name
-        default: $STAGE_CF_ID
-    steps:
-      - aws-s3/sync:
-          from: << parameters.from >>
-          to: << parameters.to >>
-          aws-access-key-id: << parameters.access-key >>
-          aws-secret-access-key: << parameters.secret-key >>
-          arguments: |
-            --delete
-      - cf-invalidations:
-          name: "Invalidate CloudFront Cache"
+      - run:
+          name: Deploy
           command: |
-            aws cloudfront create-invalidation --distribution-id << parameters.distribution-id >> --paths "/*"
-
-workflows:
-  dev:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: /master/
-      - deploy:
-          filters:
-            branches:
-              only: /master/
-
-  prod:
-    jobs:
-      - build:
-          filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)+/
-            branches:
-              ignore: /.*/
-      - deploy:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /v[0-9]+(\.[0-9]+)+/
-            branches:
-              ignore: /.*/
-          to: $PROD_S3_URL
-          distribution-id: $PROD_CF_ID
-          access-key: $PROD_ACCESS_KEY_ID
-          secret-key: $PROD_SECRET_ACCESS_KEY
+            if [ "${CIRCLE_BRANCH}" == "staging" ] ; then
+              echo Deploy to Staging...
+              AWS_ACCESS_KEY_ID="${STAGE_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${STAGE_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${STAGE_CF_ID}" S3_BUCKET="${STAGE_S3_URL}" NODE_ENV=staging node ./scripts/deploy.js
+              echo Deploy Complete
+            elif [ "${CIRCLE_BRANCH}" == "master" ] ; then
+              echo Deploy to Production...
+              AWS_ACCESS_KEY_ID="${PROD_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${PROD_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${PROD_CF_ID}" S3_BUCKET="${PROD_S3_URL}" NODE_ENV=production node ./scripts/deploy.js
+              echo Deploy Complete
+            fi
