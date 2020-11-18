@@ -1,3 +1,5 @@
+import copy
+
 from unittest.mock import patch
 
 import responses
@@ -556,3 +558,327 @@ def test_workflow_pipelines(
         str(organization_workflow_pipeline.uuid)
         in first_result["source_workflow_pipelines"]
     )
+
+
+@patch("app.workflows.routes.fetch_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_backend_500(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    fetch_mock.side_effect = HTTPError("something is wrong")
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.workflows.routes.fetch_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_backend_error(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    message = {"message": "error"}
+    fetch_mock.side_effect = ValueError(message)
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_workflow_pipelines(
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/pipelines/{wf_pipeline_uuid}",
+        json=WORKFLOW_PIPELINE_RESPONSE_JSON,
+    )
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    ow_pipeline = result.json
+    assert ow_pipeline["pipeline_uuid"] == organization_pipeline.uuid
+
+    for key in ["destination_workflow_pipelines", "source_workflow_pipelines"]:
+        str(organization_workflow_pipeline.uuid) in ow_pipeline[key]
+
+
+@patch("app.workflows.routes.update_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_update_backend_500(
+    update_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    update_mock.side_effect = HTTPError("something is wrong")
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.put(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json={
+            "pipeline_uuid": organization_workflow_pipeline.uuid,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.workflows.routes.update_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_update_backend_error(
+    update_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    message = {"message": "error"}
+    update_mock.side_effect = ValueError(message)
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.put(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json={
+            "pipeline_uuid": organization_workflow_pipeline.uuid,
+        },
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_workflow_pipeline_update(
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    # add additional workflow pipelines to this workflow pipeline
+    mock_updated = copy.deepcopy(WORKFLOW_PIPELINE_RESPONSE_JSON)
+    mock_updated["source_workflow_pipelines"].append(
+        organization_workflow_pipeline.uuid
+    )
+    mock_updated["destination_workflow_pipelines"].append(
+        organization_workflow_pipeline.uuid
+    )
+
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.PUT,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/pipelines/{wf_pipeline_uuid}",
+        json=mock_updated,
+    )
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    update_result = client.put(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json={
+            "source_workflow_pipelines": [
+                organization_workflow_pipeline.uuid,
+                organization_workflow_pipeline.uuid,
+            ],
+            "pipeline_uuid": organization_pipeline.uuid,
+            "destination_workflow_pipelines": [
+                organization_workflow_pipeline.uuid,
+                organization_workflow_pipeline.uuid,
+            ],
+        },
+    )
+
+    ow_pipeline = update_result.json
+
+    assert ow_pipeline["pipeline_uuid"] == organization_pipeline.uuid
+
+    for key in ["source_workflow_pipelines", "destination_workflow_pipelines"]:
+        assert all(
+            ow_p == organization_workflow_pipeline.uuid for ow_p in ow_pipeline[key]
+        )
+
+
+@patch("app.workflows.routes.delete_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_delete_backend_500(
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    delete_mock.side_effect = HTTPError("something is wrong")
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.delete(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.workflows.routes.delete_workflow_pipeline")
+@responses.activate
+def test_workflow_pipeline_delete_backend_error(
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    message = {"message": "error"}
+    delete_mock.side_effect = ValueError(message)
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.delete(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@responses.activate
+def test_workflow_pipeline_delete(
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/pipelines/{wf_pipeline_uuid}",
+        status=204,
+    )
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.delete(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/pipelines/{ow_wf_pipeline_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    ow_pipeline = OrganizationWorkflowPipeline.query.filter(
+        OrganizationWorkflowPipeline.uuid == organization_workflow_pipeline.uuid
+    ).first()
+
+    assert ow_pipeline.is_deleted is True
