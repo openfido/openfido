@@ -13,7 +13,7 @@ export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
 export const parseCsvData = (data) => {
   const chartData = [];
   const chartTypes = {};
-  const chartScale = {};
+  const chartScales = {};
 
   return new Promise((resolve, reject) => {
     const csvDataStream = parse({ headers: true })
@@ -25,21 +25,21 @@ export const parseCsvData = (data) => {
           if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
             rowData[column] = parseFloat(rowData[column]);
             if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.LINEAR;
           } else if (validDateString(rowData[column])) { // datetime type
             rowData[column] = toUnixTime(rowData[column]);
             if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.TIME;
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.TIME;
           } else {
             if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.LINEAR;
           }
         });
 
         chartData.push(rowData);
       })
       .on('end', () => {
-        resolve({ chartData, chartTypes, chartScale });
+        resolve({ chartData, chartTypes, chartScales });
       });
 
     csvDataStream.write(data);

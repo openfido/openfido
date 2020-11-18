@@ -27,7 +27,7 @@ export default (state = DEFAULT_STATE, action) => {
           [action.artifact.url]: {
             chartData: action.chartData,
             chartTypes: action.chartTypes,
-            chartScales: action.chartScale,
+            chartScales: action.chartScales,
           },
         },
       };

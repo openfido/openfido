@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { CHART_TYPES } from 'config/charts';
-import { addChart } from 'actions/charts';
+import { addChart, getCharts, processArtifact } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { StyledModal } from 'styles/app';
 import colors from 'styles/colors';
@@ -67,7 +67,10 @@ const AddChartPopup = ({
     if (selectedArtifact && chartType) {
       dispatch(
         addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
-      );
+      )
+        .then(() => {
+          dispatch(getCharts(currentOrg, pipeline_uuid, pipeline_run_uuid));
+        });
     }
 
     handleOk();
@@ -75,6 +78,8 @@ const AddChartPopup = ({
 
   const onArtifactSelected = () => {
     if (selectedArtifact) {
+      dispatch(processArtifact(selectedArtifact));
+
       setStep(2);
 
       if (isImage) {
@@ -134,7 +139,6 @@ const AddChartPopup = ({
       )}
       {step === 3 && !isImage && chartData && (
         <ConfigChartStep
-          selectedArtifact={selectedArtifact}
           chartType={chartType}
           onNextClicked={onAddChartClicked}
           chartData={chartData}

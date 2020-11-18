@@ -98,7 +98,7 @@ const ColumnName = styled.span`
 `;
 
 const ConfigChartStep = ({
-  selectedArtifact, chartType, onNextClicked, chartData, chartTypes, chartScales,
+  chartType, onNextClicked, chartData, chartTypes, chartScales,
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
@@ -187,7 +187,6 @@ const ConfigChartStep = ({
           <ComposedCsvChart
             type={chartType}
             config={chartConfig}
-            artifact={selectedArtifact}
             height={231}
             chartData={chartData}
             chartTypes={chartTypes}

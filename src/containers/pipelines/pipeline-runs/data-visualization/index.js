@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { getCharts, processArtifact } from 'actions/charts';
+import { getCharts } from 'actions/charts';
 import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
 import { CHART_TYPES } from 'config/charts';
 import { pipelineStates } from 'config/pipeline-status';
@@ -92,12 +92,6 @@ const DataVisualization = ({
 
     dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
   }, [currentOrg, pipelineInView, pipelineRunSelected, dispatch, charts]);
-
-  useEffect(() => {
-    if (!pipelineRunCharts) return;
-
-    pipelineRunCharts.map(({ artifact }) => dispatch(processArtifact(artifact)));
-  }, [pipelineRunCharts, dispatch]);
 
   return (
     <>
