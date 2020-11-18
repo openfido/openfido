@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { processArtifact } from 'actions/charts';
-import { useDispatch } from 'react-redux';
 
 import { PopupButton } from 'styles/pipeline-runs';
 import { StyledButton, StyledH4 } from 'styles/app';
@@ -42,7 +40,6 @@ const ArtifactsList = styled.ul`
 const SelectArtifactStep = ({
   artifacts, selectedArtifact, setSelectedArtifact, onNextClicked,
 }) => {
-  const dispatch = useDispatch();
   const onArtifactSelected = (e) => {
     e.preventDefault();
     onNextClicked();
@@ -60,10 +57,7 @@ const SelectArtifactStep = ({
                 size="large"
                 textcolor="lightBlue"
                 className={selectedArtifact === artifact ? 'selected' : ''}
-                onClick={() => {
-                  dispatch(processArtifact(artifact));
-                  setSelectedArtifact(artifact);
-                }}
+                onClick={() => setSelectedArtifact(artifact)}
               >
                 {artifact.name}
               </StyledButton>

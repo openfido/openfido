@@ -19,13 +19,13 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
   requestArtifact(artifact)
     .then((response) => response.text())
     .then((data) => parseCsvData(data))
-    .then(({ chartData, chartTypes, chartScale }) => {
+    .then(({ chartData, chartTypes, chartScales }) => {
       dispatch({
         type: PROCESS_ARTIFACT,
         artifact,
         chartData,
         chartTypes,
-        chartScale,
+        chartScales,
       });
     })
     .catch((err) => {
@@ -34,22 +34,53 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
         type: PROCESS_ARTIFACT,
         chartData: err.message,
         chartTypes: null,
-        chartScale: null,
+        chartScales: null,
       });
     });
 };
 
 export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
-  // TODO try to fetch the chart data
   requestOrganizationPipelineRunCharts(organization_uuid, pipeline_uuid, pipeline_run_uuid)
-    .then((response) => {
+    .then((chartsResponse) => {
+      const { data: charts } = chartsResponse;
+
       dispatch({
         type: GET_CHARTS,
         payload: {
           pipeline_run_uuid,
-          charts: response.data,
+          charts,
         },
       });
+
+      if (charts && charts.length) {
+        charts.forEach((chart) => {
+          const { artifact } = chart;
+
+          if (artifact) {
+            requestArtifact(artifact)
+              .then((artifactResponse) => artifactResponse.text())
+              .then((data) => parseCsvData(data))
+              .then(({ chartData, chartTypes, chartScales }) => {
+                dispatch({
+                  type: PROCESS_ARTIFACT,
+                  artifact,
+                  chartData,
+                  chartTypes,
+                  chartScales,
+                });
+              })
+              .catch((err) => {
+                dispatch({
+                  artifact,
+                  type: PROCESS_ARTIFACT,
+                  chartData: err.message,
+                  chartTypes: null,
+                  chartScales: null,
+                });
+              });
+          }
+        });
+      }
     })
     .catch((err) => {
       dispatch({
