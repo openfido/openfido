@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { CHART_TYPES } from 'config/charts';
+import {
+  ALLOWABLE_ARTIFACT_IMAGE_FORMATS,
+  CHART_TYPES,
+} from 'config/charts';
 import { addChart, getCharts, processArtifact } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { StyledModal } from 'styles/app';
@@ -61,7 +64,7 @@ const AddChartPopup = ({
   const chartDatum = useSelector((state) => state.charts.chartDatum);
   const dispatch = useDispatch();
 
-  const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
+  const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(ALLOWABLE_ARTIFACT_IMAGE_FORMATS);
 
   const onAddChartClicked = (title, chartConfig = null) => {
     if (selectedArtifact && chartType) {
@@ -124,8 +127,11 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && !chartTypes && (
-        <NoGraphingOption title={chartData}>No graphing options are available for this file.</NoGraphingOption>
+      {step === 2 && !isImage && !chartTypes && chartData && (
+        <NoGraphingOption>
+          <p>No graphing options are available for this file.</p>
+          <p>{chartData}</p>
+        </NoGraphingOption>
       )}
       {step === 2 && !isImage && chartTypes && (
         <SelectChartTypeStep

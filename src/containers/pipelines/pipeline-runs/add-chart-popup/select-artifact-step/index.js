@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import { ALLOWABLE_ARTIFACT_FORMATS } from 'config/charts';
 import { PopupButton } from 'styles/pipeline-runs';
 import { StyledButton, StyledH4 } from 'styles/app';
 import colors from 'styles/colors';
@@ -45,12 +46,16 @@ const SelectArtifactStep = ({
     onNextClicked();
   };
 
+  const usableArtifacts = artifacts && artifacts.filter((artifact) => (
+    artifact.name.match(ALLOWABLE_ARTIFACT_FORMATS)
+  ));
+
   return (
     <form>
       <div>
         <StyledH4 color="darkText">Select an artifact</StyledH4>
         <ArtifactsList>
-          {artifacts && artifacts.map((artifact) => (
+          {usableArtifacts && usableArtifacts.map((artifact) => (
             <li key={artifact.uuid}>
               <StyledButton
                 type="text"

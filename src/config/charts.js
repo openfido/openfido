@@ -23,14 +23,14 @@ export const YAXIS = 'y-axis';
 
 export const AXES_LIMIT = 4;
 
-export const chartFills = [
+export const CHART_FILLS = [
   colors.chartBlue,
   colors.chartGray,
   colors.chartGreen,
   colors.chartYellow,
 ];
 
-export const chartStrokes = [
+export const CHART_STROKES = [
   colors.chartBlue,
   colors.chartGrayStroke,
   colors.chartGreen,
@@ -38,3 +38,6 @@ export const chartStrokes = [
 ];
 
 export const CHART_TITLE_LENGTH_LIMIT = 128;
+
+export const ALLOWABLE_ARTIFACT_IMAGE_FORMATS = /\.(png|svg|gif|jpe?g|tiff|bmp)$/i;
+export const ALLOWABLE_ARTIFACT_FORMATS = /\.(png|svg|gif|jpe?g|tiff|bmp|csv)$/i;
