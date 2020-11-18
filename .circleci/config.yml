@@ -53,7 +53,7 @@ jobs:
         default: STAGE_ECR_ACCOUNT_URL
       repo:
         type: string
-        default: openfido/dev-app
+        default: openfido/stage-app
       tag:
         type: string
         default: master
@@ -92,10 +92,12 @@ workflows:
           filters:
             branches:
               only: /master/
-          family: 'openfido-dev-app-task'
-          cluster-name: 'openfido-dev-ecs-cluster'
-          service-name: 'openfido-dev-app-service'
-          container-image-name-updates: 'container=openfido-dev-app-task,tag=master'
+          family: 'openfido-stage-app-task'
+          cluster-name: 'openfido-stage-ecs-cluster'
+          service-name: 'openfido-stage-app-service'
+          container-image-name-updates: 'container=openfido-stage-app-task,tag=master'
+          aws-access-key-id: "$STAGE_ACCESS_KEY_ID"
+          aws-secret-access-key: "$STAGE_SECRET_ACCESS_KEY"
 
   prod:
     jobs:
