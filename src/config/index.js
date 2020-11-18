@@ -16,7 +16,7 @@ const API_TOKEN_PRODUCTION = process.env.API_TOKEN || '2c873e166d1e40439de6f8111
 
 const parseEnvironment = () => {
   if (window.location.hostname.includes('localhost')) return ENVIRONMENT_DEVELOPMENT;
-  if (window.location.hostname.includes('cloudfront')) return ENVIRONMENT_STAGING;
+  if (window.location.hostname.includes('staging')) return ENVIRONMENT_STAGING;
   return ENVIRONMENT_PRODUCTION;
 };
 
