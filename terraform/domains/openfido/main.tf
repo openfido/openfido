@@ -4,6 +4,12 @@ provider "aws" {
   region  = var.aws_region
 }
 
+provider "aws" {
+  alias   = "stage"
+  profile = "openfido-stage"
+  region  = var.aws_region
+}
+
 // Terraform Version
 terraform {
   required_version = ">= 0.13"

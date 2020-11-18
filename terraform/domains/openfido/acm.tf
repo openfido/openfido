@@ -34,6 +34,8 @@ resource "aws_acm_certificate_validation" "prod_acm" {
 
 // Stage certificates
 resource "aws_acm_certificate" "stage_acm" {
+  provider = aws.stage
+
   domain_name               = local.stage_subdomain[0]
   subject_alternative_names = slice(local.stage_subdomain, 1, length(local.stage_subdomain))
   validation_method         = "DNS"
@@ -41,6 +43,13 @@ resource "aws_acm_certificate" "stage_acm" {
   tags = merge(map(
   "Name", "Stage Subdomains ${var.domain}"
   ), local.tags)
+}
+
+resource "aws_acm_certificate_validation" "stage_acm" {
+  provider = aws.stage
+
+  certificate_arn         = aws_acm_certificate.stage_acm.arn
+  validation_record_fqdns = [for record in aws_route53_record.stage_acm : record.fqdn]
 }
 
 resource "aws_route53_record" "stage_acm" {
@@ -59,9 +68,4 @@ resource "aws_route53_record" "stage_acm" {
   ttl             = 60
   type            = each.value.type
   zone_id         = each.value.zone_id
-}
-
-resource "aws_acm_certificate_validation" "stage_acm" {
-  certificate_arn         = aws_acm_certificate.stage_acm.arn
-  validation_record_fqdns = [for record in aws_route53_record.stage_acm : record.fqdn]
 }
