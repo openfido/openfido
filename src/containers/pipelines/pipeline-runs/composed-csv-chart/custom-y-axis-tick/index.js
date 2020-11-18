@@ -16,13 +16,13 @@ const CustomYAxisTick = (props) => {
 
   return [
     isTimestamp && (
-      <Text textAnchor="middle" width={32} fill={fill} x={x - 32} y={y - 8} style={style} fontSize={fontSize}>{tickValue.format('MMM D')}</Text>
+      <Text key="date" textAnchor="middle" width={32} fill={fill} x={x - 32} y={y - 8} style={style} fontSize={fontSize}>{tickValue.format('MMM D')}</Text>
     ),
     isTimestamp && (
-      <Text textAnchor="middle" width={32} fill={fill} x={x - 32} y={y + 8} style={style} fontSize={fontSize}>{tickValue.format('h A')}</Text>
+      <Text key="time" textAnchor="middle" width={32} fill={fill} x={x - 32} y={y + 8} style={style} fontSize={fontSize}>{tickValue.format('h A')}</Text>
     ),
     !isTimestamp && (
-      <Text textAnchor="middle" fill={fill} x={x - 32} y={y + 3} style={style} fontSize={fontSize}>{tickValue}</Text>
+      <Text key="value" textAnchor="middle" fill={fill} x={x - 32} y={y + 3} style={style} fontSize={fontSize}>{tickValue}</Text>
     ),
   ];
 };

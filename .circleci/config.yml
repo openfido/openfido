@@ -26,10 +26,10 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "staging" ] ; then
               echo Deploy to Staging...
-              npm run deploy-staging-ci
+              AWS_ACCESS_KEY_ID="${STAGE_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${STAGE_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${STAGE_CF_ID}" S3_BUCKET="${STAGE_S3_URL}" NODE_ENV=staging node ./scripts/deploy.js
               echo Deploy Complete
             elif [ "${CIRCLE_BRANCH}" == "master" ] ; then
               echo Deploy to Production...
-              npm run deploy-production-ci
+              AWS_ACCESS_KEY_ID="${PROD_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${PROD_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${PROD_CF_ID}" S3_BUCKET="${PROD_S3_URL}" NODE_ENV=production node ./scripts/deploy.js
               echo Deploy Complete
             fi

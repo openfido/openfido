@@ -2,21 +2,9 @@ var path = require('path')
 var fs = require('fs')
 var mime = require('mime')
 
-let CloudFrontDistributionID
-let DeployBucket
-let Region
-
-if (process.env.NODE_ENV === 'production') {
-    CloudFrontDistributionID = 'E3LEDU9R7ILAUB'
-    DeployBucket = 'openfido-dev-website'
-    Region = 'us-east-1'
-} else if (process.env.NODE_ENV === 'staging') {
-    CloudFrontDistributionID = 'E3LEDU9R7ILAUB'
-    DeployBucket = 'openfido-dev-website'
-    Region = 'us-east-1'
-} else {
-    throw new Error('NODE_ENV not specified')
-}
+let CloudFrontDistributionID = process.env.CF_ID
+let DeployBucket = process.env.S3_BUCKET
+let Region = process.env.AWS_REGION
 
 //const InvalidationPaths = ['/index.html', '/favicon.ico', '/service_worker.js', '/static/js/*', '/static/css/*', '/static/media/*', '/assets/*']
 
@@ -25,7 +13,11 @@ const DeployDir = './build'
 const IgnoreFiles = ['.DS_Store']
 
 var AWS = require('aws-sdk')
-AWS.config.region = Region
+AWS.config.update({
+    region: Region,
+    "accessKeyId": process.env.AWS_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.AWS_SECRET_ACCESS_KEY
+});
 
 var buildTree = function(dir) {
     const name = dir.replace(DeployDir, '')
