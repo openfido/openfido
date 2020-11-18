@@ -4,10 +4,10 @@
 
 Contains the permissions available to API endpoints for various authenticated user roles within an organization
 
-[App Service API](http://openfido-dev-app-alb-654410805.us-east-1.elb.amazonaws.com/apidocs/)
+[App Service API](https://api.openfido.org/apidocs/)
 
 Documentation of App Service API endpoints and their required or optional request parameters, along with example responses
 
-[Auth Service API](http://openfido-dev-auth-alb-433407301.us-east-1.elb.amazonaws.com/apidocs/)
+[Auth Service API](https://auth.openfido.org/apidocs/)
 
 Documentation of Auth Service API endpoints and their required or optional request parameters, along with example responses
