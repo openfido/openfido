@@ -52,35 +52,35 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
         },
       });
 
-      if (charts && charts.length) {
-        charts.forEach((chart) => {
-          const { artifact } = chart;
+      if (!charts || !charts.length) return;
 
-          if (artifact) {
-            requestArtifact(artifact)
-              .then((artifactResponse) => artifactResponse.text())
-              .then((data) => parseCsvData(data))
-              .then(({ chartData, chartTypes, chartScales }) => {
-                dispatch({
-                  type: PROCESS_ARTIFACT,
-                  artifact,
-                  chartData,
-                  chartTypes,
-                  chartScales,
-                });
-              })
-              .catch((err) => {
-                dispatch({
-                  artifact,
-                  type: PROCESS_ARTIFACT,
-                  chartData: err.message,
-                  chartTypes: null,
-                  chartScales: null,
-                });
-              });
-          }
-        });
-      }
+      charts.forEach((chart) => {
+        const { artifact } = chart;
+
+        if (!artifact) return;
+
+        requestArtifact(artifact)
+          .then((artifactResponse) => artifactResponse.text())
+          .then((data) => parseCsvData(data))
+          .then(({ chartData, chartTypes, chartScales }) => {
+            dispatch({
+              type: PROCESS_ARTIFACT,
+              artifact,
+              chartData,
+              chartTypes,
+              chartScales,
+            });
+          })
+          .catch((err) => {
+            dispatch({
+              artifact,
+              type: PROCESS_ARTIFACT,
+              chartData: err.message,
+              chartTypes: null,
+              chartScales: null,
+            });
+          });
+      });
     })
     .catch((err) => {
       dispatch({
