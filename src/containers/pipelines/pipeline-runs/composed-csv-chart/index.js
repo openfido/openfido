@@ -168,7 +168,6 @@ const ComposedCsvChart = ({
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type={DATA_TYPES.NUMBER}
                 scale={DATA_SCALES.TIME}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
