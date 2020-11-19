@@ -4,6 +4,7 @@ import {
   GET_CHARTS,
   GET_CHARTS_FAILED,
   PROCESS_ARTIFACT,
+  PROCESS_ARTIFACT_FAILED,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -11,6 +12,7 @@ const DEFAULT_STATE = {
   messages: {
     getChartsError: null,
     addChartError: null,
+    processArtifactError: null,
   },
   chartDatum: {},
 };
@@ -19,7 +21,7 @@ export default (state = DEFAULT_STATE, action) => {
   if (action.error) return state;
 
   switch (action.type) {
-    case PROCESS_ARTIFACT: {
+    case PROCESS_ARTIFACT:
       return {
         ...state,
         chartDatum: {
@@ -31,9 +33,16 @@ export default (state = DEFAULT_STATE, action) => {
           },
         },
       };
-    }
+    case PROCESS_ARTIFACT_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          processArtifactError: action.payload,
+        },
+      };
     case GET_CHARTS: {
-      const { pipeline_run_uuid, charts } = action.payload; // TODO: formatted graph data
+      const { pipeline_run_uuid, charts } = action.payload;
 
       return {
         ...state,
@@ -52,7 +61,7 @@ export default (state = DEFAULT_STATE, action) => {
         },
       };
     case ADD_CHART: {
-      const { pipeline_run_uuid, chart } = action.payload; // TODO: formatted graph data
+      const { pipeline_run_uuid, chart } = action.payload;
 
       const pipelineRunCharts = (pipeline_run_uuid in state.charts && [...state.charts[pipeline_run_uuid]]) || [];
       pipelineRunCharts.push(chart);

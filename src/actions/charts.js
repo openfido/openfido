@@ -4,6 +4,7 @@ import {
   ADD_CHART,
   ADD_CHART_FAILED,
   PROCESS_ARTIFACT,
+  PROCESS_ARTIFACT_FAILED,
 } from 'actions';
 import {
   requestOrganizationPipelineRunCharts,
@@ -30,11 +31,8 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
     })
     .catch((err) => {
       dispatch({
-        artifact,
-        type: PROCESS_ARTIFACT,
-        chartData: err.message,
-        chartTypes: null,
-        chartScales: null,
+        type: PROCESS_ARTIFACT_FAILED,
+        payload: err.message || (!err.response || err.response.data),
       });
     });
 };

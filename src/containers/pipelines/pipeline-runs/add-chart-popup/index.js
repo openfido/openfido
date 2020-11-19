@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { CHART_TYPES } from 'config/charts';
+import {
+  ALLOWABLE_ARTIFACT_IMAGE_FORMATS,
+  CHART_TYPES,
+} from 'config/charts';
 import { addChart, getCharts, processArtifact } from 'actions/charts';
 import CloseOutlined from 'icons/CloseOutlined';
 import { StyledModal } from 'styles/app';
@@ -15,6 +18,7 @@ import ConfigChartStep from './config-chart-step';
 
 const NoGraphingOption = styled.div`
   margin: auto;
+  text-align: center;
 `;
 
 const Modal = styled(StyledModal)`
@@ -56,12 +60,24 @@ const AddChartPopup = ({
   const [step, setStep] = useState(1);
   const [selectedArtifact, setSelectedArtifact] = useState(null);
   const [chartType, setChartType] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const chartDatum = useSelector((state) => state.charts.chartDatum);
+  const processArtifactError = useSelector((state) => state.charts.messages.processArtifactError);
   const dispatch = useDispatch();
 
-  const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(/\.(png|svg|gif|jpe?g|tiff|bmp)$/i);
+  const chartData = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
+  const chartTypes = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartTypes;
+  const chartScales = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
+
+  const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(ALLOWABLE_ARTIFACT_IMAGE_FORMATS);
+
+  useEffect(() => {
+    if (chartData || processArtifactError) {
+      setIsLoading(false);
+    }
+  }, [chartData, processArtifactError]);
 
   const onAddChartClicked = (title, chartConfig = null) => {
     if (selectedArtifact && chartType) {
@@ -78,6 +94,7 @@ const AddChartPopup = ({
 
   const onArtifactSelected = () => {
     if (selectedArtifact) {
+      setIsLoading(true);
       dispatch(processArtifact(selectedArtifact));
 
       setStep(2);
@@ -93,10 +110,6 @@ const AddChartPopup = ({
       setStep(3);
     }
   };
-
-  const chartData = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
-  const chartTypes = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartTypes;
-  const chartScales = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
 
   return (
     <Modal
@@ -124,8 +137,11 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && !chartTypes && (
-        <NoGraphingOption title={chartData}>No graphing options are available for this file.</NoGraphingOption>
+      {step === 2 && !isImage && !isLoading && processArtifactError && (
+        <NoGraphingOption>
+          <p>No graphing options are available for this file.</p>
+          <p>{processArtifactError}</p>
+        </NoGraphingOption>
       )}
       {step === 2 && !isImage && chartTypes && (
         <SelectChartTypeStep
