@@ -57,6 +57,7 @@ const ComposedCsvChart = ({
               fill={CHART_FILLS[index]}
               stroke={CHART_STROKES[index]}
               formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
+              isAnimationActive={false}
             />
           ));
           break;
@@ -70,6 +71,7 @@ const ComposedCsvChart = ({
               fill={CHART_FILLS[index]}
               stroke={CHART_STROKES[index]}
               formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
+              isAnimationActive={false}
             />
           ));
           break;

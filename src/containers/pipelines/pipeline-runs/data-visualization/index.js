@@ -45,6 +45,7 @@ const StyledDataVisualization = styled.div`
     line-height: 1.3125rem;
     padding: 18px 20px;
     padding: 1.125rem 1.5rem;
+    min-height: 327px;
     h4 {
       margin-bottom: 8px;
       margin-bottom: 0.5rem;

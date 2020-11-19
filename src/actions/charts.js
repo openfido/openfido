@@ -71,11 +71,8 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
           })
           .catch((err) => {
             dispatch({
-              artifact,
-              type: PROCESS_ARTIFACT,
-              chartData: err.message,
-              chartTypes: null,
-              chartScales: null,
+              type: PROCESS_ARTIFACT_FAILED,
+              payload: err.message || (!err.response || err.response.data),
             });
           });
       });

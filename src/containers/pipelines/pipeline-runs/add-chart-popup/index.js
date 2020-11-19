@@ -137,7 +137,7 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && !isLoading && processArtifactError && (
+      {step === 2 && !isImage && !isLoading && processArtifactError && !chartTypes && (
         <NoGraphingOption>
           <p>No graphing options are available for this file.</p>
           <p>{processArtifactError}</p>
