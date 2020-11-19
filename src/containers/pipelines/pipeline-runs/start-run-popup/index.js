@@ -164,7 +164,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
         dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result));
       };
 
-      fileReader.readAsBinaryString(file);
+      fileReader.readAsArrayBuffer(file);
     });
 
     if (uploadBoxDragged) setUploadBoxDragged(false);

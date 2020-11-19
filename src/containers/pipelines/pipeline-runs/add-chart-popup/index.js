@@ -79,7 +79,7 @@ const AddChartPopup = ({
     }
   }, [chartData, processArtifactError]);
 
-  const onAddChartClicked = (title, chartConfig = null) => {
+  const onAddChartClicked = (title, chartConfig = {}) => {
     if (selectedArtifact && chartType) {
       dispatch(
         addChart(currentOrg, pipeline_uuid, pipeline_run_uuid, title, selectedArtifact && selectedArtifact.uuid, chartType, chartConfig),
