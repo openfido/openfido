@@ -1,6 +1,6 @@
 # How to invite a new user
 
-[Watch Video](https://s3.amazonaws.com/docs.openfido.org/assets/invite_new_user.mp4)
+[Watch Video](https://help.openfido.org/assets/invite_new_user.mp4)
 
 If you are an organization admin, you can invite a new user to your organization.
 

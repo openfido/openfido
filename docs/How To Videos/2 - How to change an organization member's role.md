@@ -1,6 +1,6 @@
 # How to change an organization member's role
 
-[Watch Video](https://s3.amazonaws.com/docs.openfido.org/assets/change_org_member_role.mp4)
+[Watch Video](https://help.openfido.org/assets/change_org_member_role.mp4)
 
 Once the user has accepted their invitation, you can make changes to their role.
 
