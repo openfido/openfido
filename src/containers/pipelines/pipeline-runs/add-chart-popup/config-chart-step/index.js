@@ -187,7 +187,7 @@ const ConfigChartStep = ({
           <ComposedCsvChart
             type={chartType}
             config={chartConfig}
-            height={231}
+            height={255}
             chartData={chartData}
             chartTypes={chartTypes}
             chartScales={chartScales}
