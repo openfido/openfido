@@ -23,7 +23,7 @@ const ConfigChartForm = styled.div`
     border-radius: 6px;
     background-color: ${colors.white};
     min-height: 231px;
-    padding: 2rem 0 0 1rem;
+    padding: 0 1rem;
   }
   > button {
     margin: 24px auto 0 auto;
