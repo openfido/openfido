@@ -8,8 +8,8 @@ import {
   YAxis,
   Area,
   Bar,
-  Label,
   Tooltip,
+  Legend,
 } from 'recharts';
 
 import {
@@ -96,17 +96,7 @@ const ComposedCsvChart = ({
           tickCount={5}
           tick={<CustomYAxisTick isNumber />}
           stroke={colors.gray10}
-        >
-          <Label
-            angle={-90}
-            value={axesByType[DATA_TYPES.NUMBER].join(', ')}
-            position="insideLeft"
-            offset={-16}
-            style={{
-              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-            }}
-          />
-        </YAxis>
+        />
       ));
     }
 
@@ -145,17 +135,7 @@ const ComposedCsvChart = ({
           tickCount={5}
           stroke={colors.gray10}
           tick={CustomYAxisTick}
-        >
-          <Label
-            angle={-90}
-            value={axesByType[DATA_TYPES.CATEGORY].join(', ')}
-            position="insideLeft"
-            offset={-16}
-            style={{
-              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-            }}
-          />
-        </YAxis>
+        />
       ));
     }
 
@@ -168,7 +148,8 @@ const ComposedCsvChart = ({
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                scale={DATA_SCALES.TIME}
+                type={type === CHART_TYPES.BAR_CHART ? DATA_TYPES.CATEGORY : DATA_TYPES.NUMBER}
+                scale={type === CHART_TYPES.BAR_CHART ? DATA_SCALES.AUTO : DATA_SCALES.TIME}
                 interval="preserveStartEnd"
                 domain={['auto', 'auto']}
                 fontSize={10}
@@ -228,7 +209,6 @@ const ComposedCsvChart = ({
         data={chartData}
         margin={{
           bottom: 16,
-          left: 32,
           right: 32,
           top: 32,
         }}
@@ -236,6 +216,13 @@ const ComposedCsvChart = ({
         <CartesianGrid stroke="rgba(112, 112, 112, 0.2)" vertical={false} />
         {axesComponents}
         {dataComponents}
+        <Legend
+          wrapperStyle={{ bottom: 0 }}
+          iconSize={12}
+          formatter={(value) => (
+            <span style={{ fontSize: 12 }}>{value}</span>
+          )}
+        />
         <Tooltip
           labelFormatter={(value) => axesFormatter(value, hasTimeXAxis)}
           contentStyle={{
@@ -269,7 +256,7 @@ ComposedCsvChart.propTypes = {
 };
 
 ComposedCsvChart.defaultProps = {
-  height: 264,
+  height: 288,
 };
 
 export default ComposedCsvChart;
