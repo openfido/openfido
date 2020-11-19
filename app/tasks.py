@@ -79,7 +79,7 @@ class RunExecutor:
         return self._put("state", {"state": run_state_enum.name})
 
     def upload_artifact(self, filename, location):
-        with open(location) as f:
+        with open(location, "rb") as f:
             self._make_request(f"artifacts?name={filename}", f, {}, "POST")
 
     def run(self, command, directory):
