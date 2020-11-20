@@ -136,6 +136,10 @@ export const requestPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/console`, appToken)
 );
 
+export const requestOrganizationPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
+  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}`, appToken)
+);
+
 export const requestCreatePipelineRunArtifact = (organization_uuid, pipeline_uuid, pipeline_run_uuid, title, artifact_uuid, chart_type_code, chart_config) => (
   ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, {
     name: title,
