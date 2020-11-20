@@ -101,10 +101,10 @@ const DataVisualization = () => {
   }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
 
   useEffect(() => {
-    if (currentPipelineRunUuid !== pipelineRunSelectedUuid) {
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid || !currentPipelineRun) {
       dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
     }
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, dispatch]);
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
 
   useEffect(() => {
     if (charts && pipelineRunSelectedUuid in charts) return;

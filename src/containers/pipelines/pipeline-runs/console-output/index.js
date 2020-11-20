@@ -75,10 +75,10 @@ const ConsoleOutput = () => {
   }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
 
   useEffect(() => {
-    if (currentPipelineRunUuid !== pipelineRunSelectedUuid) {
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid || !currentPipelineRun) {
       dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
     }
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, dispatch]);
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
 
   useEffect(() => {
     requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
