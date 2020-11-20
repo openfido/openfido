@@ -6,7 +6,6 @@ import {
   GET_PIPELINE_RUNS_FAILED,
   GET_PIPELINE_RUN,
   GET_PIPELINE_RUN_FAILED,
-  SELECT_PIPELINE_RUN,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -106,12 +105,6 @@ export default (state = DEFAULT_STATE, action) => {
         messages: DEFAULT_STATE.messages,
       };
     }
-    case SELECT_PIPELINE_RUN:
-      return {
-        ...state,
-        messages: DEFAULT_STATE.messages,
-        currentPipelineRunUuid: action.payload,
-      };
     case GET_PIPELINE_RUN_FAILED: {
       return {
         ...state,

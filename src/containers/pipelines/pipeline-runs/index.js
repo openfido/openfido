@@ -6,8 +6,8 @@ import styled from 'styled-components';
 import { pipelineStates } from 'config/pipeline-status';
 import {
   getPipelineRuns,
+  getPipelineRun,
   getPipelines,
-  selectPipelineRun,
 } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
@@ -114,12 +114,12 @@ const PipelineRuns = () => {
 
   useEffect(() => {
     if (pipelineRuns && pipelineRuns.length && !selectedRun) {
-      dispatch(selectPipelineRun(pipelineRuns[0].uuid));
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRuns[0].uuid));
     }
-  }, [pipelineRuns, selectedRun, dispatch]);
+  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch]);
 
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
-    dispatch(selectPipelineRun(pipelineRunSelectedUuid));
+    dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
   };
 
   const openStartRunPopup = () => {
