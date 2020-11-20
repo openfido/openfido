@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { requestOrganizationPipelineRun, requestPipelineRunConsoleOutput } from 'services';
+import { requestPipelineRunConsoleOutput } from 'services';
 import { STDOUT, STDERR } from 'config/pipeline-runs';
-import { getPipelines } from 'actions/pipelines';
+import { getPipelineRun, getPipelines } from 'actions/pipelines';
 import {
   StyledH2, StyledButton, StyledTitle, StyledText,
 } from 'styles/app';
@@ -59,29 +59,26 @@ const ConsoleOutput = () => {
   const [stderr, setStderr] = useState();
   const [outputType, setOutputType] = useState(STDOUT);
   const [getConsoleOutputError, setGetConsoleOutputError] = useState(null);
-  const [pipelineRun, setPipelineRun] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const dispatch = useDispatch();
 
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
 
   useEffect(() => {
-    if (!pipelines) {
+    if (!pipelines && !pipelineItemInView) {
       dispatch(getPipelines(currentOrg));
     }
-  }, [currentOrg, dispatch, pipelines]);
+  }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
 
   useEffect(() => {
-    requestOrganizationPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid)
-      .then((response) => {
-        setPipelineRun(response.data);
-      })
-      .catch(() => {
-
-      });
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid]);
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    }
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, dispatch]);
 
   useEffect(() => {
     requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
@@ -110,7 +107,7 @@ const ConsoleOutput = () => {
         <header>
           <StyledH2 color="black">
             Run #
-            {pipelineRun && pipelineRun.sequence}
+            {currentPipelineRun && currentPipelineRun.sequence}
           </StyledH2>
           <OverviewTabMenu
             dataVisualizationReady

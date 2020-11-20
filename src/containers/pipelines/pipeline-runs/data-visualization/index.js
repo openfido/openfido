@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { requestOrganizationPipelineRun } from 'services';
 import { getCharts } from 'actions/charts';
 import { CHART_TYPES } from 'config/charts';
 import {
@@ -14,7 +13,7 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
-import { getPipelines } from 'actions/pipelines';
+import { getPipelines, getPipelineRun } from 'actions/pipelines';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 import ComposedCsvChart from '../composed-csv-chart';
@@ -82,32 +81,30 @@ const DataVisualization = () => {
   const { pipeline_uuid: pipelineInView, pipeline_run_uuid: pipelineRunSelectedUuid } = useParams();
 
   const [showAddChartPopup, setShowAddChartPopup] = useState(false);
-  const [pipelineRun, setPipelineRun] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const charts = useSelector((state) => state.charts.charts);
   const chartDatum = useSelector((state) => state.charts.chartDatum);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const dispatch = useDispatch();
 
   const pipelineRunCharts = charts && charts[pipelineRunSelectedUuid];
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
+  const pipelineRunArtifacts = currentPipelineRun && currentPipelineRun.artifacts;
 
   useEffect(() => {
-    if (!pipelines) {
+    if (!pipelines && !pipelineItemInView) {
       dispatch(getPipelines(currentOrg));
     }
-  }, [currentOrg, dispatch, pipelines]);
+  }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
 
   useEffect(() => {
-    requestOrganizationPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid)
-      .then((response) => {
-        setPipelineRun(response.data);
-      })
-      .catch(() => {
-
-      });
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid]);
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    }
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, dispatch]);
 
   useEffect(() => {
     if (charts && pipelineRunSelectedUuid in charts) return;
@@ -130,7 +127,7 @@ const DataVisualization = () => {
         <header>
           <StyledH2 color="black">
             Run #
-            {pipelineRun && pipelineRun.sequence}
+            {currentPipelineRun && currentPipelineRun.sequence}
           </StyledH2>
           <OverviewTabMenu
             dataVisualizationReady
@@ -183,7 +180,7 @@ const DataVisualization = () => {
           handleCancel={() => setShowAddChartPopup(false)}
           pipeline_uuid={pipelineInView}
           pipeline_run_uuid={pipelineRunSelectedUuid}
-          artifacts={pipelineRun && pipelineRun.artifacts}
+          artifacts={pipelineRunArtifacts}
         />
       )}
     </>

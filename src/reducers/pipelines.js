@@ -1,12 +1,11 @@
-import moment from 'moment';
-
-import { createdAtSort } from 'util/data';
-import { pipelineStates } from 'config/pipeline-status';
+import { computePipelineRunMetaData, createdAtSort } from 'util/data';
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_FAILED,
+  GET_PIPELINE_RUN,
+  GET_PIPELINE_RUN_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -17,6 +16,8 @@ const DEFAULT_STATE = {
   pipelines: null,
   pipelineRuns: {},
   inputFiles: null,
+  currentPipelineRun: null,
+  currentPipelineRunUuid: null,
   messages: {
     getPipelinesError: null,
     getPipelineRunsError: null,
@@ -48,6 +49,7 @@ export default (state = DEFAULT_STATE, action) => {
 
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         pipelines: action.payload,
       };
     }
@@ -71,45 +73,12 @@ export default (state = DEFAULT_STATE, action) => {
       });
 
       pipelineRuns.forEach((run, index) => {
-        const { states } = run;
-
-        let status = null;
-        let startedAt = null;
-        let completedAt = null;
-        let momentStartedAt = null;
-        let momentCompletedAt = null;
-        let duration = null;
-
-        if (states && states.length) {
-          states.sort(createdAtSort);
-
-          status = states[states.length - 1].state;
-          startedAt = states.find((stateItem) => stateItem.state === pipelineStates.RUNNING);
-          completedAt = states.find((stateItem) => (
-            stateItem.state === pipelineStates.COMPLETED
-              || stateItem.state === pipelineStates.FAILED
-              || stateItem.state === pipelineStates.CANCELED
-          ));
-
-          startedAt = startedAt && startedAt.created_at;
-          completedAt = completedAt && completedAt.created_at;
-
-          momentStartedAt = startedAt && moment.utc(startedAt).local();
-          momentCompletedAt = completedAt && moment.utc(completedAt).local();
-
-          if (momentStartedAt && momentCompletedAt) {
-            duration = moment.duration(momentStartedAt.diff(momentCompletedAt)).humanize();
-          }
-        }
-
-        pipelineRuns[index].status = status;
-        pipelineRuns[index].startedAt = momentStartedAt;
-        pipelineRuns[index].completedAt = momentCompletedAt;
-        pipelineRuns[index].duration = duration;
+        pipelineRuns[index] = computePipelineRunMetaData(run);
       });
 
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         pipelineRuns: {
           ...state.pipelineRuns,
           [pipeline_uuid]: pipelineRuns,
@@ -124,6 +93,26 @@ export default (state = DEFAULT_STATE, action) => {
           getPipelineRunsError: action.payload,
         },
       };
+    case GET_PIPELINE_RUN: {
+      const { pipelineRun, pipeline_run_uuid } = action.payload;
+
+      computePipelineRunMetaData(pipelineRun);
+
+      return {
+        ...state,
+        currentPipelineRun: pipelineRun,
+        currentPipelineRunUuid: pipeline_run_uuid,
+        messages: DEFAULT_STATE.messages,
+      };
+    }
+    case GET_PIPELINE_RUN_FAILED: {
+      return {
+        ...state,
+        currentPipelineRun: null,
+        currentPipelineRunUuid: null,
+        messages: DEFAULT_STATE.messages,
+      };
+    }
     case UPLOAD_INPUT_FILE:
       return {
         ...state,

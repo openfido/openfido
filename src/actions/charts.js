@@ -7,7 +7,7 @@ import {
   PROCESS_ARTIFACT_FAILED,
 } from 'actions';
 import {
-  requestOrganizationPipelineRunCharts,
+  requestPipelineRunCharts,
   requestCreatePipelineRunArtifact,
   requestArtifact,
 } from 'services';
@@ -38,7 +38,7 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
 };
 
 export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
-  requestOrganizationPipelineRunCharts(organization_uuid, pipeline_uuid, pipeline_run_uuid)
+  requestPipelineRunCharts(organization_uuid, pipeline_uuid, pipeline_run_uuid)
     .then((chartsResponse) => {
       const { data: charts } = chartsResponse;
 
