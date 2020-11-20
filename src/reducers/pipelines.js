@@ -21,6 +21,7 @@ const DEFAULT_STATE = {
   messages: {
     getPipelinesError: null,
     getPipelineRunsError: null,
+    getPipelineRunError: null,
     uploadInputFileError: null,
   },
 };
@@ -110,7 +111,10 @@ export default (state = DEFAULT_STATE, action) => {
         ...state,
         currentPipelineRun: null,
         currentPipelineRunUuid: null,
-        messages: DEFAULT_STATE.messages,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunError: action.payload,
+        },
       };
     }
     case UPLOAD_INPUT_FILE:
