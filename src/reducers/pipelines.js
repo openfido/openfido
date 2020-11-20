@@ -97,11 +97,9 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_PIPELINE_RUN: {
       const { pipelineRun, pipeline_run_uuid } = action.payload;
 
-      computePipelineRunMetaData(pipelineRun);
-
       return {
         ...state,
-        currentPipelineRun: pipelineRun,
+        currentPipelineRun: computePipelineRunMetaData(pipelineRun),
         currentPipelineRunUuid: pipeline_run_uuid,
         messages: DEFAULT_STATE.messages,
       };
