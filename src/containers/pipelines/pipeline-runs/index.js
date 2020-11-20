@@ -4,7 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { pipelineStates } from 'config/pipeline-status';
-import { getPipelineRuns, getPipelines } from 'actions/pipelines';
+import {
+  getPipelineRuns,
+  getPipelines,
+  selectPipelineRun,
+} from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
 import StartRunPopup from './start-run-popup';
@@ -82,10 +86,10 @@ const PipelineRuns = () => {
   const { pipeline_uuid: pipelineInView } = useParams();
 
   const [showStartRunPopup, setStartRunPopup] = useState(false);
-  const [selectedRun, setSelectedRun] = useState(null);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
+  const selectedRun = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
@@ -109,10 +113,14 @@ const PipelineRuns = () => {
   }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
 
   useEffect(() => {
-    if (pipelineRuns && pipelineRuns.length) {
-      setSelectedRun(pipelineRuns[0].uuid);
+    if (pipelineRuns && pipelineRuns.length && !selectedRun) {
+      dispatch(selectPipelineRun(pipelineRuns[0].uuid));
     }
-  }, [pipelineRuns]);
+  }, [pipelineRuns, selectedRun, dispatch]);
+
+  const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
+    dispatch(selectPipelineRun(pipelineRunSelectedUuid));
+  };
 
   const openStartRunPopup = () => {
     setStartRunPopup(true);
@@ -139,7 +147,7 @@ const PipelineRuns = () => {
             openStartRunPopup={openStartRunPopup}
             pipelineRuns={pipelineRuns}
             selectedRun={selectedRun}
-            setSelectedRun={setSelectedRun}
+            onSelectPipelineRun={onSelectPipelineRun}
           />
         </AllRunsSection>
         <OverviewSection>

@@ -7,6 +7,7 @@ import {
   GET_PIPELINE_RUNS_FAILED,
   GET_PIPELINE_RUN,
   GET_PIPELINE_RUN_FAILED,
+  SELECT_PIPELINE_RUN,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -83,6 +84,11 @@ export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uu
       });
     })
 );
+
+export const selectPipelineRun = (pipeline_run_uuid) => ({
+  type: SELECT_PIPELINE_RUN,
+  payload: pipeline_run_uuid,
+});
 
 export const uploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (dispatch) => (
   requestUploadInputFile(organization_uuid, pipeline_uuid, file_name, file_content)
