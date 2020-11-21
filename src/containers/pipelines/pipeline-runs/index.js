@@ -130,7 +130,7 @@ const PipelineRuns = () => {
       dispatch(getPipelineRun(currentOrg, pipelineInView, selectedRun));
     }, POLL_PIPELINE_RUN_INTERVAL);
     return () => clearInterval(interval);
-  }, [currentOrg, pipelineInView, selectedRun, dispatch]);
+  }, [currentOrg, pipelineInView, selectedRun, getPipelineRunInProgress, dispatch]);
 
   useEffect(() => {
     if (pipelineRuns && pipelineRuns.length && !selectedRun) {

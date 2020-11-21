@@ -3,6 +3,7 @@ import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_IN_PROGRESS,
   GET_PIPELINE_RUNS_FAILED,
   GET_PIPELINE_RUN,
   GET_PIPELINE_RUN_IN_PROGRESS,
@@ -21,6 +22,7 @@ const DEFAULT_STATE = {
   currentPipelineRunUuid: null,
   messages: {
     getPipelinesError: null,
+    getPipelineRunsInProgress: false,
     getPipelineRunsError: null,
     getPipelineRunInProgress: false,
     getPipelineRunError: null,
@@ -90,6 +92,14 @@ export default (state = DEFAULT_STATE, action) => {
         currentPipelineRunUuid: pipelineRuns.length && pipelineRuns[0].uuid,
       };
     }
+    case GET_PIPELINE_RUNS_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunsInProgress: true,
+        },
+      };
     case GET_PIPELINE_RUNS_FAILED:
       return {
         ...state,
