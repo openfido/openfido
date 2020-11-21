@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { PIPELINE_STATES } from 'config/pipelines';
+import {
+  PIPELINE_STATES,
+  POLL_PIPELINE_RUN_INTERVAL,
+} from 'config/pipelines';
 import {
   getPipelineRuns,
   getPipelineRun,
@@ -103,6 +106,7 @@ const PipelineRuns = () => {
   const dispatch = useDispatch();
 
   const pipelineRunSelected = useSelector((state) => state.pipelines.currentPipelineRun);
+  const getPipelineRunInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunInProgress);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
   const pipelineRunStatus = (
     pipelineRunSelected
@@ -122,9 +126,9 @@ const PipelineRuns = () => {
   }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
 
   useEffect(() => {
-    const interval = selectedRun && setInterval(() => {
+    const interval = selectedRun && !getPipelineRunInProgress && setInterval(() => {
       dispatch(getPipelineRun(currentOrg, pipelineInView, selectedRun));
-    }, 5000);
+    }, POLL_PIPELINE_RUN_INTERVAL);
     return () => clearInterval(interval);
   }, [currentOrg, pipelineInView, selectedRun, dispatch]);
 
@@ -135,7 +139,9 @@ const PipelineRuns = () => {
   }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch]);
 
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
-    dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    if (!getPipelineRunInProgress) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    }
   };
 
   const openStartRunPopup = () => {

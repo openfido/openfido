@@ -6,6 +6,7 @@ import {
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_FAILED,
   GET_PIPELINE_RUN,
+  GET_PIPELINE_RUN_IN_PROGRESS,
   GET_PIPELINE_RUN_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
@@ -64,7 +65,8 @@ export const getPipelineRuns = (organization_uuid, pipeline_uuid) => (dispatch) 
     })
 );
 
-export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
+export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => async (dispatch) => {
+  await dispatch({ type: GET_PIPELINE_RUN_IN_PROGRESS });
   requestGetPipelineRun(organization_uuid, pipeline_uuid, pipeline_run_uuid)
     .then((response) => {
       dispatch({
@@ -81,8 +83,8 @@ export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uu
         type: GET_PIPELINE_RUN_FAILED,
         payload: !err.response || err.response.data,
       });
-    })
-);
+    });
+};
 
 export const uploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (dispatch) => (
   requestUploadInputFile(organization_uuid, pipeline_uuid, file_name, file_content)

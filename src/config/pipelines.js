@@ -1,6 +1,8 @@
 export const STDOUT = 'std_out';
 export const STDERR = 'std_err';
 
+export const POLL_PIPELINE_RUN_INTERVAL = 5000;
+
 export const STATUS_LEGEND = {
   NOT_STARTED: 'purple',
   QUEUED: 'skyBlue',
