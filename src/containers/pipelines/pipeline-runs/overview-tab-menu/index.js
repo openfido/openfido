@@ -82,12 +82,13 @@ OverviewTabMenu.propTypes = {
   dataVisualizationReady: PropTypes.bool,
   consoleOutputReady: PropTypes.bool,
   pipelineInView: PropTypes.string.isRequired,
-  pipelineRunSelectedUuid: PropTypes.string.isRequired,
+  pipelineRunSelectedUuid: PropTypes.string,
 };
 
 OverviewTabMenu.defaultProps = {
   dataVisualizationReady: false,
   consoleOutputReady: false,
+  pipelineRunSelectedUuid: null,
 };
 
 export default OverviewTabMenu;
