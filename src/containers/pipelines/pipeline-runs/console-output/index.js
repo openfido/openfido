@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { requestPipelineRunConsoleOutput } from 'services';
 import { STDOUT, STDERR } from 'config/pipeline-runs';
+import { pipelineStates } from 'config/pipeline-status';
 import { getPipelineRun, getPipelines } from 'actions/pipelines';
 import {
   StyledH2, StyledButton, StyledTitle, StyledText,
@@ -110,7 +111,7 @@ const ConsoleOutput = () => {
             {currentPipelineRun && currentPipelineRun.sequence}
           </StyledH2>
           <OverviewTabMenu
-            dataVisualizationReady
+            dataVisualizationReady={currentPipelineRun && currentPipelineRun.status === pipelineStates.COMPLETED}
             consoleOutputReady
             pipelineInView={pipelineInView}
             pipelineRunSelectedUuid={pipelineRunSelectedUuid}
