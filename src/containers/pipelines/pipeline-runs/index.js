@@ -112,12 +112,6 @@ const PipelineRuns = () => {
     dispatch(getPipelineRuns(currentOrg, pipelineInView));
   }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
 
-  useEffect(() => {
-    if (pipelineRuns && pipelineRuns.length && !selectedRun) {
-      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRuns[0].uuid));
-    }
-  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch]);
-
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
     dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
   };
