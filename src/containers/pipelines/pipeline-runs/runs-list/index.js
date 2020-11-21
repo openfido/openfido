@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Menu } from 'antd';
+import { Menu, Spin } from 'antd';
 
 import {
-  statusLegend,
-  statusNameLegend,
-} from 'config/pipeline-status';
+  STATUS_LEGEND,
+  STATUS_NAME_LEGEND,
+} from 'config/pipelines';
+import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledButton,
   StyledH2,
@@ -134,17 +135,20 @@ const RunsList = ({
       </StyledButton>
       <div />
     </StyledH2>
+    {(!pipelineRuns || !pipelineRuns.length) && (
+    <Spin indicator={<LoadingFilled spin />} />
+    )}
     <RunMenu selectedKeys={[selectedRun]}>
       {pipelineRuns && pipelineRuns.map(({
         uuid: run_uuid, sequence, status, startedAt, duration,
       }) => (
-        <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => onSelectPipelineRun(run_uuid)}>
+        <RunItem key={run_uuid} bgcolor={STATUS_LEGEND[status]} onClick={() => onSelectPipelineRun(run_uuid)}>
           <div>
             <StyledH4>
               Run #
               {sequence}
             </StyledH4>
-            <StatusText>{statusNameLegend[status]}</StatusText>
+            <StatusText>{STATUS_NAME_LEGEND[status]}</StatusText>
             <StyledH5>Started At:</StyledH5>
             {startedAt && (
             <StyledText size="middle" color="gray">
@@ -157,7 +161,7 @@ const RunsList = ({
               {duration}
             </StyledText>
             )}
-            {selectedRun === run_uuid && <Caret bgcolor={statusLegend[status]} />}
+            {selectedRun === run_uuid && <Caret bgcolor={STATUS_LEGEND[status]} />}
           </div>
         </RunItem>
       ))}

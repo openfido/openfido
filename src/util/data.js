@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { pipelineStates } from 'config/pipeline-status';
+import { PIPELINE_STATES } from 'config/pipelines';
 
 export const createdAtSort = (dateA, dateB) => {
   if (!dateA || !dateB || !dateA.created_at || !dateB.created_at) return -1;
@@ -24,11 +24,11 @@ export const computePipelineRunMetaData = (pipelineRun) => {
     states.sort(createdAtSort);
 
     status = states[states.length - 1].state;
-    startedAt = states.find((stateItem) => stateItem.state === pipelineStates.RUNNING);
+    startedAt = states.find((stateItem) => stateItem.state === PIPELINE_STATES.RUNNING);
     completedAt = states.find((stateItem) => (
-      stateItem.state === pipelineStates.COMPLETED
-        || stateItem.state === pipelineStates.FAILED
-        || stateItem.state === pipelineStates.CANCELED
+      stateItem.state === PIPELINE_STATES.COMPLETED
+        || stateItem.state === PIPELINE_STATES.FAILED
+        || stateItem.state === PIPELINE_STATES.CANCELED
     ));
 
     startedAt = startedAt && startedAt.created_at;

@@ -3,7 +3,7 @@ import { Spin } from 'antd';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { pipelineStates, statusLongNameLegend } from 'config/pipeline-status';
+import { PIPELINE_STATES, STATUS_LONG_NAME_LEGEND } from 'config/pipelines';
 import LoadingFilled from 'icons/LoadingFilled';
 import DownloadFilled from 'icons/DownloadFilled';
 import { StyledH3, StyledText } from 'styles/app';
@@ -101,9 +101,9 @@ const FilesList = ({ title, files, pipelineRunStatus }) => (
         <li>
           <OverviewMeta>
             <StyledText size="large" color="black" fontweight={500}>
-              {statusLongNameLegend[pipelineRunStatus]}
+              {STATUS_LONG_NAME_LEGEND[pipelineRunStatus]}
             </StyledText>
-            {pipelineRunStatus === pipelineStates.RUNNING && (
+            {pipelineRunStatus === PIPELINE_STATES.RUNNING && (
             <Spin indicator={<LoadingFilled spin />} />
             )}
           </OverviewMeta>

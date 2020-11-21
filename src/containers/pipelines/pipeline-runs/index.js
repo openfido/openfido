@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { pipelineStates } from 'config/pipeline-status';
+import { PIPELINE_STATES } from 'config/pipelines';
 import {
   getPipelineRuns,
   getPipelineRun,
@@ -38,6 +38,11 @@ const AllRunsSection = styled.section`
   grid-row: 1 / span 2;
   width: 318px;
   height: 718px;
+  position: relative;
+  .ant-spin .anticon {
+    top: calc(50% - 8px);
+    left: calc(50% - 8px);
+  }
   h2 { 
      width: 100%;
      padding-bottom: 3px;
@@ -57,6 +62,10 @@ const AllRunsSection = styled.section`
         left: -1rem;
         box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.1);
       }
+  }
+  .anticon {
+    width: 16px;
+    height: 16px;
   }
 `;
 
@@ -93,7 +102,7 @@ const PipelineRuns = () => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
-  const pipelineRunSelected = pipelineRuns && pipelineRuns.find((run) => run.uuid === selectedRun);
+  const pipelineRunSelected = useSelector((state) => state.pipelines.currentPipelineRun);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
   const pipelineRunStatus = (
     pipelineRunSelected
@@ -111,6 +120,19 @@ const PipelineRuns = () => {
   useEffect(() => {
     dispatch(getPipelineRuns(currentOrg, pipelineInView));
   }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
+
+  useEffect(() => {
+    const interval = selectedRun && setInterval(() => {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, selectedRun));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [currentOrg, pipelineInView, selectedRun, dispatch]);
+
+  useEffect(() => {
+    if (pipelineRuns && pipelineRuns.length && !selectedRun) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRuns[0].uuid));
+    }
+  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch]);
 
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
     dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
@@ -146,7 +168,7 @@ const PipelineRuns = () => {
         </AllRunsSection>
         <OverviewSection>
           <OverviewTabMenu
-            dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+            dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === PIPELINE_STATES.COMPLETED}
             consoleOutputReady={!!pipelineRunSelected}
             pipelineInView={pipelineInView}
             pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
