@@ -99,22 +99,20 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_PIPELINE_RUN: {
       const { pipelineRun, pipeline_uuid, pipeline_run_uuid } = action.payload;
 
-      if (!(pipeline_uuid in state.pipelineRuns)) return state;
-
-      const pipelineRuns = [...state.pipelineRuns[pipeline_uuid]] || [];
+      const pipelineRuns = (pipeline_uuid in state.pipelineRuns && [...state.pipelineRuns[pipeline_uuid]]) || [];
       const currentPipelineRun = computePipelineRunMetaData(pipelineRun);
       const pipelineRunIndex = pipelineRuns.findIndex((run) => run.uuid === pipeline_run_uuid);
 
-      if (pipelineRunIndex === -1) return state;
-
-      pipelineRuns[pipelineRunIndex] = currentPipelineRun;
+      if (pipelineRunIndex !== -1) pipelineRuns[pipelineRunIndex] = currentPipelineRun;
 
       return {
         ...state,
-        pipelineRuns: {
-          ...state.pipelineRuns,
-          [pipeline_uuid]: pipelineRuns,
-        },
+        pipelineRuns: pipelineRuns.length ? (
+          {
+            ...state.pipelineRuns,
+            [pipeline_uuid]: pipelineRuns,
+          }
+        ) : state.pipelineRuns,
         currentPipelineRun,
         currentPipelineRunUuid: pipeline_run_uuid,
         messages: DEFAULT_STATE.messages,
