@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import urllib
 from os.path import join
+from urllib.parse import quote
 
 from celery import Celery, Task, shared_task
 from celery.utils.log import get_task_logger
@@ -80,7 +81,7 @@ class RunExecutor:
 
     def upload_artifact(self, filename, location):
         with open(location, "rb") as f:
-            self._make_request(f"artifacts?name={filename}", f, {}, "POST")
+            self._make_request(f"artifacts?name={quote(filename)}", f, {}, "POST")
 
     def run(self, command, directory):
         """ Execute a command, raise an exception on nonzero error codes. """

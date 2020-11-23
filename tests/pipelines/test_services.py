@@ -133,8 +133,8 @@ def test_create_pipeline_run(app, pipeline, mock_execute_pipeline):
         "url": "https://example.com/name1.pdf",
     }
     input2 = {
-        "name": "name2.pdf",
-        "url": "https://example.com/name2.pdf",
+        "name": "name 2.pdf",
+        "url": "https://example.com/name%202.pdf",
     }
     pipeline_run = services.create_pipeline_run(
         pipeline.uuid,
