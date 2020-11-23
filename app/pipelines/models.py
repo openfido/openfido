@@ -1,4 +1,5 @@
 from flask import current_app
+from urllib.parse import quote
 
 from application_roles.model_utils import CommonColumnsMixin, get_db
 from blob_utils import create_url
@@ -75,7 +76,8 @@ class PipelineRunArtifact(CommonColumnsMixin, db.Model):
         """ Generate a publicly visible URL for this artifact. """
 
         return create_url(
-            f"{self.pipeline_run.pipeline.uuid}/{self.pipeline_run.uuid}/{self.uuid}-{self.name}"
+            f"{self.pipeline_run.pipeline.uuid}/{self.pipeline_run.uuid}/{self.uuid}-{quote(self.name)}",
+            self.name,
         )
 
 
