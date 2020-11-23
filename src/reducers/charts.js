@@ -2,8 +2,10 @@ import {
   ADD_CHART,
   ADD_CHART_FAILED,
   GET_CHARTS,
+  GET_CHARTS_IN_PROGRESS,
   GET_CHARTS_FAILED,
   PROCESS_ARTIFACT,
+  PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
 } from 'actions';
 
@@ -11,7 +13,9 @@ const DEFAULT_STATE = {
   charts: null,
   messages: {
     getChartsError: null,
+    getChartsInProgress: false,
     addChartError: null,
+    processArtifactInProgress: false,
     processArtifactError: null,
   },
   chartDatum: {},
@@ -24,6 +28,7 @@ export default (state = DEFAULT_STATE, action) => {
     case PROCESS_ARTIFACT:
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         chartDatum: {
           ...state.chartDatum,
           [action.artifact.url]: {
@@ -31,6 +36,14 @@ export default (state = DEFAULT_STATE, action) => {
             chartTypes: action.chartTypes,
             chartScales: action.chartScales,
           },
+        },
+      };
+    case PROCESS_ARTIFACT_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          processArtifactInProgress: true,
         },
       };
     case PROCESS_ARTIFACT_FAILED:
@@ -52,6 +65,14 @@ export default (state = DEFAULT_STATE, action) => {
         },
       };
     }
+    case GET_CHARTS_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getChartsInProgress: true,
+        },
+      };
     case GET_CHARTS_FAILED:
       return {
         ...state,

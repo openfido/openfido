@@ -1,9 +1,11 @@
 import {
   GET_CHARTS,
+  GET_CHARTS_IN_PROGRESS,
   GET_CHARTS_FAILED,
   ADD_CHART,
   ADD_CHART_FAILED,
   PROCESS_ARTIFACT,
+  PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
 } from 'actions';
 import {
@@ -37,7 +39,8 @@ export const processArtifact = (artifact) => (dispatch, getState) => {
     });
 };
 
-export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
+export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => async (dispatch) => {
+  await dispatch({ type: GET_CHARTS_IN_PROGRESS });
   requestPipelineRunCharts(organization_uuid, pipeline_uuid, pipeline_run_uuid)
     .then((chartsResponse) => {
       const { data: charts } = chartsResponse;
@@ -52,11 +55,12 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
 
       if (!charts || !charts.length) return;
 
-      charts.forEach((chart) => {
+      charts.forEach(async (chart) => {
         const { artifact } = chart;
 
         if (!artifact) return;
 
+        await dispatch({ type: PROCESS_ARTIFACT_IN_PROGRESS });
         requestArtifact(artifact)
           .then((artifactResponse) => artifactResponse.text())
           .then((data) => parseCsvData(data))
@@ -82,8 +86,8 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
         type: GET_CHARTS_FAILED,
         payload: !err.response || err.response.data,
       });
-    })
-);
+    });
+};
 
 export const addChart = (organization_uuid, pipeline_uuid, pipeline_run_uuid, title, artifact_uuid, chart_type_code, chart_config) => (dispatch) => (
   requestCreatePipelineRunArtifact(organization_uuid, pipeline_uuid, pipeline_run_uuid, title, artifact_uuid, chart_type_code, chart_config)
