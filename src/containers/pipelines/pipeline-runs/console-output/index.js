@@ -4,7 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Spin } from 'antd';
 import styled from 'styled-components';
 
-import { STDOUT, STDERR, PIPELINE_STATES } from 'config/pipelines';
+import {
+  STDOUT,
+  STDERR,
+  PIPELINE_STATES,
+  POLL_CONSOLE_OUTPUT_INTERVAL,
+} from 'config/pipelines';
 import {
   getPipelines,
   getPipelineRun,
@@ -95,7 +100,7 @@ const ConsoleOutput = () => {
   useEffect(() => {
     const interval = pipelineRunSelectedUuid && !getConsoleOutputInProgress && setInterval(() => {
       dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
-    }, 5000);
+    }, POLL_CONSOLE_OUTPUT_INTERVAL);
     return () => clearInterval(interval);
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch]);
 
