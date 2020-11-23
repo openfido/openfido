@@ -42,18 +42,22 @@ def upload_stream(key, stream, s3_client=None):
         key,
     )
 
-def create_url(key, s3_client=None):
+def create_url(key, filename=None, s3_client=None):
     """ Generate a publicly visible URL for this key. """
 
     if not s3_client:
         s3_client = get_s3()
 
+    params = {
+        "Bucket": current_app.config[S3_BUCKET],
+        "Key": key,
+    }
+    if filename:
+        params["ResponseContentDisposition"] = f"attachment; filename = {filename}"
+
     return s3_client.generate_presigned_url(
         "get_object",
-        Params={
-            "Bucket": current_app.config[S3_BUCKET],
-            "Key": key,
-        },
+        Params=params,
         ExpiresIn=current_app.config[S3_PRESIGNED_TIMEOUT],
     )
 
