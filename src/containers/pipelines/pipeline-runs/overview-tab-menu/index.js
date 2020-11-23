@@ -1,10 +1,16 @@
 import React from 'react';
+import { generatePath } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { OVERVIEW_TAB, DATA_VISUALIZATION_TAB, CONSOLE_OUTPUT_TAB } from 'config/pipeline-runs';
 import { StyledButton } from 'styles/app';
 import colors from 'styles/colors';
+import {
+  ROUTE_PIPELINE_RUNS,
+  ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT,
+  ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION,
+} from 'config/routes';
 
 const StyledOverviewTabMenu = styled.ul`
   list-style-type: none;
@@ -14,7 +20,7 @@ const StyledOverviewTabMenu = styled.ul`
   grid-gap: 2rem;
   grid-auto-flow: column;
   justify-content: start;
-  li {
+  li a {
     padding-bottom: 4px;
     padding-bottom: 0.25rem;
     button {
@@ -34,41 +40,55 @@ const StyledOverviewTabMenu = styled.ul`
 `;
 
 const OverviewTabMenu = ({
-  displayTab, setDisplayTab, dataVisualizationReady, consoleOutputReady,
-}) => (
-  <StyledOverviewTabMenu mode="horizontal">
-    <li className={displayTab === OVERVIEW_TAB ? 'active' : ''}>
-      <StyledButton type="text" size="middle" onClick={() => setDisplayTab(OVERVIEW_TAB)}>
-        Overview
-      </StyledButton>
-    </li>
-    {dataVisualizationReady && (
-      <li className={displayTab === DATA_VISUALIZATION_TAB ? 'active' : ''}>
-        <StyledButton type="text" size="middle" onClick={() => setDisplayTab(DATA_VISUALIZATION_TAB)}>
-          Data Visualization
-        </StyledButton>
+  dataVisualizationReady, consoleOutputReady, pipelineInView, pipelineRunSelectedUuid,
+}) => {
+  const routeParams = {
+    pipeline_uuid: pipelineInView,
+    pipeline_run_uuid: pipelineRunSelectedUuid,
+  };
+
+  return (
+    <StyledOverviewTabMenu mode="horizontal">
+      <li>
+        <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS, routeParams)}>
+          <StyledButton type="text" size="middle">
+            Overview
+          </StyledButton>
+        </NavLink>
       </li>
-    )}
-    {consoleOutputReady && (
-      <li className={displayTab === CONSOLE_OUTPUT_TAB ? 'active' : ''}>
-        <StyledButton type="text" size="middle" onClick={() => setDisplayTab(CONSOLE_OUTPUT_TAB)}>
-          Console Output
-        </StyledButton>
+      {dataVisualizationReady && (
+      <li>
+        <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION, routeParams)}>
+          <StyledButton type="text" size="middle">
+            Data Visualization
+          </StyledButton>
+        </NavLink>
       </li>
-    )}
-  </StyledOverviewTabMenu>
-);
+      )}
+      {consoleOutputReady && (
+      <li>
+        <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT, routeParams)}>
+          <StyledButton type="text" size="middle">
+            Console Output
+          </StyledButton>
+        </NavLink>
+      </li>
+      )}
+    </StyledOverviewTabMenu>
+  );
+};
 
 OverviewTabMenu.propTypes = {
-  displayTab: PropTypes.string.isRequired,
-  setDisplayTab: PropTypes.func.isRequired,
   dataVisualizationReady: PropTypes.bool,
   consoleOutputReady: PropTypes.bool,
+  pipelineInView: PropTypes.string.isRequired,
+  pipelineRunSelectedUuid: PropTypes.string,
 };
 
 OverviewTabMenu.defaultProps = {
   dataVisualizationReady: false,
   consoleOutputReady: false,
+  pipelineRunSelectedUuid: null,
 };
 
 export default OverviewTabMenu;

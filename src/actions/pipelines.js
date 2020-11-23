@@ -5,6 +5,8 @@ import {
   DELETE_PIPELINE,
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_FAILED,
+  GET_PIPELINE_RUN,
+  GET_PIPELINE_RUN_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -13,6 +15,7 @@ import {
 import {
   requestGetPipelines,
   requestGetPipelineRuns,
+  requestGetPipelineRun,
   requestUploadInputFile,
 } from 'services';
 
@@ -56,6 +59,26 @@ export const getPipelineRuns = (organization_uuid, pipeline_uuid) => (dispatch) 
     .catch((err) => {
       dispatch({
         type: GET_PIPELINE_RUNS_FAILED,
+        payload: !err.response || err.response.data,
+      });
+    })
+);
+
+export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (dispatch) => (
+  requestGetPipelineRun(organization_uuid, pipeline_uuid, pipeline_run_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_PIPELINE_RUN,
+        payload: {
+          pipelineRun: response.data,
+          pipeline_uuid,
+          pipeline_run_uuid,
+        },
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: GET_PIPELINE_RUN_FAILED,
         payload: !err.response || err.response.data,
       });
     })

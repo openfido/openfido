@@ -124,7 +124,7 @@ const Caret = styled.div`
 `;
 
 const RunsList = ({
-  openStartRunPopup, pipelineRuns, selectedRun, setSelectedRun,
+  openStartRunPopup, pipelineRuns, selectedRun, onSelectPipelineRun,
 }) => (
   <>
     <StyledH2 color="black">
@@ -138,7 +138,7 @@ const RunsList = ({
       {pipelineRuns && pipelineRuns.map(({
         uuid: run_uuid, sequence, status, startedAt, duration,
       }) => (
-        <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => setSelectedRun(run_uuid)}>
+        <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => onSelectPipelineRun(run_uuid)}>
           <div>
             <StyledH4>
               Run #
@@ -171,7 +171,7 @@ RunsList.propTypes = {
 
   })),
   selectedRun: PropTypes.string,
-  setSelectedRun: PropTypes.func.isRequired,
+  onSelectPipelineRun: PropTypes.func.isRequired,
 };
 
 RunsList.defaultProps = {

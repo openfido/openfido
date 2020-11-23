@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { getCharts } from 'actions/charts';
-import { DATA_VISUALIZATION_TAB } from 'config/pipeline-runs';
 import { CHART_TYPES } from 'config/charts';
-import { pipelineStates } from 'config/pipeline-status';
 import {
   StyledH2,
   StyledH4,
   StyledButton,
+  StyledTitle,
+  StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
-import { useDispatch, useSelector } from 'react-redux';
+import { getPipelines, getPipelineRun } from 'actions/pipelines';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 import ComposedCsvChart from '../composed-csv-chart';
@@ -76,37 +77,63 @@ const AddChartButton = styled(StyledButton)`
   }
 `;
 
-const DataVisualization = ({
-  pipelineInView, pipelineRunSelected, sequence, setDisplayTab,
-}) => {
+const DataVisualization = () => {
+  const { pipeline_uuid: pipelineInView, pipeline_run_uuid: pipelineRunSelectedUuid } = useParams();
+
   const [showAddChartPopup, setShowAddChartPopup] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const charts = useSelector((state) => state.charts.charts);
   const chartDatum = useSelector((state) => state.charts.chartDatum);
+  const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const dispatch = useDispatch();
 
-  const pipelineRunCharts = charts && charts[pipelineRunSelected && pipelineRunSelected.uuid];
+  const pipelineRunCharts = charts && charts[pipelineRunSelectedUuid];
+  const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
+  const pipelineRunArtifacts = currentPipelineRun && currentPipelineRun.artifacts;
 
   useEffect(() => {
-    if (charts && pipelineRunSelected && pipelineRunSelected.uuid in charts) return;
+    if (!pipelines && !pipelineItemInView) {
+      dispatch(getPipelines(currentOrg));
+    }
+  }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
 
-    dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelected && pipelineRunSelected.uuid));
-  }, [currentOrg, pipelineInView, pipelineRunSelected, dispatch, charts]);
+  useEffect(() => {
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid || !currentPipelineRun) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    }
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
+
+  useEffect(() => {
+    if (charts && pipelineRunSelectedUuid in charts) return;
+
+    dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, dispatch, charts]);
 
   return (
     <>
+      <StyledTitle>
+        <div>
+          <h1>
+            Pipeline Runs:
+            {' '}
+            <StyledText color="blue">{pipelineItemInView && pipelineItemInView.name}</StyledText>
+          </h1>
+        </div>
+      </StyledTitle>
       <StyledDataVisualization>
         <header>
           <StyledH2 color="black">
             Run #
-            {sequence}
+            {currentPipelineRun && currentPipelineRun.sequence}
           </StyledH2>
           <OverviewTabMenu
-            displayTab={DATA_VISUALIZATION_TAB}
-            setDisplayTab={setDisplayTab}
-            dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
-            consoleOutputReady={!!pipelineRunSelected}
+            dataVisualizationReady
+            consoleOutputReady
+            pipelineInView={pipelineInView}
+            pipelineRunSelectedUuid={pipelineRunSelectedUuid}
           />
         </header>
         <AddChartButton
@@ -152,27 +179,12 @@ const DataVisualization = ({
           handleOk={() => setShowAddChartPopup(false)}
           handleCancel={() => setShowAddChartPopup(false)}
           pipeline_uuid={pipelineInView}
-          pipeline_run_uuid={pipelineRunSelected && pipelineRunSelected.uuid}
-          artifacts={pipelineRunSelected && pipelineRunSelected.artifacts}
+          pipeline_run_uuid={pipelineRunSelectedUuid}
+          artifacts={pipelineRunArtifacts}
         />
       )}
     </>
   );
-};
-
-DataVisualization.propTypes = {
-  pipelineInView: PropTypes.string.isRequired,
-  pipelineRunSelected: PropTypes.shape({
-    uuid: PropTypes.string.isRequired,
-    status: PropTypes.string.isRequired,
-    artifacts: PropTypes.arrayOf(PropTypes.shape({
-      uuid: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    })).isRequired,
-  }).isRequired,
-  sequence: PropTypes.number.isRequired,
-  setDisplayTab: PropTypes.func.isRequired,
 };
 
 export default DataVisualization;

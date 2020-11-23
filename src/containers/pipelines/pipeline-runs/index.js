@@ -3,19 +3,16 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  OVERVIEW_TAB,
-  DATA_VISUALIZATION_TAB,
-  CONSOLE_OUTPUT_TAB,
-} from 'config/pipeline-runs';
 import { pipelineStates } from 'config/pipeline-status';
-import { getPipelineRuns, getPipelines } from 'actions/pipelines';
+import {
+  getPipelineRuns,
+  getPipelineRun,
+  getPipelines,
+} from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
 import StartRunPopup from './start-run-popup';
 import OverviewTabMenu from './overview-tab-menu';
-import ConsoleOutput from './console-output';
-import DataVisualization from './data-visualization';
 import Overview from './overview';
 import RunsList from './runs-list';
 import FilesList from './files-list';
@@ -89,11 +86,10 @@ const PipelineRuns = () => {
   const { pipeline_uuid: pipelineInView } = useParams();
 
   const [showStartRunPopup, setStartRunPopup] = useState(false);
-  const [selectedRun, setSelectedRun] = useState(null);
-  const [displayTab, setDisplayTab] = useState(OVERVIEW_TAB);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
+  const selectedRun = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
@@ -116,11 +112,9 @@ const PipelineRuns = () => {
     dispatch(getPipelineRuns(currentOrg, pipelineInView));
   }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
 
-  useEffect(() => {
-    if (pipelineRuns && pipelineRuns.length) {
-      setSelectedRun(pipelineRuns[0].uuid);
-    }
-  }, [pipelineRuns]);
+  const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
+    dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+  };
 
   const openStartRunPopup = () => {
     setStartRunPopup(true);
@@ -141,62 +135,43 @@ const PipelineRuns = () => {
           </h1>
         </div>
       </StyledTitle>
-      {displayTab === OVERVIEW_TAB && (
-        <PipelineRunsGrid gridTemplateColumns="1fr 1fr 1fr">
-          <AllRunsSection>
-            <RunsList
-              openStartRunPopup={openStartRunPopup}
-              pipelineRuns={pipelineRuns}
-              selectedRun={selectedRun}
-              setSelectedRun={setSelectedRun}
-            />
-          </AllRunsSection>
-          <OverviewSection>
-            <OverviewTabMenu
-              displayTab={displayTab}
-              setDisplayTab={setDisplayTab}
-              dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
-              consoleOutputReady={!!pipelineRunSelected}
-            />
-            {pipelineRunSelected && (
-              <Overview
-                pipelineRunSelected={pipelineRunSelected}
-              />
-            )}
-          </OverviewSection>
-          <InputFilesSection>
-            <FilesList
-              title="Input Files"
-              files={pipelineRunSelected && pipelineRunSelected.inputs}
-              pipelineRunStatus={pipelineRunStatus}
-            />
-          </InputFilesSection>
-          <ArtifactsSection>
-            <FilesList
-              title="Artifacts"
-              files={pipelineRunSelected && pipelineRunSelected.artifacts}
-              pipelineRunStatus={pipelineRunStatus}
-            />
-          </ArtifactsSection>
-        </PipelineRunsGrid>
-      )}
-      {displayTab === CONSOLE_OUTPUT_TAB && (
-        <ConsoleOutput
-          pipelineInView={pipelineInView}
-          pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
-          pipelineRunSelectedStatus={pipelineRunSelected && pipelineRunSelected.status}
-          sequence={pipelineRunSelected && pipelineRunSelected.sequence}
-          setDisplayTab={setDisplayTab}
-        />
-      )}
-      {displayTab === DATA_VISUALIZATION_TAB && (
-        <DataVisualization
-          pipelineInView={pipelineInView}
-          pipelineRunSelected={pipelineRunSelected}
-          sequence={pipelineRunSelected && pipelineRunSelected.sequence}
-          setDisplayTab={setDisplayTab}
-        />
-      )}
+      <PipelineRunsGrid gridTemplateColumns="1fr 1fr 1fr">
+        <AllRunsSection>
+          <RunsList
+            openStartRunPopup={openStartRunPopup}
+            pipelineRuns={pipelineRuns}
+            selectedRun={selectedRun}
+            onSelectPipelineRun={onSelectPipelineRun}
+          />
+        </AllRunsSection>
+        <OverviewSection>
+          <OverviewTabMenu
+            dataVisualizationReady={pipelineRunSelected && pipelineRunSelected.status === pipelineStates.COMPLETED}
+            consoleOutputReady={!!pipelineRunSelected}
+            pipelineInView={pipelineInView}
+            pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
+          />
+          {pipelineRunSelected && (
+          <Overview
+            pipelineRunSelected={pipelineRunSelected}
+          />
+          )}
+        </OverviewSection>
+        <InputFilesSection>
+          <FilesList
+            title="Input Files"
+            files={pipelineRunSelected && pipelineRunSelected.inputs}
+            pipelineRunStatus={pipelineRunStatus}
+          />
+        </InputFilesSection>
+        <ArtifactsSection>
+          <FilesList
+            title="Artifacts"
+            files={pipelineRunSelected && pipelineRunSelected.artifacts}
+            pipelineRunStatus={pipelineRunStatus}
+          />
+        </ArtifactsSection>
+      </PipelineRunsGrid>
       {showStartRunPopup && (
         <StartRunPopup
           handleOk={closeStartRunPopup}
