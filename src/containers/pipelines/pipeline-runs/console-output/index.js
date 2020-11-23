@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Spin } from 'antd';
 import styled from 'styled-components';
 
-import { requestPipelineRunConsoleOutput } from 'services';
 import { STDOUT, STDERR, PIPELINE_STATES } from 'config/pipelines';
-import { getPipelineRun, getPipelines } from 'actions/pipelines';
+import {
+  getPipelines,
+  getPipelineRun,
+  getPipelineRunConsoleOutput,
+} from 'actions/pipelines';
+import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2, StyledButton, StyledTitle, StyledText,
 } from 'styles/app';
@@ -39,31 +44,38 @@ const StyledConsoleOutput = styled.div`
     line-height: 21px;
     line-height: 1.3125rem;
     white-space: pre-line;
+    text-align: center;
+    .ant-spin .anticon {
+      position: static;
+      margin-top: 2.5rem;
+    }
   }
 `;
 
 const ConsoleOutputTypes = styled.div`
   padding-top: 16px;
   padding-top: 1rem;
+  text-align: left;
 `;
 
 const ConsoleOutputContent = styled.div`
   padding: 20px 28px;
   padding: 1.25rem 1.75rem;
+  text-align: left;
 `;
 
 const ConsoleOutput = () => {
   const { pipeline_uuid: pipelineInView, pipeline_run_uuid: pipelineRunSelectedUuid } = useParams();
 
-  const [stdout, setStdout] = useState();
-  const [stderr, setStderr] = useState();
   const [outputType, setOutputType] = useState(STDOUT);
-  const [getConsoleOutputError, setGetConsoleOutputError] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
   const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const consoleOutput = useSelector((state) => state.pipelines.consoleOutput);
+  const getConsoleOutputInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputInProgress);
+  const getConsoleOutputError = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputError);
   const dispatch = useDispatch();
 
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
@@ -81,16 +93,19 @@ const ConsoleOutput = () => {
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
 
   useEffect(() => {
-    requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
-      .then((response) => {
-        if (STDOUT in response.data) setStdout(response.data[STDOUT]);
-        if (STDERR in response.data) setStderr(response.data[STDERR]);
-        setGetConsoleOutputError(null);
-      })
-      .catch((err) => {
-        setGetConsoleOutputError(!err.response || err.response.data);
-      });
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid]);
+    const interval = pipelineRunSelectedUuid && !getConsoleOutputInProgress && setInterval(() => {
+      dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch]);
+
+  useEffect(() => {
+    if (!getConsoleOutputInProgress && consoleOutput && !consoleOutput[outputType]) {
+      dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
+    }
+  }, [
+    consoleOutput, outputType, currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch,
+  ]);
 
   return (
     <>
@@ -137,10 +152,12 @@ const ConsoleOutput = () => {
               stderr
             </StyledButton>
           </ConsoleOutputTypes>
+          {(getConsoleOutputError || (consoleOutput && !consoleOutput[outputType])) && (
+            <Spin key="spin" indicator={<LoadingFilled spin />} />
+          )}
           <ConsoleOutputContent>
-            {getConsoleOutputError && 'message' in getConsoleOutputError && getConsoleOutputError.message}
-            {outputType === STDOUT && stdout}
-            {outputType === STDERR && stderr}
+            {getConsoleOutputError && getConsoleOutputError.message}
+            {consoleOutput && consoleOutput[outputType]}
           </ConsoleOutputContent>
         </section>
       </StyledConsoleOutput>

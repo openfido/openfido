@@ -9,6 +9,9 @@ import {
   GET_PIPELINE_RUN,
   GET_PIPELINE_RUN_IN_PROGRESS,
   GET_PIPELINE_RUN_FAILED,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT_IN_PROGRESS,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -18,6 +21,7 @@ import {
   requestGetPipelines,
   requestGetPipelineRuns,
   requestGetPipelineRun,
+  requestPipelineRunConsoleOutput,
   requestUploadInputFile,
 } from 'services';
 
@@ -83,6 +87,23 @@ export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uu
     .catch((err) => {
       dispatch({
         type: GET_PIPELINE_RUN_FAILED,
+        payload: !err.response || err.response.data,
+      });
+    });
+};
+
+export const getPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid, pipeilne_run_uuid, poll) => async (dispatch) => {
+  if (!poll) await dispatch({ type: GET_PIPELINE_RUN_CONSOLE_OUTPUT_IN_PROGRESS });
+  requestPipelineRunConsoleOutput(organization_uuid, pipeline_uuid, pipeilne_run_uuid)
+    .then((response) => {
+      dispatch({
+        type: GET_PIPELINE_RUN_CONSOLE_OUTPUT,
+        payload: response.data,
+      });
+    })
+    .catch((err) => {
+      dispatch({
+        type: GET_PIPELINE_RUN_CONSOLE_OUTPUT_FAILED,
         payload: !err.response || err.response.data,
       });
     });
