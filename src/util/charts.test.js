@@ -59,8 +59,8 @@ describe('parseCsvData()', () => {
     });
 
     it('can detect scales', async () => {
-      const { chartScale } = await parseCsvData(CSV_FILE);
-      expect(chartScale).toEqual({
+      const { chartScales } = await parseCsvData(CSV_FILE);
+      expect(chartScales).toEqual({
         timestamp: 'time',
         generation_kW: 'linear',
         total_load_kW: 'linear',
