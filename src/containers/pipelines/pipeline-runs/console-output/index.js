@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { requestPipelineRunConsoleOutput } from 'services';
-import { STDOUT, STDERR } from 'config/pipeline-runs';
-import { pipelineStates } from 'config/pipeline-status';
+import { STDOUT, STDERR, PIPELINE_STATES } from 'config/pipelines';
 import { getPipelineRun, getPipelines } from 'actions/pipelines';
 import {
   StyledH2, StyledButton, StyledTitle, StyledText,
@@ -111,7 +110,7 @@ const ConsoleOutput = () => {
             {currentPipelineRun && currentPipelineRun.sequence}
           </StyledH2>
           <OverviewTabMenu
-            dataVisualizationReady={currentPipelineRun && currentPipelineRun.status === pipelineStates.COMPLETED}
+            dataVisualizationReady={currentPipelineRun && currentPipelineRun.status === PIPELINE_STATES.COMPLETED}
             consoleOutputReady
             pipelineInView={pipelineInView}
             pipelineRunSelectedUuid={pipelineRunSelectedUuid}

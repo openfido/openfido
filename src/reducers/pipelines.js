@@ -3,8 +3,10 @@ import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_IN_PROGRESS,
   GET_PIPELINE_RUNS_FAILED,
   GET_PIPELINE_RUN,
+  GET_PIPELINE_RUN_IN_PROGRESS,
   GET_PIPELINE_RUN_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
@@ -20,7 +22,9 @@ const DEFAULT_STATE = {
   currentPipelineRunUuid: null,
   messages: {
     getPipelinesError: null,
+    getPipelineRunsInProgress: false,
     getPipelineRunsError: null,
+    getPipelineRunInProgress: false,
     getPipelineRunError: null,
     uploadInputFileError: null,
   },
@@ -88,6 +92,14 @@ export default (state = DEFAULT_STATE, action) => {
         currentPipelineRunUuid: pipelineRuns.length && pipelineRuns[0].uuid,
       };
     }
+    case GET_PIPELINE_RUNS_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunsInProgress: true,
+        },
+      };
     case GET_PIPELINE_RUNS_FAILED:
       return {
         ...state,
@@ -118,7 +130,15 @@ export default (state = DEFAULT_STATE, action) => {
         messages: DEFAULT_STATE.messages,
       };
     }
-    case GET_PIPELINE_RUN_FAILED: {
+    case GET_PIPELINE_RUN_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunInProgress: true,
+        },
+      };
+    case GET_PIPELINE_RUN_FAILED:
       return {
         ...state,
         currentPipelineRun: null,
@@ -128,7 +148,6 @@ export default (state = DEFAULT_STATE, action) => {
           getPipelineRunError: action.payload,
         },
       };
-    }
     case UPLOAD_INPUT_FILE:
       return {
         ...state,

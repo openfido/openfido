@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { Menu } from 'antd';
+import { Menu, Spin } from 'antd';
 
 import {
-  statusLegend,
-  statusNameLegend,
-} from 'config/pipeline-status';
+  STATUS_LEGEND,
+  STATUS_NAME_LEGEND,
+} from 'config/pipelines';
+import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledButton,
   StyledH2,
@@ -125,45 +127,52 @@ const Caret = styled.div`
 
 const RunsList = ({
   openStartRunPopup, pipelineRuns, selectedRun, onSelectPipelineRun,
-}) => (
-  <>
-    <StyledH2 color="black">
-      All Runs:
-      <StyledButton type="text" onClick={openStartRunPopup}>
-        + Start a run
-      </StyledButton>
-      <div />
-    </StyledH2>
-    <RunMenu selectedKeys={[selectedRun]}>
-      {pipelineRuns && pipelineRuns.map(({
-        uuid: run_uuid, sequence, status, startedAt, duration,
-      }) => (
-        <RunItem key={run_uuid} bgcolor={statusLegend[status]} onClick={() => onSelectPipelineRun(run_uuid)}>
-          <div>
-            <StyledH4>
-              Run #
-              {sequence}
-            </StyledH4>
-            <StatusText>{statusNameLegend[status]}</StatusText>
-            <StyledH5>Started At:</StyledH5>
-            {startedAt && (
-            <StyledText size="middle" color="gray">
-              {startedAt.format('M/D/YY')}
-            </StyledText>
-            )}
-            <StyledH5>Duration:</StyledH5>
-            {duration && (
-            <StyledText size="middle" color="gray">
-              {duration}
-            </StyledText>
-            )}
-            {selectedRun === run_uuid && <Caret bgcolor={statusLegend[status]} />}
-          </div>
-        </RunItem>
-      ))}
-    </RunMenu>
-  </>
-);
+}) => {
+  const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
+
+  return (
+    <>
+      <StyledH2 color="black">
+        All Runs:
+        <StyledButton type="text" onClick={openStartRunPopup}>
+          + Start a run
+        </StyledButton>
+        <div />
+      </StyledH2>
+      {(getPipelineRunsInProgress || !pipelineRuns || !pipelineRuns.length) && (
+        <Spin key="spin" indicator={<LoadingFilled spin />} />
+      )}
+      <RunMenu selectedKeys={[selectedRun]}>
+        {!getPipelineRunsInProgress && pipelineRuns && pipelineRuns.map(({
+          uuid: run_uuid, sequence, status, startedAt, duration,
+        }) => (
+          <RunItem key={run_uuid} bgcolor={STATUS_LEGEND[status]} onClick={() => onSelectPipelineRun(run_uuid)}>
+            <div>
+              <StyledH4>
+                Run #
+                {sequence}
+              </StyledH4>
+              <StatusText>{STATUS_NAME_LEGEND[status]}</StatusText>
+              <StyledH5>Started At:</StyledH5>
+              {startedAt && (
+                <StyledText size="middle" color="gray">
+                  {startedAt.format('M/D/YY')}
+                </StyledText>
+              )}
+              <StyledH5>Duration:</StyledH5>
+              {duration && (
+                <StyledText size="middle" color="gray">
+                  {duration}
+                </StyledText>
+              )}
+              {selectedRun === run_uuid && <Caret bgcolor={STATUS_LEGEND[status]} />}
+            </div>
+          </RunItem>
+        ))}
+      </RunMenu>
+    </>
+  );
+};
 
 RunsList.propTypes = {
   openStartRunPopup: PropTypes.func.isRequired,

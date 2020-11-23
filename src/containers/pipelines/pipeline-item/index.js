@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
-  statusLegend,
-  statusNameLegend,
-  statusPhraseLegend,
-} from 'config/pipeline-status';
+  STATUS_LEGEND,
+  STATUS_NAME_LEGEND,
+  STATUS_PHRASE_LEGEND,
+} from 'config/pipelines';
 import EditOutlined from 'icons/EditOutlined';
 import {
   StyledGrid,
@@ -69,11 +69,11 @@ const PipelineItem = ({
         {name}
       </StyledText>
       <StatusLegend
-        color={statusLegend[runStatus]}
-        title={statusNameLegend[runStatus]}
+        color={STATUS_LEGEND[runStatus]}
+        title={STATUS_NAME_LEGEND[runStatus]}
       />
       <StyledText size="middle" color="darkText">
-        {runStatus && `Last run ${statusPhraseLegend[runStatus]} ${moment.utc(lastPipelineRunState && lastPipelineRunState.created_at).fromNow()}`}
+        {runStatus && `Last run ${STATUS_PHRASE_LEGEND[runStatus]} ${moment.utc(lastPipelineRunState && lastPipelineRunState.created_at).fromNow()}`}
       </StyledText>
       <ViewRunsColumn>
         <StyledButton
