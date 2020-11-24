@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Spin } from 'antd';
 import styled from 'styled-components';
 
 import { getCharts } from 'actions/charts';
 import { CHART_TYPES } from 'config/charts';
+import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2,
   StyledH4,
@@ -47,9 +49,15 @@ const StyledDataVisualization = styled.div`
     padding: 18px 20px;
     padding: 1.125rem 1.5rem;
     min-height: 351px;
+    text-align: center;
+    .ant-spin .anticon {
+      position: static;
+      margin-top: 5rem;
+    }
     h4 {
       margin-bottom: 8px;
       margin-bottom: 0.5rem;
+      text-align: left;
     }
   }
 `;
@@ -88,6 +96,8 @@ const DataVisualization = () => {
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
   const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const getChartsInProgress = useSelector((state) => state.charts.messages.getChartsInProgress);
+  const processArtifactInProgress = useSelector((state) => state.charts.messages.processArtifactInProgress);
   const dispatch = useDispatch();
 
   const pipelineRunCharts = charts && charts[pipelineRunSelectedUuid];
@@ -148,6 +158,9 @@ const DataVisualization = () => {
         }) => (
           <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
             <StyledH4 color="black">{title}</StyledH4>
+            {(getChartsInProgress || processArtifactInProgress) && (
+              <Spin key="spin" indicator={<LoadingFilled spin />} />
+            )}
             {chart_type_code === CHART_TYPES.IMAGE_CHART && (
               <img src={artifact.url} alt={artifact.name} width="100%" />
             )}
