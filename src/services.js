@@ -1,5 +1,6 @@
 import ApiClient from 'util/api-client';
 import config from 'config';
+import mime from 'mime';
 
 const { baseUrl, appToken } = config.api;
 
@@ -115,7 +116,12 @@ export const requestDeletePipeline = (organization_uuid, pipeline_uuid) => (
 );
 
 export const requestUploadInputFile = (organization_uuid, pipeline_uuid, file_name, file_content) => (
-  ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/input_files?name=${file_name}`, file_content, appToken)
+  ApiClient.post(
+    `${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/input_files?name=${file_name}`,
+    file_content,
+    appToken,
+    mime.getType(file_name),
+  )
 );
 
 export const requestStartPipelineRun = (organization_uuid, pipeline_uuid, inputs) => (
@@ -130,6 +136,10 @@ export const requestPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/console`, appToken)
 );
 
+export const requestGetPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
+  ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}`, appToken)
+);
+
 export const requestCreatePipelineRunArtifact = (organization_uuid, pipeline_uuid, pipeline_run_uuid, title, artifact_uuid, chart_type_code, chart_config) => (
   ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, {
     name: title,
@@ -139,7 +149,7 @@ export const requestCreatePipelineRunArtifact = (organization_uuid, pipeline_uui
   }, appToken)
 );
 
-export const requestOrganizationPipelineRunCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
+export const requestPipelineRunCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, appToken)
 );
 

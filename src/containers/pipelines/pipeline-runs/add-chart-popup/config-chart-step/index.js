@@ -23,7 +23,7 @@ const ConfigChartForm = styled.div`
     border-radius: 6px;
     background-color: ${colors.white};
     min-height: 231px;
-    padding: 2rem 0 0 1rem;
+    padding: 0 1rem 1rem;
   }
   > button {
     margin: 24px auto 0 auto;
@@ -98,7 +98,7 @@ const ColumnName = styled.span`
 `;
 
 const ConfigChartStep = ({
-  selectedArtifact, chartType, onNextClicked, chartData, chartTypes, chartScales,
+  chartType, onNextClicked, chartData, chartTypes, chartScales,
 }) => {
   const [xAxis, setXAxis] = useState([]);
   const [yAxis, setYAxis] = useState([]);
@@ -187,8 +187,7 @@ const ConfigChartStep = ({
           <ComposedCsvChart
             type={chartType}
             config={chartConfig}
-            artifact={selectedArtifact}
-            height={231}
+            height={255}
             chartData={chartData}
             chartTypes={chartTypes}
             chartScales={chartScales}

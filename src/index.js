@@ -19,6 +19,8 @@ import CreateNewAccountInvitation from 'containers/login/create-new-account-invi
 import App from 'containers/app';
 import Pipelines from 'containers/pipelines';
 import PipelineRuns from 'containers/pipelines/pipeline-runs';
+import DataVisualization from 'containers/pipelines/pipeline-runs/data-visualization';
+import ConsoleOutput from 'containers/pipelines/pipeline-runs/console-output';
 import Settings from 'containers/settings';
 import { refreshUserToken } from 'actions/user';
 import store from 'config/store';
@@ -33,6 +35,8 @@ import {
   ROUTE_ACCEPT_ORGANIZATION_INVITATION,
   ROUTE_CREATE_NEW_ACCOUNT_INVITATION,
   ROUTE_SETTINGS,
+  ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION,
+  ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT,
 } from 'config/routes';
 import { ROLE_ADMINISTRATOR } from 'config/roles';
 import * as serviceWorker from './serviceWorker';
@@ -96,6 +100,14 @@ const AppSwitch = () => {
       <Route exact path={ROUTE_PIPELINE_RUNS}>
         {noProfileRedirectToLogin}
         {hasProfile && <App>{organizations && <PipelineRuns />}</App>}
+      </Route>
+      <Route exact path={ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION}>
+        {noProfileRedirectToLogin}
+        {hasProfile && <App>{organizations && <DataVisualization />}</App>}
+      </Route>
+      <Route exact path={ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT}>
+        {noProfileRedirectToLogin}
+        {hasProfile && <App>{organizations && <ConsoleOutput />}</App>}
       </Route>
       <Route exact path={ROUTE_USERS}>
         {noProfileRedirectToLogin}

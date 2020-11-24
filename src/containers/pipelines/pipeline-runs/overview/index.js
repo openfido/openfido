@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Spin } from 'antd';
 
 import { StyledH2, StyledText } from 'styles/app';
-import { pipelineStates, statusLongNameLegend } from 'config/pipeline-status';
+import { PIPELINE_STATES, STATUS_LONG_NAME_LEGEND } from 'config/pipelines';
 import LoadingFilled from 'icons/LoadingFilled';
 import styled from 'styled-components';
 
@@ -77,7 +77,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
               </>
             ) : (
               <StyledText size="large" color="black" fontweight={500}>
-                {statusLongNameLegend[runStatus]}
+                {STATUS_LONG_NAME_LEGEND[runStatus]}
               </StyledText>
             )}
           </OverviewMeta>
@@ -85,7 +85,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
         <div>
           <StyledText size="middle" color="gray20" fontweight="bold">Completed At:</StyledText>
           <OverviewMeta>
-            {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.CANCELED]) ? (
+            {checkPipelineRunStatus([PIPELINE_STATES.COMPLETED, PIPELINE_STATES.FAILED, PIPELINE_STATES.CANCELED]) ? (
               <>
                 <StyledText size="large" color="black" fontweight={500}>
                   {completedAt && completedAt.format('M/D/YY')}
@@ -97,9 +97,9 @@ const Overview = ({ pipelineRunSelected: run }) => {
             ) : (
               <>
                 <StyledText size="large" color="black" fontweight={500}>
-                  {statusLongNameLegend[runStatus]}
+                  {STATUS_LONG_NAME_LEGEND[runStatus]}
                 </StyledText>
-                {runStatus === pipelineStates.RUNNING && (
+                {runStatus === PIPELINE_STATES.RUNNING && (
                   <Spin indicator={<LoadingFilled spin />} />
                 )}
               </>
@@ -111,7 +111,7 @@ const Overview = ({ pipelineRunSelected: run }) => {
           <StyledText size="middle" color="gray20" fontweight="bold">Duration</StyledText>
           <StyledText size="large" color="black" fontweight={500}>
             <OverviewMeta>
-              {checkPipelineRunStatus([pipelineStates.COMPLETED, pipelineStates.FAILED, pipelineStates.CANCELED]) ? (
+              {checkPipelineRunStatus([PIPELINE_STATES.COMPLETED, PIPELINE_STATES.FAILED, PIPELINE_STATES.CANCELED]) ? (
                 <>
                   <StyledText size="large" color="black" fontweight={500}>
                     {duration}
@@ -120,9 +120,9 @@ const Overview = ({ pipelineRunSelected: run }) => {
               ) : (
                 <>
                   <StyledText size="large" color="black" fontweight={500}>
-                    {statusLongNameLegend[runStatus]}
+                    {STATUS_LONG_NAME_LEGEND[runStatus]}
                   </StyledText>
-                  {runStatus === pipelineStates.RUNNING && (
+                  {runStatus === PIPELINE_STATES.RUNNING && (
                     <Spin indicator={<LoadingFilled spin />} />
                   )}
                 </>

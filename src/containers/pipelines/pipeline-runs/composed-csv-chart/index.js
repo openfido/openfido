@@ -8,16 +8,16 @@ import {
   YAxis,
   Area,
   Bar,
-  Label,
   Tooltip,
+  Legend,
 } from 'recharts';
 
 import {
   CHART_TYPES,
   DATA_TYPES,
   DATA_SCALES,
-  chartFills,
-  chartStrokes,
+  CHART_FILLS,
+  CHART_STROKES,
   XAXIS,
   YAXIS,
 } from 'config/charts';
@@ -32,7 +32,9 @@ const ComposedCsvChart = ({
   const axesComponents = [];
   const dataComponents = [];
 
-  if (config && config[XAXIS] && config[YAXIS] && chartFills && chartStrokes) {
+  let hasTimeXAxis = false; // used for axesFormatter in util/charts
+
+  if (config && config[XAXIS] && config[YAXIS] && CHART_FILLS && CHART_STROKES && chartTypes && chartScales) {
     const axesByType = {
       [DATA_TYPES.NUMBER]: [],
       [DATA_TYPES.TIME]: [],
@@ -52,8 +54,10 @@ const ComposedCsvChart = ({
               dataKey={axis}
               yAxisId={chartTypes[axis]}
               dot={false}
-              fill={chartFills[index]}
-              stroke={chartStrokes[index]}
+              fill={CHART_FILLS[index]}
+              stroke={CHART_STROKES[index]}
+              formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
+              isAnimationActive={false}
             />
           ));
           break;
@@ -64,8 +68,10 @@ const ComposedCsvChart = ({
               dataKey={axis}
               yAxisId={chartTypes[axis]}
               dot={false}
-              fill={chartFills[index]}
-              stroke={chartStrokes[index]}
+              fill={CHART_FILLS[index]}
+              stroke={CHART_STROKES[index]}
+              formatter={(value) => axesFormatter(value, chartTypes[axis] === DATA_TYPES.TIME)}
+              isAnimationActive={false}
             />
           ));
           break;
@@ -81,7 +87,7 @@ const ComposedCsvChart = ({
           yAxisId={DATA_TYPES.NUMBER}
           type={DATA_TYPES.NUMBER}
           scale={chartScales[axesByType[DATA_TYPES.NUMBER][0]] || DATA_SCALES.AUTO} // scale by first 'number' column scale setting
-          interval={0}
+          interval="preserveStartEnd"
           fontSize={12}
           style={{ fontWeight: 500, fill: colors.gray10 }}
           angle={-90}
@@ -90,17 +96,7 @@ const ComposedCsvChart = ({
           tickCount={5}
           tick={<CustomYAxisTick isNumber />}
           stroke={colors.gray10}
-        >
-          <Label
-            angle={-90}
-            value={axesByType[DATA_TYPES.NUMBER].join(', ')}
-            position="insideLeft"
-            offset={-16}
-            style={{
-              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-            }}
-          />
-        </YAxis>
+        />
       ));
     }
 
@@ -139,17 +135,7 @@ const ComposedCsvChart = ({
           tickCount={5}
           stroke={colors.gray10}
           tick={CustomYAxisTick}
-        >
-          <Label
-            angle={-90}
-            value={axesByType[DATA_TYPES.CATEGORY].join(', ')}
-            position="insideLeft"
-            offset={-16}
-            style={{
-              textAnchor: 'middle', fontSize: 14, fontWeight: 'bold', fill: colors.gray,
-            }}
-          />
-        </YAxis>
+        />
       ));
     }
 
@@ -157,13 +143,14 @@ const ComposedCsvChart = ({
       if (axis in chartTypes && axis in chartScales) {
         switch (chartTypes[axis]) {
           case DATA_TYPES.TIME:
+            hasTimeXAxis = true;
             axesComponents.push((
               <XAxis
                 key={`xAxis${axis}`}
                 dataKey={axis}
-                type={DATA_TYPES.NUMBER}
-                scale={DATA_SCALES.TIME}
-                interval="preserveStartEnd"
+                type={type === CHART_TYPES.BAR_CHART ? DATA_TYPES.CATEGORY : DATA_TYPES.NUMBER}
+                scale={type === CHART_TYPES.BAR_CHART ? DATA_SCALES.AUTO : DATA_SCALES.TIME}
+                interval={parseInt(chartData.length / 8, 10)}
                 domain={['auto', 'auto']}
                 fontSize={10}
                 style={{ fontWeight: '500', fill: colors.gray10 }}
@@ -222,16 +209,21 @@ const ComposedCsvChart = ({
         data={chartData}
         margin={{
           bottom: 16,
-          left: 32,
-          right: 32,
+          top: 32,
         }}
       >
         <CartesianGrid stroke="rgba(112, 112, 112, 0.2)" vertical={false} />
         {axesComponents}
         {dataComponents}
+        <Legend
+          wrapperStyle={{ bottom: 0 }}
+          iconSize={12}
+          formatter={(value) => (
+            <span style={{ fontSize: 12 }}>{value}</span>
+          )}
+        />
         <Tooltip
-          labelFormatter={axesFormatter}
-          formatter={axesFormatter}
+          labelFormatter={(value) => axesFormatter(value, hasTimeXAxis)}
           contentStyle={{
             fontSize: 12,
             fontWeight: 400,
@@ -257,13 +249,13 @@ ComposedCsvChart.propTypes = {
     [YAXIS]: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired,
   height: PropTypes.number,
-  chartData: PropTypes.arrayOf({ }).isRequired,
-  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  chartTypes: PropTypes.objectOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 ComposedCsvChart.defaultProps = {
-  height: 264,
+  height: 288,
 };
 
 export default ComposedCsvChart;

@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Spin } from 'antd';
 import styled from 'styled-components';
 
-import { requestPipelineRunConsoleOutput } from 'services';
-import { CONSOLE_OUTPUT_TAB, STDOUT, STDERR } from 'config/pipeline-runs';
-import { pipelineStates } from 'config/pipeline-status';
-import { StyledH2, StyledButton } from 'styles/app';
+import {
+  STDOUT,
+  STDERR,
+  PIPELINE_STATES,
+  POLL_CONSOLE_OUTPUT_INTERVAL,
+} from 'config/pipelines';
+import {
+  getPipelines,
+  getPipelineRun,
+  getPipelineRunConsoleOutput,
+} from 'actions/pipelines';
+import LoadingFilled from 'icons/LoadingFilled';
+import {
+  StyledH2, StyledButton, StyledTitle, StyledText,
+} from 'styles/app';
 import colors from 'styles/colors';
 import OverviewTabMenu from '../overview-tab-menu';
 
@@ -37,93 +49,125 @@ const StyledConsoleOutput = styled.div`
     line-height: 21px;
     line-height: 1.3125rem;
     white-space: pre-line;
+    text-align: center;
+    .ant-spin .anticon {
+      position: static;
+      margin-top: 2.5rem;
+    }
   }
 `;
 
 const ConsoleOutputTypes = styled.div`
   padding-top: 16px;
   padding-top: 1rem;
+  text-align: left;
 `;
 
 const ConsoleOutputContent = styled.div`
   padding: 20px 28px;
   padding: 1.25rem 1.75rem;
+  text-align: left;
 `;
 
-const ConsoleOutput = ({
-  pipelineInView, pipelineRunSelectedUuid, pipelineRunSelectedStatus, sequence, setDisplayTab,
-}) => {
-  const [stdout, setStdout] = useState();
-  const [stderr, setStderr] = useState();
+const ConsoleOutput = () => {
+  const { pipeline_uuid: pipelineInView, pipeline_run_uuid: pipelineRunSelectedUuid } = useParams();
+
   const [outputType, setOutputType] = useState(STDOUT);
-  const [getConsoleOutputError, setGetConsoleOutputError] = useState(null);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
+  const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const consoleOutput = useSelector((state) => state.pipelines.consoleOutput);
+  const getConsoleOutputInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputInProgress);
+  const getConsoleOutputError = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputError);
+  const dispatch = useDispatch();
+
+  const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
 
   useEffect(() => {
-    requestPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid)
-      .then((response) => {
-        if (STDOUT in response.data) setStdout(response.data[STDOUT]);
-        if (STDERR in response.data) setStderr(response.data[STDERR]);
-        setGetConsoleOutputError(null);
-      })
-      .catch((err) => {
-        setGetConsoleOutputError(!err.response || err.response.data);
-      });
-  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid]);
+    if (!pipelines && !pipelineItemInView) {
+      dispatch(getPipelines(currentOrg));
+    }
+  }, [currentOrg, dispatch, pipelines, pipelineItemInView]);
+
+  useEffect(() => {
+    if (currentPipelineRunUuid !== pipelineRunSelectedUuid || !currentPipelineRun) {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRunSelectedUuid));
+    }
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
+
+  useEffect(() => {
+    const interval = pipelineRunSelectedUuid && !getConsoleOutputInProgress && setInterval(() => {
+      dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
+    }, POLL_CONSOLE_OUTPUT_INTERVAL);
+    return () => clearInterval(interval);
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch]);
+
+  useEffect(() => {
+    if (!getConsoleOutputInProgress && consoleOutput && !consoleOutput[outputType]) {
+      dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
+    }
+  }, [
+    consoleOutput, outputType, currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch,
+  ]);
 
   return (
-    <StyledConsoleOutput>
-      <header>
-        <StyledH2 color="black">
-          Run #
-          {sequence}
-        </StyledH2>
-        <OverviewTabMenu
-          displayTab={CONSOLE_OUTPUT_TAB}
-          setDisplayTab={setDisplayTab}
-          dataVisualizationReady={pipelineRunSelectedStatus === pipelineStates.COMPLETED}
-          consoleOutputReady={!!pipelineRunSelectedUuid}
-        />
-      </header>
-      <section>
-        <ConsoleOutputTypes>
-          <StyledButton
-            type="text"
-            size="large"
-            width={108}
-            onClick={() => setOutputType(STDOUT)}
-            textcolor={outputType === STDOUT ? 'lightBlue' : 'gray'}
-          >
-            stdout
-          </StyledButton>
-          <StyledButton
-            type="text"
-            size="large"
-            width={108}
-            onClick={() => setOutputType(STDERR)}
-            textcolor={outputType === STDERR ? 'lightBlue' : 'gray'}
-          >
-            stderr
-          </StyledButton>
-        </ConsoleOutputTypes>
-        <ConsoleOutputContent>
-          {getConsoleOutputError && 'message' in getConsoleOutputError && getConsoleOutputError.message}
-          {outputType === STDOUT && stdout}
-          {outputType === STDERR && stderr}
-        </ConsoleOutputContent>
-      </section>
-    </StyledConsoleOutput>
-
+    <>
+      <StyledTitle>
+        <div>
+          <h1>
+            Pipeline Runs:
+            {' '}
+            <StyledText color="blue">{pipelineItemInView && pipelineItemInView.name}</StyledText>
+          </h1>
+        </div>
+      </StyledTitle>
+      <StyledConsoleOutput>
+        <header>
+          <StyledH2 color="black">
+            Run #
+            {currentPipelineRun && currentPipelineRun.sequence}
+          </StyledH2>
+          <OverviewTabMenu
+            dataVisualizationReady={currentPipelineRun && currentPipelineRun.status === PIPELINE_STATES.COMPLETED}
+            consoleOutputReady
+            pipelineInView={pipelineInView}
+            pipelineRunSelectedUuid={pipelineRunSelectedUuid}
+          />
+        </header>
+        <section>
+          <ConsoleOutputTypes>
+            <StyledButton
+              type="text"
+              size="large"
+              width={108}
+              onClick={() => setOutputType(STDOUT)}
+              textcolor={outputType === STDOUT ? 'lightBlue' : 'gray'}
+            >
+              stdout
+            </StyledButton>
+            <StyledButton
+              type="text"
+              size="large"
+              width={108}
+              onClick={() => setOutputType(STDERR)}
+              textcolor={outputType === STDERR ? 'lightBlue' : 'gray'}
+            >
+              stderr
+            </StyledButton>
+          </ConsoleOutputTypes>
+          {(getConsoleOutputError || (consoleOutput && !consoleOutput[outputType])) && (
+            <Spin key="spin" indicator={<LoadingFilled spin />} />
+          )}
+          <ConsoleOutputContent>
+            {getConsoleOutputError && getConsoleOutputError.message}
+            {consoleOutput && consoleOutput[outputType]}
+          </ConsoleOutputContent>
+        </section>
+      </StyledConsoleOutput>
+    </>
   );
-};
-
-ConsoleOutput.propTypes = {
-  pipelineInView: PropTypes.string.isRequired,
-  pipelineRunSelectedUuid: PropTypes.string.isRequired,
-  pipelineRunSelectedStatus: PropTypes.string.isRequired,
-  sequence: PropTypes.number.isRequired,
-  setDisplayTab: PropTypes.func.isRequired,
 };
 
 export default ConsoleOutput;

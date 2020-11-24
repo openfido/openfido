@@ -1,4 +1,10 @@
-export const statusLegend = {
+export const STDOUT = 'std_out';
+export const STDERR = 'std_err';
+
+export const POLL_PIPELINE_RUN_INTERVAL = 5000;
+export const POLL_CONSOLE_OUTPUT_INTERVAL = 5000;
+
+export const STATUS_LEGEND = {
   NOT_STARTED: 'purple',
   QUEUED: 'skyBlue',
   RUNNING: 'lightBlue',
@@ -7,7 +13,7 @@ export const statusLegend = {
   CANCELED: 'orange',
 };
 
-export const statusNameLegend = {
+export const STATUS_NAME_LEGEND = {
   NOT_STARTED: 'Not Started',
   QUEUED: 'In Queue',
   RUNNING: 'In Progress',
@@ -16,7 +22,7 @@ export const statusNameLegend = {
   CANCELED: 'Canceled',
 };
 
-export const statusLongNameLegend = {
+export const STATUS_LONG_NAME_LEGEND = {
   NOT_STARTED: 'Not started',
   QUEUED: 'In the queue',
   RUNNING: 'In Progress',
@@ -25,7 +31,7 @@ export const statusLongNameLegend = {
   CANCELED: 'Canceled',
 };
 
-export const statusPhraseLegend = {
+export const STATUS_PHRASE_LEGEND = {
   NOT_STARTED: 'not started',
   QUEUED: 'queued',
   RUNNING: 'started',
@@ -34,7 +40,7 @@ export const statusPhraseLegend = {
   CANCELED: 'canceled',
 };
 
-export const pipelineStates = {
+export const PIPELINE_STATES = {
   NOT_STARTED: 'NOT_STARTED',
   QUEUED: 'QUEUED',
   RUNNING: 'RUNNING',

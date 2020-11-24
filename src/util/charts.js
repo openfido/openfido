@@ -10,43 +10,6 @@ const DATE_FORMATS = [
 export const toUnixTime = (str) => moment(str, DATE_FORMATS).unix();
 export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
 
-export const parseCsvData = (data) => {
-  const chartData = [];
-  const chartTypes = {};
-  const chartScale = {};
-
-  return new Promise((resolve, reject) => {
-    const csvDataStream = parse({ headers: true })
-      .on('error', reject)
-      .on('data', (row) => {
-        const rowData = { ...row };
-
-        Object.keys(rowData).forEach((column) => {
-          if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
-            rowData[column] = parseFloat(rowData[column]);
-            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
-          } else if (validDateString(rowData[column])) { // datetime type
-            rowData[column] = toUnixTime(rowData[column]);
-            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.TIME;
-          } else {
-            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
-            if (!(column in chartScale)) chartScale[column] = DATA_SCALES.LINEAR;
-          }
-        });
-
-        chartData.push(rowData);
-      })
-      .on('end', () => {
-        resolve({ chartData, chartTypes, chartScale });
-      });
-
-    csvDataStream.write(data);
-    csvDataStream.end();
-  });
-};
-
 export const TOTAL_GRAPH_POINTS = 800;
 
 export const getLimitedDataPointsForGraph = ({
@@ -90,10 +53,10 @@ export const getLimitedDataPointsForGraph = ({
   return limitedDataSet;
 };
 
-export const axesFormatter = (value) => {
+export const axesFormatter = (value, isTimestamp) => {
   const valueString = value.toString();
 
-  if (valueString.length === 10) { // will try to parse is a number of length 10
+  if (isTimestamp && valueString.length === 10) {
     const dataValue = moment.unix(value);
     if (dataValue.isValid()) {
       return moment.unix(value).format('M/D/YYYY h:mm:ss A');
@@ -105,4 +68,45 @@ export const axesFormatter = (value) => {
   }
 
   return value;
+};
+
+export const parseCsvData = (data) => {
+  const chartData = [];
+  const chartTypes = {};
+  const chartScales = {};
+
+  return new Promise((resolve, reject) => {
+    const csvDataStream = parse({ headers: true })
+      .on('error', reject)
+      .on('data', (row) => {
+        const rowData = { ...row };
+
+        Object.keys(rowData).forEach((column) => {
+          if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
+            rowData[column] = parseFloat(rowData[column]);
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.NUMBER; // interpolate type and scale from first row
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.LINEAR;
+          } else if (validDateString(rowData[column])) { // datetime type
+            rowData[column] = toUnixTime(rowData[column]);
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.TIME;
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.TIME;
+          } else {
+            if (!(column in chartTypes)) chartTypes[column] = DATA_TYPES.CATEGORY;
+            if (!(column in chartScales)) chartScales[column] = DATA_SCALES.LINEAR;
+          }
+        });
+
+        chartData.push(rowData);
+      })
+      .on('end', () => {
+        resolve({
+          chartData: getLimitedDataPointsForGraph({ data: chartData, minIndex: 0, maxIndex: chartData.length - 1 }),
+          chartTypes,
+          chartScales,
+        });
+      });
+
+    csvDataStream.write(data);
+    csvDataStream.end();
+  });
 };

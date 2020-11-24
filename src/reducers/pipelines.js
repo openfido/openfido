@@ -1,11 +1,16 @@
-import moment from 'moment';
-
-import { pipelineStates } from 'config/pipeline-status';
+import { computePipelineRunMetaData, createdAtSort } from 'util/data';
 import {
   GET_PIPELINES,
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
+  GET_PIPELINE_RUNS_IN_PROGRESS,
   GET_PIPELINE_RUNS_FAILED,
+  GET_PIPELINE_RUN,
+  GET_PIPELINE_RUN_IN_PROGRESS,
+  GET_PIPELINE_RUN_FAILED,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT_IN_PROGRESS,
+  GET_PIPELINE_RUN_CONSOLE_OUTPUT_FAILED,
   UPLOAD_INPUT_FILE,
   UPLOAD_INPUT_FILE_FAILED,
   REMOVE_INPUT_FILE,
@@ -16,9 +21,17 @@ const DEFAULT_STATE = {
   pipelines: null,
   pipelineRuns: {},
   inputFiles: null,
+  currentPipelineRun: null,
+  currentPipelineRunUuid: null,
+  consoleOutput: {},
   messages: {
     getPipelinesError: null,
+    getPipelineRunsInProgress: false,
     getPipelineRunsError: null,
+    getPipelineRunInProgress: false,
+    getPipelineRunError: null,
+    getPipelineRunConsoleOutputInProgress: false,
+    getPipelineRunConsoleOutputError: null,
     uploadInputFileError: null,
   },
 };
@@ -38,8 +51,16 @@ export default (state = DEFAULT_STATE, action) => {
         return -1;
       });
 
+      pipelines.forEach((pipeline) => {
+        const { last_pipeline_run = {} } = pipeline;
+        const { states = [] } = last_pipeline_run;
+
+        states.sort(createdAtSort);
+      });
+
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         pipelines: action.payload,
       };
     }
@@ -63,68 +84,96 @@ export default (state = DEFAULT_STATE, action) => {
       });
 
       pipelineRuns.forEach((run, index) => {
-        const { states } = run;
-
-        if (states) {
-          states.sort((stateA, stateB) => {
-            const dateA = moment(stateA.created_at);
-            const dateB = moment(stateB.created_at);
-
-            if (dateA && dateB) {
-              return dateA - dateB;
-            }
-
-            return -1;
-          });
-        }
-
-        let status = null;
-        let startedAt = null;
-        let completedAt = null;
-        let momentStartedAt = null;
-        let momentCompletedAt = null;
-        let duration = null;
-
-        if (states && states.length) {
-          status = states[states.length - 1].state;
-          startedAt = states.find((stateItem) => stateItem.state === pipelineStates.RUNNING);
-          completedAt = states.find((stateItem) => (
-            stateItem.state === pipelineStates.COMPLETED
-              || stateItem.state === pipelineStates.FAILED
-              || stateItem.state === pipelineStates.CANCELED
-          ));
-
-          startedAt = startedAt && startedAt.created_at;
-          completedAt = completedAt && completedAt.created_at;
-
-          momentStartedAt = startedAt && moment.utc(startedAt).local();
-          momentCompletedAt = completedAt && moment.utc(completedAt).local();
-
-          if (momentStartedAt && momentCompletedAt) {
-            duration = moment.duration(momentStartedAt.diff(momentCompletedAt)).humanize();
-          }
-        }
-
-        pipelineRuns[index].status = status;
-        pipelineRuns[index].startedAt = momentStartedAt;
-        pipelineRuns[index].completedAt = momentCompletedAt;
-        pipelineRuns[index].duration = duration;
+        pipelineRuns[index] = computePipelineRunMetaData(run);
       });
 
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         pipelineRuns: {
           ...state.pipelineRuns,
           [pipeline_uuid]: pipelineRuns,
         },
+        currentPipelineRun: pipelineRuns.length && pipelineRuns[0],
+        currentPipelineRunUuid: pipelineRuns.length && pipelineRuns[0].uuid,
       };
     }
+    case GET_PIPELINE_RUNS_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunsInProgress: true,
+        },
+      };
     case GET_PIPELINE_RUNS_FAILED:
       return {
         ...state,
         messages: {
           ...DEFAULT_STATE.messages,
           getPipelineRunsError: action.payload,
+        },
+      };
+    case GET_PIPELINE_RUN: {
+      const { pipelineRun, pipeline_uuid, pipeline_run_uuid } = action.payload;
+
+      const pipelineRuns = (pipeline_uuid in state.pipelineRuns && [...state.pipelineRuns[pipeline_uuid]]) || [];
+      const currentPipelineRun = computePipelineRunMetaData(pipelineRun);
+      const pipelineRunIndex = pipelineRuns.findIndex((run) => run.uuid === pipeline_run_uuid);
+
+      if (pipelineRunIndex !== -1) pipelineRuns[pipelineRunIndex] = currentPipelineRun;
+
+      return {
+        ...state,
+        pipelineRuns: pipelineRuns.length ? (
+          {
+            ...state.pipelineRuns,
+            [pipeline_uuid]: pipelineRuns,
+          }
+        ) : state.pipelineRuns,
+        currentPipelineRun,
+        currentPipelineRunUuid: pipeline_run_uuid,
+        messages: DEFAULT_STATE.messages,
+      };
+    }
+    case GET_PIPELINE_RUN_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunInProgress: true,
+        },
+      };
+    case GET_PIPELINE_RUN_FAILED:
+      return {
+        ...state,
+        currentPipelineRun: null,
+        currentPipelineRunUuid: null,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunError: action.payload,
+        },
+      };
+    case GET_PIPELINE_RUN_CONSOLE_OUTPUT:
+      return {
+        ...state,
+        consoleOutput: action.payload,
+        messages: DEFAULT_STATE.messages,
+      };
+    case GET_PIPELINE_RUN_CONSOLE_OUTPUT_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelineRunConsoleOutputInProgress: true,
+        },
+      };
+    case GET_PIPELINE_RUN_CONSOLE_OUTPUT_FAILED:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getConsoleOutputError: action.payload,
         },
       };
     case UPLOAD_INPUT_FILE:

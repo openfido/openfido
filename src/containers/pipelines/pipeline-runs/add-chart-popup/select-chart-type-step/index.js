@@ -20,23 +20,33 @@ const ChartTypesList = styled.ul`
   grid-gap: 46px;
   grid-gap: 2.875rem;
   li {
-   button.ant-btn {
-     width: 178px;
-     height: 178px;
-     padding: 28px 8px;
-     padding: 1.75rem 0.5rem;
-     flex-wrap: wrap;
-     border: 3px solid ${colors.white};
-     border-radius: 2px;
-     &, &:hover {
+    button.ant-btn {
+      width: 178px;
+      height: 178px;
+      padding: 28px 8px;
+      padding: 1.75rem 0.5rem;
+      flex-wrap: wrap;
+      border: 3px solid ${colors.white};
+      border-radius: 2px;
+      &, &:hover {
        background-color: ${colors.white};
-     }
-     &:active, &:focus, &.selected {
+      }
+      &:active, &:focus, &.selected {
        border: 3px solid ${colors.lightBlue};
        background-color: ${colors.white};
-     }
-   }
+      }
+    }
   }
+`;
+
+const LineChartSVGContainer = styled.div`
+  height: 94px;
+  width: 100%;
+`;
+
+const BarChartSVGContainer = styled.div`
+  height: 88px;
+  width: 100%;
 `;
 
 const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
@@ -55,7 +65,9 @@ const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
             onClick={() => setChartType(CHART_TYPES.LINE_CHART)}
           >
             Line Chart
-            <img src={LinesImg} alt="Line" />
+            <LineChartSVGContainer>
+              <img src={LinesImg} alt="Line" height="94px" />
+            </LineChartSVGContainer>
           </StyledButton>
         </li>
         <li>
@@ -67,7 +79,9 @@ const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
             onClick={() => setChartType(CHART_TYPES.BAR_CHART)}
           >
             Bar Chart
-            <img src={BarsImg} alt="Bar" />
+            <BarChartSVGContainer>
+              <img src={BarsImg} alt="Bar" height="88px" />
+            </BarChartSVGContainer>
           </StyledButton>
         </li>
       </ChartTypesList>

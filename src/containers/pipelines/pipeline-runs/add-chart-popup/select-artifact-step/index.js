@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { processArtifact } from 'actions/charts';
-import { useDispatch } from 'react-redux';
 
+import { ALLOWABLE_ARTIFACT_FORMATS } from 'config/charts';
 import { PopupButton } from 'styles/pipeline-runs';
 import { StyledButton, StyledH4 } from 'styles/app';
 import colors from 'styles/colors';
@@ -14,7 +13,7 @@ const ArtifactsList = styled.ul`
   margin: 12px 0;
   margin: 0.75rem 0;
   overflow-y: overlay;
-  max-height: min(242px, calc(50vh - 60px));
+  max-height: max(242px, calc(50vh - 60px));
   li {
     background-color: ${colors.white};
     &:not(:last-child) {
@@ -42,28 +41,28 @@ const ArtifactsList = styled.ul`
 const SelectArtifactStep = ({
   artifacts, selectedArtifact, setSelectedArtifact, onNextClicked,
 }) => {
-  const dispatch = useDispatch();
   const onArtifactSelected = (e) => {
     e.preventDefault();
     onNextClicked();
   };
+
+  const usableArtifacts = artifacts && artifacts.filter((artifact) => (
+    artifact.name.match(ALLOWABLE_ARTIFACT_FORMATS)
+  ));
 
   return (
     <form>
       <div>
         <StyledH4 color="darkText">Select an artifact</StyledH4>
         <ArtifactsList>
-          {artifacts && artifacts.map((artifact) => (
+          {usableArtifacts && usableArtifacts.map((artifact) => (
             <li key={artifact.uuid}>
               <StyledButton
                 type="text"
                 size="large"
                 textcolor="lightBlue"
                 className={selectedArtifact === artifact ? 'selected' : ''}
-                onClick={() => {
-                  dispatch(processArtifact(artifact));
-                  setSelectedArtifact(artifact);
-                }}
+                onClick={() => setSelectedArtifact(artifact)}
               >
                 {artifact.name}
               </StyledButton>
