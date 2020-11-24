@@ -165,7 +165,7 @@ const ComposedCsvChart = ({
                 dataKey={axis}
                 type={type === CHART_TYPES.BAR_CHART ? DATA_TYPES.CATEGORY : DATA_TYPES.NUMBER}
                 scale={type === CHART_TYPES.BAR_CHART ? DATA_SCALES.AUTO : DATA_SCALES.TIME}
-                interval={graphInterval}
+                interval={type === CHART_TYPES.BAR_CHART ? 'preserveStartEnd' : graphInterval}
                 domain={['auto', 'auto']}
                 fontSize={10}
                 style={{ fontWeight: '500', fill: colors.gray10 }}
