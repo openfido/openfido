@@ -124,7 +124,7 @@ const PipelineRuns = () => {
   }, [currentOrg, dispatch, pipelines]);
 
   useEffect(() => {
-    if (!getPipelineRunsInProgress && (!pipelineRuns || !pipelineRuns.length)) {
+    if (!getPipelineRunsInProgress && !pipelineRuns) {
       dispatch(getPipelineRuns(currentOrg, pipelineInView));
     }
   }, [currentOrg, pipelineInView, dispatch, getPipelineRunsInProgress, pipelineRuns]);
