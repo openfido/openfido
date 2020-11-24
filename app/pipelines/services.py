@@ -4,6 +4,7 @@ import urllib
 import urllib.request
 import uuid
 from urllib.error import URLError
+from urllib.parse import quote
 from blob_utils import upload_stream
 
 from flask import current_app
@@ -236,7 +237,7 @@ def create_pipeline_run_artifact(run_uuid, filename, stream):
     if pipeline_run is None:
         raise ValueError("pipeline run not found")
 
-    sname = secure_filename(filename)
+    sname = quote(filename)
     artifact_uuid = uuid.uuid4().hex
 
     upload_stream(

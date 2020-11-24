@@ -40,8 +40,10 @@ services:
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://workflowstorage:9000
+      PYTHONPATH: /opt/utils
     volumes:
       - ${WORKFLOW_DIR:-.}:/opt/app:delegated
+      - ${UTILS_DIR:-.}:/opt/utils:delegated
     ports:
       - "${WORKFLOW_PORT:-5000}:5000"
     depends_on:

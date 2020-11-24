@@ -280,8 +280,8 @@ def test_execute_pipeline(
         "run_uuid",
         [
             {
-                "name": "afile.pdf",
-                "url": "https://example.com",
+                "name": "a file.pdf",
+                "url": "https://example.com/a%20file.pdf",
             }
         ],
         "python:3",
@@ -308,7 +308,7 @@ def test_execute_pipeline(
     assert update_run_status_mock.call_args_list[1] == call(RunStateEnum.COMPLETED)
 
     assert retrieve_mock.call_count == 1
-    assert retrieve_mock.call_args_list[0][0][0] == "https://example.com"
+    assert retrieve_mock.call_args_list[0][0][0] == "https://example.com/a%20file.pdf"
 
     assert upload_artifact_mock.call_count == 1
     assert upload_artifact_mock.call_args_list[0][0][0] == "output.txt"
