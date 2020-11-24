@@ -45,7 +45,7 @@ const ComposedCsvChart = ({
 
   const graphedChartData = getLimitedDataPointsForGraph({ data: chartData, minIndex: graphMinMax && graphMinMax.min, maxIndex: graphMinMax && graphMinMax.max });
 
-  const totalPoints = graphMinMax ? graphMinMax.max - graphMinMax.min : chartData.length;
+  const totalPoints = graphMinMax ? graphedChartData.length : chartData.length;
 
   const graphInterval = getGraphInterval(totalPoints);
 
