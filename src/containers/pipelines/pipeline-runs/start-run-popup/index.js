@@ -191,7 +191,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
 
     requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
       .then(() => {
-        handleOk();
+        handleOk(true);
         dispatch(clearInputFiles());
       });
   };

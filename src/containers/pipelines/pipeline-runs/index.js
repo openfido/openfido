@@ -102,6 +102,7 @@ const PipelineRuns = () => {
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
+  const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
   const selectedRun = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
@@ -123,8 +124,10 @@ const PipelineRuns = () => {
   }, [currentOrg, dispatch, pipelines]);
 
   useEffect(() => {
-    dispatch(getPipelineRuns(currentOrg, pipelineInView));
-  }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
+    if (!getPipelineRunsInProgress && (!pipelineRuns || !pipelineRuns.length)) {
+      dispatch(getPipelineRuns(currentOrg, pipelineInView));
+    }
+  }, [currentOrg, pipelineInView, dispatch, getPipelineRunsInProgress, pipelineRuns]);
 
   useEffect(() => {
     const interval = selectedRun && !getPipelineRunInProgress && setInterval(() => {
@@ -149,8 +152,9 @@ const PipelineRuns = () => {
     setStartRunPopup(true);
   };
 
-  const closeStartRunPopup = () => {
+  const closeStartRunPopup = (runStarted) => {
     setStartRunPopup(false);
+    if (runStarted) dispatch(getPipelineRuns(currentOrg, pipelineInView));
   };
 
   return (
