@@ -139,7 +139,7 @@ const RunsList = ({
         </StyledButton>
         <div />
       </StyledH2>
-      {(getPipelineRunsInProgress || !pipelineRuns || !pipelineRuns.length) && (
+      {getPipelineRunsInProgress && (
         <Spin key="spin" indicator={<LoadingFilled spin />} />
       )}
       <RunMenu selectedKeys={[selectedRun]}>
