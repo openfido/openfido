@@ -133,10 +133,10 @@ const PipelineRuns = () => {
   }, [currentOrg, pipelineInView, selectedRun, getPipelineRunInProgress, dispatch]);
 
   useEffect(() => {
-    if (pipelineRuns && pipelineRuns.length && !selectedRun) {
+    if (!getPipelineRunInProgress && pipelineRuns && pipelineRuns.length && !selectedRun) {
       dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRuns[0].uuid));
     }
-  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch]);
+  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch, getPipelineRunInProgress]);
 
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
     if (!getPipelineRunInProgress) {
@@ -179,10 +179,10 @@ const PipelineRuns = () => {
             pipelineInView={pipelineInView}
             pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
           />
-          {pipelineRunSelected && (
-          <Overview
-            pipelineRunSelected={pipelineRunSelected}
-          />
+          {!!pipelineRunSelected && (
+            <Overview
+              pipelineRunSelected={pipelineRunSelected}
+            />
           )}
         </OverviewSection>
         <InputFilesSection>
