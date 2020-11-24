@@ -100,9 +100,13 @@ PipelineItem.propTypes = {
       state: PropTypes.string.isRequired,
       created_at: PropTypes.string.isRequired,
     })),
-  }).isRequired,
+  }),
   openPipelineEdit: PropTypes.func.isRequired,
   viewPipelineRuns: PropTypes.func.isRequired,
+};
+
+PipelineItem.defaultProps = {
+  last_pipeline_run: null,
 };
 
 export default PipelineItem;
