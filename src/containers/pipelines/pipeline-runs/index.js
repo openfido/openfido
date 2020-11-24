@@ -194,7 +194,7 @@ const PipelineRuns = () => {
           <FilesList
             title="Input Files"
             files={pipelineRunSelected && pipelineRunSelected.inputs}
-            emptyText={!!pipelineRunSelected && !pipelineRunSelected.length && 'No Input Files'}
+            emptyText={!!pipelineRunSelected && !pipelineRunSelected.length ? 'No Input Files' : null}
           />
         </InputFilesSection>
         <ArtifactsSection>

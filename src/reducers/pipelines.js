@@ -94,8 +94,8 @@ export default (state = DEFAULT_STATE, action) => {
           ...state.pipelineRuns,
           [pipeline_uuid]: pipelineRuns,
         },
-        currentPipelineRun: pipelineRuns.length && pipelineRuns[0],
-        currentPipelineRunUuid: pipelineRuns.length && pipelineRuns[0].uuid,
+        currentPipelineRun: pipelineRuns.length ? pipelineRuns[0] : null,
+        currentPipelineRunUuid: pipelineRuns.length ? pipelineRuns[0].uuid : null,
       };
     }
     case GET_PIPELINE_RUNS_IN_PROGRESS:
