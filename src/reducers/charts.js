@@ -59,6 +59,7 @@ export default (state = DEFAULT_STATE, action) => {
 
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         charts: {
           ...state.charts,
           [pipeline_run_uuid]: charts,
@@ -89,6 +90,7 @@ export default (state = DEFAULT_STATE, action) => {
 
       return {
         ...state,
+        messages: DEFAULT_STATE.messages,
         charts: {
           ...state.charts,
           [pipeline_run_uuid]: pipelineRunCharts,
