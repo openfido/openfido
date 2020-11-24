@@ -10,7 +10,7 @@ import {
 export const getGraphInterval = (totalPoints) => {
   const numberOfPoints = parseInt(totalPoints, 10);
 
-  return numberOfPoints > 10 ? numberOfPoints / 8 : 1;
+  return numberOfPoints > 10 ? Math.ceil(numberOfPoints / 8.0) : 1;
 };
 
 const DATE_FORMATS = [
