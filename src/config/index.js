@@ -42,7 +42,7 @@ else if (isProduction()) apiToken = API_TOKEN_PRODUCTION;
 
 export default {
   api: {
-    defaultTimeout: 10000,
+    defaultTimeout: 60000,
     baseUrl: {
       auth: baseApiUrlAuth,
       app: baseApiUrlApp,
