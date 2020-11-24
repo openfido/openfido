@@ -140,6 +140,7 @@ const ConfigChartStep = ({
     <ColumnMenu>
       {chartData && chartData.length && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
+          key={axis}
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
           hovercolor="white"
@@ -158,6 +159,7 @@ const ConfigChartStep = ({
     <ColumnMenu>
       {chartData && chartData.length && Object.keys(chartData[0]).map((axis) => (
         <StyledMenuItem
+          key={axis}
           bordercolor="lightBg"
           hoverbgcolor="darkGray"
           hovercolor="white"
@@ -253,16 +255,11 @@ const ConfigChartStep = ({
 };
 
 ConfigChartStep.propTypes = {
-  selectedArtifact: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    uuid: PropTypes.string.isRequired,
-  }).isRequired,
   onNextClicked: PropTypes.func.isRequired,
   chartType: PropTypes.string.isRequired,
-  chartData: PropTypes.arrayOf({ }).isRequired,
-  chartTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  chartScales: PropTypes.arrayOf(PropTypes.string).isRequired,
+  chartData: PropTypes.arrayOf(PropTypes.object).isRequired,
+  chartTypes: PropTypes.objectOf(PropTypes.string).isRequired,
+  chartScales: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 export default ConfigChartStep;
