@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from flask import current_app
-from werkzeug.utils import secure_filename
+from urllib.parse import quote
 
 import requests
 from app.constants import S3_BUCKET, WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
@@ -191,7 +191,7 @@ def create_pipeline_input_file(organization_pipeline, filename, stream):
     if len(filename) > OrganizationPipelineInputFile.name.type.length:
         raise ValueError("filename too long")
 
-    sname = secure_filename(filename)
+    sname = quote(filename)
     input_file_uuid = uuid.uuid4().hex
     upload_stream(
         f"{organization_pipeline.uuid}/{input_file_uuid}-{sname}",
@@ -233,8 +233,8 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     new_pipeline = {"inputs": []}
 
     for opf in org_pipeline_input_files:
-        sname = secure_filename(opf.name)
-        url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
+        sname = quote(opf.name)
+        url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}", sname)
         new_pipeline["inputs"].append({"url": url, "name": opf.name})
 
     response = requests.post(
@@ -369,8 +369,8 @@ def fetch_pipeline_runs(organization_uuid, pipeline_uuid):
             # generate download urls and add uuid
             for opf in org_pipeline_input_files:
                 if opf.organization_pipeline_run_id == opr.id:
-                    sname = secure_filename(opf.name)
-                    url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}")
+                    sname = quote(opf.name)
+                    url = create_url(f"{pipeline_uuid}/{opf.uuid}-{sname}", sname)
                     inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
             pr["inputs"] = inputs
@@ -422,8 +422,10 @@ def fetch_pipeline_run(
         # generate download urls and add uuid
         for opf in org_pipeline_input_files:
             if opf.organization_pipeline_run_id == opr.id:
-                sname = secure_filename(opf.name)
-                url = create_url(f"{organization_pipeline_uuid}/{opf.uuid}-{sname}")
+                sname = quote(opf.name)
+                url = create_url(
+                    f"{organization_pipeline_uuid}/{opf.uuid}-{sname}", sname
+                )
                 inputs.append({"url": url, "name": opf.name, "uuid": opf.uuid})
 
         pipeline_run["inputs"] = inputs
