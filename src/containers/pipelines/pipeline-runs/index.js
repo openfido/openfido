@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import {
   PIPELINE_STATES,
   POLL_PIPELINE_RUN_INTERVAL,
+  STATUS_LONG_NAME_LEGEND,
 } from 'config/pipelines';
 import {
   getPipelineRuns,
@@ -153,7 +154,7 @@ const PipelineRuns = () => {
   };
 
   return (
-    <>
+    <React.Fragment key={pipelineInView}>
       <StyledTitle>
         <div>
           <h1>
@@ -189,7 +190,7 @@ const PipelineRuns = () => {
           <FilesList
             title="Input Files"
             files={pipelineRunSelected && pipelineRunSelected.inputs}
-            pipelineRunStatus={pipelineRunStatus}
+            emptyText={!!pipelineRunSelected && !pipelineRunSelected.length && 'No Input Files'}
           />
         </InputFilesSection>
         <ArtifactsSection>
@@ -197,6 +198,7 @@ const PipelineRuns = () => {
             title="Artifacts"
             files={pipelineRunSelected && pipelineRunSelected.artifacts}
             pipelineRunStatus={pipelineRunStatus}
+            emptyText={STATUS_LONG_NAME_LEGEND[pipelineRunStatus]}
           />
         </ArtifactsSection>
       </PipelineRunsGrid>
@@ -207,7 +209,7 @@ const PipelineRuns = () => {
           pipeline_uuid={pipelineInView}
         />
       )}
-    </>
+    </React.Fragment>
   );
 };
 
