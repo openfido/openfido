@@ -1,7 +1,11 @@
 import moment from 'moment';
 import { parse } from '@fast-csv/parse';
 
-import { DATA_TYPES, DATA_SCALES } from 'config/charts';
+import {
+  DATA_TYPES,
+  DATA_SCALES,
+  TOTAL_GRAPH_POINTS,
+} from 'config/charts';
 
 const DATE_FORMATS = [
   'YYYY-MM-DDTHH:mm:ssZ',
@@ -9,8 +13,6 @@ const DATE_FORMATS = [
 
 export const toUnixTime = (str) => moment(str, DATE_FORMATS).unix();
 export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
-
-export const TOTAL_GRAPH_POINTS = 800;
 
 export const getLimitedDataPointsForGraph = ({
   data,
@@ -23,10 +25,6 @@ export const getLimitedDataPointsForGraph = ({
   }
 
   let timeSubsetData = [...data];
-
-  if (timeSubsetData.length <= totalGraphPoints) {
-    return timeSubsetData;
-  }
 
   if (minIndex !== undefined && maxIndex !== undefined) {
     timeSubsetData = timeSubsetData.slice(minIndex, maxIndex);
@@ -100,7 +98,7 @@ export const parseCsvData = (data) => {
       })
       .on('end', () => {
         resolve({
-          chartData: getLimitedDataPointsForGraph({ data: chartData, minIndex: 0, maxIndex: chartData.length - 1 }),
+          chartData,
           chartTypes,
           chartScales,
         });

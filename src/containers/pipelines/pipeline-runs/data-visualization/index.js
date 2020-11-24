@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spin } from 'antd';
+import { Spin, Slider } from 'antd';
 import styled from 'styled-components';
 
-import { getCharts } from 'actions/charts';
-import { CHART_TYPES } from 'config/charts';
+import { getCharts, setGraphMinMax } from 'actions/charts';
+import { CHART_TYPES, TOTAL_GRAPH_POINTS } from 'config/charts';
 import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2,
@@ -52,7 +52,7 @@ const StyledDataVisualization = styled.div`
     text-align: center;
     .ant-spin .anticon {
       position: static;
-      margin-top: 5rem;
+      margin-top: 8rem;
     }
     h4 {
       margin-bottom: 8px;
@@ -81,6 +81,27 @@ const AddChartButton = styled(StyledButton)`
     }
     span {
       display: flex;
+    }
+  }
+`;
+
+const ChartSlider = styled(Slider)`
+  &, &:hover {
+    .ant-slider-rail {
+      background-color: ${colors.grey};
+      &:hover {
+        background-color: ${colors.lightOverlay};
+      }
+    }
+    .ant-slider-track {
+      &, &:hover {
+        background-color: ${colors.skyBlue};
+      }
+    }
+    .ant-slider-handle {
+      &, &:hover {
+        border: 2px solid ${colors.skyBlue};
+      }
     }
   }
 `;
@@ -155,37 +176,57 @@ const DataVisualization = () => {
         </AddChartButton>
         {pipelineRunCharts && pipelineRunCharts.map(({
           artifact, name: title, chart_type_code, chart_config,
-        }) => (
-          <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
-            <StyledH4 color="black">{title}</StyledH4>
-            {(getChartsInProgress || processArtifactInProgress) && (
-              <Spin key="spin" indicator={<LoadingFilled spin />} />
-            )}
-            {chart_type_code === CHART_TYPES.IMAGE_CHART && (
-              <img src={artifact.url} alt={artifact.name} width="100%" />
-            )}
-            {chart_type_code === CHART_TYPES.LINE_CHART && artifact.url in chartDatum && (
-              <ComposedCsvChart
-                type={chart_type_code}
-                config={chart_config}
-                artifact={artifact}
-                chartData={chartDatum[artifact.url].chartData}
-                chartTypes={chartDatum[artifact.url].chartTypes}
-                chartScales={chartDatum[artifact.url].chartScales}
-              />
-            )}
-            {chart_type_code === CHART_TYPES.BAR_CHART && artifact.url in chartDatum && (
-              <ComposedCsvChart
-                type={chart_type_code}
-                config={chart_config}
-                artifact={artifact}
-                chartData={chartDatum[artifact.url].chartData}
-                chartTypes={chartDatum[artifact.url].chartTypes}
-                chartScales={chartDatum[artifact.url].chartScales}
-              />
-            )}
-          </section>
-        ))}
+        }, chartIndex) => {
+          const chartDataLength = chartDatum[artifact.url] && chartDatum[artifact.url].chartData.length;
+
+          return (
+            <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
+              <StyledH4 color="black">{title}</StyledH4>
+              {(getChartsInProgress || processArtifactInProgress) && (
+                <Spin key="spin" indicator={<LoadingFilled spin />} />
+              )}
+              {chart_type_code === CHART_TYPES.IMAGE_CHART && (
+                <img src={artifact.url} alt={artifact.name} width="100%" />
+              )}
+              {chart_type_code === CHART_TYPES.LINE_CHART && artifact.url in chartDatum && (
+                <ComposedCsvChart
+                  type={chart_type_code}
+                  config={chart_config}
+                  artifact={artifact}
+                  chartData={chartDatum[artifact.url].chartData}
+                  chartTypes={chartDatum[artifact.url].chartTypes}
+                  chartScales={chartDatum[artifact.url].chartScales}
+                  chartIndex={chartIndex}
+                  pipelineRunSelectedUuid={pipelineRunSelectedUuid}
+                />
+              )}
+              {chart_type_code === CHART_TYPES.BAR_CHART && artifact.url in chartDatum && (
+                <ComposedCsvChart
+                  type={chart_type_code}
+                  config={chart_config}
+                  artifact={artifact}
+                  chartData={chartDatum[artifact.url].chartData}
+                  chartTypes={chartDatum[artifact.url].chartTypes}
+                  chartScales={chartDatum[artifact.url].chartScales}
+                  chartIndex={chartIndex}
+                  pipelineRunSelectedUuid={pipelineRunSelectedUuid}
+                />
+              )}
+              {artifact.url in chartDatum && (
+                <ChartSlider
+                  range
+                  width={TOTAL_GRAPH_POINTS}
+                  style={{ marginLeft: '60px' }}
+                  tooltipVisible={false}
+                  defaultValue={[0, 100]}
+                  onAfterChange={([min, max]) => (
+                    dispatch(setGraphMinMax(pipelineRunSelectedUuid, chartIndex, min * chartDataLength * 0.01, max * chartDataLength * 0.01))
+                  )}
+                />
+              )}
+            </section>
+          );
+        })}
       </StyledDataVisualization>
       {showAddChartPopup && (
         <AddChartPopup

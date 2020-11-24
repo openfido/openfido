@@ -35,7 +35,7 @@ const CustomXAxisTick = (props) => {
       </Text>
     ),
     !isTimestamp && (
-      <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>
+      <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 20} style={style} fontSize={12}>
         {tickValue}
       </Text>
     ),

@@ -7,6 +7,7 @@ import {
   PROCESS_ARTIFACT,
   PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
+  SET_GRAPH_MIN_MAX,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -19,6 +20,7 @@ const DEFAULT_STATE = {
     processArtifactError: null,
   },
   chartDatum: {},
+  graphMinMax: {},
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -35,6 +37,16 @@ export default (state = DEFAULT_STATE, action) => {
             chartData: action.chartData,
             chartTypes: action.chartTypes,
             chartScales: action.chartScales,
+          },
+        },
+        graphMinMax: {
+          ...state.graphMinMax,
+          [action.pipeline_run_uuid]: {
+            ...state.graphMinMax[action.pipeline_run_uuid],
+            [action.chartIndex]: {
+              min: action.minIndex,
+              max: action.maxIndex,
+            },
           },
         },
       };
@@ -103,6 +115,24 @@ export default (state = DEFAULT_STATE, action) => {
           addChartError: action.payload,
         },
       };
+    case SET_GRAPH_MIN_MAX: {
+      const {
+        pipeline_run_uuid, index, min, max,
+      } = action.payload;
+
+      const pipelineRunGraphMinMax = state.graphMinMax[pipeline_run_uuid] || {};
+
+      pipelineRunGraphMinMax[index] = { min, max };
+
+      return {
+        ...state,
+        messages: DEFAULT_STATE.messages,
+        graphMinMax: {
+          ...state.graphMinMax,
+          [pipeline_run_uuid]: pipelineRunGraphMinMax,
+        },
+      };
+    }
     default:
       return state;
   }

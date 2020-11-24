@@ -41,3 +41,5 @@ export const CHART_TITLE_LENGTH_LIMIT = 128;
 
 export const ALLOWABLE_ARTIFACT_IMAGE_FORMATS = /\.(png|gif|jpe?g|tiff|bmp)$/i;
 export const ALLOWABLE_ARTIFACT_FORMATS = /\.(png|gif|jpe?g|tiff|bmp|csv)$/i;
+
+export const TOTAL_GRAPH_POINTS = 800;
