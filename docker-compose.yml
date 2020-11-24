@@ -32,8 +32,10 @@ services:
       S3_SECRET_ACCESS_KEY: minio123
       S3_BUCKET: openfido-data
       S3_ENDPOINT_URL: http://authstorage:9000
+      PYTHONPATH: /opt/utils
     volumes:
       - ${AUTH_DIR:-.}:/opt/app:delegated
+      - ${UTILS_DIR:-.}:/opt/utils:delegated
     ports:
       - "${AUTH_PORT:-5000}:5000"
     depends_on:
