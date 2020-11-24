@@ -56,23 +56,23 @@ const OverviewTabMenu = ({
           </StyledButton>
         </NavLink>
       </li>
-      {dataVisualizationReady && (
-      <li>
-        <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION, routeParams)}>
-          <StyledButton type="text" size="middle">
-            Data Visualization
-          </StyledButton>
-        </NavLink>
-      </li>
+      {!!dataVisualizationReady && (
+        <li>
+          <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION, routeParams)}>
+            <StyledButton type="text" size="middle">
+              Data Visualization
+            </StyledButton>
+          </NavLink>
+        </li>
       )}
-      {consoleOutputReady && (
-      <li>
-        <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT, routeParams)}>
-          <StyledButton type="text" size="middle">
-            Console Output
-          </StyledButton>
-        </NavLink>
-      </li>
+      {!!consoleOutputReady && (
+        <li>
+          <NavLink exact to={generatePath(ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT, routeParams)}>
+            <StyledButton type="text" size="middle">
+              Console Output
+            </StyledButton>
+          </NavLink>
+        </li>
       )}
     </StyledOverviewTabMenu>
   );

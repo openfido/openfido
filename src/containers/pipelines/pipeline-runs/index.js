@@ -179,10 +179,10 @@ const PipelineRuns = () => {
             pipelineInView={pipelineInView}
             pipelineRunSelectedUuid={pipelineRunSelected && pipelineRunSelected.uuid}
           />
-          {pipelineRunSelected && (
-          <Overview
-            pipelineRunSelected={pipelineRunSelected}
-          />
+          {!!pipelineRunSelected && (
+            <Overview
+              pipelineRunSelected={pipelineRunSelected}
+            />
           )}
         </OverviewSection>
         <InputFilesSection>
