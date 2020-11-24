@@ -7,6 +7,12 @@ import {
   TOTAL_GRAPH_POINTS,
 } from 'config/charts';
 
+export const getGraphInterval = (totalPoints) => {
+  const numberOfPoints = parseInt(totalPoints, 10);
+
+  return numberOfPoints > 10 ? numberOfPoints / 8 : 1;
+};
+
 const DATE_FORMATS = [
   'YYYY-MM-DDTHH:mm:ssZ',
 ];

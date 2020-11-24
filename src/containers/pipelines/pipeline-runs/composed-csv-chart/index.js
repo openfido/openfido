@@ -22,7 +22,11 @@ import {
   XAXIS,
   YAXIS,
 } from 'config/charts';
-import { axesFormatter, getLimitedDataPointsForGraph } from 'util/charts';
+import {
+  axesFormatter,
+  getLimitedDataPointsForGraph,
+  getGraphInterval,
+} from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
@@ -43,7 +47,7 @@ const ComposedCsvChart = ({
 
   const totalPoints = graphMinMax ? graphMinMax.max - graphMinMax.min : chartData.length;
 
-  const graphInterval = parseInt(totalPoints > 10 ? (totalPoints / 8) : 1, 10);
+  const graphInterval = getGraphInterval(totalPoints);
 
   if (config && config[XAXIS] && config[YAXIS] && CHART_FILLS && CHART_STROKES && chartTypes && chartScales) {
     const axesByType = {
