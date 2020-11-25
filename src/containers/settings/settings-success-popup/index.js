@@ -59,6 +59,7 @@ const SettingsSuccessPopup = ({
         {message}
       </StyledText>
       <StyledButton
+        aria-label="Return to Settings button"
         size="middle"
         color="blue"
         onClick={handleOk}

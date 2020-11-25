@@ -137,6 +137,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             Pipeline Name
           </StyledText>
           <StyledInput
+            aria-label="Pipeline Name input"
             type="text"
             bgcolor="white"
             size="large"
@@ -155,6 +156,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             Description
           </StyledText>
           <StyledTextArea
+            aria-label="Pipeline Description textarea"
             rows={3}
             bgcolor="white"
             size="large"
@@ -173,6 +175,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             DockerHub Repository
           </StyledText>
           <StyledInput
+            aria-label="Pipeline DockerHub Repository input"
             type="text"
             bgcolor="white"
             size="large"
@@ -191,6 +194,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             Git Clone URL (https)
           </StyledText>
           <StyledInput
+            aria-label="Pipeline Repository input"
             type="text"
             bgcolor="white"
             size="large"
@@ -209,6 +213,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             Repository Branch
           </StyledText>
           <StyledInput
+            aria-label="Pipeline Repository Branch input"
             type="text"
             bgcolor="white"
             size="large"
@@ -227,6 +232,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
             Entrypoint Script (.sh)
           </StyledText>
           <StyledInput
+            aria-label="Pipeline Repository Script input"
             type="text"
             bgcolor="white"
             size="large"

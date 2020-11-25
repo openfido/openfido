@@ -89,7 +89,9 @@ const OrganizationsDropdown = () => {
       {organizations && !!organizations.length && (
         <StyledDropdown overlay={menu} disabled={dropdownDisabled}>
           <div>
-            <span>
+            <span
+              aria-label="Organization name navigation"
+            >
               {currentOrgObj ? currentOrgObj.name : 'No organization'}
               {!dropdownDisabled && <DownOutlined color="lightGray" />}
             </span>

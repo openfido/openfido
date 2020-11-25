@@ -257,6 +257,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
           </div>
         </ArtifactsSection>
         <StyledButton
+          aria-label="Start Run button"
           size="middle"
           color="blue"
           width={108}

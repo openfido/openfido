@@ -141,6 +141,7 @@ const EditProfile = () => {
         <label htmlFor="first_name">
           <StyledText display="block" color="darkText">First Name</StyledText>
           <StyledInput
+            aria-label="First Name settings edit profile input"
             type="text"
             bgcolor="white"
             size="large"
@@ -153,6 +154,7 @@ const EditProfile = () => {
         <label htmlFor="last_name">
           <StyledText display="block" color="darkText">Last Name</StyledText>
           <StyledInput
+            aria-label="Last Name settings edit profile input"
             type="text"
             bgcolor="white"
             size="large"
@@ -165,6 +167,7 @@ const EditProfile = () => {
         <label htmlFor="email">
           <StyledText display="block" color="darkText">Email</StyledText>
           <StyledInput
+            aria-label="Email settings edit profile input"
             type="text"
             bgcolor="white"
             size="large"

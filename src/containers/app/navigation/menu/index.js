@@ -58,16 +58,31 @@ const MainMenu = () => {
     <StyledMenu selectedKeys={selectedKeys}>
       {currentOrg && (
         <Menu.Item key="pipelines">
-          <Link to={ROUTE_PIPELINES}>Pipelines</Link>
+          <Link
+            aria-label="Pipelines menu link"
+            to={ROUTE_PIPELINES}
+          >
+            Pipelines
+          </Link>
         </Menu.Item>
       )}
       {isOrganizationAdmin && (
         <Menu.Item key="users">
-          <Link to={ROUTE_USERS}>Users</Link>
+          <Link
+            aria-label="Users menu link"
+            to={ROUTE_USERS}
+          >
+            Users
+          </Link>
         </Menu.Item>
       )}
       <Menu.Item key="settings">
-        <Link to={ROUTE_SETTINGS}>Settings</Link>
+        <Link
+          aria-label="Settings menu link"
+          to={ROUTE_SETTINGS}
+        >
+          Settings
+        </Link>
       </Menu.Item>
     </StyledMenu>
   );

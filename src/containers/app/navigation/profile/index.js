@@ -50,7 +50,7 @@ const Profile = () => {
           <StyledPhoto />
         </StyledPhotoContainer>
         {profile && (
-          <StyledName>
+          <StyledName aria-label="First name last name profile navigation">
             {profile.first_name}
             {profile.last_name && ` ${profile.last_name}`}
           </StyledName>
