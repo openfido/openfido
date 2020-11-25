@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import {
   PIPELINE_STATES,
   POLL_PIPELINE_RUN_INTERVAL,
+  STATUS_LONG_NAME_LEGEND,
 } from 'config/pipelines';
 import {
   getPipelineRuns,
@@ -101,6 +102,7 @@ const PipelineRuns = () => {
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
+  const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
   const selectedRun = useSelector((state) => state.pipelines.currentPipelineRunUuid);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
@@ -122,8 +124,10 @@ const PipelineRuns = () => {
   }, [currentOrg, dispatch, pipelines]);
 
   useEffect(() => {
-    dispatch(getPipelineRuns(currentOrg, pipelineInView));
-  }, [currentOrg, pipelineInView, dispatch, showStartRunPopup]);
+    if (!getPipelineRunsInProgress && !pipelineRuns) {
+      dispatch(getPipelineRuns(currentOrg, pipelineInView));
+    }
+  }, [currentOrg, pipelineInView, dispatch, getPipelineRunsInProgress, pipelineRuns]);
 
   useEffect(() => {
     const interval = selectedRun && !getPipelineRunInProgress && setInterval(() => {
@@ -148,12 +152,13 @@ const PipelineRuns = () => {
     setStartRunPopup(true);
   };
 
-  const closeStartRunPopup = () => {
+  const closeStartRunPopup = (runStarted) => {
     setStartRunPopup(false);
+    if (runStarted) dispatch(getPipelineRuns(currentOrg, pipelineInView));
   };
 
   return (
-    <>
+    <React.Fragment key={pipelineInView}>
       <StyledTitle>
         <div>
           <h1>
@@ -189,7 +194,7 @@ const PipelineRuns = () => {
           <FilesList
             title="Input Files"
             files={pipelineRunSelected && pipelineRunSelected.inputs}
-            pipelineRunStatus={pipelineRunStatus}
+            emptyText={!!pipelineRunSelected && !pipelineRunSelected.length ? 'No Input Files' : null}
           />
         </InputFilesSection>
         <ArtifactsSection>
@@ -197,6 +202,7 @@ const PipelineRuns = () => {
             title="Artifacts"
             files={pipelineRunSelected && pipelineRunSelected.artifacts}
             pipelineRunStatus={pipelineRunStatus}
+            emptyText={STATUS_LONG_NAME_LEGEND[pipelineRunStatus]}
           />
         </ArtifactsSection>
       </PipelineRunsGrid>
@@ -207,7 +213,7 @@ const PipelineRuns = () => {
           pipeline_uuid={pipelineInView}
         />
       )}
-    </>
+    </React.Fragment>
   );
 };
 
