@@ -49,8 +49,8 @@ jobs:
       - aws-cli/setup:
           aws-access-key-id: << parameters.access-key >>
           aws-secret-access-key: << parameters.secret-key >>
-          aws-region: $AWS_REGION
-          version: 2
+          aws-region: AWS_REGION
+          version: "2"
       - run:
           name: Move workspace to correct directory
           command: |
