@@ -19,9 +19,9 @@ import {
 import colors from 'styles/colors';
 
 const RunMenu = styled(Menu)`
-  overflow: overlay;
+  overflow-y: scroll;
   height: 617px;
-  margin-right: -8px;
+  margin-right: -28px;
   &.ant-menu-vertical {
     border-right: 0;
     > .ant-menu-item {
@@ -38,7 +38,7 @@ const RunMenu = styled(Menu)`
 
 const RunItem = styled(Menu.Item)`
   position: relative;
-  margin-right: 14px;
+  margin-right: 19px;
   > div {
     display: grid;
     align-items: center;
