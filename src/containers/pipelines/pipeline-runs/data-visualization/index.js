@@ -212,7 +212,7 @@ const DataVisualization = () => {
                   pipelineRunSelectedUuid={pipelineRunSelectedUuid}
                 />
               )}
-              {artifact.url in chartDatum && (
+              {chart_type_code === CHART_TYPES.LINE_CHART && artifact.url in chartDatum && (
                 <ChartSlider
                   range
                   width={TOTAL_GRAPH_POINTS}
