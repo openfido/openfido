@@ -22,10 +22,10 @@ jobs:
       - run:
           name: Move Build to tmb
           command: |
-            mkdir -p workspace/build
-            mv ./build workspace/build
+            mkdir -p /tmp/workspace/build
+            mv ./build /tmp/workspace/build
       - persist_to_workspace:
-          root: workspace
+          root: /tmp/workspace
           paths:
             - build
 
@@ -47,7 +47,7 @@ jobs:
         default: STAGE_CF_ID
     steps:
       - attach_workspace:
-          at: /tmp/workspace/build
+          at: /tmp/workspace
       - aws-cli/setup:
           aws-access-key-id: << parameters.access-key >>
           aws-secret-access-key: << parameters.secret-key >>
