@@ -22,8 +22,9 @@ jobs:
       - run:
           name: Move Build to tmb
           command: |
+            ls
             mkdir -p /tmp/workspace/build
-            mv ./build /tmp/workspace/build
+            mv build /tmp/workspace/build
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -56,12 +57,13 @@ jobs:
       - run:
           name: Move workspace to correct directory
           command: |
+            ls
             rm -r build
             mkdir -p build
             mv /tmp/workspace/build build
       - run:
           name: Deploy to S3
-          command: aws s3 sync ./build s3://<< parameters.s3-bucket >>
+          command: aws s3 sync build s3://<< parameters.s3-bucket >>
       - run:
           name: Run CF invalidation
           command: aws cloudfront create-invalidation --distribution-id << parameters.cf-id >> --paths '/*'
