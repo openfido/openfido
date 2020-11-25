@@ -57,6 +57,7 @@ jobs:
           name: Move workspace to correct directory
           command: |
             rm -r ./build
+            mkdir -p ./build
             mv /tmp/workspace/build ./build
       - run:
           name: Deploy to S3
