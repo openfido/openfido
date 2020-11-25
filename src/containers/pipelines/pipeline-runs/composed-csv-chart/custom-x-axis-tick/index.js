@@ -14,7 +14,7 @@ const CustomXAxisTick = (props) => {
 
   const showTickRect = index !== (visibleTicksCount) && index % 2;
 
-  const rectWidth = width / (visibleTicksCount - 1);
+  const rectWidth = (width + (visibleTicksCount * 3.1)) / visibleTicksCount; // good for 1-8 ticks, approx width
 
   const dateOffset = isTimestamp ? 28 : 22;
 
@@ -35,7 +35,7 @@ const CustomXAxisTick = (props) => {
       </Text>
     ),
     !isTimestamp && (
-      <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 16} style={style} fontSize={12}>
+      <Text key="value" textAnchor="middle" fill={fill} x={x} y={y + 20} style={style} fontSize={12}>
         {tickValue}
       </Text>
     ),

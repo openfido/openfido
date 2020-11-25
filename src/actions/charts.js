@@ -7,6 +7,7 @@ import {
   PROCESS_ARTIFACT,
   PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
+  SET_GRAPH_MIN_MAX,
 } from 'actions';
 import {
   requestPipelineRunCharts,
@@ -55,7 +56,7 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
 
       if (!charts || !charts.length) return;
 
-      charts.forEach(async (chart) => {
+      charts.forEach(async (chart, chartIndex) => {
         const { artifact } = chart;
 
         if (!artifact) return;
@@ -71,6 +72,10 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
               chartData,
               chartTypes,
               chartScales,
+              chartIndex,
+              minIndex: 0,
+              maxIndex: chartData.length - 1,
+              pipeline_run_uuid,
             });
           })
           .catch((err) => {
@@ -107,3 +112,13 @@ export const addChart = (organization_uuid, pipeline_uuid, pipeline_run_uuid, ti
       });
     })
 );
+
+export const setGraphMinMax = (pipeline_run_uuid, index, min, max) => ({
+  type: SET_GRAPH_MIN_MAX,
+  payload: {
+    pipeline_run_uuid,
+    index,
+    min,
+    max,
+  },
+});

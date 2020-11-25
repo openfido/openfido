@@ -94,8 +94,12 @@ const SelectChartTypeStep = ({ onNextClicked, chartType, setChartType }) => {
 
 SelectChartTypeStep.propTypes = {
   onNextClicked: PropTypes.func.isRequired,
-  chartType: PropTypes.string.isRequired,
+  chartType: PropTypes.string,
   setChartType: PropTypes.func.isRequired,
+};
+
+SelectChartTypeStep.defaultProps = {
+  chartType: null,
 };
 
 export default SelectChartTypeStep;

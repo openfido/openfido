@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -21,18 +22,32 @@ import {
   XAXIS,
   YAXIS,
 } from 'config/charts';
-import { axesFormatter } from 'util/charts';
+import {
+  axesFormatter,
+  getLimitedDataPointsForGraph,
+  getGraphInterval,
+} from 'util/charts';
 import colors from 'styles/colors';
 import CustomXAxisTick from './custom-x-axis-tick';
 import CustomYAxisTick from './custom-y-axis-tick';
 
 const ComposedCsvChart = ({
-  type, config, height, chartData, chartTypes, chartScales,
+  type, config, height, chartData, chartTypes, chartScales, chartIndex, pipelineRunSelectedUuid,
 }) => {
   const axesComponents = [];
   const dataComponents = [];
 
   let hasTimeXAxis = false; // used for axesFormatter in util/charts
+
+  const graphMinMax = useSelector((state) => (
+    state.charts.graphMinMax[pipelineRunSelectedUuid] && state.charts.graphMinMax[pipelineRunSelectedUuid][chartIndex]
+  ));
+
+  const graphedChartData = getLimitedDataPointsForGraph({ data: chartData, minIndex: graphMinMax && graphMinMax.min, maxIndex: graphMinMax && graphMinMax.max });
+
+  const totalPoints = graphMinMax ? graphedChartData.length : chartData.length;
+
+  const graphInterval = getGraphInterval(totalPoints);
 
   if (config && config[XAXIS] && config[YAXIS] && CHART_FILLS && CHART_STROKES && chartTypes && chartScales) {
     const axesByType = {
@@ -150,7 +165,7 @@ const ComposedCsvChart = ({
                 dataKey={axis}
                 type={type === CHART_TYPES.BAR_CHART ? DATA_TYPES.CATEGORY : DATA_TYPES.NUMBER}
                 scale={type === CHART_TYPES.BAR_CHART ? DATA_SCALES.AUTO : DATA_SCALES.TIME}
-                interval={parseInt(chartData.length / 8, 10)}
+                interval={type === CHART_TYPES.BAR_CHART ? 'preserveStartEnd' : graphInterval}
                 domain={['auto', 'auto']}
                 fontSize={10}
                 style={{ fontWeight: '500', fill: colors.gray10 }}
@@ -206,7 +221,7 @@ const ComposedCsvChart = ({
     >
       <ComposedChart
         height={height}
-        data={chartData}
+        data={graphedChartData}
         margin={{
           bottom: 16,
           top: 32,
@@ -234,6 +249,7 @@ const ComposedCsvChart = ({
             fontWeight: 'bold',
             lineHeight: '20px',
             color: colors.gray,
+            textAlign: 'left',
           }}
           cursor={{ stroke: colors.gray, strokeWidth: 1, strokeDasharray: '3, 3' }}
         />
@@ -252,10 +268,14 @@ ComposedCsvChart.propTypes = {
   chartData: PropTypes.arrayOf(PropTypes.object).isRequired,
   chartTypes: PropTypes.objectOf(PropTypes.string).isRequired,
   chartScales: PropTypes.objectOf(PropTypes.string).isRequired,
+  chartIndex: PropTypes.number,
+  pipelineRunSelectedUuid: PropTypes.string,
 };
 
 ComposedCsvChart.defaultProps = {
   height: 288,
+  chartIndex: null,
+  pipelineRunSelectedUuid: null,
 };
 
 export default ComposedCsvChart;
