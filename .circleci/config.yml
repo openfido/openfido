@@ -23,7 +23,7 @@ jobs:
           name: Move Build to tmb
           command: |
             mkdir -p /tmp/workspace/build
-            mv build /tmp/workspace/build
+            mv -v build/* /tmp/workspace/build
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
