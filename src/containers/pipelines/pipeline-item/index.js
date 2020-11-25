@@ -17,6 +17,7 @@ import moment from 'moment';
 import colors from 'styles/colors';
 
 const PipelineItemGrid = styled(StyledGrid)`
+  text-align: left;
   .ant-btn {
     height: 32px;
     height: 2rem;

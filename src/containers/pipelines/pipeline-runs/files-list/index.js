@@ -106,7 +106,7 @@ const FilesList = ({
               {emptyText}
             </StyledText>
             {pipelineRunStatus === PIPELINE_STATES.RUNNING && (
-            <Spin indicator={<LoadingFilled spin />} />
+              <Spin indicator={<LoadingFilled spin />} />
             )}
           </OverviewMeta>
         </li>

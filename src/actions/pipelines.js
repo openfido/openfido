@@ -1,8 +1,7 @@
 import {
   GET_PIPELINES,
+  GET_PIPELINES_IN_PROGRESS,
   GET_PIPELINES_FAILED,
-  ADD_PIPELINE,
-  DELETE_PIPELINE,
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_IN_PROGRESS,
   GET_PIPELINE_RUNS_FAILED,
@@ -25,7 +24,8 @@ import {
   requestUploadInputFile,
 } from 'services';
 
-export const getPipelines = (organization_uuid) => (dispatch) => (
+export const getPipelines = (organization_uuid) => async (dispatch) => {
+  await dispatch({ type: GET_PIPELINES_IN_PROGRESS });
   requestGetPipelines(organization_uuid)
     .then((response) => {
       dispatch({
@@ -38,18 +38,8 @@ export const getPipelines = (organization_uuid) => (dispatch) => (
         type: GET_PIPELINES_FAILED,
         payload: !err.response || err.response.data,
       });
-    })
-);
-
-export const addPipeline = (payload) => ({
-  type: ADD_PIPELINE,
-  payload,
-});
-
-export const deletePipeline = (payload) => ({
-  type: DELETE_PIPELINE,
-  payload,
-});
+    });
+};
 
 export const getPipelineRuns = (organization_uuid, pipeline_uuid) => async (dispatch) => {
   await dispatch({ type: GET_PIPELINE_RUNS_IN_PROGRESS });

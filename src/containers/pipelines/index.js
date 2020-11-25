@@ -3,10 +3,11 @@ import { generatePath } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Space } from 'antd';
+import { Space, Spin } from 'antd';
 
 import { ROUTE_PIPELINE_RUNS } from 'config/routes';
 import { getPipelines } from 'actions/pipelines';
+import LoadingFilled from 'icons/LoadingFilled';
 import { StyledTitle, StyledButton } from 'styles/app';
 import PipelineItem from './pipeline-item';
 import CreatePipelinePopup from './get-started-popup';
@@ -16,6 +17,11 @@ import EditPipeline from './edit-pipeline';
 const PipelineItems = styled(Space)`
   padding: 28px 20px 28px 16px;
   padding: 1.75rem 1.25rem 1.75rem 1rem;
+  text-align: center;
+  .ant-spin .anticon {
+    position: static;
+    margin: 5rem auto;
+  }
 `;
 
 const Pipelines = () => {
@@ -23,11 +29,12 @@ const Pipelines = () => {
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const getPipelinesInProgress = useSelector((state) => state.pipelines.messages.getPipelinesInProgress);
   const dispatch = useDispatch();
 
   const [showGetStartedPopup, setShowGetStartedPopup] = useState(false);
   const [showAddPipelines, setShowAddPipelines] = useState(false);
-  const [pipelineInEdit, setPipelineInEdit] = useState(null); // 20e5d78126f1475382199e9d629762e2
+  const [pipelineInEdit, setPipelineInEdit] = useState(null);
 
   const pipelineItemInEdit = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInEdit);
 
@@ -107,22 +114,23 @@ const Pipelines = () => {
           pipelineItem={pipelineItemInEdit}
         />
       )}
-      {!showAddPipelines && !pipelineInEdit && (
-        <PipelineItems direction="vertical" size={26}>
-          {pipelines && pipelines.map(({
-            uuid, name, last_pipeline_run,
-          }) => (
-            <PipelineItem
-              key={uuid}
-              uuid={uuid}
-              name={name}
-              last_pipeline_run={last_pipeline_run}
-              openPipelineEdit={openPipelineEdit}
-              viewPipelineRuns={viewPipelineRuns}
-            />
-          ))}
-        </PipelineItems>
-      )}
+      <PipelineItems direction="vertical" size={26}>
+        {getPipelinesInProgress && (
+          <Spin indicator={<LoadingFilled spin />} />
+        )}
+        {!getPipelinesInProgress && !showAddPipelines && !pipelineInEdit && pipelines && pipelines.map(({
+          uuid, name, last_pipeline_run,
+        }) => (
+          <PipelineItem
+            key={uuid}
+            uuid={uuid}
+            name={name}
+            last_pipeline_run={last_pipeline_run}
+            openPipelineEdit={openPipelineEdit}
+            viewPipelineRuns={viewPipelineRuns}
+          />
+        ))}
+      </PipelineItems>
     </>
   );
 };

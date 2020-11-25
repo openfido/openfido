@@ -1,6 +1,7 @@
 import { computePipelineRunMetaData, createdAtSort } from 'util/data';
 import {
   GET_PIPELINES,
+  GET_PIPELINES_IN_PROGRESS,
   GET_PIPELINES_FAILED,
   GET_PIPELINE_RUNS,
   GET_PIPELINE_RUNS_IN_PROGRESS,
@@ -25,6 +26,7 @@ const DEFAULT_STATE = {
   currentPipelineRunUuid: null,
   consoleOutput: {},
   messages: {
+    getPipelinesInProgress: false,
     getPipelinesError: null,
     getPipelineRunsInProgress: false,
     getPipelineRunsError: null,
@@ -64,6 +66,14 @@ export default (state = DEFAULT_STATE, action) => {
         pipelines: action.payload,
       };
     }
+    case GET_PIPELINES_IN_PROGRESS:
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          getPipelinesInProgress: true,
+        },
+      };
     case GET_PIPELINES_FAILED:
       return {
         ...state,

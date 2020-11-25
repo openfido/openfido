@@ -140,7 +140,7 @@ const RunsList = ({
         <div />
       </StyledH2>
       {getPipelineRunsInProgress && (
-        <Spin key="spin" indicator={<LoadingFilled spin />} />
+        <Spin indicator={<LoadingFilled spin />} />
       )}
       <RunMenu selectedKeys={[selectedRun]}>
         {!getPipelineRunsInProgress && pipelineRuns && pipelineRuns.map(({
