@@ -7,6 +7,11 @@ module "ecs" {
   lb_enable      = false
   fargate_enable = false
 
+  as_desire_capacity      = 5
+  as_min                  = 5
+  as_max                  = 8
+  containers_desire_count = 5
+
   container_task_definition = [{
     name       = var.ecs_name
     privileged = true
@@ -31,7 +36,8 @@ module "ecs" {
     read_only      = false
     container_path = "/var/run/docker.sock"
     add_to         = [var.ecs_name]
-  },{
+  },
+  {
     name           = "tmb_in_docker"
     host_path      = "/tmp"
     read_only      = false
