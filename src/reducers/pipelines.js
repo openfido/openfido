@@ -21,8 +21,8 @@ const DEFAULT_STATE = {
   pipelines: null,
   pipelineRuns: {},
   inputFiles: null,
-  currentPipelineRun: null,
-  currentPipelineRunUuid: null,
+  currentPipelineRuns: {},
+  currentPipelineRunUuids: {},
   consoleOutput: {},
   messages: {
     getPipelinesError: null,
@@ -94,8 +94,14 @@ export default (state = DEFAULT_STATE, action) => {
           ...state.pipelineRuns,
           [pipeline_uuid]: pipelineRuns,
         },
-        currentPipelineRun: pipelineRuns.length ? pipelineRuns[0] : null,
-        currentPipelineRunUuid: pipelineRuns.length ? pipelineRuns[0].uuid : null,
+        currentPipelineRuns: {
+          ...state.currentPipelineRuns,
+          [pipeline_uuid]: pipelineRuns.length ? pipelineRuns[0] : null,
+        },
+        currentPipelineRunUuids: {
+          ...state.currentPipelineRunUuids,
+          [pipeline_uuid]: pipelineRuns.length ? pipelineRuns[0].uuid : null,
+        },
       };
     }
     case GET_PIPELINE_RUNS_IN_PROGRESS:
@@ -131,8 +137,14 @@ export default (state = DEFAULT_STATE, action) => {
             [pipeline_uuid]: pipelineRuns,
           }
         ) : state.pipelineRuns,
-        currentPipelineRun,
-        currentPipelineRunUuid: pipeline_run_uuid,
+        currentPipelineRuns: {
+          ...state.currentPipelineRuns,
+          [pipeline_uuid]: currentPipelineRun,
+        },
+        currentPipelineRunUuids: {
+          ...state.currentPipelineRunUuids,
+          [pipeline_uuid]: pipeline_run_uuid,
+        },
         messages: DEFAULT_STATE.messages,
       };
     }
@@ -147,8 +159,6 @@ export default (state = DEFAULT_STATE, action) => {
     case GET_PIPELINE_RUN_FAILED:
       return {
         ...state,
-        currentPipelineRun: null,
-        currentPipelineRunUuid: null,
         messages: {
           ...DEFAULT_STATE.messages,
           getPipelineRunError: action.payload,

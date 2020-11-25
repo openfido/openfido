@@ -103,11 +103,11 @@ const PipelineRuns = () => {
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
-  const selectedRun = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRunUuids[pipelineInView]);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
-  const pipelineRunSelected = useSelector((state) => state.pipelines.currentPipelineRun);
+  const pipelineRunSelected = useSelector((state) => state.pipelines.currentPipelineRuns[pipelineInView]);
   const getPipelineRunInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunInProgress);
   const pipelineItemInView = pipelines && pipelines.find((pipelineItem) => pipelineItem.uuid === pipelineInView);
   const pipelineRunStatus = (
@@ -130,17 +130,17 @@ const PipelineRuns = () => {
   }, [currentOrg, pipelineInView, dispatch, getPipelineRunsInProgress, pipelineRuns]);
 
   useEffect(() => {
-    const interval = selectedRun && !getPipelineRunInProgress && setInterval(() => {
-      dispatch(getPipelineRun(currentOrg, pipelineInView, selectedRun));
+    const interval = currentPipelineRun && !getPipelineRunInProgress && setInterval(() => {
+      dispatch(getPipelineRun(currentOrg, pipelineInView, currentPipelineRun));
     }, POLL_PIPELINE_RUN_INTERVAL);
     return () => clearInterval(interval);
-  }, [currentOrg, pipelineInView, selectedRun, getPipelineRunInProgress, dispatch]);
+  }, [currentOrg, pipelineInView, currentPipelineRun, getPipelineRunInProgress, dispatch]);
 
   useEffect(() => {
-    if (!getPipelineRunInProgress && pipelineRuns && pipelineRuns.length && !selectedRun) {
+    if (!getPipelineRunInProgress && pipelineRuns && pipelineRuns.length && !currentPipelineRun) {
       dispatch(getPipelineRun(currentOrg, pipelineInView, pipelineRuns[0].uuid));
     }
-  }, [pipelineRuns, selectedRun, currentOrg, pipelineInView, dispatch, getPipelineRunInProgress]);
+  }, [pipelineRuns, currentPipelineRun, currentOrg, pipelineInView, dispatch, getPipelineRunInProgress]);
 
   const onSelectPipelineRun = (pipelineRunSelectedUuid) => {
     if (!getPipelineRunInProgress) {
@@ -173,7 +173,7 @@ const PipelineRuns = () => {
           <RunsList
             openStartRunPopup={openStartRunPopup}
             pipelineRuns={pipelineRuns}
-            selectedRun={selectedRun}
+            currentPipelineRun={currentPipelineRun}
             onSelectPipelineRun={onSelectPipelineRun}
           />
         </AllRunsSection>

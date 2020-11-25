@@ -76,8 +76,8 @@ const ConsoleOutput = () => {
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
-  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
-  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRuns[pipelineInView]);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuids[pipelineInView]);
   const consoleOutput = useSelector((state) => state.pipelines.consoleOutput);
   const getConsoleOutputInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputInProgress);
   const getConsoleOutputError = useSelector((state) => state.pipelines.messages.getPipelineRunConsoleOutputError);

@@ -126,7 +126,7 @@ const Caret = styled.div`
 `;
 
 const RunsList = ({
-  openStartRunPopup, pipelineRuns, selectedRun, onSelectPipelineRun,
+  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun,
 }) => {
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
 
@@ -142,7 +142,7 @@ const RunsList = ({
       {getPipelineRunsInProgress && (
         <Spin key="spin" indicator={<LoadingFilled spin />} />
       )}
-      <RunMenu selectedKeys={[selectedRun]}>
+      <RunMenu selectedKeys={[currentPipelineRun]}>
         {!getPipelineRunsInProgress && pipelineRuns && pipelineRuns.map(({
           uuid: run_uuid, sequence, status, startedAt, duration,
         }) => (
@@ -165,7 +165,7 @@ const RunsList = ({
                   {duration}
                 </StyledText>
               )}
-              {selectedRun === run_uuid && <Caret bgcolor={STATUS_LEGEND[status]} />}
+              {currentPipelineRun === run_uuid && <Caret bgcolor={STATUS_LEGEND[status]} />}
             </div>
           </RunItem>
         ))}
@@ -179,13 +179,13 @@ RunsList.propTypes = {
   pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
 
   })),
-  selectedRun: PropTypes.string,
+  currentPipelineRun: PropTypes.string,
   onSelectPipelineRun: PropTypes.func.isRequired,
 };
 
 RunsList.defaultProps = {
   pipelineRuns: [],
-  selectedRun: null,
+  currentPipelineRun: null,
 };
 
 export default RunsList;

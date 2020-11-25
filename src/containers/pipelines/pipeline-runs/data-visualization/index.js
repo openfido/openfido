@@ -115,8 +115,8 @@ const DataVisualization = () => {
   const charts = useSelector((state) => state.charts.charts);
   const chartDatum = useSelector((state) => state.charts.chartDatum);
   const pipelines = useSelector((state) => state.pipelines.pipelines);
-  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRun);
-  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuid);
+  const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRuns[pipelineInView]);
+  const currentPipelineRunUuid = useSelector((state) => state.pipelines.currentPipelineRunUuids[pipelineInView]);
   const getChartsInProgress = useSelector((state) => state.charts.messages.getChartsInProgress);
   const processArtifactInProgress = useSelector((state) => state.charts.messages.processArtifactInProgress);
   const dispatch = useDispatch();
