@@ -21,7 +21,9 @@ jobs:
           command: npm run build
       - run:
           name: Move Build to tmb
-          command: mv ./build /tmp/workspace/build
+          command: |
+            mkdir -p workspace/build
+            mv ./build workspace/build
       - persist_to_workspace:
           root: workspace
           paths:
@@ -45,7 +47,7 @@ jobs:
         default: STAGE_CF_ID
     steps:
       - attach_workspace:
-          at: /tmp/build
+          at: /tmp/workspace/build
       - aws-cli/setup:
           aws-access-key-id: << parameters.access-key >>
           aws-secret-access-key: << parameters.secret-key >>
@@ -70,7 +72,7 @@ workflows:
           filters:
             branches:
               ignore: /master/
-  dev:
+  stage:
     jobs:
       - build:
           filters:
