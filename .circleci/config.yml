@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@2.1.1
+  aws-cli: circleci/aws-cli@1.3.1
 jobs:
   build:
     docker:
@@ -11,25 +12,94 @@ jobs:
           node-version: latest
       - run:
           name: Install Dependencies
-          command: |
-            npm install
+          command: npm install
       - run:
           name: Run Lint
-          command: |
-            npm run lint
+          command: npm run lint
       - run:
           name: Build
-          command: |
-            npm run build
+          command: npm run build
       - run:
-          name: Deploy
+          name: Move Build to tmb
+          command: mv ./build /tmp/workspace/build
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - build
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    parameters:
+      access-key:
+        type: env_var_name
+        default: STAGE_ACCESS_KEY_ID
+      secret-key:
+        type: env_var_name
+        default: STAGE_SECRET_ACCESS_KEY
+      s3-bucket:
+        type: env_var_name
+        default: STAGE_S3_URL
+      cf-id:
+        type: env_var_name
+        default: STAGE_CF_ID
+    steps:
+      - attach_workspace:
+          at: /tmp/build
+      - aws-cli/setup:
+          aws-access-key-id: << parameters.access-key >>
+          aws-secret-access-key: << parameters.secret-key >>
+          aws-region: $AWS_REGION
+          version: 2
+      - run:
+          name: Move workspace to correct directory
           command: |
-            if [ "${CIRCLE_BRANCH}" == "staging" ] ; then
-              echo Deploy to Staging...
-              AWS_ACCESS_KEY_ID="${STAGE_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${STAGE_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${STAGE_CF_ID}" S3_BUCKET="${STAGE_S3_URL}" NODE_ENV=staging node ./scripts/deploy.js
-              echo Deploy Complete
-            elif [ "${CIRCLE_BRANCH}" == "master" ] ; then
-              echo Deploy to Production...
-              AWS_ACCESS_KEY_ID="${PROD_ACCESS_KEY_ID}" AWS_SECRET_ACCESS_KEY="${PROD_SECRET_ACCESS_KEY}" AWS_REGION="${AWS_REGION}" CF_ID="${PROD_CF_ID}" S3_BUCKET="${PROD_S3_URL}" NODE_ENV=production node ./scripts/deploy.js
-              echo Deploy Complete
-            fi
+            rm -r ./build
+            mv /tmp/workspace/build ./build
+      - run:
+          name: Deploy to S3
+          command: aws s3 sync ./build s3://<< parameters.s3-bucket >>
+      - run:
+          name: Run CF invalidation
+          command: aws cloudfront create-invalidation --distribution-id << parameters.cf-id >> --paths '/*'
+
+workflows:
+  pullrequests:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: /master/
+  dev:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /master/
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /master/
+
+  prod:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
+            branches:
+              ignore: /.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/
+            branches:
+              ignore: /.*/
+          cf-id: PROD_CF_ID
+          s3-bucket: PROD_S3_URL
+          access-key: PROD_ACCESS_KEY_ID
+          secret-key: PROD_SECRET_ACCESS_KEY
