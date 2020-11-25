@@ -104,6 +104,7 @@ const ConfigChartStep = ({
   const [yAxis, setYAxis] = useState([]);
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState(false);
+  const [axesLimitError, setAxesLimitError] = useState(false);
 
   const chartConfig = {
     [XAXIS]: xAxis,
@@ -128,12 +129,17 @@ const ConfigChartStep = ({
         axes.push(item);
         setAxis(axes);
       }
+
+      setAxesLimitError(false);
+    } else {
+      setAxesLimitError(true);
     }
   };
 
   const removeAxis = (axis, setAxis, item) => {
     const axes = axis.filter((axisItem) => axisItem !== item);
     setAxis(axes);
+    setAxesLimitError(false);
   };
 
   const xAxisMenu = (
@@ -229,6 +235,13 @@ const ConfigChartStep = ({
                   + Add Column
                 </StyledButton>
               </Dropdown>
+              <StyledText size="xsmall" color={axesLimitError && 'pink'}>
+                (max
+                {' '}
+                {AXES_LIMIT}
+                {' '}
+                columns)
+              </StyledText>
             </Space>
             {yAxis && yAxis.map((axisItem, axisIndex) => (
               <AxisItem key={axisItem} title={axisItem}>

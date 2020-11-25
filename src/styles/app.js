@@ -119,6 +119,10 @@ export const StyledText = styled.span`
   font-size: 12px;
   line-height: 14px;
   `) : ''}
+  ${size === 'xsmall' ? (`
+  font-size: 11px;
+  line-height: 12px;
+  `) : ''}
   ${bordercolor ? (`
   border: 1px solid ${bordercolor in colors ? colors[bordercolor] : bordercolor};
   border-radius: 2px;
