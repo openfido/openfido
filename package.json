@@ -54,11 +54,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint 'src/**/*.js'",
-    "deploy-staging-ci": "NODE_ENV=staging node ./scripts/deploy.js",
-    "deploy-production-ci": "NODE_ENV=production node ./scripts/deploy.js",
-    "deploy-staging": "AWS_PROFILE=openfido-staging NODE_ENV=staging node ./scripts/deploy.js",
-    "deploy-production": "AWS_PROFILE=openfido-production NODE_ENV=production node ./scripts/deploy.js"
+    "lint": "eslint 'src/**/*.js'"
   },
   "eslintConfig": {
     "extends": [
