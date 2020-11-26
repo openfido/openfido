@@ -54,6 +54,11 @@ service-apply:
 	@echo "Running Apply on $(arg1) Services"
 	cd enviroments/$(arg1)/services/; terragrunt apply-all
 
+# ********** ses-forwarding ********** #
+ses:
+	@echo "Running "$c" on $(arg1) SES"
+	cd enviroments/$(arg1)/services/ses/; terragrunt $c
+
 # ********** front-end ********** #
 front:
 	@echo "Running "$c" on $(arg1) Front-End"
