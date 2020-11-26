@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -60,11 +60,11 @@ const AddChartPopup = ({
   const [step, setStep] = useState(1);
   const [selectedArtifact, setSelectedArtifact] = useState(null);
   const [chartType, setChartType] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const chartDatum = useSelector((state) => state.charts.chartDatum);
   const processArtifactError = useSelector((state) => state.charts.messages.processArtifactError);
+  const processArtifactInProgress = useSelector((state) => state.charts.messages.processArtifactInProgress);
   const dispatch = useDispatch();
 
   const chartData = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartData;
@@ -72,12 +72,6 @@ const AddChartPopup = ({
   const chartScales = selectedArtifact && selectedArtifact.url in chartDatum && chartDatum[selectedArtifact.url].chartScales;
 
   const isImage = selectedArtifact && selectedArtifact.name && selectedArtifact.name.match(ALLOWABLE_ARTIFACT_IMAGE_FORMATS);
-
-  useEffect(() => {
-    if (chartData || processArtifactError) {
-      setIsLoading(false);
-    }
-  }, [chartData, processArtifactError]);
 
   const onAddChartClicked = (title, chartConfig = {}) => {
     if (selectedArtifact && chartType) {
@@ -94,7 +88,6 @@ const AddChartPopup = ({
 
   const onArtifactSelected = () => {
     if (selectedArtifact) {
-      setIsLoading(true);
       dispatch(processArtifact(selectedArtifact));
 
       setStep(2);
@@ -137,7 +130,7 @@ const AddChartPopup = ({
           onNextClicked={onAddChartClicked}
         />
       )}
-      {step === 2 && !isImage && !isLoading && processArtifactError && !chartTypes && (
+      {step === 2 && !isImage && !processArtifactInProgress && processArtifactError && !chartTypes && (
         <NoGraphingOption>
           <p>No graphing options are available for this file.</p>
           <p>{processArtifactError}</p>

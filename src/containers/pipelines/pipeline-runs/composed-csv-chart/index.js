@@ -243,6 +243,7 @@ const ComposedCsvChart = ({
             fontSize: 12,
             fontWeight: 400,
             lineHeight: '14px',
+            textAlign: 'left',
           }}
           labelStyle={{
             fontSize: 12,

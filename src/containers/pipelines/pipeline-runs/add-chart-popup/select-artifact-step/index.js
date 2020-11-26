@@ -38,6 +38,14 @@ const ArtifactsList = styled.ul`
   }
 `;
 
+const NoArtifacts = styled.div`
+  height: 242px;
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const SelectArtifactStep = ({
   artifacts, selectedArtifact, setSelectedArtifact, onNextClicked,
 }) => {
@@ -54,6 +62,11 @@ const SelectArtifactStep = ({
     <form>
       <div>
         <StyledH4 color="darkText">Select an artifact</StyledH4>
+        {usableArtifacts && !usableArtifacts.length && (
+          <NoArtifacts>
+            No usable artifacts found.
+          </NoArtifacts>
+        )}
         <ArtifactsList>
           {usableArtifacts && usableArtifacts.map((artifact) => (
             <li key={artifact.uuid}>
@@ -70,9 +83,11 @@ const SelectArtifactStep = ({
           ))}
         </ArtifactsList>
       </div>
-      <PopupButton size="middle" color="blue" width={108} onClick={onArtifactSelected}>
-        Next
-      </PopupButton>
+      {usableArtifacts && !!usableArtifacts.length && (
+        <PopupButton size="middle" color="blue" width={108} onClick={onArtifactSelected}>
+          Next
+        </PopupButton>
+      )}
     </form>
   );
 };
