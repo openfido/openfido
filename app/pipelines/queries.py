@@ -24,6 +24,11 @@ def find_organization_pipeline(organization_uuid, organization_pipeline_uuid):
     ).one_or_none()
 
 
+def find_organization_pipeline_by_id(organization_pipeline_id):
+    """ Fetcha a OrganizationPipeline by ID"""
+    return OrganizationPipeline.query.get(organization_pipeline_id)
+
+
 def find_organization_pipeline_input_files(organization_pipeline_id):
     """ Search for Organization Pipeline Input Files """
     return OrganizationPipelineInputFile.query.filter(

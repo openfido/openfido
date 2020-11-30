@@ -22,6 +22,12 @@ class OrganizationPipeline(CommonColumnsMixin, db.Model):
         lazy="immediate",
     )
 
+    organization_workflow_pipelines = db.relationship(
+        "OrganizationWorkflowPipeline",
+        backref="organization_pipeline",
+        lazy="select",
+    )
+
 
 class OrganizationPipelineInputFile(CommonColumnsMixin, db.Model):
     """ An input file associated with a OrganizationPipeline. """
