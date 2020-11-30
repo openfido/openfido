@@ -208,11 +208,13 @@ def test_fetch_pipeline(app, organization_pipeline, organization_pipeline_run):
         json=PIPELINE_JSON,
     )
 
+    pipeline_json = dict(PIPELINE_JSON)
+    pipeline_json["uuid"] = organization_pipeline.uuid
     assert (
         fetch_pipeline(
             ORGANIZATION_UUID, organization_pipeline_run.organization_pipeline.uuid
         )
-        == PIPELINE_JSON
+        == pipeline_json
     )
 
 

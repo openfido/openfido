@@ -143,7 +143,10 @@ def fetch_pipeline(organization_uuid, organization_pipeline_uuid):
         },
     )
 
-    return response.json()
+    data = response.json()
+    data["uuid"] = organization_pipeline.uuid
+
+    return data
 
 
 def fetch_pipelines(organization_uuid):
