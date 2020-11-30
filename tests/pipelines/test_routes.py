@@ -146,6 +146,94 @@ def test_pipelines(
     assert result.json == json_response
 
 
+@patch("app.pipelines.routes.fetch_pipeline")
+@responses.activate
+def test_get_pipeline_backing_error(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+):
+    message = {"message": "error"}
+    fetch_mock.side_effect = ValueError(message)
+
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@patch("app.pipelines.routes.fetch_pipeline")
+@responses.activate
+def test_get_pipeline_backend_500(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+):
+    fetch_mock.side_effect = HTTPError("something is wrong")
+
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.pipelines.services.fetch_pipeline")
+@responses.activate
+def test_get_pipeline(
+    mock_pipeline,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+):
+    mock_pipeline.return_value = PIPELINE_JSON
+    pipeline_json = dict(PIPELINE_JSON)
+    pipeline_json.update(
+        {
+            "created_at": "2020-10-08T12:20:36.564095",
+            "updated_at": "2020-10-08T12:20:36.564100",
+            "uuid": organization_pipeline.uuid,
+        }
+    )
+    json_response = pipeline_json
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+        json=json_response,
+    )
+
+    result = client.get(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 200
+    json_response["uuid"] = organization_pipeline.uuid
+    assert result.json == json_response
+
+
 @patch("app.pipelines.routes.create_pipeline")
 @responses.activate
 def test_create_pipeline_backend_500(
