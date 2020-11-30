@@ -27,7 +27,7 @@ module "ecs" {
         S3_PRESIGNED_TIMEOUT                         = 3600
         SECRET_KEY                                   = random_password.secret.result
         SQLALCHEMY_DATABASE_URI                      = "postgresql://${var.db_user}:${var.db_password}@${var.db_endpoint}/${var.ecs_name}service"
-        SYSTEM_FROM_EMAIL_ADDRESS                    = "kevin.rohling@presencepg.com"
+        SYSTEM_FROM_EMAIL_ADDRESS                    = "support@openfido.org"
         // TODO: Change to secrets, for this they should be read it as JSON
         SENDGRID_API_KEY                             = "xx"
         SENDGRID_PASSWORD_RESET_TEMPLATE_ID          = "xx"

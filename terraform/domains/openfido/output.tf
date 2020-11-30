@@ -1,3 +1,11 @@
+output "main_domain" {
+  value = var.domain
+}
+
+output "zone_id" {
+  value = aws_route53_zone.host.zone_id
+}
+
 output "front_subdomain" {
   value = {
     prod = {
