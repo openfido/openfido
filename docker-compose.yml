@@ -10,7 +10,7 @@ services:
       - ./uploads:/data:delegated
     ports:
       - "10000:9000"
-  workflow_queue:
+  workflow-queue:
     build:
       context: ../openfido-workflow-service/
       dockerfile: Dockerfile.rabbitmq
@@ -18,22 +18,22 @@ services:
       RABBITMQ_DEFAULT_USER: rabbit-user
       RABBITMQ_DEFAULT_PASS: rabbit-password
       RABBITMQ_DEFAULT_VHOST: api-queue
-  workflow_db:
+  workflow-db:
     image: postgres:11
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
-  workflow_service:
+  workflow-service:
     build: ../openfido-workflow-service/
     environment:
       PGDATABASE: workflowservice
       PGUSER: postgres
-      PGHOST: workflow_db
+      PGHOST: workflow-db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow-db/workflowservice
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
@@ -44,17 +44,17 @@ services:
     ports:
       - "6001:5000"
     depends_on:
-      - workflow_db
-      - workflow_queue
+      - workflow-db
+      - workflow-queue
       - blobstorage
-  workflow_worker:
+  workflow-worker:
     build:
       context: ../openfido-workflow-service
       dockerfile: Dockerfile.worker
     command: celery -A app.worker worker -l DEBUG
     environment:
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
-      WORKER_API_SERVER: http://workflow_service:5000
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
+      WORKER_API_SERVER: http://workflow-service:5000
     env_file:
       - .worker-env
     volumes:
@@ -66,15 +66,15 @@ services:
       # found).
       - /tmp:/tmp
     depends_on:
-      - workflow_queue
-      - workflow_service
+      - workflow-queue
+      - workflow-service
       - blobstorage
-  auth_db:
+  auth-db:
     image: postgres:11
     environment:
       POSTGRES_DB: accountservices
       POSTGRES_PASSWORD: dev-password
-  auth_service:
+  auth-service:
     build: ../openfido-auth-service
     command: flask run -h 0.0.0.0
     env_file:
@@ -82,11 +82,11 @@ services:
     environment:
       PGDATABASE: accountservices
       PGUSER: postgres
-      PGHOST: auth_db
+      PGHOST: auth-db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth-db/accountservices"
       S3_BUCKET: auth-service
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
@@ -98,28 +98,28 @@ services:
     ports:
       - "6002:5000"
     depends_on:
-      - auth_db
+      - auth-db
       - blobstorage
-  app_db:
+  app-db:
     image: postgres:11
     environment:
       POSTGRES_DB: appservice
       POSTGRES_PASSWORD: dev-password
-  app_service:
+  app-service:
     build: .
     environment:
       PGDATABASE: appservice
       PGUSER: postgres
-      PGHOST: app_db
+      PGHOST: app-db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app_db/appservice
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app-db/appservice
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
-      AUTH_HOSTNAME: http://auth_service:5000
-      WORKFLOW_HOSTNAME: http://workflow_service:5000
+      AUTH_HOSTNAME: http://auth-service:5000
+      WORKFLOW_HOSTNAME: http://workflow-service:5000
       PYTHONPATH: /opt/utils
     volumes:
       - .:/opt/app:delegated
@@ -127,7 +127,7 @@ services:
     ports:
       - "6003:5000"
     depends_on:
-      - app_db
-      - auth_service
+      - app-db
+      - auth-service
       - blobstorage
-      - workflow_service
+      - workflow-service
