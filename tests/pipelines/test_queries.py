@@ -1,6 +1,7 @@
 from ..conftest import ORGANIZATION_UUID, PIPELINE_UUID
 from app.pipelines.queries import (
     find_organization_pipeline,
+    find_organization_pipeline_by_id,
     find_organization_pipelines,
     find_organization_pipeline_input_files,
     find_organization_pipeline_run,
@@ -40,6 +41,13 @@ def test_find_organization_pipeline(app, organization_pipeline):
             organization_pipeline.organization_uuid, organization_pipeline.uuid
         )
         is None
+    )
+
+
+def test_find_organization_pipeline_by_id(app, organization_pipeline):
+    assert (
+        find_organization_pipeline_by_id(organization_pipeline.id)
+        == organization_pipeline
     )
 
 

@@ -784,7 +784,9 @@ def test_delete_workflow_pipeline_not_found(
 
 
 @responses.activate
-def test_delete_workflow(app, organization_workflow, organization_workflow_pipeline):
+def test_delete_workflow_pipeline(
+    app, organization_workflow, organization_workflow_pipeline
+):
     wf_uuid = organization_workflow.workflow_uuid
     wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
 

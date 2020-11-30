@@ -14,6 +14,7 @@ from app.workflows.models import (
 )
 from app.pipelines.queries import (
     find_organization_pipeline,
+    find_organization_pipeline_by_id,
     find_organization_pipelines,
 )
 from app.workflows.queries import (
@@ -329,19 +330,14 @@ def fetch_workflow_pipeline(
     organization_uuid, organization_workflow_uuid, organization_workflow_pipeline_uuid
 ):
     """Fetches an Organization Workflow Pipeline."""
-    organization_workflow = find_organization_workflow(
-        organization_uuid, organization_workflow_uuid
-    )
-
-    if not organization_workflow:
-        raise ValueError("Organization Workflow not found.")
-
     organization_workflow_pipeline = find_organization_workflow_pipeline(
         organization_workflow_uuid, organization_workflow_pipeline_uuid
     )
 
     if not organization_workflow_pipeline:
         raise ValueError("Organization Workflow Pipeline not found.")
+
+    organization_workflow = organization_workflow_pipeline.organization_workflow
 
     w_uuid = organization_workflow.workflow_uuid
     wp_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
@@ -358,15 +354,13 @@ def fetch_workflow_pipeline(
         workflow = response.json()
         response.raise_for_status()
 
-        org_pipeline = OrganizationPipeline.query.get(
+        org_pipeline = find_organization_pipeline_by_id(
             organization_workflow_pipeline.organization_pipeline_id
         )
 
         org_workflow_pipelines = {
             ow_p.workflow_pipeline_uuid: ow_p.uuid
-            for ow_p in find_organization_workflow_pipelines(
-                organization_workflow_uuid, org_pipeline.id
-            )
+            for ow_p in org_pipeline.organization_workflow_pipelines
         }
 
         workflow["uuid"] = org_workflow_pipelines[workflow["uuid"]]
@@ -466,19 +460,14 @@ def delete_workflow_pipeline(
 ):
     """Deletes an Organization Workflow Pipeline. """
 
-    organization_workflow = find_organization_workflow(
-        organization_uuid, organization_workflow_uuid
-    )
-
-    if not organization_workflow:
-        raise ValueError("Organization Workflow not found.")
-
     organization_workflow_pipeline = find_organization_workflow_pipeline(
         organization_workflow_uuid, organization_workflow_pipeline_uuid
     )
 
     if not organization_workflow_pipeline:
         raise ValueError("Organization Workflow Pipeline not found.")
+
+    organization_workflow = organization_workflow_pipeline.organization_workflow
 
     w_uuid = organization_workflow.workflow_uuid
     wp_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
@@ -495,5 +484,4 @@ def delete_workflow_pipeline(
 
     organization_workflow_pipeline.is_deleted = True
 
-    db.session.add(organization_workflow_pipeline)
     db.session.commit()

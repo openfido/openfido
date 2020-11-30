@@ -621,7 +621,7 @@ def test_workflow_pipeline_backend_error(
 
 
 @responses.activate
-def test_workflow_pipelines(
+def test_workflow_pipeline(
     app,
     client,
     client_application,
