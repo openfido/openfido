@@ -76,16 +76,28 @@ const Settings = () => {
       </StyledTitle>
       <Root>
         <StyledMenu selectedKeys={[selectedKey]}>
-          <Menu.Item key="Edit Profile" onClick={() => setSelectedKey('Edit Profile')}>
+          <Menu.Item
+            aria-label="Edit Profile settings item"
+            key="Edit Profile"
+            onClick={() => setSelectedKey('Edit Profile')}
+          >
             <StyledText size="xlarge">Edit Profile</StyledText>
           </Menu.Item>
-          <Menu.Item key="Change Password" onClick={() => setSelectedKey('Change Password')}>
+          <Menu.Item
+            aria-label="Change Password settings item"
+            key="Change Password"
+            onClick={() => setSelectedKey('Change Password')}
+          >
             <StyledText size="xlarge">Change Password</StyledText>
           </Menu.Item>
           {profile && (profile.is_system_admin || isAnOrganizationAdmin) && (
-          <Menu.Item key="Edit Organization" onClick={() => setSelectedKey('Edit Organization')}>
-            <StyledText size="xlarge">Edit Organization</StyledText>
-          </Menu.Item>
+            <Menu.Item
+              aria-label="Edit Organization settings item"
+              key="Edit Organization"
+              onClick={() => setSelectedKey('Edit Organization')}
+            >
+              <StyledText size="xlarge">Edit Organization</StyledText>
+            </Menu.Item>
           )}
         </StyledMenu>
         {content}

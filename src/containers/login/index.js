@@ -71,8 +71,18 @@ const Login = () => {
       <FormWrapper>
         <StyledForm onSubmit={onLoginClicked}>
           <StyledH2>SIGN IN</StyledH2>
-          <StyledInput type="email" placeholder="email" onChange={onEmailChanged} />
-          <StyledInput type="password" placeholder="password" onChange={onPasswordChanged} />
+          <StyledInput
+            aria-label="Email sign in input"
+            type="email"
+            placeholder="email"
+            onChange={onEmailChanged}
+          />
+          <StyledInput
+            aria-label="Password sign in input"
+            type="password"
+            placeholder="password"
+            onChange={onPasswordChanged}
+          />
           <FormMessage size="large">
             <StyledText
               size="middle"

@@ -192,6 +192,7 @@ const EditOrganization = () => {
       <StyledForm onSubmit={onSaveClicked} autoComplete="off" onClick={(e) => e.stopPropagation()}>
         {profile.is_system_admin && (
           <StyledButton
+            aria-label="Edit Organization add button"
             color="gray80"
             hoverbgcolor="lightBlue"
             onClick={onAddOrganizationClicked}
@@ -201,9 +202,13 @@ const EditOrganization = () => {
           </StyledButton>
         )}
         {profile.is_system_admin && addOrganization && (
-          <label htmlFor="organization_name">
+          <label
+            aria-label="Edit Organization create label"
+            htmlFor="organization_name"
+          >
             <StyledText display="block" color="darkText">Create Organization</StyledText>
             <StyledInput
+              aria-label="Edit Organization create input"
               ref={createOrganizationInput}
               type="text"
               bgcolor="white"
@@ -231,11 +236,13 @@ const EditOrganization = () => {
         )}
         {organizations && organizations.map((org) => (
           <label
+            aria-label="Edit Organization edit label"
             key={org.uuid}
             htmlFor={org.uuid}
           >
             <StyledText display="block" color="darkText">{org.name}</StyledText>
             <StyledInput
+              aria-label="Edit Organization edit input"
               type="text"
               bgcolor="white"
               size="large"

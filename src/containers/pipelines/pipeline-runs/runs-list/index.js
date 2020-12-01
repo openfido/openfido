@@ -134,7 +134,11 @@ const RunsList = ({
     <>
       <StyledH2 color="black">
         All Runs:
-        <StyledButton type="text" onClick={openStartRunPopup}>
+        <StyledButton
+          aria-label="Start a run button"
+          type="text"
+          onClick={openStartRunPopup}
+        >
           + Start a run
         </StyledButton>
         <div />
@@ -152,7 +156,11 @@ const RunsList = ({
                 Run #
                 {sequence}
               </StyledH4>
-              <StatusText>{STATUS_NAME_LEGEND[status]}</StatusText>
+              <StatusText
+                aria-label="Run Item status mark"
+              >
+                {STATUS_NAME_LEGEND[status]}
+              </StatusText>
               <StyledH5>Started At:</StyledH5>
               {startedAt && (
                 <StyledText size="middle" color="gray">

@@ -53,6 +53,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:integration": "jest -c tests/jest.config.js --runInBand",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.js'"
   },
@@ -107,6 +108,8 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.683.0",
-    "eslint-plugin-jest": "^24.1.3"
+    "eslint-plugin-jest": "^24.1.3",
+    "jest-puppeteer": "^4.4.0",
+    "puppeteer": "^5.5.0"
   }
 }

@@ -86,12 +86,16 @@ const Pipelines = () => {
 
   return (
     <>
-      <StyledTitle>
+      <StyledTitle aria-label="Pipelines page title">
         <div>
           <h1>
             Pipelines
             {(showGetStartedPopup || (!showAddPipelines && !pipelineInEdit)) && (
-            <StyledButton size="small" onClick={openAddPipelines}>
+            <StyledButton
+              aria-label="Add Pipeline button"
+              size="small"
+              onClick={openAddPipelines}
+            >
               + Add Pipeline
             </StyledButton>
             )}

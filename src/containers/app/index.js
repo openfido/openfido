@@ -70,7 +70,12 @@ const App = ({ children }) => {
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
-        <Link to={ROUTE_LOGOUT}>Log Out</Link>
+        <Link
+          aria-label="Log Out link"
+          to={ROUTE_LOGOUT}
+        >
+          Log Out
+        </Link>
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );
@@ -82,7 +87,7 @@ const App = ({ children }) => {
       </StyledSider>
       <StyledContent>
         <AppDropdown overlay={menu} trigger="click">
-          <div>
+          <div aria-label="App dropdown">
             <StyledText color="darkText">
               OpenFIDO
             </StyledText>

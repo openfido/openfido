@@ -66,7 +66,12 @@ const PipelineItem = ({
 
   return (
     <PipelineItemGrid gridTemplateColumns="1fr 48px 2fr 140px 40px" bgcolor="white">
-      <StyledText size="xlarge" fontweight={700} color="black">
+      <StyledText
+        aria-label="Pipeline Item name"
+        size="xlarge"
+        fontweight={700}
+        color="black"
+      >
         {name}
       </StyledText>
       <StatusLegend
@@ -78,6 +83,7 @@ const PipelineItem = ({
       </StyledText>
       <ViewRunsColumn>
         <StyledButton
+          aria-label={`${name} View Runs button`}
           size="middle"
           color="blue"
           width={108}
