@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export LANG=en_GB.utf8
+export PGDATA=/var/lib/postgresql/data
+
+/opt/postgres/entrypoint.sh postgres
