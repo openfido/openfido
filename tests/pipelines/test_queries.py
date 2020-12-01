@@ -51,25 +51,6 @@ def test_find_organization_pipeline_by_id(app, organization_pipeline):
     )
 
 
-def test_find_organization_pipeline(app, organization_pipeline):
-    assert (
-        find_organization_pipeline(
-            organization_pipeline.organization_uuid, organization_pipeline.uuid
-        )
-        == organization_pipeline
-    )
-
-    # deleted pipelines are not returned
-    organization_pipeline.is_deleted = True
-    db.session.commit()
-    assert (
-        find_organization_pipeline(
-            organization_pipeline.organization_uuid, organization_pipeline.uuid
-        )
-        is None
-    )
-
-
 def test_search_organization_pipeline_input_files(
     app, organization_pipeline, organization_pipeline_input_file
 ):

@@ -17,6 +17,7 @@ from .services import (
     fetch_pipeline_run,
     fetch_pipeline_run_console,
     fetch_pipeline_runs,
+    fetch_pipeline,
     fetch_pipelines,
     update_pipeline,
 )
@@ -240,6 +241,57 @@ def pipelines(organization_uuid):
     """
     try:
         return jsonify(fetch_pipelines(organization_uuid))
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>", methods=["GET"]
+)
+@any_application_required
+@validate_organization(False)
+def get_pipeline(organization_uuid, organization_pipeline_uuid):
+    """Get a Organization Pipeline.
+    ---
+    tags:
+      - pipelines
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "List of pipelines"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                docker_image_url:
+                  type: string
+                repository_ssh_url:
+                  type: string
+                repository_branch:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+    """
+    try:
+        return jsonify(fetch_pipeline(organization_uuid, organization_pipeline_uuid))
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:

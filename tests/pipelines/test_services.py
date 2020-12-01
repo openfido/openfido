@@ -17,6 +17,7 @@ from app.pipelines.services import (
     create_pipeline_run,
     delete_pipeline,
     fetch_artifact_charts,
+    fetch_pipeline,
     fetch_pipeline_run,
     fetch_pipeline_run_console,
     fetch_pipeline_runs,
@@ -192,6 +193,29 @@ def test_fetch_pipelines_no_runs(post_mock, mock_runs, app, organization_pipelin
     post_mock().raise_for_status.assert_called()
     post_mock().json.assert_called()
     assert not mock_runs.called
+
+
+def test_fetch_pipeline_no_org_run(app):
+    with pytest.raises(ValueError):
+        assert fetch_pipeline(ORGANIZATION_UUID, "nosuchid")
+
+
+@responses.activate
+def test_fetch_pipeline(app, organization_pipeline, organization_pipeline_run):
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+        json=PIPELINE_JSON,
+    )
+
+    pipeline_json = dict(PIPELINE_JSON)
+    pipeline_json["uuid"] = organization_pipeline.uuid
+    assert (
+        fetch_pipeline(
+            ORGANIZATION_UUID, organization_pipeline_run.organization_pipeline.uuid
+        )
+        == pipeline_json
+    )
 
 
 @patch("app.pipelines.services.fetch_pipeline_run")

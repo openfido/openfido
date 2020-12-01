@@ -118,6 +118,37 @@ def delete_pipeline(organization_uuid, organization_pipeline_uuid):
     db.session.commit()
 
 
+def fetch_pipeline(organization_uuid, organization_pipeline_uuid):
+    """Find an OrganizationPipeline for an organization.
+
+    Note: assumes that the organization_uuid has already been verified (by
+    validate_organization() mixin)
+
+    Raises a an HTTPError when there is some unrecoverable downstream error.
+    Raises a ValueError when there is some downstream error (its
+    args[0] contains the json message from the backing server)
+    """
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        raise ValueError({"message": "organizational_pipeline_uuid not found"})
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    data = response.json()
+    data["uuid"] = organization_pipeline.uuid
+
+    return data
+
+
 def fetch_pipelines(organization_uuid):
     """Find all OrganizationPipelines for an organization.
 
