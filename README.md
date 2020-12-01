@@ -32,20 +32,20 @@ docker-compose which files to use, and where each project is:
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
 
     # Initialize all the databases for all the services:
-    docker-compose run --rm auth_service flask db upgrade
-    docker-compose run --rm workflow_service flask db upgrade 
-    docker-compose run --rm app_service flask db upgrade
+    docker-compose run --rm auth-service flask db upgrade
+    docker-compose run --rm workflow-service flask db upgrade 
+    docker-compose run --rm app-service flask db upgrade
 
     # Configure the workflow service access tokens:
-    docker-compose run --rm workflow_service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
-    docker-compose run --rm workflow_service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .env
+    docker-compose run --rm workflow-service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
+    docker-compose run --rm workflow-service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .env
 
     # Configure an application key to use this service!
-    docker-compose run --rm app_service invoke create-application-key -n "react client" -p REACT_CLIENT
+    docker-compose run --rm app-service invoke create-application-key -n "react client" -p REACT_CLIENT
 
 
     # Create an super admin user:
-    docker-compose run --rm auth_service flask shell
+    docker-compose run --rm auth-service flask shell
     from app import models, services
     u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
     u.is_system_admin = True
