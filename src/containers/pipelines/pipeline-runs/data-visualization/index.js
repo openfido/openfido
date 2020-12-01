@@ -183,7 +183,7 @@ const DataVisualization = () => {
             <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
               <StyledH4 color="black">{title}</StyledH4>
               {(getChartsInProgress || processArtifactInProgress) && !(artifact.url in chartDatum) && (
-                <Spin key="spin" indicator={<LoadingFilled spin />} />
+                <Spin indicator={<LoadingFilled spin />} />
               )}
               {chart_type_code === CHART_TYPES.IMAGE_CHART && (
                 <img src={artifact.url} alt={artifact.name} width="100%" />

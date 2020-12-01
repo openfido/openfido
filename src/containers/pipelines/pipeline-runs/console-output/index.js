@@ -158,7 +158,7 @@ const ConsoleOutput = () => {
             </StyledButton>
           </ConsoleOutputTypes>
           {(getConsoleOutputError || (consoleOutput && !consoleOutput[outputType])) && (
-            <Spin key="spin" indicator={<LoadingFilled spin />} />
+            <Spin indicator={<LoadingFilled spin />} />
           )}
           <ConsoleOutputContent>
             {getConsoleOutputError && getConsoleOutputError.message}
