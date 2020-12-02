@@ -3,25 +3,31 @@ import requests
 from flask import current_app
 from requests import HTTPError
 
+from blob_utils import create_url
 from application_roles.decorators import ROLES_KEY
 from app.constants import WORKFLOW_API_TOKEN, WORKFLOW_HOSTNAME
 
-from app.pipelines.models import OrganizationPipeline
 from app.workflows.models import (
     OrganizationWorkflow,
+    OrganizationWorkflowRun,
     OrganizationWorkflowPipeline,
+    OrganizationWorkflowPipelineRun,
     db,
 )
 from app.pipelines.queries import (
     find_organization_pipeline,
     find_organization_pipeline_by_id,
     find_organization_pipelines,
+    find_organization_pipeline_by_pipeline_run_uuid,
 )
+from app.pipelines.services import fetch_pipeline_run
 from app.workflows.queries import (
     find_organization_workflow,
     find_organization_workflows,
     find_organization_workflow_pipeline,
     find_organization_workflow_pipelines,
+    find_organization_workflow_run,
+    find_organization_workflow_pipeline_run_by_workflow_run_uuid,
 )
 
 
@@ -485,3 +491,167 @@ def delete_workflow_pipeline(
     organization_workflow_pipeline.is_deleted = True
 
     db.session.commit()
+
+
+def create_workflow_run(organization_uuid, organization_workflow_uuid, request_json):
+    """Creates an OrganizationWorkflowRun."""
+
+    org_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    if not org_workflow:
+        raise ValueError({"message": "organization_workflow_uuid not found"})
+
+    org_workflow_pipelines = org_workflow.organization_workflow_pipelines
+
+    if not org_workflow_pipelines:
+        raise ValueError(
+            {"message": "organization_workflow_uuid must have at least 1 pipeline"}
+        )
+
+    input_file_meta = request_json.get("input_files", [])
+
+    org_workflow_pipeline_runs = []
+
+    response = requests.post(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{org_workflow.workflow_uuid}/runs",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+        json=input_file_meta,
+    )
+
+    try:
+        created_workflow_run = response.json()
+        response.raise_for_status()
+
+        # add org workflow run
+        new_workflow_run = OrganizationWorkflowRun(
+            organization_workflow_uuid=org_workflow.uuid,
+            workflow_run_uuid=created_workflow_run.get("uuid"),
+        )
+
+        db.session.add(new_workflow_run)
+        db.session.flush()
+
+        # add in org workflow pipeline runs
+        pipeline_runs = []
+        for workflow_pipeline_run in created_workflow_run.get("workflow_pipeline_runs"):
+
+            # get org pipeline from pipeline run and then fetch the pipeline
+            org_pipeline_run_model = find_organization_pipeline_by_pipeline_run_uuid(
+                workflow_pipeline_run.get("pipeline_run").get("uuid")
+            )
+
+            org_pipeline_model = find_organization_pipeline_by_id(
+                org_pipeline_run_model.organization_pipeline_id
+            )
+            pipeline_run = fetch_pipeline_run(
+                organization_uuid, org_pipeline_model.uuid, org_pipeline_run_model.uuid
+            )
+
+            # remove artifacts from response
+            pipeline_run.pop("artifacts", None)
+
+            new_workflow_pipeline_run = OrganizationWorkflowPipelineRun(
+                organization_workflow_id=org_workflow.id,
+                organization_pipeline_run_id=org_pipeline_run_model.id,
+                organization_workflow_run_id=new_workflow_run.id,
+                workflow_run_uuid=created_workflow_run.get("uuid"),
+            )
+
+            # add new model and grab uuid
+            db.session.add(new_workflow_pipeline_run)
+            db.session.flush()
+
+            # add to pipeline runs collection
+            pipeline_runs.append(
+                {"uuid": new_workflow_pipeline_run.uuid, "pipeline_run": pipeline_run}
+            )
+
+        # commit and update response
+        db.session.commit()
+
+        created_workflow_run["uuid"] = new_workflow_run.uuid
+        created_workflow_run["workflow_pipeline_runs"] = pipeline_runs
+
+        return created_workflow_run
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(created_workflow_run) from http_error
+
+
+def fetch_workflow_run(
+    organization_uuid, organization_workflow_uuid, organization_workflow_run_uuid
+):
+    """Fetches an OrganizationWorkflowRun."""
+
+    org_workflow_run = find_organization_workflow_run(
+        organization_workflow_uuid, organization_workflow_run_uuid
+    )
+
+    if not org_workflow_run:
+        raise ValueError({"message": "organization_workflow_run_uuid not found"})
+
+    org_workflow = find_organization_workflow(
+        organization_uuid, organization_workflow_uuid
+    )
+
+    wf_uuid = org_workflow.workflow_uuid
+    wfr_uuid = org_workflow_run.workflow_run_uuid
+
+    response = requests.get(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs/{wfr_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        workflow_run = response.json()
+        response.raise_for_status()
+
+        workflow_run["uuid"] = org_workflow_run.uuid
+
+        # update org workflow pipeline runs
+        workflow_pipeline_runs = []
+        for workflow_pipeline_run in workflow_run.get("workflow_pipeline_runs"):
+            org_wf_pipeline_run = (
+                find_organization_workflow_pipeline_run_by_workflow_run_uuid(
+                    workflow_pipeline_run.get("uuid")
+                )
+            )
+
+            workflow_pipeline_run["uuid"] = org_wf_pipeline_run.uuid
+
+            org_pipeline_run_model = find_organization_pipeline_by_pipeline_run_uuid(
+                workflow_pipeline_run.get("pipeline_run").get("uuid")
+            )
+
+            org_pipeline_model = find_organization_pipeline_by_id(
+                org_pipeline_run_model.organization_pipeline_id
+            )
+            pipeline_run = fetch_pipeline_run(
+                organization_uuid, org_pipeline_model.uuid, org_pipeline_run_model.uuid
+            )
+
+            # remove artifacts from response
+            pipeline_run.pop("artifacts", None)
+
+            # add to updated workflow pipeline runs collection
+            workflow_pipeline_runs.append(
+                {"uuid": org_wf_pipeline_run.uuid, "pipeline_run": pipeline_run}
+            )
+
+        workflow_run["uuid"] = org_workflow_run.uuid
+        workflow_run["workflow_pipeline_runs"] = workflow_pipeline_runs
+
+        return workflow_run
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(workflow_run) from http_error

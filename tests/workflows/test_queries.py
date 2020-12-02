@@ -4,6 +4,8 @@ from app.workflows.queries import (
     find_organization_workflows,
     find_organization_workflow_pipeline,
     find_organization_workflow_pipelines,
+    find_organization_workflow_run,
+    find_organization_workflow_pipeline_run_by_workflow_run_uuid,
 )
 from app.workflows.models import db
 
@@ -63,4 +65,26 @@ def test_find_organization_workflow_pipeline(
             organization_workflow.uuid, organization_workflow_pipeline.uuid
         )
         == organization_workflow_pipeline
+    )
+
+
+def test_find_organization_workflow_run(
+    app, organization_workflow, organization_workflow_run
+):
+    assert (
+        find_organization_workflow_run(
+            organization_workflow.uuid, organization_workflow_run.uuid
+        )
+        == organization_workflow_run
+    )
+
+
+def test_find_organization_workflow_pipeline_run_by_workflow_run_uuid(
+    app, organization_workflow_run, organization_workflow_pipeline_run
+):
+    assert (
+        find_organization_workflow_pipeline_run_by_workflow_run_uuid(
+            organization_workflow_run.workflow_run_uuid
+        )
+        == organization_workflow_pipeline_run
     )

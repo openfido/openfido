@@ -15,6 +15,8 @@ from app.workflows.services import (
     fetch_workflow_pipeline,
     update_workflow_pipeline,
     delete_workflow_pipeline,
+    create_workflow_run,
+    fetch_workflow_run,
 )
 
 logger = logging.getLogger("organization-workflows")
@@ -560,3 +562,177 @@ def workflow_pipeline_delete(
         return {"message": http_error.args[0]}, 503
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
+
+
+@organization_workflow_bp.route(
+    "/<organization_uuid>/workflows/<organization_workflow_uuid>/runs",
+    methods=["POST"],
+)
+@any_application_required
+@validate_organization(False)
+def workflow_run_create(organization_uuid, organization_workflow_uuid):
+    """Create an Organization Workflow Runs.
+    ---
+    tags:
+      - workflow runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Creates a workflow run"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                created_at:
+                  type: string
+                uuid:
+                  type: string
+                status:
+                  type: string
+                workflow_pipeline_runs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                      pipeline_run:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            created_at:
+                              type: string
+                            inputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  url:
+                                    type: string
+                                  uuid:
+                                    type: string
+                            sequence:
+                              type: integer
+                            states:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  created_at:
+                                    type: string
+                                  state:
+                                    type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    try:
+        return jsonify(
+            create_workflow_run(
+                organization_uuid, organization_workflow_uuid, request.json
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_workflow_bp.route(
+    "/<organization_uuid>/workflows/<organization_workflow_uuid>/runs/<organization_workflow_run_uuid>",
+    methods=["GET"],
+)
+@any_application_required
+@validate_organization()
+def workflow_run(
+    organization_uuid, organization_workflow_uuid, organization_workflow_run_uuid
+):
+    """Fetch an Organization Workflow Run.
+    ---
+    tags:
+      - workflow runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Creates a workflow run"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                created_at:
+                  type: string
+                uuid:
+                  type: string
+                status:
+                  type: string
+                workflow_pipeline_runs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                      pipeline_run:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            created_at:
+                              type: string
+                            inputs:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  url:
+                                    type: string
+                                  uuid:
+                                    type: string
+                            sequence:
+                              type: integer
+                            states:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  created_at:
+                                    type: string
+                                  state:
+                                    type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    try:
+        return jsonify(
+            fetch_workflow_run(
+                organization_uuid,
+                organization_workflow_uuid,
+                organization_workflow_run_uuid,
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503

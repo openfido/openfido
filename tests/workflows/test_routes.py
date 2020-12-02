@@ -25,8 +25,14 @@ from ..conftest import (
     WORKFLOW_UUID,
 )
 from .test_services import (
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE,
     WORKFLOW_JSON,
     WORKFLOW_PIPELINE_RESPONSE_JSON,
+    WORKFLOW_PIPELINE_RUN_RESPONSE_JSON,
+)
+from ..pipelines.test_services import (
+    PIPELINE_RUN_RESPONSE_JSON,
+    PIPELINE_RUN_INPUT_FILE_JSON,
 )
 
 
@@ -882,3 +888,186 @@ def test_workflow_pipeline_delete(
     ).first()
 
     assert ow_pipeline.is_deleted is True
+
+
+@patch("app.workflows.routes.create_workflow_run")
+@responses.activate
+def test_workflow_run_create_backend_error_503(
+    create_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_pipeline,
+    organization_workflow_pipeline,
+):
+    create_mock.side_effect = HTTPError("something is wrong")
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.post(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/runs",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json=PIPELINE_RUN_INPUT_FILE_JSON,
+    )
+
+    assert result.status_code == 503
+
+
+@patch("app.workflows.routes.create_workflow_run")
+@responses.activate
+def test_workflow_run_create_backend_error(
+    create_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_workflow_pipeline,
+):
+    message = {"message": "error"}
+    create_mock.side_effect = ValueError(message)
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.post(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/runs",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json=PIPELINE_RUN_INPUT_FILE_JSON,
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@patch("app.workflows.routes.create_workflow_run")
+@responses.activate
+def test_workflow_run_create(
+    create_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_workflow_pipeline,
+    organization_pipeline_run,
+    organization_pipeline,
+    organization_pipeline_input_file,
+    organization_workflow_run,
+    organization_workflow_pipeline_run,
+):
+    create_mock.return_value = ORGANIZATION_WORKFLOW_RUN_RESPONSE
+
+    org_uuid = organization_workflow.organization_uuid
+    ow_wf_uuid = organization_workflow.uuid
+    ow_wf_pipeline_uuid = organization_workflow_pipeline.uuid
+
+    result = client.post(
+        f"/v1/organizations/{org_uuid}/workflows/{ow_wf_uuid}/runs",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json=PIPELINE_RUN_INPUT_FILE_JSON,
+    )
+
+    assert result.status_code == 200
+    assert result.json == ORGANIZATION_WORKFLOW_RUN_RESPONSE
+
+
+@patch("app.workflows.routes.fetch_workflow_run")
+@responses.activate
+def test_workflow_run_backend_error_503(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_workflow_run,
+):
+    fetch_mock.side_effect = HTTPError("something is wrong")
+
+    org_uuid = organization_workflow.organization_uuid
+    owf_uuid = organization_workflow.uuid
+    owr_uuid = organization_workflow_run.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@patch("app.workflows.routes.fetch_workflow_run")
+@responses.activate
+def test_workflow_run_backend_error(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_workflow_run,
+):
+    message = {"message": "error"}
+    fetch_mock.side_effect = ValueError(message)
+    org_uuid = organization_workflow.organization_uuid
+    owf_uuid = organization_workflow.uuid
+    owr_uuid = organization_workflow_run.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+    assert result.json == message
+
+
+@patch("app.workflows.routes.fetch_workflow_run")
+@responses.activate
+def test_workflow_run(
+    fetch_mock,
+    app,
+    client,
+    client_application,
+    organization_workflow,
+    organization_workflow_run,
+):
+    org_workflow_run = dict(ORGANIZATION_WORKFLOW_RUN_RESPONSE)
+    fetch_mock.return_value = org_workflow_run
+
+    org_uuid = organization_workflow.organization_uuid
+    owf_uuid = organization_workflow.uuid
+    owr_uuid = organization_workflow_run.uuid
+
+    result = client.get(
+        f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 200
+    assert result.json == org_workflow_run
