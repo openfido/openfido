@@ -1,0 +1,9 @@
+.vimrc
+__pycache__
+.coverage
+.worker-env
+.auth-env
+htmlcov
+test-results
+uploads
+/.idea/
