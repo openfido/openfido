@@ -7,10 +7,10 @@ set -e
 # print command to stdout before executing it:
 set -x
 
-chown -R postgres "$PGDATA"
+chown -R postgres:postgres "$PGDATA"
 
 if [ -z "$(ls -A "$PGDATA")" ]; then
-    su-exec postgres initdb
+    gosu postgres initdb
     sed -ri "s/^#(listen_addresses\s*=\s*)\S+/\1'*'/" "$PGDATA"/postgresql.conf
 
     : ${POSTGRES_USER:="postgres"}
@@ -31,7 +31,19 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
 
     if [ "$POSTGRES_DB" != 'postgres' ]; then
       createSql="CREATE DATABASE $POSTGRES_DB;"
-      echo $createSql | su-exec postgres postgres --single -jE
+      echo $createSql | gosu postgres postgres --single -jE
+      echo
+
+      createSql="CREATE DATABASE accountservice;"
+      echo $createSql | gosu postgres postgres --single -jE
+      echo
+
+      createSql="CREATE DATABASE workflowservice;"
+      echo $createSql | gosu postgres postgres --single -jE
+      echo
+
+      createSql="CREATE DATABASE appservice;"
+      echo $createSql | gosu postgres postgres --single -jE
       echo
     fi
 
@@ -42,18 +54,18 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     fi
 
     userSql="$op USER $POSTGRES_USER WITH SUPERUSER $pass;"
-    echo $userSql | su-exec postgres postgres --single -jE
+    echo $userSql | gosu postgres postgres --single -jE
     echo
 
-    su-exec postgres pg_ctl -D "$PGDATA" \
+    gosu postgres pg_ctl -D "$PGDATA" \
         -o "-c listen_addresses=''" \
         -w start
 
     echo
 
-    su-exec postgres pg_ctl -D "$PGDATA" -m fast -w stop
+    gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
 
     { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
 fi
 
-exec su-exec postgres "$@"
+exec gosu postgres "$@"
