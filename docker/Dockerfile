@@ -52,6 +52,33 @@ ADD files/run-auth-service.sh /etc/services.d/3-openfido-auth-service/run
 
 EXPOSE 5001/tcp
 
+# WORKFLOW SERVER
+
+FROM base as python-deps
+
+# require a private key to access private github repositories
+ARG SSH_PRIVATE_KEY
+RUN mkdir /root/.ssh/
+RUN echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
+RUN touch /root/.ssh/known_hosts
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+RUN mkdir /opt/openfido-workflow-service
+ADD openfido-workflow-service/Pipfile /opt/openfido-workflow-service
+ADD openfido-workflow-service/Pipfile.lock /opt/openfido-workflow-service
+RUN pip install pipenv
+RUN --mount=type=ssh cd /opt/openfido-workflow-service && PIPENV_VENV_IN_PROJECT="enabled" pipenv install --dev --deploy
+
+FROM auth-runtime as workflow-runtime
+
+COPY openfido-workflow-service /opt/openfido-workflow-service
+COPY --from=python-deps /opt/openfido-workflow-service/.venv /opt/openfido-workflow-service/.venv
+RUN mkdir /etc/services.d/3-openfido-workflow-service
+ADD files/run-workflow-service.sh /etc/services.d/4-openfido-workflow-service/run
+
+EXPOSE 5002/tcp
+
 # POSTGRES
 
 RUN mkdir /opt/postgres
