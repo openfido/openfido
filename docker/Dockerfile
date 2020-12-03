@@ -11,8 +11,7 @@ VOLUME /var/lib/postgresql/data
 # All project dependencies
 
 RUN apt-get update && \
-    apt-get install -y gnupg ssh git wget && \
-    apt-get clean
+    apt-get install -y gnupg ssh git wget
 
 # MINIO
 
@@ -25,9 +24,11 @@ RUN mkdir /etc/services.d/1-minio
 RUN mkdir /var/opt/minio
 ADD files/run-minio /etc/services.d/1-minio/run
 
+EXPOSE 9000/tcp
+
 # AUTH SERVER
 
-FROM base as python-deps
+FROM base as auth-deps
 
 # require a private key to access private github repositories
 ARG SSH_PRIVATE_KEY
@@ -43,10 +44,10 @@ ADD openfido-auth-service/Pipfile.lock /opt/openfido-auth-service
 RUN pip install pipenv
 RUN --mount=type=ssh cd /opt/openfido-auth-service && PIPENV_VENV_IN_PROJECT="enabled" pipenv install --dev --deploy
 
-FROM python-deps as auth-runtime
+FROM base as auth-runtime
 
 COPY openfido-auth-service /opt/openfido-auth-service
-COPY --from=python-deps /opt/openfido-auth-service/.venv /opt/openfido-auth-service/.venv
+COPY --from=auth-deps /opt/openfido-auth-service/.venv /opt/openfido-auth-service/.venv
 RUN mkdir /etc/services.d/3-openfido-auth-service
 ADD files/run-auth-service.sh /etc/services.d/3-openfido-auth-service/run
 
@@ -54,7 +55,7 @@ EXPOSE 5001/tcp
 
 # WORKFLOW SERVER
 
-FROM base as python-deps
+FROM base as workflow-deps
 
 # require a private key to access private github repositories
 ARG SSH_PRIVATE_KEY
@@ -73,15 +74,21 @@ RUN --mount=type=ssh cd /opt/openfido-workflow-service && PIPENV_VENV_IN_PROJECT
 FROM auth-runtime as workflow-runtime
 
 COPY openfido-workflow-service /opt/openfido-workflow-service
-COPY --from=python-deps /opt/openfido-workflow-service/.venv /opt/openfido-workflow-service/.venv
+COPY --from=workflow-deps /opt/openfido-workflow-service/.venv /opt/openfido-workflow-service/.venv
 RUN mkdir /etc/services.d/4-openfido-workflow-service
 ADD files/run-workflow-service.sh /etc/services.d/4-openfido-workflow-service/run
 
 EXPOSE 5002/tcp
 
+# WORKFLOW WORKER SERVER
+
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+RUN apt update && apt install -y docker-ce
+
 # APP SERVER
 
-FROM base as python-deps
+FROM base as app-deps
 
 # require a private key to access private github repositories
 ARG SSH_PRIVATE_KEY
@@ -100,11 +107,24 @@ RUN --mount=type=ssh cd /opt/openfido-app-service && PIPENV_VENV_IN_PROJECT="ena
 FROM auth-runtime as app-runtime
 
 COPY openfido-app-service /opt/openfido-app-service
-COPY --from=python-deps /opt/openfido-app-service/.venv /opt/openfido-app-service/.venv
+COPY --from=app-deps /opt/openfido-app-service/.venv /opt/openfido-app-service/.venv
 RUN mkdir /etc/services.d/5-openfido-app-service
 ADD files/run-app-service.sh /etc/services.d/5-openfido-app-service/run
 
 EXPOSE 5003/tcp
+
+# RABBITMQ
+
+ADD https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc /tmp/
+RUN cat /tmp/rabbitmq-release-signing-key.asc | apt-key add -
+RUN apt-get install apt-transport-https
+RUN echo "deb https://dl.bintray.com/rabbitmq-erlang/debian buster erlang-22.x" > /etc/apt/sources.list.d/bintray.erlang.list
+RUN echo "deb https://dl.bintray.com/rabbitmq/debian buster main" > /etc/apt/sources.list.d/bintray.rabbitmq.list
+RUN apt-get update && apt-get install rabbitmq-server -y --fix-missing
+RUN mkdir /etc/services.d/0-rabbitmq
+ADD files/run-rabbitmq /etc/services.d/0-rabbitmq/run
+
+EXPOSE 9000/tcp
 
 # POSTGRES
 
@@ -119,5 +139,7 @@ RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 RUN mkdir /etc/services.d/2-postgres
 ADD files/run-postgres /etc/services.d/2-postgres/run
 ADD files/entrypoint-postgres.sh /opt/postgres/entrypoint.sh
+
+EXPOSE 5432/tcp
 
 ENTRYPOINT ["/init"]
