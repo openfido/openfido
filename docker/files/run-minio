@@ -1,6 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-export MINIO_ACCESS_KEY=minio_access_key
-export MINIO_SECRET_KEY=minio123
+source $PWD/env
 
 /opt/minio/minio server /var/opt/minio

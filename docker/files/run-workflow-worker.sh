@@ -1,10 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-export CELERY_BROKER_URL="amqp://rabbit-user:rabbit-password@localhost/api-queue"
-export WORKER_API_SERVER="http://localhost:5002"
-export S3_ACCESS_KEY_ID=minio_access_key
-export S3_SECRET_ACCESS_KEY=minio123
-export S3_ENDPOINT_URL="http://localhost:9000"
+source $PWD/env
 
 cd /opt/openfido-workflow-service
 celery -A app.worker worker -l DEBUG

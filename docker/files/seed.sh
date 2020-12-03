@@ -1,4 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+
+# allow variables to be passed in from the container
+with-contenv
+
+source /etc/services.d/2-postgres/env
 
 # nounset: undefined variable outputs error message, and forces an exit
 set -u
@@ -68,4 +73,51 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
 fi
 
-exec gosu postgres "$@"
+if [ -z "$(ls -A "/opt/openfido-workflow-service/.worker-env")" ]; then
+  nohup exec gosu postgres postgres &
+  POSTGRES_PID=$!
+
+  cd /opt/openfido-auth-service
+  source /etc/services.d/3-openfido-auth-service/env
+
+  export ADMIN_EMAIL=${ADMIN_EMAIL:-'admin@example.com'}
+  export ADMIN_PASSWORD=${ADMIN_PASSWORD:-'1234567890'}
+
+  flask db upgrade
+
+  flask shell <<END
+from app import models, services
+u = services.create_user('${ADMIN_EMAIL}','${ADMIN_PASSWORD}','admin','user')
+u.is_system_admin = True
+models.db.session.commit()
+END
+
+  cd /opt/openfido-app-service
+  source /etc/services.d/5-openfido-app-service/env
+
+  flask db upgrade
+
+  invoke create-application-key -n "react client" -p REACT_CLIENT > /opt/openfido-client/.env
+
+  cd /opt/openfido-workflow-service
+  source /etc/services.d/4-openfido-workflow-service/env
+
+  flask db upgrade
+
+  invoke create-application-key -n "local worker" -p PIPELINES_WORKER > /opt/openfido-workflow-service/.worker-env
+  invoke create-application-key -n "local worker" -p PIPELINES_CLIENT > /opt/openfido-app-service/.env
+
+  nohup rabbitmq-server start &
+  RABBIT_PID=$!
+
+  sleep 10
+
+  rabbitmqctl start_app
+
+  rabbitmqctl add_vhost api-queue
+  echo 'rabbit-password' | rabbitmqctl add_user 'rabbit-user'
+  rabbitmqctl set_permissions -p "api-queue" "rabbit-user" ".*" ".*" ".*"
+
+  kill $RABBIT_PID
+  kill $POSTGRES_PID
+fi

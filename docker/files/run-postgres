@@ -1,9 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-export LANG=en_US.utf8
-export PGDATA=/var/lib/postgresql/data
-export PATH=/usr/lib/postgresql/12/bin:$PATH
-export POSTGRES_DB=services
-export POSTGRES_PASSWORD=dev-password
+source $PWD/env
 
-/opt/postgres/entrypoint.sh postgres
+gosu postgres postgres
