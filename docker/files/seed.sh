@@ -97,15 +97,15 @@ END
 
   flask db upgrade
 
-  invoke create-application-key -n "react client" -p REACT_CLIENT > /opt/openfido-client/.env
+  invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^/export /' > /opt/openfido-client/.env
 
   cd /opt/openfido-workflow-service
   source /etc/services.d/4-openfido-workflow-service/env
 
   flask db upgrade
 
-  invoke create-application-key -n "local worker" -p PIPELINES_WORKER > /opt/openfido-workflow-service/.worker-env
-  invoke create-application-key -n "local worker" -p PIPELINES_CLIENT > /opt/openfido-app-service/.env
+  invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/openfido-workflow-service/.worker-env
+  invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/openfido-app-service/.env
 
   nohup rabbitmq-server start &
   RABBIT_PID=$!
