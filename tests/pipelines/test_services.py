@@ -15,12 +15,14 @@ from app.pipelines.services import (
     create_pipeline,
     create_pipeline_input_file,
     create_pipeline_run,
+    delete_artifact_chart,
     delete_pipeline,
     fetch_artifact_charts,
     fetch_pipeline_run,
     fetch_pipeline_run_console,
     fetch_pipeline_runs,
     fetch_pipelines,
+    update_artifact_chart,
     update_pipeline,
 )
 from application_roles.decorators import ROLES_KEY
@@ -756,6 +758,16 @@ def test_fetch_artifact_charts(app, organization_pipeline, organization_pipeline
         chart_config="{}",
     )
     organization_pipeline_run.artifact_charts.append(chart)
+
+    deleted_chart = ArtifactChart(
+        name="b chart",
+        artifact_uuid=FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"],
+        chart_type_code="BCODE",
+        chart_config="{}",
+    )
+    deleted_chart.is_deleted = True
+    organization_pipeline_run.artifact_charts.append(deleted_chart)
+
     db.session.commit()
 
     chart_json_result = fetch_artifact_charts(organization_pipeline_run)
@@ -771,3 +783,127 @@ def test_fetch_artifact_charts(app, organization_pipeline, organization_pipeline
             "updated_at": chart.updated_at.isoformat(),
         }
     ]
+
+
+@responses.activate
+def test_update_artifact_chart(app, organization_pipeline, organization_pipeline_run):
+    pipeline_uuid = organization_pipeline.pipeline_uuid
+    pipeline_run_uuid = organization_pipeline_run.pipeline_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline_uuid}/runs/{pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="my_chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    chart_updates = {"name": "my_new_chart_name"}
+
+    updated_chart_result = update_artifact_chart(
+        organization_pipeline_run, chart.uuid, chart_updates
+    )
+
+    assert updated_chart_result == {
+        "uuid": chart.uuid,
+        "name": chart_updates["name"],
+        "artifact": FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0],
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": chart.chart_config,
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
+
+
+@responses.activate
+def test_update_artifact_chart_not_found(
+    app, organization_pipeline, organization_pipeline_run
+):
+    pipeline_uuid = organization_pipeline.pipeline_uuid
+    pipeline_run_uuid = organization_pipeline_run.pipeline_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline_uuid}/runs/{pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="my_chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    with pytest.raises(ValueError):
+        updated_chart_result = update_artifact_chart(organization_pipeline_run, "1234")
+
+
+@responses.activate
+def test_delete_artifact_chart(app, organization_pipeline, organization_pipeline_run):
+    pipeline_uuid = organization_pipeline.pipeline_uuid
+    pipeline_run_uuid = organization_pipeline_run.pipeline_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline_uuid}/runs/{pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="im_going_to_be_deleted",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    delete_artifact_chart(organization_pipeline_run, chart.uuid)
+
+    deleted_chart = ArtifactChart.query.get(chart.id)
+
+    assert deleted_chart.is_deleted == True
+
+
+@responses.activate
+def test_delete_artifact_chart_not_found(
+    app, organization_pipeline, organization_pipeline_run
+):
+    pipeline_uuid = organization_pipeline.pipeline_uuid
+    pipeline_run_uuid = organization_pipeline_run.pipeline_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{pipeline_uuid}/runs/{pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="im_going_to_be_deleted",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    with pytest.raises(ValueError):
+        delete_artifact_chart(organization_pipeline_run, "4321")
