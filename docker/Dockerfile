@@ -4,7 +4,9 @@ FROM python:3.8-slim as base
 # S6 for multiprocess management
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/v2.1.0.2/s6-overlay-amd64-installer /tmp/
-RUN chmod u+x /tmp/s6-overlay-amd64-installer && /tmp/s6-overlay-amd64-installer /
+RUN chmod u+x /tmp/s6-overlay-amd64-installer && \
+  /tmp/s6-overlay-amd64-installer / && \
+  rm /tmp/s6-overlay-amd64-installer
 
 # All project dependencies
 
@@ -15,6 +17,9 @@ RUN apt-get update && apt-get install -y gnupg ssh git apt-transport-https ca-ce
   (cat /tmp/gpg | apt-key add -) && \
   (cat /tmp/rabbitmq-release-signing-key.asc | apt-key add -) && \
   (cat /tmp/ACCC4CF8.asc | apt-key add -) && \
+  rm /tmp/gpg && \
+  rm /tmp/rabbitmq-release-signing-key.asc && \
+  rm /tmp/ACCC4CF8.asc && \
   echo "deb https://dl.bintray.com/rabbitmq-erlang/debian buster erlang-22.x" > /etc/apt/sources.list.d/bintray.erlang.list && \
   echo "deb https://dl.bintray.com/rabbitmq/debian buster main" > /etc/apt/sources.list.d/bintray.rabbitmq.list && \
   echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/bintray.postgres.list && \
@@ -110,6 +115,7 @@ COPY openfido-client /opt/openfido-client
 ENV NVM_DIR /opt/openfido-client/.nvm
 ADD https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh /tmp/
 RUN (mkdir $NVM_DIR && cat /tmp/install.sh | bash) && \
+  rm /tmp/install.sh && \
   . $NVM_DIR/nvm.sh && cd /opt/openfido-client && \
   nvm install && \
   npm install && \
