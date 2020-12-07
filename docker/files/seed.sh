@@ -3,10 +3,8 @@
 # allow variables to be passed in from the container
 with-contenv
 
-source /etc/services.d/2-postgres/env
+source /opt/postgres/env
 
-# nounset: undefined variable outputs error message, and forces an exit
-set -u
 # errexit: abort script at first error
 set -e
 # print command to stdout before executing it:
@@ -78,7 +76,7 @@ if [ -z "$(ls -A "/opt/openfido-workflow-service/.worker-env")" ]; then
   POSTGRES_PID=$!
 
   cd /opt/openfido-auth-service
-  source /etc/services.d/3-openfido-auth-service/env
+  source /opt/openfido-auth-service/env
 
   export ADMIN_EMAIL=${ADMIN_EMAIL:-'admin@example.com'}
   export ADMIN_PASSWORD=${ADMIN_PASSWORD:-'1234567890'}
@@ -93,14 +91,19 @@ models.db.session.commit()
 END
 
   cd /opt/openfido-app-service
-  source /etc/services.d/5-openfido-app-service/env
+  source /opt/openfido-app-service/env
 
   flask db upgrade
 
-  invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^/export /' > /opt/openfido-client/.env
+  invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^.*=\(.*\)$/export const API_TOKEN="\1"/' > /opt/openfido-client/src/config/reactclient.js
+
+  cd /opt/openfido-client
+  . .nvm/nvm.sh
+  nvm use
+  npm run build
 
   cd /opt/openfido-workflow-service
-  source /etc/services.d/4-openfido-workflow-service/env
+  source /opt/openfido-workflow-service/env
 
   flask db upgrade
 
@@ -110,10 +113,11 @@ END
   nohup rabbitmq-server start &
   RABBIT_PID=$!
 
-  sleep 10
+  mkdir /var/run/rabbitmq
+  echo $RABBIT_PID > /var/run/rabbitmq/server.pid
 
+  rabbitmqctl wait /var/run/rabbitmq/server.pid
   rabbitmqctl start_app
-
   rabbitmqctl add_vhost api-queue
   echo 'rabbit-password' | rabbitmqctl add_user 'rabbit-user'
   rabbitmqctl set_permissions -p "api-queue" "rabbit-user" ".*" ".*" ".*"

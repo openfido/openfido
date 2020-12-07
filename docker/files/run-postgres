@@ -1,5 +1,6 @@
 #!/bin/bash
 
-source $PWD/env
+cd /opt/postgres
+source ./env
 
 gosu postgres postgres

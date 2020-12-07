@@ -1,5 +1,6 @@
 #!/bin/bash
 
-source $PWD/env
+cd /opt/minio
+source ./env
 
 /opt/minio/minio server /var/opt/minio

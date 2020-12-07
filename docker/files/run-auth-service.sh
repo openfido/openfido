@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source $PWD/env
 
 cd /opt/openfido-auth-service
+source ./env
+
 sh start.sh

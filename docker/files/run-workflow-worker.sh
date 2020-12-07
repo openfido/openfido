@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source $PWD/env
-source /opt/openfido-workflow-service/.worker-env
-
 cd /opt/openfido-workflow-service
+source ./worker-env
+source ./.worker-env
+
 celery -A app.worker worker -l DEBUG

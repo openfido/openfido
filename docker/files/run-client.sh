@@ -1,7 +1,8 @@
 #!/bin/bash
 
-source $PWD/env
-source /opt/openfido-client/.env
-
 cd /opt/openfido-client
-npm start
+
+source .nvm/nvm.sh
+nvm use
+
+serve -l tcp://0.0.0.0:3000 -s build
