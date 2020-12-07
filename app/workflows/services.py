@@ -512,8 +512,6 @@ def create_workflow_run(organization_uuid, organization_workflow_uuid, request_j
 
     input_file_meta = request_json.get("input_files", [])
 
-    org_workflow_pipeline_runs = []
-
     response = requests.post(
         f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{org_workflow.workflow_uuid}/runs",
         headers={

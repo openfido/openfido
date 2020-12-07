@@ -569,7 +569,7 @@ def workflow_pipeline_delete(
     methods=["POST"],
 )
 @any_application_required
-@validate_organization(False)
+@validate_organization()
 def workflow_run_create(organization_uuid, organization_workflow_uuid):
     """Create an Organization Workflow Runs.
     ---
@@ -581,6 +581,20 @@ def workflow_run_create(organization_uuid, organization_workflow_uuid):
         description: Requires key type REACT_CLIENT
         schema:
           type: string
+    requestBody:
+      description: "Create an Organization Workflow Run"
+      required: true
+      content:
+        application/json:
+          inputs:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
     responses:
       "200":
         description: "Creates a workflow run"
@@ -654,7 +668,7 @@ def workflow_run_create(organization_uuid, organization_workflow_uuid):
     methods=["GET"],
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def workflow_run(
     organization_uuid, organization_workflow_uuid, organization_workflow_run_uuid
 ):

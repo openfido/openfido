@@ -1004,7 +1004,6 @@ def test_workflow_run_backend_error_503(
 
     result = client.get(
         f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
-        content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
@@ -1032,7 +1031,6 @@ def test_workflow_run_backend_error(
 
     result = client.get(
         f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
-        content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
@@ -1062,7 +1060,6 @@ def test_workflow_run(
 
     result = client.get(
         f"/v1/organizations/{org_uuid}/workflows/{owf_uuid}/runs/{owr_uuid}",
-        content_type="application/json",
         headers={
             "Authorization": f"Bearer {JWT_TOKEN}",
             ROLES_KEY: client_application.api_key,
