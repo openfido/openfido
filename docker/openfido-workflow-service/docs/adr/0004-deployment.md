@@ -32,5 +32,5 @@ not support passing the --ssh
 option](https://github.com/CircleCI-Public/aws-ecr-orb/issues/77). Using
 docker-compose locally builds images by explicitly passing the private key -
 which is different than the Buildkit `--ssh` option (potentially less secure).
-When docker-compose supports Buildkit more fully we should update our local dev
+When Buildkit is supported more fully we should update our local dev
 instructions.
