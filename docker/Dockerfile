@@ -13,7 +13,8 @@ RUN chmod u+x /tmp/s6-overlay-amd64-installer && \
 ADD https://download.docker.com/linux/debian/gpg /tmp/
 ADD https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc /tmp/
 ADD https://www.postgresql.org/media/keys/ACCC4CF8.asc /tmp/
-RUN apt-get update && apt-get install -y gnupg ssh git apt-transport-https ca-certificates curl && \
+RUN apt-get update && apt-get install --no-install-recommends -y \
+  gnupg ssh git apt-transport-https ca-certificates curl && \
   (cat /tmp/gpg | apt-key add -) && \
   (cat /tmp/rabbitmq-release-signing-key.asc | apt-key add -) && \
   (cat /tmp/ACCC4CF8.asc | apt-key add -) && \
@@ -25,11 +26,12 @@ RUN apt-get update && apt-get install -y gnupg ssh git apt-transport-https ca-ce
   echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/bintray.postgres.list && \
   echo "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" > /etc/apt/sources.list.d/bintray.docker.list && \
   mkdir /docker-entrypoint-initdb.d && \
-  apt-get clean && apt-get update && apt-get install -y \
+  apt-get clean && apt-get update && apt-get install --no-install-recommends -y \
   docker-ce \
   gosu tzdata postgresql-common postgresql-12 postgresql-contrib-12 \
   rabbitmq-server && \
-  apt-get clean
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 # AUTH, WORKFLOW, APP DEPS
 

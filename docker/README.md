@@ -1,18 +1,22 @@
 Docker Provisioning
 ===================
 
-This directory contains a Dockerfile of a self contained OpenFido installation.
-You can use this directly from docker hub without building it yourself with the
-following command:
+This Docker image provides a multi-service docker image that demonstrates the
+OpenFido platform.
 
-    docker run docker run --rm \
+To run this image directly, use the following command:
+
+    docker run --rm \
       -v /tmp:/tmp \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -p 127.0.0.1:5001:5001 \
       -p 127.0.0.1:5002:5002 \
       -p 127.0.0.1:5003:5003 \
       -p 127.0.0.1:3000:3000 \
-      openfido
+      zne17nct/openfido
+
+The system will take a few minutes to bring up the underlying services and seed
+the initial system databases.
 
 Visit [http://127.0.0.1:3000](http://127.0.0.1:3000) and login with username `admin@example.com` and
 password `1234567890`.
