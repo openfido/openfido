@@ -1,6 +1,6 @@
 version: '3'
 services:
-  workflow_queue:
+  workflow-queue:
     build:
       context: ${WORKFLOW_DIR:-.}
       dockerfile: Dockerfile.rabbitmq
@@ -9,7 +9,7 @@ services:
       RABBITMQ_DEFAULT_USER: rabbit-user
       RABBITMQ_DEFAULT_PASS: rabbit-password
       RABBITMQ_DEFAULT_VHOST: api-queue
-  workflow_db:
+  workflow-db:
     image: postgres:11
     environment:
       POSTGRES_DB: workflowservice
@@ -24,19 +24,19 @@ services:
       - ${WORKFLOW_DIR:-.}/uploads:/data:delegated
     ports:
       - "9000:9000"
-  workflow_service:
+  workflow-service:
     build: ${WORKFLOW_DIR:-.}
     image: openfido/dev-workflow
     command: flask run -h 0.0.0.0
     environment:
       PGDATABASE: workflowservice
       PGUSER: postgres
-      PGHOST: workflow_db
+      PGHOST: workflow-db
       FLASK_APP: run.py
       FLASK_ENV: development
       SECRET_KEY: local-dev-db
-      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow_db/workflowservice
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow-db/workflowservice
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://workflowstorage:9000
@@ -47,18 +47,18 @@ services:
     ports:
       - "${WORKFLOW_PORT:-5000}:5000"
     depends_on:
-      - workflow_db
-      - workflow_queue
+      - workflow-db
+      - workflow-queue
       - workflowstorage
-  workflow_worker:
+  workflow-worker:
     build:
       context: ${WORKFLOW_DIR:-.}
       dockerfile: Dockerfile.worker
     image: openfido/dev-workflow-worker
     command: celery -A app.worker worker -l DEBUG
     environment:
-      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow_queue/api-queue
-      WORKER_API_SERVER: http://workflow_service:${WORKFLOW_PORT:-5000}
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
+      WORKER_API_SERVER: http://workflow-service:${WORKFLOW_PORT:-5000}
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://workflowstorage:9000
@@ -73,6 +73,6 @@ services:
       # found).
       - /tmp:/tmp
     depends_on:
-      - workflow_queue
-      - workflow_service
+      - workflow-queue
+      - workflow-service
       - workflowstorage
