@@ -62,3 +62,16 @@ def create_application_key(c, name, permission):
         application = create_application(name, ApplicationsEnum[permission])
         db.session.commit()
         print(f"API_TOKEN={application.api_key}")
+
+
+@task
+def create_organization_pipeline(c, organization_uuid, pipeline_uuid):
+    """Create an organization pipeline, that is associated with a pipeline_uuid.
+    """
+    from app import create_app
+    from app.pipelines.services import create_organization_pipeline
+
+    (app, db, _) = create_app()
+    with app.app_context():
+        organization_pipeline = create_organization_pipeline(organization_uuid, pipeline_uuid)
+        print(organization_pipeline.uuid)

@@ -29,6 +29,8 @@ docker-compose which files to use, and where each project is:
 
     # Because these repositories make use of private github repositories, they
     # need access to an SSH key that you have configured for github access:
+    touch .worker-env
+    touch ../openfido-auth-service/.env
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
 
     # Initialize all the databases for all the services:

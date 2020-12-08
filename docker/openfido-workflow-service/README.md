@@ -34,7 +34,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     # parameter - until then we need to pass the key manually :(
 
     # Login to an docker instance of the flask app:
-    docker-compose run --rm workflow_service bash
+    docker-compose run --rm workflow-service bash
 
     # Run database migrations
     flask db upgrade
@@ -58,10 +58,10 @@ To start the server locally:
 To run tests, use [invoke](https://pyinvoke.org):
 
     # Run within the preconfigured docker instance:
-    docker-compose run --rm workflow_service invoke test
+    docker-compose run --rm workflow-service invoke test
 
     # with code coverage
-    docker-compose run --rm workflow_service invoke --cov-report test
+    docker-compose run --rm workflow-service invoke --cov-report test
 
     # Or if you'd rather run locally
     pipenv install
