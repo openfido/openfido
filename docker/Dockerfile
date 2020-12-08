@@ -77,7 +77,8 @@ RUN mkdir /etc/services.d/0-rabbitmq \
   /etc/services.d/4-openfido-workflow-service \
   /etc/services.d/5-openfido-app-service \
   /etc/services.d/6-openfido-workflow-worker \
-  /etc/services.d/7-openfido-client
+  /etc/services.d/7-openfido-client \
+  /opt/app-keys
 
 ## AUTH
 
@@ -137,6 +138,7 @@ RUN chmod +x /tmp/minio && \
 ADD files/run-minio /etc/services.d/1-minio/run
 ADD files/minio-env /opt/minio/env
 
+VOLUME /var/opt/minio
 EXPOSE 9000/tcp
 
 # RABBITMQ
@@ -151,7 +153,6 @@ ADD files/run-postgres /etc/services.d/2-postgres/run
 ADD files/postgres-env /opt/postgres/env
 
 VOLUME /var/lib/postgresql/data
-
 EXPOSE 5432/tcp
 
 # SEED SCRIPT

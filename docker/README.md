@@ -20,7 +20,7 @@ The system will take a few minutes to bring up the underlying services and seed
 the initial system databases.
 
 Visit [http://127.0.0.1:3000](http://127.0.0.1:3000) and login with username `admin@example.com` and
-password `1234567890`.
+password `1234567890`. Several pipelines are created in an 'OpenFIDO' organization.
 
 Building
 --------
@@ -32,7 +32,7 @@ To build the image yourself, issue the following command:
 
     # Build the docker image, using the SSH private key you use for github
     # access (to access other openslac private repositories)
-    docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido .
+    docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido/openfido .
 
 
 Development
@@ -59,6 +59,7 @@ strictly necessary, but makes working with `git subtree` commands more concise):
     git remote add openfido-auth-service git@github.com:slacgismo/openfido-auth-service.git
     git remote add openfido-app-service git@github.com:slacgismo/openfido-app-service.git
     git remote add openfido-client git@github.com:slacgismo/openfido-client.git
+    git remote add openfido-utils git@github.com:slacgismo/openfido-utils.git
 
 
 NOTE: To simplify subtree merging be sure to commit any changes to these
@@ -73,6 +74,7 @@ subtree pull`. To pull changes from all dependent projects:
     git subtree pull --prefix=docker/openfido-auth-service openfido-auth-service master
     git subtree pull --prefix=docker/openfido-app-service openfido-app-service master
     git subtree pull --prefix=docker/openfido-client openfido-client master
+    git subtree pull --prefix=docker/openfido-utils openfido-utils master
 
 ### Pushing to original projects
 

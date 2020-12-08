@@ -71,7 +71,7 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
 fi
 
-if [ -z "$(ls -A "/opt/openfido-workflow-service/.worker-env")" ]; then
+if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
   nohup exec gosu postgres postgres &
   POSTGRES_PID=$!
 
@@ -83,32 +83,31 @@ if [ -z "$(ls -A "/opt/openfido-workflow-service/.worker-env")" ]; then
 
   flask db upgrade
 
-  flask shell <<END
-from app import models, services
-u = services.create_user('${ADMIN_EMAIL}','${ADMIN_PASSWORD}','admin','user')
-u.is_system_admin = True
-models.db.session.commit()
-END
-
-  cd /opt/openfido-app-service
-  source /opt/openfido-app-service/env
-
-  flask db upgrade
-
-  invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^.*=\(.*\)$/export const API_TOKEN="\1"/' > /opt/openfido-client/src/config/reactclient.js
-
-  cd /opt/openfido-client
-  . .nvm/nvm.sh
-  nvm use
-  npm run build
+  invoke create-user -e "${ADMIN_EMAIL}" -p "${ADMIN_PASSWORD}" -f Admin -l User --is-system-admin
+  ORG_UUID=$(invoke create-organization -n "OpenFIDO" -e "${ADMIN_EMAIL}")
 
   cd /opt/openfido-workflow-service
   source /opt/openfido-workflow-service/env
 
   flask db upgrade
 
-  invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/openfido-workflow-service/.worker-env
-  invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/openfido-app-service/.env
+  invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/app-keys/worker-client
+  invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/app-keys/pipelines-client
+  EXAMPLE_UUID=$(invoke create-pipeline -n "Example" -e master -p openfido.sh -e "python:3" -r "https://github.com/PresencePG/presence-pipeline-example.git" )
+  ABSORPTION_UUID=$(invoke create-pipeline -n "Absorption" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-absorption-pipeline.git" )
+  ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-anticipation-pipeline.git" )
+  RECOVERY_UUID=$(invoke create-pipeline -n "Recovery" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-recovery-pipeline.git" )
+
+  cd /opt/openfido-app-service
+  source /opt/openfido-app-service/env
+
+  flask db upgrade
+
+  invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^.*=\(.*\)$/export const API_TOKEN="\1"/' > /opt/app-keys/react-client
+  invoke create-organization-pipeline -o $ORG_UUID -p $EXAMPLE_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $ABSORPTION_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $ANTICIPATION_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $RECOVERY_UUID
 
   nohup rabbitmq-server start &
   RABBIT_PID=$!
@@ -125,3 +124,10 @@ END
   kill $RABBIT_PID
   kill $POSTGRES_PID
 fi
+
+# On every build we need to configure the react api token on the off chance it changed:
+cd /opt/openfido-client
+cp /opt/app-keys/react-client /opt/openfido-client/src/config/reactclient.js
+. .nvm/nvm.sh
+nvm use
+npm run build
