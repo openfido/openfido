@@ -1,0 +1,43 @@
+version: '3'
+services:
+  auth_db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: accountservices
+      POSTGRES_PASSWORD: dev-password
+  authstorage:
+    image: minio/minio
+    command: server /uploads
+    environment:
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: minio123
+    volumes:
+      - ${AUTH_DIR:-.}/uploads:/data:delegated
+    ports:
+      - "9000:9000"
+  auth_service:
+    build: ${AUTH_DIR:-.}
+    command: flask run -h 0.0.0.0
+    env_file:
+      - ${AUTH_DIR:-.}/.env
+    environment:
+      PGDATABASE: accountservices
+      PGUSER: postgres
+      PGHOST: auth_db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth_db/accountservices"
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_BUCKET: openfido-data
+      S3_ENDPOINT_URL: http://authstorage:9000
+      PYTHONPATH: /opt/utils
+    volumes:
+      - ${AUTH_DIR:-.}:/opt/app:delegated
+      - ${UTILS_DIR:-.}:/opt/utils:delegated
+    ports:
+      - "${AUTH_PORT:-5000}:5000"
+    depends_on:
+      - auth_db
+      - authstorage

@@ -1,0 +1,8 @@
+**
+
+!Pipfile
+!Pipfile.lock
+!start.sh
+!*.py
+!app
+!migrations

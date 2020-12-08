@@ -1,0 +1,12 @@
+export const ROUTE_LOGIN = '/login';
+export const ROUTE_LOGOUT = '/logout';
+export const ROUTE_RESET_PASSWORD = '/reset-password';
+export const ROUTE_UPDATE_PASSWORD = '/reset-password/:reset_token';
+export const ROUTE_PIPELINES = '/pipelines';
+export const ROUTE_PIPELINE_RUNS = '/pipelines/:pipeline_uuid/runs';
+export const ROUTE_PIPELINE_RUNS_DATA_VISUALIZATION = '/pipelines/:pipeline_uuid/runs/:pipeline_run_uuid/charts';
+export const ROUTE_PIPELINE_RUNS_CONSOLE_OUTPUT = '/pipelines/:pipeline_uuid/runs/:pipeline_run_uuid/console';
+export const ROUTE_USERS = '/users';
+export const ROUTE_ACCEPT_ORGANIZATION_INVITATION = '/accept-invitation';
+export const ROUTE_CREATE_NEW_ACCOUNT_INVITATION = '/create-account';
+export const ROUTE_SETTINGS = '/settings';

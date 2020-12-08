@@ -1,0 +1,133 @@
+version: '3'
+services:
+  blobstorage:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: minio_access_key
+      MINIO_SECRET_KEY: minio123
+    volumes:
+      - ./uploads:/data:delegated
+    ports:
+      - "10000:9000"
+  workflow-queue:
+    build:
+      context: ../openfido-workflow-service/
+      dockerfile: Dockerfile.rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit-user
+      RABBITMQ_DEFAULT_PASS: rabbit-password
+      RABBITMQ_DEFAULT_VHOST: api-queue
+  workflow-db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: workflowservice
+      POSTGRES_PASSWORD: dev-password
+  workflow-service:
+    build: ../openfido-workflow-service/
+    environment:
+      PGDATABASE: workflowservice
+      PGUSER: postgres
+      PGHOST: workflow-db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@workflow-db/workflowservice
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blobstorage:9000
+      PYTHONPATH: /opt/utils
+    volumes:
+      - ../openfido-workflow-service:/opt/app:delegated
+      - ../openfido-utils:/opt/utils:delegated
+    ports:
+      - "6001:5000"
+    depends_on:
+      - workflow-db
+      - workflow-queue
+      - blobstorage
+  workflow-worker:
+    build:
+      context: ../openfido-workflow-service
+      dockerfile: Dockerfile.worker
+    command: celery -A app.worker worker -l DEBUG
+    environment:
+      CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
+      WORKER_API_SERVER: http://workflow-service:5000
+    env_file:
+      - .worker-env
+    volumes:
+      - ../openfido-workflow-service:/opt/app:delegated
+      - /var/run/docker.sock:/var/run/docker.sock
+      # The 'docker in docker' nature of this local configuration means that
+      # bind mounts happen on the 'host docker' not the first docker container.
+      # Make temp directories on the main host (otherwise files cannot be
+      # found).
+      - /tmp:/tmp
+    depends_on:
+      - workflow-queue
+      - workflow-service
+      - blobstorage
+  auth-db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: accountservices
+      POSTGRES_PASSWORD: dev-password
+  auth-service:
+    build: ../openfido-auth-service
+    command: flask run -h 0.0.0.0
+    env_file:
+      - ../openfido-auth-service/.env
+    environment:
+      PGDATABASE: accountservices
+      PGUSER: postgres
+      PGHOST: auth-db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: "postgresql://postgres:dev-password@auth-db/accountservices"
+      S3_BUCKET: auth-service
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blobstorage:9000
+      PYTHONPATH: /opt/utils
+    volumes:
+      - ../openfido-auth-service:/opt/app:delegated
+      - ../openfido-utils:/opt/utils:delegated
+    ports:
+      - "6002:5000"
+    depends_on:
+      - auth-db
+      - blobstorage
+  app-db:
+    image: postgres:11
+    environment:
+      POSTGRES_DB: appservice
+      POSTGRES_PASSWORD: dev-password
+  app-service:
+    build: .
+    environment:
+      PGDATABASE: appservice
+      PGUSER: postgres
+      PGHOST: app-db
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      SECRET_KEY: local-dev-db
+      SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app-db/appservice
+      S3_ACCESS_KEY_ID: minio_access_key
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_ENDPOINT_URL: http://blobstorage:9000
+      AUTH_HOSTNAME: http://auth-service:5000
+      WORKFLOW_HOSTNAME: http://workflow-service:5000
+      PYTHONPATH: /opt/utils
+    volumes:
+      - .:/opt/app:delegated
+      - ../openfido-utils:/opt/utils:delegated
+    ports:
+      - "6003:5000"
+    depends_on:
+      - app-db
+      - auth-service
+      - blobstorage
+      - workflow-service

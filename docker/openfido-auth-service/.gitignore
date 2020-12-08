@@ -1,0 +1,12 @@
+__pycache__
+.vim
+htmlcov
+.coverage
+.DS_Store
+test-results
+.env
+.env.dev
+.env.staging
+.env.prod
+.env.test
+uploads
