@@ -50,7 +50,7 @@ have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://
     cp .env.example .env
 
     # Login to an docker instance of the flask app:
-    docker-compose run --rm auth_service bash
+    docker-compose run --rm auth-service bash
 
     # Run database migrations
     flask db upgrade
@@ -76,10 +76,10 @@ To connect to the database:
     docker-compose exec db psql -d accountservices -U postgres
 
 
-To connect to a shell in the auth_service container:
+To connect to a shell in the auth-service container:
     
     # while docker-compose is running:
-    docker-compose exec auth_service bash
+    docker-compose exec auth-service bash
 
 To connect to a shell in the db container:
     
@@ -89,23 +89,23 @@ To connect to a shell in the db container:
 To run tests, use [invoke](https://pyinvoke.org):
 
     # Run within the preconfigured docker instance:
-    docker-compose run --rm auth_service invoke test
+    docker-compose run --rm auth-service invoke test
 
     # with code coverage
-    docker-compose run --rm auth_service invoke test --cov-report && open htmlcov/index.html
+    docker-compose run --rm auth-service invoke test --cov-report && open htmlcov/index.html
 
     # Or if you'd rather run locally
     pipenv install
     pipenv run invoke test
 
     # to run a lint test
-    docker-compose run --rm auth_service invoke lint
+    docker-compose run --rm auth-service invoke lint
 
     # to check code style
-    docker-compose run --rm auth_service invoke style
+    docker-compose run --rm auth-service invoke style
 
     # to auto-correct code style errors
-    docker-compose run --rm auth_service invoke style --fix
+    docker-compose run --rm auth-service invoke style --fix
 
 Other tasks are available, in particular the `precommit` task, which mirrors the
 tests performed by CircleCI.
