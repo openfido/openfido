@@ -40,7 +40,8 @@ docker-compose which files to use, and where each project is:
     docker-compose run --rm workflow-service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
     docker-compose run --rm workflow-service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .env
 
-    # Configure an application key to use this service!
+    # Obtain the React application key.
+    # COPY this to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable:
     docker-compose run --rm app-service invoke create-application-key -n "react client" -p REACT_CLIENT
 
 
@@ -55,7 +56,5 @@ docker-compose which files to use, and where each project is:
     docker-compose up
 
 ## Deployment
-TODO coming soon.
 
-## Provisioning
-TODO see the openfido repository.
+See [openfido terraform docs](https://github.com/slacgismo/openfido/blob/master/terraform/provisioning.md).
