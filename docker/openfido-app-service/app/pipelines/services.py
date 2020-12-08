@@ -57,7 +57,9 @@ def create_pipeline(organization_uuid, request_json):
         json_value = response.json()
         response.raise_for_status()
 
-        pipeline = create_organization_pipeline(organization_uuid, json_value.get("uuid"))
+        pipeline = create_organization_pipeline(
+            organization_uuid, json_value.get("uuid")
+        )
 
         json_value["uuid"] = pipeline.uuid
         return json_value
