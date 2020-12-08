@@ -30,6 +30,18 @@ from .queries import (
 )
 
 
+def create_organization_pipeline(organization_uuid, pipeline_uuid):
+    """ Create OrganizationPipeline record. """
+    pipeline = OrganizationPipeline(
+        organization_uuid=organization_uuid,
+        pipeline_uuid=pipeline_uuid,
+    )
+    db.session.add(pipeline)
+    db.session.commit()
+
+    return pipeline
+
+
 def create_pipeline(organization_uuid, request_json):
     """ Create a new pipeline associated with an organization. """
     response = requests.post(
@@ -45,12 +57,7 @@ def create_pipeline(organization_uuid, request_json):
         json_value = response.json()
         response.raise_for_status()
 
-        pipeline = OrganizationPipeline(
-            organization_uuid=organization_uuid,
-            pipeline_uuid=json_value.get("uuid"),
-        )
-        db.session.add(pipeline)
-        db.session.commit()
+        pipeline = create_organization_pipeline(organization_uuid, json_value.get("uuid"))
 
         json_value["uuid"] = pipeline.uuid
         return json_value
