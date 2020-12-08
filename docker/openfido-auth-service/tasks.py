@@ -44,3 +44,29 @@ def precommit(c, fix=False):
     test(c, junit=True, enforce_percent=92)
     style(c, fix=fix)
     lint(c, fail_under=9)
+
+
+@task
+def create_user(c, email, password, first_name, last_name, is_system_admin=False):
+    """ Create a user. Returns the UUID of the organization. """
+    from app import create_app, models, services
+
+    (app, db, _) = create_app()
+    with app.app_context():
+        user = services.create_user(email, password, first_name, last_name)
+        user.is_system_admin = is_system_admin
+        models.db.session.commit()
+        print(user.uuid)
+
+
+@task
+def create_organization(c, name, email):
+    """ Create an organization for a user with 'email'. Returns the UUID of the organization. """
+    from app import create_app, models, services, queries
+
+    (app, db, _) = create_app()
+    with app.app_context():
+        user = queries.find_user_by_email(email)
+        organization = services.create_organization(name, user)
+        models.db.session.commit()
+        print(organization.uuid)
