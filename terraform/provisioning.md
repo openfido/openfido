@@ -4,6 +4,8 @@ Run terragrunt for a specific environment to create AWS:
 
 TODO show commands needed to create environment.
 
+TODO include docs for configuring the AWS --profile setting for the account.
+
 # Configuration
 
 Once the infrastructure has been stood up, the databases and initial accounts

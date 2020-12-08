@@ -60,6 +60,10 @@ strictly necessary, but makes working with `git subtree` commands more concise):
     git remote add openfido-app-service git@github.com:slacgismo/openfido-app-service.git
     git remote add openfido-client git@github.com:slacgismo/openfido-client.git
 
+
+NOTE: To simplify subtree merging be sure to commit any changes to these
+projects as individual commits.
+
 ### Pulling from upstream projects
 
 To pull in any changes from the original projects to this one, you can use `git
