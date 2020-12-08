@@ -97,3 +97,21 @@ def run_worker(c, input_directory, docker_image, repository_url, repository_bran
                          repository_branch,
                          repository_script)
     fake_execute()
+
+
+@task
+def create_pipeline(c, name, docker_image_url, repository_ssh_url, repository_branch='master', repository_script='openfido.sh'):
+    """ Create a pipeline. """
+    from app import create_app
+    from app.pipelines.services import create_pipeline
+
+    (app, db, _, _) = create_app()
+    with app.app_context():
+        pipeline = create_pipeline({
+            'name': name,
+            'docker_image_url': docker_image_url,
+            'repository_ssh_url': repository_ssh_url,
+            'repository_branch': repository_branch,
+            'repository_script': repository_script,
+        })
+        print(pipeline.uuid)
