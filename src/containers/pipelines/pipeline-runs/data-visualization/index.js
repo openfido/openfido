@@ -9,7 +9,6 @@ import { CHART_TYPES, TOTAL_GRAPH_POINTS } from 'config/charts';
 import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2,
-  StyledH4,
   StyledButton,
   StyledTitle,
   StyledText,
@@ -19,6 +18,7 @@ import { getPipelines, getPipelineRun } from 'actions/pipelines';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 import ComposedCsvChart from '../composed-csv-chart';
+import EditChart from './edit-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -181,7 +181,11 @@ const DataVisualization = () => {
 
           return (
             <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
-              <StyledH4 color="black">{title}</StyledH4>
+              <EditChart
+                chart={pipelineRunCharts[chartIndex]}
+                pipelineRun={currentPipelineRun}
+                pipelineUuid={pipelineInView}
+              />
               {(getChartsInProgress || processArtifactInProgress) && !(artifact.url in chartDatum) && (
                 <Spin indicator={<LoadingFilled spin />} />
               )}
