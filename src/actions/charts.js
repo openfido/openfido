@@ -8,6 +8,8 @@ import {
   PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
   SET_GRAPH_MIN_MAX,
+  UPDATE_CHART,
+  DELETE_CHART,
 } from 'actions';
 import {
   requestPipelineRunCharts,
@@ -121,4 +123,23 @@ export const setGraphMinMax = (pipeline_run_uuid, index, min, max) => ({
     min,
     max,
   },
+});
+
+export const updateChart = (orgUuid, pipelineUuid, pipelineRunUuid, chartUuid, name) => ({
+  type: UPDATE_CHART,
+  payload: {
+    orgUuid,
+    pipelineUuid,
+    pipelineRunUuid,
+    chartUuid,
+    name
+  }
+});
+
+export const deleteChart = (pipelineRunUuid, chartUuid) => ({
+  type: DELETE_CHART,
+  payload: {
+    pipelineRunUuid,
+    chartUuid,
+  }
 });

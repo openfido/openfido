@@ -153,6 +153,14 @@ export const requestPipelineRunCharts = (organization_uuid, pipeline_uuid, pipel
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, appToken)
 );
 
+export const requestUpdatePipelineRunChart = (organization_uuid, pipeline_uuid, pipeline_run_uuid, artifact_uuid, chart_updates) => (
+  ApiClient.put(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts/${artifact_uuid}`, chart_updates, appToken)
+);
+
+export const requestDeletePipelineRunChart = (organization_uuid, pipeline_uuid, pipeline_run_uuid, artifact_uuid) => (
+  ApiClient.delete(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts/${artifact_uuid}`, appToken)
+);
+
 export const requestArtifact = ({ url }) => (
   window.fetch(url)
 );
