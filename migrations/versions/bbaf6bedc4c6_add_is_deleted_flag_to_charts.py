@@ -28,7 +28,9 @@ def upgrade():
     sa.Column('is_deleted', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.add_column('artifact_chart', sa.Column('is_deleted', sa.Boolean(), nullable=False))
+    op.add_column('artifact_chart', sa.Column('is_deleted', sa.Boolean(), nullable=True))
+    op.execute("UPDATE artifact_chart SET is_deleted = false")
+    op.alter_column('artifact_chart', 'is_deleted', nullable=False)
     op.add_column('organization_workflow_pipeline_run', sa.Column('organization_workflow_run_id', sa.Integer(), nullable=False))
     op.create_foreign_key(None, 'organization_workflow_pipeline_run', 'organization_workflow_run', ['organization_workflow_run_id'], ['id'])
     # ### end Alembic commands ###
