@@ -120,18 +120,18 @@ const DeleteChartPopUp = ({
         pipelineRunUuid,
         chartUuid,
       )
-      .then(() => {
-        dispatch(
-          deleteChart(
-            pipelineRunUuid,
-            chartUuid,
-          )
-        );
-        handleOk();
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+        .then(() => {
+          dispatch(
+            deleteChart(
+              pipelineRunUuid,
+              chartUuid,
+            ),
+          );
+          handleOk();
+        })
+        .catch(() => {
+          setLoading(false);
+        });
     }
   };
 

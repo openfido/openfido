@@ -142,7 +142,7 @@ export default (state = DEFAULT_STATE, action) => {
 
       pipelineRunCharts.forEach((chart) => {
         if (chart.uuid === action.payload.chartUuid) {
-          chart.name = action.payload.name;
+          chart.name = action.payload.name; // eslint-disable-line no-param-reassign
         }
       });
 
@@ -154,8 +154,8 @@ export default (state = DEFAULT_STATE, action) => {
         charts: {
           ...state.charts,
           [action.payload.pipelineRunUuid]: pipelineRunCharts,
-        }
-      }
+        },
+      };
     }
     case DELETE_CHART: {
       const pipelineRunCharts = state.charts[action.payload.pipelineRunUuid];
@@ -170,7 +170,7 @@ export default (state = DEFAULT_STATE, action) => {
           ...state.charts,
           [action.payload.pipelineRunUuid]: pipelineRunCharts.filter((chart) => action.payload.chartUuid !== chart.uuid),
         },
-      }
+      };
     }
     default:
       return state;

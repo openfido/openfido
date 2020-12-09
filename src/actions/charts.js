@@ -132,8 +132,8 @@ export const updateChart = (orgUuid, pipelineUuid, pipelineRunUuid, chartUuid, n
     pipelineUuid,
     pipelineRunUuid,
     chartUuid,
-    name
-  }
+    name,
+  },
 });
 
 export const deleteChart = (pipelineRunUuid, chartUuid) => ({
@@ -141,5 +141,5 @@ export const deleteChart = (pipelineRunUuid, chartUuid) => ({
   payload: {
     pipelineRunUuid,
     chartUuid,
-  }
+  },
 });
