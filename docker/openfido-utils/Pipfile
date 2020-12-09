@@ -22,6 +22,7 @@ pylint = "*"
 pylint-flask-sqlalchemy = "*"
 invoke = "*"
 black = "*"
+regex = "*"
 
 [requires]
 python_version = "3.8"
