@@ -321,3 +321,6 @@ sketch
 .idea/
 .terraform/
 .terragrunt-cache/
+
+docker/.worker-env
+docker/.workflow-env
