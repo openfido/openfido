@@ -12,7 +12,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/slacgismo/openfido-utils",
-    packages=setuptools.find_packages(),
+    packages=['application_roles', 'blob_utils', 'openfido'],
+    entry_points={
+        'console_scripts': ['openfido = openfido.script:main'],
+    },
     classifiers=[],
     python_requires='>=3.7',
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )

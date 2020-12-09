@@ -10,14 +10,18 @@ from .constants import (
     S3_ENDPOINT_URL,
     S3_REGION_NAME,
     S3_PRESIGNED_TIMEOUT,
-    FLASK_ENV
+    FLASK_ENV,
 )
+
 
 def get_s3():
     """ Get access to the Boto s3 service. """
 
     # For local development we need to explicitly set the S3 keys:
-    if FLASK_ENV in current_app.config and current_app.config[FLASK_ENV] != 'production':
+    if (
+        FLASK_ENV in current_app.config
+        and current_app.config[FLASK_ENV] != "production"
+    ):
         params = {
             "aws_access_key_id": current_app.config[S3_ACCESS_KEY_ID],
             "aws_secret_access_key": current_app.config[S3_SECRET_ACCESS_KEY],
@@ -41,6 +45,7 @@ def upload_stream(key, stream, s3_client=None):
         current_app.config[S3_BUCKET],
         key,
     )
+
 
 def create_url(key, filename=None, s3_client=None):
     """ Generate a publicly visible URL for this key. """
@@ -68,9 +73,6 @@ def get_file(key, s3_client=None):
     if not s3_client:
         s3_client = get_s3()
 
-    return (
-        s3_client
-        .get_object(Bucket=current_app.config[S3_BUCKET], Key=key)
-        .get("Body")
-
+    return s3_client.get_object(Bucket=current_app.config[S3_BUCKET], Key=key).get(
+        "Body"
     )

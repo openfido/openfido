@@ -12,9 +12,9 @@ def test(c, cov=False, cov_report=False, junit=False, enforce_percent=0):
     if enforce_percent > 0:
         command += f" --cov-fail-under={enforce_percent}"
     if cov or cov_report or junit or enforce_percent:
-        command += " --cov application_roles --cov application_application_roles"
+        command += " --cov application_roles --cov blob_utils"
     else:
-        command += " application_roles tests"
+        command += " application_roles blob_utils tests"
 
     c.run(command)
 
@@ -26,7 +26,7 @@ def style(c, fix=False):
     if not fix:
         command += " --check"
 
-    c.run(f"{command} application_roles tests")
+    c.run(f"{command} application_roles blob_utils tests")
 
 
 @task
@@ -36,7 +36,7 @@ def lint(c, fail_under=0):
     if fail_under > 0:
         command += f" --fail-under={fail_under}"
 
-    c.run(f"{command} application_roles")
+    c.run(f"{command} application_roles blob_utils")
 
 
 @task
