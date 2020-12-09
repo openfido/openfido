@@ -9,7 +9,6 @@ import { CHART_TYPES, TOTAL_GRAPH_POINTS } from 'config/charts';
 import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2,
-  StyledH4,
   StyledButton,
   StyledTitle,
   StyledText,

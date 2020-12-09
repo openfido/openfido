@@ -17,7 +17,7 @@ import {
 } from 'styles/app';
 import colors from 'styles/colors';
 import { deleteChart } from 'actions/charts';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -112,10 +112,6 @@ const DeleteChartPopUp = ({
   };
 
   const onPermanentlyDeleteClicked = () => {
-    console.log('here');
-    console.log(deleteName === chartName);
-    console.log(confirmDelete);
-    console.log(!loading);
     if (deleteName === chartName && confirmDelete && !loading) {
       setLoading(true);
       requestDeletePipelineRunChart(
