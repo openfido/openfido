@@ -98,21 +98,37 @@ def update_workflow(app_session, app_url, uuid, create_workflow_data):
     # Create a workflow pipeline in the workflow if it doesn't already exist:
     for pipeline in create_workflow_data['pipelines']:
         if pipeline['uuid'] not in [wp['pipeline_uuid'] for wp in workflow_pipelines]:
-            request_json = {
-                'pipeline_uuid': pipeline['uuid'],
-                # 'source_workflow_pipelines': pipeline.get('dependencies', []),
-                'source_workflow_pipelines': [],
-                'destination_workflow_pipelines': [],
-            }
-            workflow_pipelines = _call_api(
+            _call_api(
                 app_session,
                 f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines",
                 'post',
-                request_json
+                {
+                    'pipeline_uuid': pipeline['uuid'],
+                    'source_workflow_pipelines': [],
+                    'destination_workflow_pipelines': [],
+                }
             )
 
     # TODO remove workflow pipelines when relationships are gone.
 
-    # TODO Update the workflow pipeline relationships
+    workflow_pipelines = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+    )
+
+    # Update the workflow pipeline relationships
+    for pipeline in create_workflow_data['pipelines']:
+        workflow_pipeline_uuid = next(wp['uuid'] for wp in workflow_pipelines if wp['pipeline_uuid'] == pipeline['uuid'])
+        dependencies = pipeline.get('dependencies', [])
+        _call_api(
+            app_session,
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines/{workflow_pipeline_uuid}",
+            'put',
+            {
+                'pipeline_uuid': pipeline['uuid'],
+                'source_workflow_pipelines': [wp['uuid'] for wp in workflow_pipelines if wp['pipeline_uuid'] in dependencies],
+                'destination_workflow_pipelines': [],
+            }
+        )
 
     return uuid
