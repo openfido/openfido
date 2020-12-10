@@ -10,6 +10,7 @@ pylint-flask-sqlalchemy = "*"
 invoke = "*"
 pytest = "*"
 pytest-cov = "*"
+responses = "*"
 
 [packages]
 flask = "*"
