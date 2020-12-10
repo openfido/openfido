@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Spin, Slider } from 'antd';
 import styled from 'styled-components';
+import _ from 'lodash';
+import moment from 'moment';
 
 import { getCharts, setGraphMinMax } from 'actions/charts';
 import { CHART_TYPES, TOTAL_GRAPH_POINTS } from 'config/charts';
@@ -143,6 +145,8 @@ const DataVisualization = () => {
     dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelectedUuid));
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, dispatch, charts]);
 
+  const sortedPipelineRunCharts = pipelineRunCharts ? _.sortBy(pipelineRunCharts, (c) => moment.utc(c.created_at)).reverse() : [];
+
   return (
     <>
       <StyledTitle>
@@ -174,7 +178,7 @@ const DataVisualization = () => {
         >
           Add A Chart
         </AddChartButton>
-        {pipelineRunCharts && pipelineRunCharts.map(({
+        {sortedPipelineRunCharts && sortedPipelineRunCharts.map(({
           artifact, name: title, chart_type_code, chart_config,
         }, chartIndex) => {
           const chartDataLength = chartDatum[artifact.url] && chartDatum[artifact.url].chartData.length;
@@ -182,7 +186,7 @@ const DataVisualization = () => {
           return (
             <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
               <EditChart
-                chart={pipelineRunCharts[chartIndex]}
+                chart={sortedPipelineRunCharts[chartIndex]}
                 pipelineRun={currentPipelineRun}
                 pipelineUuid={pipelineInView}
               />

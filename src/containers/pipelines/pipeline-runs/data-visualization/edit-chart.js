@@ -4,13 +4,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import {
   requestUpdatePipelineRunChart,
+  requestDeletePipelineRunChart,
 } from 'services';
-import { updateChart } from 'actions/charts';
+import { updateChart, deleteChart } from 'actions/charts';
 import { StyledText, StyledInput, StyledButton } from 'styles/app';
 import EditOutlined from 'icons/EditOutlined';
 import DeleteOutlined from 'icons/DeleteOutlined';
 import colors from 'styles/colors';
-import DeleteChartPopUp from './delete-chart-popup';
 
 const StyledForm = styled.form`
   display: grid;
@@ -66,7 +66,6 @@ const EditChart = ({ chart, pipelineUuid, pipelineRun }) => {
   const [selectedChart, setSelectedChart] = useState(null);
   const [selectedChartName, setSelectedChartName] = useState(null);
   const [selectedInput, setSelectedInput] = useState(null);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -130,16 +129,20 @@ const EditChart = ({ chart, pipelineUuid, pipelineRun }) => {
     setLoading(false);
     setSelectedInput(null);
 
-    setShowDeletePopup(false);
-  };
-
-  const openDeletePopup = (e) => {
-    e.preventDefault();
-    setShowDeletePopup(true);
-  };
-
-  const closeDeletePopup = () => {
-    setShowDeletePopup(false);
+    requestDeletePipelineRunChart(
+      currentOrg,
+      pipelineUuid,
+      pipelineRun.uuid,
+      chart.uuid,
+    )
+      .then(() => {
+        dispatch(
+          deleteChart(
+            pipelineRun.uuid,
+            chart.uuid,
+          ),
+        );
+      });
   };
   return (
     <>
@@ -163,7 +166,7 @@ const EditChart = ({ chart, pipelineUuid, pipelineRun }) => {
             onClick={(e) => onChartNameClick(e, chart.uuid, chart.name)}
           />
           {chart.uuid !== selectedChart && <EditOutlined />}
-          {chart.uuid === selectedChart && <DeleteOutlined onClick={(e) => openDeletePopup(e, chart.name)} />}
+          {chart.uuid === selectedChart && <DeleteOutlined onClick={(e) => onPermanentlyDeleteClicked(e)} />}
           {chart.uuid === selectedChart && (
           <FormMessage>
             <StyledText color="pink">
@@ -183,17 +186,6 @@ const EditChart = ({ chart, pipelineUuid, pipelineRun }) => {
           )}
         </label>
       </StyledForm>
-      {showDeletePopup && selectedChart && (
-        <DeleteChartPopUp
-          handleOk={onPermanentlyDeleteClicked}
-          handleCancel={closeDeletePopup}
-          organizationUUID={currentOrg}
-          pipelineUuid={pipelineUuid}
-          pipelineRunUuid={pipelineRun.uuid}
-          chartName={selectedChartName}
-          chartUuid={chart.uuid}
-        />
-      )}
     </>
   );
 };
