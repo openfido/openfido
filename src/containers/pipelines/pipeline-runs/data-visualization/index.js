@@ -145,8 +145,7 @@ const DataVisualization = () => {
     dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelectedUuid));
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, dispatch, charts]);
 
-
-  const sortedPipelineRunCharts = pipelineRunCharts ? _.sortBy(pipelineRunCharts, c => moment.utc(c.created_at)).reverse() : [];
+  const sortedPipelineRunCharts = pipelineRunCharts ? _.sortBy(pipelineRunCharts, (c) => moment.utc(c.created_at)).reverse() : [];
 
   return (
     <>

@@ -143,8 +143,6 @@ const EditChart = ({ chart, pipelineUuid, pipelineRun }) => {
           ),
         );
       });
-
-    //setShowDeletePopup(false);
   };
   return (
     <>
