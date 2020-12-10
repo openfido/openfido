@@ -59,35 +59,7 @@ def view_workflow(app_session, app_url, uuid):
         print("Dependencies:")
 
 
-def create_workflow(app_session, app_url, create_workflow_data):
-    """ Create a new Workflow. Returns workflow UUID. """
-    workflow_json = _call_api(
-        app_session,
-        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows",
-        'post',
-        {
-            "name": create_workflow_data["name"],
-            "description": create_workflow_data["description"],
-        }
-    )
-
-    # TODO fixup update_workflow logic here.
-
-    return workflow_json["uuid"]
-
-
-def update_workflow(app_session, app_url, uuid, create_workflow_data):
-    """ Update a Workflow. Returns workflow UUID. """
-    _call_api(
-        app_session,
-        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}",
-        'put',
-        {
-            "name": create_workflow_data["name"],
-            "description": create_workflow_data["description"],
-        }
-    )
-
+def _update_workflow_pipelines(app_session, app_url, create_workflow_data, uuid):
     workflow_pipelines = _call_api(
         app_session,
         f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
@@ -130,5 +102,37 @@ def update_workflow(app_session, app_url, uuid, create_workflow_data):
                 'destination_workflow_pipelines': [],
             }
         )
+
+
+def create_workflow(app_session, app_url, create_workflow_data):
+    """ Create a new Workflow. Returns workflow UUID. """
+    workflow_json = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows",
+        'post',
+        {
+            "name": create_workflow_data["name"],
+            "description": create_workflow_data["description"],
+        }
+    )
+
+    _update_workflow_pipelines(app_session, app_url, create_workflow_data, workflow_json["uuid"])
+
+    return workflow_json["uuid"]
+
+
+def update_workflow(app_session, app_url, uuid, create_workflow_data):
+    """ Update a Workflow. Returns workflow UUID. """
+    _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}",
+        'put',
+        {
+            "name": create_workflow_data["name"],
+            "description": create_workflow_data["description"],
+        }
+    )
+
+    _update_workflow_pipelines(app_session, app_url, create_workflow_data, uuid)
 
     return uuid
