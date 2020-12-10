@@ -1,23 +1,23 @@
 from openfido import services
 import responses
 
-empty = {
+EMPTY = {
   "name": "Example workflow",
   "description": "description example",
   "pipelines": [ ]
 }
 
-line = {
+LINE = {
   "name": "Line workflow",
   "description": "description example",
   "pipelines": [
     {
-      "uuid": "04f01114cbaf4ca98724a7c7965f9df3"
+      "uuid": "pipeline-1"
     },
     {
-      "uuid": "cef461a5c10945e4b81ae480fe3c8b38",
+      "uuid": "pipeline-2",
       "dependencies": [
-        "04f01114cbaf4ca98724a7c7965f9df3"
+        "pipeline-1"
       ]
     }
   ]
@@ -28,85 +28,119 @@ line = {
 def test_create_workflow_empty(session):
     responses.add(
         responses.POST,
-        f"http://app-api/v1/organizations/organization-uuid/workflows",
+        f"http://app-api/v1/organizations/organization-1/workflows",
         match=[
             responses.json_params_matcher({
-                "name": empty["name"],
-                "description": empty["description"],
+                "name": EMPTY["name"],
+                "description": EMPTY["description"],
             })
         ],
         json={
             "created_at": "2020-12-10T16:39:01.189231",
-            "description": empty["description"],
-            "name": empty["name"],
+            "description": EMPTY["description"],
+            "name": EMPTY["name"],
             "updated_at": "2020-12-10T16:39:30.324064",
-            "uuid": "a-uuid"
+            "uuid": "workflow-1"
         },
     )
     responses.add(
         responses.GET,
-        f"http://app-api/v1/organizations/organization-uuid/workflows/a-uuid/pipelines",
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
         json=[],
     )
-    assert services.create_workflow(session, 'http://app-api', empty) == 'a-uuid'
+    assert services.create_workflow(session, 'http://app-api', EMPTY) == 'workflow-1'
 
 
 @responses.activate
 def test_update_workflow_empty(session):
     responses.add(
         responses.PUT,
-        f"http://app-api/v1/organizations/organization-uuid/workflows/a-uuid",
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
         match=[
             responses.json_params_matcher({
-                "name": empty["name"],
-                "description": empty["description"],
+                "name": EMPTY["name"],
+                "description": EMPTY["description"],
             })
         ],
         json={
             "created_at": "2020-12-10T16:39:01.189231",
-            "description": empty["description"],
-            "name": empty["name"],
+            "description": EMPTY["description"],
+            "name": EMPTY["name"],
             "updated_at": "2020-12-10T16:39:30.324064",
-            "uuid": "e1fc3a54188b4f43a3b45b621c782fe8"
+            "uuid": "workflow-1"
         },
     )
     responses.add(
         responses.GET,
-        f"http://app-api/v1/organizations/organization-uuid/workflows/a-uuid/pipelines",
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
         json=[],
     )
-    assert services.update_workflow(session, 'http://app-api', 'a-uuid', empty) == 'a-uuid'
+    assert services.update_workflow(session, 'http://app-api', 'workflow-1', EMPTY) == 'workflow-1'
 
 
-# @responses.activate
-# def test_update_workflow_line(session):
-#     responses.add(
-#         responses.PUT,
-#         f"http://app-api/v1/organizations/organization-uuid/workflows/a-uuid",
-#         match=[
-#             responses.json_params_matcher({
-#                 "name": empty["name"],
-#                 "description": empty["description"],
-#             })
-#         ],
-#         json={
-#             "created_at": "2020-12-10T16:39:01.189231",
-#             "description": "description example",
-#             "name": "Line workflow",
-#             "updated_at": "2020-12-10T16:39:30.324064",
-#             "uuid": "e1fc3a54188b4f43a3b45b621c782fe8"
-#         },
-#     )
-#     responses.add(
-#         responses.GET,
-#         f"http://app-api/v1/organizations/organization-uuid/workflows/a-uuid/pipelines",
-#         json=[{
-#             "created_at": "2020-12-10T16:46:10.965112",
-#             "destination_workflow_pipelines": [],
-#             "pipeline_uuid": "cef461a5c10945e4b81ae480fe3c8b38",
-#             "source_workflow_pipelines": [],
-#             "updated_at": "2020-12-10T16:46:10.965127",
-#             "uuid": "daa74cfa1f1f439cafd4bf4d8fa1e71b"
-#         }],
-#     )
-#     services.update_workflow(session, 'http://app-api', 'a-uuid', empty)
+@responses.activate
+def test_update_workflow_line(session):
+    responses.add(
+        responses.PUT,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
+        match=[
+            responses.json_params_matcher({
+                "name": LINE["name"],
+                "description": LINE["description"],
+            })
+        ],
+        json={
+            "created_at": "2020-12-10T16:39:01.189231",
+            "description": LINE["description"],
+            "name": LINE["name"],
+            "updated_at": "2020-12-10T16:39:30.324064",
+            "uuid": "workflow-1"
+        },
+    )
+    responses.add(
+        responses.GET,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
+        json=[{
+            "created_at": "2020-12-10T16:46:10.965112",
+            "destination_workflow_pipelines": [],
+            "pipeline_uuid": "pipeline-1",
+            "source_workflow_pipelines": [],
+            "updated_at": "2020-12-10T16:46:10.965127",
+            "uuid": "workflow-pipeline-1"
+        }, {
+            "created_at": "2020-12-10T16:46:10.965112",
+            "destination_workflow_pipelines": [],
+            "pipeline_uuid": "pipeline-2",
+            "source_workflow_pipelines": [],
+            "updated_at": "2020-12-10T16:46:10.965127",
+            "uuid": "workflow-pipeline-2"
+        }],
+    )
+
+    for pipeline in LINE['pipelines']:
+        responses.add(
+            responses.POST,
+            f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
+            json={},
+            match=[
+                responses.json_params_matcher({
+                    'pipeline_uuid': pipeline['uuid'],
+                    'source_workflow_pipelines': [],
+                    'destination_workflow_pipelines': [],
+                })
+            ],
+        )
+        responses.add(
+            responses.PUT,
+            f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{pipeline['uuid']}",
+            json={},
+            match=[
+                responses.json_params_matcher({
+                    'pipeline_uuid': pipeline['uuid'],
+                    'source_workflow_pipelines': [f"workflow-{p}" for p in pipeline.get('dependencies', [])],
+                    'destination_workflow_pipelines': [],
+                })
+            ],
+        )
+
+    assert services.update_workflow(session, 'http://app-api', 'workflow-1', LINE) == 'workflow-1'

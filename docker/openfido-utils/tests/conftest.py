@@ -36,6 +36,6 @@ def app():
 def session():
     session = requests.Session()
     session.headers['Workflow-API-Key'] = 'workflow-api-key'
-    session.headers['X-Organization'] = 'organization-uuid'
+    session.headers['X-Organization'] = 'organization-1'
 
     return session
