@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from flask import Flask
 from flask_migrate import Migrate
@@ -29,3 +30,12 @@ def app():
 
         db.session.remove()
         db.drop_all()
+
+
+@pytest.fixture
+def session():
+    session = requests.Session()
+    session.headers['Workflow-API-Key'] = 'workflow-api-key'
+    session.headers['X-Organization'] = 'organization-uuid'
+
+    return session
