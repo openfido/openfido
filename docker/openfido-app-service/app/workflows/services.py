@@ -448,7 +448,7 @@ def update_workflow_pipeline(
         json={
             "pipeline_uuid": org_pipeline.pipeline_uuid,
             "source_workflow_pipelines": src_workflow_pipelines,
-            "dest_workflow_pipelines": dest_workflow_pipelines,
+            "destination_workflow_pipelines": dest_workflow_pipelines,
         },
     )
 
