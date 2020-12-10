@@ -24,11 +24,10 @@ LINE = {
 }
 
 
-@responses.activate
-def test_create_workflow_empty(session):
+def _test_empty(method, session, extra_param=''):
     responses.add(
-        responses.POST,
-        f"http://app-api/v1/organizations/organization-1/workflows",
+        method,
+        f"http://app-api/v1/organizations/organization-1/workflows{extra_param}",
         match=[
             responses.json_params_matcher({
                 "name": EMPTY["name"],
@@ -48,41 +47,24 @@ def test_create_workflow_empty(session):
         f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
         json=[],
     )
+
+
+@responses.activate
+def test_create_workflow_empty(session):
+    _test_empty(responses.POST, session)
     assert services.create_workflow(session, 'http://app-api', EMPTY) == 'workflow-1'
 
 
 @responses.activate
 def test_update_workflow_empty(session):
-    responses.add(
-        responses.PUT,
-        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
-        match=[
-            responses.json_params_matcher({
-                "name": EMPTY["name"],
-                "description": EMPTY["description"],
-            })
-        ],
-        json={
-            "created_at": "2020-12-10T16:39:01.189231",
-            "description": EMPTY["description"],
-            "name": EMPTY["name"],
-            "updated_at": "2020-12-10T16:39:30.324064",
-            "uuid": "workflow-1"
-        },
-    )
-    responses.add(
-        responses.GET,
-        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
-        json=[],
-    )
+    _test_empty(responses.PUT, session, '/workflow-1')
     assert services.update_workflow(session, 'http://app-api', 'workflow-1', EMPTY) == 'workflow-1'
 
 
-@responses.activate
-def test_update_workflow_line(session):
+def _test_line(method, session, extra_param=''):
     responses.add(
-        responses.PUT,
-        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
+        method,
+        f"http://app-api/v1/organizations/organization-1/workflows{extra_param}",
         match=[
             responses.json_params_matcher({
                 "name": LINE["name"],
@@ -142,5 +124,16 @@ def test_update_workflow_line(session):
                 })
             ],
         )
+
+
+@responses.activate
+def test_create_workflow_line(session):
+    _test_line(responses.POST, session)
+
+    assert services.create_workflow(session, 'http://app-api', LINE) == 'workflow-1'
+
+@responses.activate
+def test_update_workflow_line(session):
+    _test_line(responses.PUT, session, '/workflow-1')
 
     assert services.update_workflow(session, 'http://app-api', 'workflow-1', LINE) == 'workflow-1'
