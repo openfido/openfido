@@ -1,7 +1,7 @@
 from app.pipelines.schemas import PipelineRunSchema
+from blob_utils.schemas import UUID
 from marshmallow import Schema, fields, validate
 
-from ..schemas import UUID
 from .models import Workflow
 
 

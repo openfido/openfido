@@ -1,8 +1,8 @@
 from marshmallow import Schema, fields, validate
+from blob_utils.schemas import UUID
 from marshmallow_enum import EnumField
 
 from ..model_utils import RunStateEnum
-from ..schemas import UUID
 
 
 class InputSchema(Schema):
