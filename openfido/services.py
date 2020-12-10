@@ -2,6 +2,17 @@ import logging
 
 logger = logging.getLogger('openfido.services')
 
+def _call_api(session, url, method="get", json_data=None):
+    """ Call a URL within a session and return the JSON response. """
+    logger.debug("json_data:")
+    logger.debug(json_data)
+    response = getattr(session, method)(url, json=json_data)
+    logger.debug(response.text)
+    response_json = response.json()
+    response.raise_for_status()
+
+    return response_json
+
 
 def login(auth_session, app_session, api_url, email, password):
     """ Login as email. On success, store the JWT token and organization uuid in
@@ -9,22 +20,15 @@ def login(auth_session, app_session, api_url, email, password):
 
     TODO if the user is a member of more than one organization, raises an error.
     """
-    auth = auth_session.post(f"{api_url}/users/auth",
-                            json={
-                                'email': email,
-                                'password': password
-                            })
-    auth_json = auth.json()
-    logger.debug(auth_json)
-    auth.raise_for_status()
+    auth_json = _call_api(auth_session, f"{api_url}/users/auth", "post", {
+        'email': email,
+        'password': password
+    })
 
     app_session.headers['Authorization'] = f"Bearer {auth_json['token']}"
     auth_session.headers['Authorization'] = f"Bearer {auth_json['token']}"
 
-    orgs = auth_session.get(f"{api_url}/users/{auth_json['uuid']}/organizations")
-    orgs_json = orgs.json()
-    logger.debug(orgs_json)
-    orgs.raise_for_status()
+    orgs_json = _call_api(auth_session, f"{api_url}/users/{auth_json['uuid']}/organizations")
 
     if len(orgs_json) != 1:
         raise ValueError("User is either not a member of an organization, or a member of many!")
@@ -34,31 +38,56 @@ def login(auth_session, app_session, api_url, email, password):
 
 def create_workflow(app_session, app_url, create_workflow_data):
     """ Create a new Workflow. Returns workflow UUID. """
-    workflow = app_session.post(
+    workflow_json = _call_api(
+        app_session,
         f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows",
-        json={
+        'post',
+        {
             "name": create_workflow_data["name"],
             "description": create_workflow_data["description"],
         }
     )
-    workflow_json = workflow.json()
-    logger.debug(workflow_json)
-    workflow.raise_for_status()
 
     return workflow_json["uuid"]
 
 
 def update_workflow(app_session, app_url, uuid, create_workflow_data):
     """ Update a Workflow. Returns workflow UUID. """
-    workflow = app_session.put(
+    _call_api(
+        app_session,
         f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}",
-        json={
+        'put',
+        {
             "name": create_workflow_data["name"],
             "description": create_workflow_data["description"],
         }
     )
-    workflow_json = workflow.json()
-    logger.debug(workflow_json)
-    workflow.raise_for_status()
 
-    return workflow_json["uuid"]
+    workflow_pipelines = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+    )
+
+    # TODO compare the sets.
+
+    # Create a workflow pipeline in the workflow if it doesn't already exist:
+    for pipeline in create_workflow_data['pipelines']:
+        if pipeline['uuid'] not in [wp['pipeline_uuid'] for wp in workflow_pipelines]:
+            request_json = {
+                'pipeline_uuid': pipeline['uuid'],
+                # 'source_workflow_pipelines': pipeline.get('dependencies', []),
+                'source_workflow_pipelines': [],
+                'destination_workflow_pipelines': [],
+            }
+            workflow_pipelines = _call_api(
+                app_session,
+                f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines",
+                'post',
+                request_json
+            )
+
+    # TODO remove workflow pipelines when relationships are gone.
+
+    # TODO Update the workflow pipeline relationships
+
+    return uuid
