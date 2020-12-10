@@ -1,6 +1,7 @@
 import logging
 
 from flask import Blueprint, jsonify, request, current_app
+from marshmallow.exceptions import ValidationError
 from requests import HTTPError
 
 from app.utils import validate_organization, any_application_required
@@ -336,6 +337,8 @@ def workflow_pipeline_create(organization_uuid, organization_workflow_uuid):
         return {"message": http_error.args[0]}, 503
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
+    except ValidationError as validation_err:
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
 
 
 @organization_workflow_bp.route(
@@ -343,7 +346,7 @@ def workflow_pipeline_create(organization_uuid, organization_workflow_uuid):
     methods=["GET"],
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def workflow_pipelines(organization_uuid, organization_workflow_uuid):
     """Get Organization Workflow Pipelines.
     ---
@@ -519,6 +522,8 @@ def workflow_pipeline_update(
         return {"message": http_error.args[0]}, 503
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
+    except ValidationError as validation_err:
+        return {"message": "Validation error", "errors": validation_err.messages}, 400
 
 
 @organization_workflow_bp.route(
