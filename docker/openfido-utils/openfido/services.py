@@ -36,6 +36,29 @@ def login(auth_session, app_session, api_url, email, password):
     app_session.headers['X-Organization'] = orgs_json[0]["uuid"]
 
 
+def view_workflow(app_session, app_url, uuid):
+    workflow_json = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}",
+    )
+    workflow_pipelines = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+    )
+
+    print(f"Name: {workflow_json['name']}")
+    print(f"ID: {workflow_json['uuid']}")
+    print()
+    print("Pipelines:")
+    for wp in workflow_pipelines:
+        workflow_pipeline = _call_api(
+            app_session,
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines/{wp['uuid']}"
+        )
+        print(f"ID: {wp['uuid']}")
+        print("Dependencies:")
+
+
 def create_workflow(app_session, app_url, create_workflow_data):
     """ Create a new Workflow. Returns workflow UUID. """
     workflow_json = _call_api(
@@ -47,6 +70,8 @@ def create_workflow(app_session, app_url, create_workflow_data):
             "description": create_workflow_data["description"],
         }
     )
+
+    # TODO fixup update_workflow logic here.
 
     return workflow_json["uuid"]
 
