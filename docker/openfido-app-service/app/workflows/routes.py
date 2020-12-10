@@ -88,7 +88,7 @@ def create(organization_uuid):
 
 @organization_workflow_bp.route("/<organization_uuid>/workflows", methods=["GET"])
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def workflows(organization_uuid):
     """Get Organization Workflows.
     ---
@@ -404,7 +404,7 @@ def workflow_pipelines(organization_uuid, organization_workflow_uuid):
     methods=["GET"],
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def workflow_pipeline(
     organization_uuid, organization_workflow_uuid, organization_workflow_pipeline_uuid
 ):

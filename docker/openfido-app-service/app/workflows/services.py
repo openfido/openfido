@@ -347,6 +347,9 @@ def fetch_workflow_pipeline(
 
     organization_workflow = organization_workflow_pipeline.organization_workflow
 
+    if not organization_workflow:
+        raise ValueError("Organization Workflow not found.")
+
     w_uuid = organization_workflow.workflow_uuid
     wp_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
 
