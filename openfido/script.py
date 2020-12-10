@@ -38,6 +38,11 @@ def main():
         description='Create and monitory workflows.')
     workflow_subparsers = workflow_parser.add_subparsers(help='workflow commands', dest='subcommand')
 
+    view_workflow_parser = workflow_subparsers.add_parser(
+        'view', help='View a Workflow',
+        description='View a Workflow.')
+    view_workflow_parser.add_argument('uuid', type=str, help="Workflow UUID")
+
     create_workflow_parser = workflow_subparsers.add_parser(
         'create', help='Create a Workflow',
         description='Create a new Workflow.')
@@ -64,20 +69,19 @@ def main():
     auth_session = requests.Session()
     auth_session.headers['Workflow-API-Key'] = args.app_key
 
+    services.login(auth_session, app_session, args.auth_service, args.email, args.password)
+
     if args.command == 'workflow':
-        if args.subcommand in ['create', 'update']:
+        if args.subcommand == 'view':
+            return services.view_workflow(app_session, args.app_service, args.uuid)
+        if args.subcommand == 'create':
             json_data = json.load(args.json_file)
-            logger.debug("json_file:")
-            logger.debug(json_data)
-
             create_workflow_data = schemas.CreateWorkflowSchema().load(json_data)
-
-            services.login(auth_session, app_session, args.auth_service, args.email, args.password)
-
-            if args.subcommand == 'create':
-                return services.create_workflow(app_session, args.app_service, create_workflow_data)
-            elif args.subcommand == 'update':
-                return services.update_workflow(app_session, args.app_service, args.uuid, create_workflow_data)
+            return services.create_workflow(app_session, args.app_service, create_workflow_data)
+        elif args.subcommand == 'update':
+            json_data = json.load(args.json_file)
+            create_workflow_data = schemas.CreateWorkflowSchema().load(json_data)
+            return services.update_workflow(app_session, args.app_service, args.uuid, create_workflow_data)
 
     print('Unknown command or subcommand supplied. See --help for usage.')
     sys.exit(posix.EX_USAGE)
