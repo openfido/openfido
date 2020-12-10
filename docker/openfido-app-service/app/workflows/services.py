@@ -24,6 +24,8 @@ from app.workflows.queries import (
     find_organization_workflow_pipelines,
 )
 
+from .schemas import CreateWorkflowPipelineSchema
+
 
 def create_workflow(organization_uuid, request_json):
     """ Create a new workflow associated with an organization. """
@@ -191,6 +193,8 @@ def create_workflow_pipeline(
 ):
     """Creates an Organization Workflow Pipeline."""
 
+    data = CreateWorkflowPipelineSchema().load(request_json)
+
     organization_workflow = find_organization_workflow(
         organization_uuid, organization_workflow_uuid
     )
@@ -199,7 +203,7 @@ def create_workflow_pipeline(
         raise ValueError("Organization Workflow not found.")
 
     org_pipeline = find_organization_pipeline(
-        organization_uuid, request_json.get("pipeline_uuid")
+        organization_uuid, data.get("pipeline_uuid")
     )
 
     if not org_pipeline:
@@ -215,13 +219,17 @@ def create_workflow_pipeline(
     }
 
     # org workflow pipelines
-    src_org_workflow_pipelines = request_json.get("source_workflow_pipelines", [])
-    dest_org_workflow_pipelines = request_json.get("destination_workflow_pipelines", [])
+    src_org_workflow_pipelines = data.get("source_workflow_pipelines", [])
+    dest_org_workflow_pipelines = data.get("destination_workflow_pipelines", [])
 
     # workflow pipelines
+    if len(set(src_org_workflow_pipelines) - set(org_workflow_pipelines)) > 0:
+        raise ValueError("Invalid UUIDs provided to source_workflow_pipelines")
     src_workflow_pipelines = [
         org_workflow_pipelines[sp_uuid] for sp_uuid in src_org_workflow_pipelines
     ]
+    if len(set(dest_org_workflow_pipelines) - set(org_workflow_pipelines)) > 0:
+        raise ValueError("Invalid UUIDs provided to destination_workflow_pipelines")
     dest_workflow_pipelines = [
         org_workflow_pipelines[dp_uuid] for dp_uuid in dest_org_workflow_pipelines
     ]
@@ -235,7 +243,7 @@ def create_workflow_pipeline(
         json={
             "pipeline_uuid": org_pipeline.pipeline_uuid,
             "source_workflow_pipelines": src_workflow_pipelines,
-            "dest_workflow_pipelines": dest_workflow_pipelines,
+            "destination_workflow_pipelines": dest_workflow_pipelines,
         },
     )
 
@@ -384,6 +392,8 @@ def update_workflow_pipeline(
 ):
     """Updates an Organization Workflow Pipeline. """
 
+    data = CreateWorkflowPipelineSchema().load(request_json)
+
     organization_workflow = find_organization_workflow(
         organization_uuid, organization_workflow_uuid
     )
@@ -392,7 +402,7 @@ def update_workflow_pipeline(
         raise ValueError("Organization Workflow not found.")
 
     org_pipeline = find_organization_pipeline(
-        organization_uuid, request_json.get("pipeline_uuid")
+        organization_uuid, data.get("pipeline_uuid")
     )
 
     if not org_pipeline:
@@ -412,8 +422,8 @@ def update_workflow_pipeline(
         raise ValueError("Organization Workflow Pipeline not found.")
 
     # org workflow pipelines
-    src_org_workflow_pipelines = request_json.get("source_workflow_pipelines", [])
-    dest_org_workflow_pipelines = request_json.get("destination_workflow_pipelines", [])
+    src_org_workflow_pipelines = data.get("source_workflow_pipelines", [])
+    dest_org_workflow_pipelines = data.get("destination_workflow_pipelines", [])
 
     # workflow pipelines
     src_workflow_pipelines = [
