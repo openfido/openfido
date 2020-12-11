@@ -57,14 +57,14 @@ def test_create_workflow_pipeline(
         headers={ROLES_KEY: client_application.api_key},
     )
     assert result.status_code == 200
-    workflow_pipeline = find_workflow_pipeline(result.json["uuid"])
+    result_wp = find_workflow_pipeline(result.json["uuid"])
     assert result.json == {
-        "uuid": workflow_pipeline.uuid,
+        "uuid": result_wp.uuid,
         "pipeline_uuid": pipeline.uuid,
         "source_workflow_pipelines": [workflow_pipeline.uuid],
         "destination_workflow_pipelines": [another_workflow_pipeline.uuid],
-        "created_at": to_iso8601(workflow_pipeline.created_at),
-        "updated_at": to_iso8601(workflow_pipeline.updated_at),
+        "created_at": to_iso8601(result_wp.created_at),
+        "updated_at": to_iso8601(result_wp.updated_at),
     }
 
 

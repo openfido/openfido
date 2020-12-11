@@ -96,7 +96,6 @@ def test_delete_workflow_pipeline_with_associations(app, workflow, workflow_pipe
     assert pipeline_with_dest.is_deleted
     assert find_workflow_pipeline(the_uuid) is None
     assert workflow_pipeline.source_workflow_pipelines == []
-    assert workflow.workflow_pipelines == [workflow_pipeline]
 
 
 def test_delete_workflow_pipeline_via_delete_workflow(app, workflow, workflow_pipeline):
