@@ -22,19 +22,25 @@ from app.workflows.models import (
     OrganizationWorkflow,
     OrganizationWorkflowPipeline,
     OrganizationWorkflowPipelineRun,
+    OrganizationWorkflowRun,
     db,
 )
 from app.utils import ApplicationsEnum
 from application_roles.services import create_application
 
 ORGANIZATION_UUID = "4d96f0b6fe9a4872813b3fac7a675505"
+ORGANIZATION_WORKFLOW_UUID = "5626c02f0a964aecb2e254a189c8c0ad"
 ORGANIZATION_WORKFLOW_PIPELINE_UUID = "d2830dff5d164b1fa5448ef041def206"
+ORGANIZATION_WORKFLOW_RUN_UUID = "a445d6723e0a4b8e8829bda8b6b794d2"
+ORGANIZATION_WORKFLOW_PIPELINE_RUN_UUID = "a445d6723e0a4b8e8829bda8b6b794d2"
 PIPELINE_UUID = "0" * 32
 PIPELINE_RUN_UUID = "d6c42c749a1643aba0217c02e177625f"
 PIPELINE_RUN_INPUT_FILE_UUID = "1a393d3d847d41b4bbf006738bb576c5"
 WORKFLOW_UUID = "da9917748b2f4d71bc82426579b7565c"
 WORKFLOW_PIPELINE_UUID = "85ca9cdcfc6645d3a2e41fac10061bff"
 WORKFLOW_PIPELINE_RESPONSE_UUID = "943a00bfb92c4d0ea65ccc8d12f372b2"
+WORKFLOW_RUN_UUID = "2ede53ecee824b3baf09f38f14867412"
+WORKFLOW_PIPELINE_RUN_UUID = "c33103fa663f43a1bd8789031f7123e6"
 USER_UUID = "ded3f053-d25e-4873-8e38-7fbf9c38"
 JWT_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZGVkM2YwNTMtZDI1ZS00ODczLThlMzgtN2ZiZjljMzgiLCJleHAiOjE2MDMyOTQ3MzYsIm1heC1leHAiOjE2MDU3MTM5MzYsImlzcyI6ImFwcCIsImlhdCI6MTYwMjA4NTEzNn0.YRVky4oynBJRF6XhchCvDzeEqUOxAaki-xPTnXmAd3Y"
 
@@ -86,7 +92,9 @@ def organization_pipeline(app):
 @pytest.fixture
 def organization_workflow(app):
     ow = OrganizationWorkflow(
-        organization_uuid=ORGANIZATION_UUID, workflow_uuid=WORKFLOW_UUID
+        organization_uuid=ORGANIZATION_UUID,
+        workflow_uuid=WORKFLOW_UUID,
+        uuid=ORGANIZATION_WORKFLOW_UUID,
     )
     db.session.add(ow)
     db.session.commit()
@@ -139,6 +147,37 @@ def organization_workflow_pipeline(app, organization_pipeline, organization_work
     db.session.commit()
 
     return ow_pipeline
+
+
+@pytest.fixture
+def organization_workflow_run(app, organization_pipeline, organization_workflow):
+    owr = OrganizationWorkflowRun(
+        uuid=ORGANIZATION_WORKFLOW_RUN_UUID,
+        organization_workflow_uuid=ORGANIZATION_WORKFLOW_UUID,
+        workflow_run_uuid=WORKFLOW_RUN_UUID,
+    )
+    db.session.add(owr)
+    db.session.commit()
+
+    return owr
+
+
+@pytest.fixture
+def organization_workflow_pipeline_run(
+    app, organization_workflow, organization_pipeline_run, organization_workflow_run
+):
+    owpr = OrganizationWorkflowPipelineRun(
+        uuid=ORGANIZATION_WORKFLOW_PIPELINE_RUN_UUID,
+        organization_workflow_id=organization_workflow.id,
+        organization_pipeline_run_id=organization_pipeline_run.id,
+        organization_workflow_run_id=organization_workflow_run.id,
+        workflow_run_uuid=WORKFLOW_RUN_UUID,
+    )
+
+    db.session.add(owpr)
+    db.session.commit()
+
+    return owpr
 
 
 @pytest.fixture

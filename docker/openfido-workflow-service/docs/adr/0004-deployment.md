@@ -34,3 +34,5 @@ docker-compose locally builds images by explicitly passing the private key -
 which is different than the Buildkit `--ssh` option (potentially less secure).
 When Buildkit is supported more fully we should update our local dev
 instructions.
+
+See [openfido terraform docs](https://github.com/slacgismo/openfido/blob/master/terraform/provisioning.md).

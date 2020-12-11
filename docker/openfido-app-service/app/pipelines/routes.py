@@ -12,6 +12,7 @@ from .services import (
     create_pipeline,
     create_pipeline_input_file,
     create_pipeline_run,
+    delete_artifact_chart,
     delete_pipeline,
     fetch_artifact_charts,
     fetch_pipeline_run,
@@ -19,6 +20,7 @@ from .services import (
     fetch_pipeline_runs,
     fetch_pipeline,
     fetch_pipelines,
+    update_artifact_chart,
     update_pipeline,
 )
 
@@ -774,6 +776,139 @@ def get_charts(
 
     try:
         return jsonify(fetch_artifact_charts(organization_pipeline_run))
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/charts/<artifact_chart_uuid>",
+    methods=["PUT"],
+)
+@any_application_required
+@validate_organization(False)
+def update_chart(
+    organization_uuid,
+    organization_pipeline_uuid,
+    organization_pipeline_run_uuid,
+    artifact_chart_uuid,
+):
+    """Updates Artifact Chart
+    ---
+    tags:
+      - pipeline run charts
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Updated Chart"
+        content:
+          application/json:
+            type: object
+              properties:
+                uuid:
+                  type: string
+                name:
+                  type: string
+                chart_type_code:
+                  type: string
+                artifact:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                    name:
+                      type: string
+                    url:
+                      type: string
+                chart_config:
+                  type: object
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+      "400":
+        description: "Bad request"
+      "503":
+        description: "Http error"
+    """
+
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+
+    organization_pipeline_run = find_organization_pipeline_run(
+        organization_pipeline.id, organization_pipeline_run_uuid
+    )
+
+    if not organization_pipeline_run:
+        return {"message": "No such pipeline run found"}, 400
+
+    try:
+        return jsonify(
+            update_artifact_chart(
+                organization_pipeline_run, artifact_chart_uuid, chart_json=request.json
+            )
+        )
+    except ValueError as value_error:
+        return jsonify(value_error.args[0]), 400
+    except HTTPError as http_error:
+        return {"message": http_error.args[0]}, 503
+
+
+@organization_pipeline_bp.route(
+    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/charts/<artifact_chart_uuid>",
+    methods=["DELETE"],
+)
+@any_application_required
+@validate_organization(False)
+def delete_chart(
+    organization_uuid,
+    organization_pipeline_uuid,
+    organization_pipeline_run_uuid,
+    artifact_chart_uuid,
+):
+    """Deletes an Artifact Chart
+    ---
+    tags:
+      - pipeline runs chart
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type REACT_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Deleted ArtifactChart"
+      "400":
+        description: "Bad request"
+    """
+    organization_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not organization_pipeline:
+        return {"message": "No such pipeline found"}, 400
+
+    organization_pipeline_run = find_organization_pipeline_run(
+        organization_pipeline.id, organization_pipeline_run_uuid
+    )
+
+    if not organization_pipeline_run:
+        return {"message": "No such pipeline run found"}, 400
+
+    try:
+        delete_artifact_chart(organization_pipeline_run, artifact_chart_uuid)
+
+        return {}, 200
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:

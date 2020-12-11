@@ -10,6 +10,7 @@ pylint-flask-sqlalchemy = "*"
 invoke = "*"
 pytest = "*"
 pytest-cov = "*"
+responses = "*"
 
 [packages]
 flask = "*"
@@ -23,6 +24,8 @@ pylint-flask-sqlalchemy = "*"
 invoke = "*"
 black = "*"
 regex = "*"
+requests = "*"
+marshmallow = "*"
 
 [requires]
 python_version = "3.8"

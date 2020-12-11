@@ -84,6 +84,21 @@ def test_delete_workflow_pipeline(app, workflow, workflow_pipeline):
     assert find_workflow_pipeline(the_uuid) is None
 
 
+def test_delete_workflow_pipeline_with_associations(app, workflow, workflow_pipeline):
+    pipeline_with_dest = services.create_workflow_pipeline(
+        workflow_pipeline.workflow.uuid,
+        _create_workflow_pipeline_json(
+            workflow_pipeline.pipeline, [], [workflow_pipeline.uuid]
+        ),
+    )
+    the_uuid = pipeline_with_dest.uuid
+    services.delete_workflow_pipeline(workflow.uuid, pipeline_with_dest.uuid)
+    assert pipeline_with_dest.is_deleted
+    assert find_workflow_pipeline(the_uuid) is None
+    assert workflow_pipeline.source_workflow_pipelines == []
+    assert workflow.workflow_pipelines == [workflow_pipeline]
+
+
 def test_delete_workflow_pipeline_via_delete_workflow(app, workflow, workflow_pipeline):
     services.delete_workflow(workflow.uuid)
     assert find_workflow_pipeline(workflow_pipeline.uuid) is None

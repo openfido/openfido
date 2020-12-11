@@ -14,7 +14,7 @@ To run this image directly, use the following command:
       -p 127.0.0.1:5003:5003 \
       -p 127.0.0.1:9000:9000 \
       -p 127.0.0.1:3000:3000 \
-      zne17nct/openfido
+      openfido/openfido
 
 The system will take a few minutes to bring up the underlying services and seed
 the initial system databases.
@@ -34,7 +34,6 @@ To build the image yourself, issue the following command:
     # access (to access other openslac private repositories)
     docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido/openfido .
 
-
 Development
 -----------
 
@@ -43,6 +42,40 @@ This project can be used for local development for the entire project.
 TODO We need to setup a docker-compose.yml that is similar to the
 openfido-app-service project's and include the openfido-utils project as a git
 subtree.
+
+    export DOCKER_BUILDKIT=1
+    export COMPOSE_DOCKER_CLI_BUILD=1
+
+    touch .worker-env
+    touch openfido-auth-service/.env
+
+    # Build the docker image, using the SSH private key you use for github
+    # access (to access other openslac private repositories)
+    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
+
+    # Initialize all the databases for all the services:
+    docker-compose run --rm auth-service flask db upgrade
+    docker-compose run --rm workflow-service flask db upgrade 
+    docker-compose run --rm app-service flask db upgrade
+
+    # Configure the workflow service access tokens:
+    docker-compose run --rm workflow-service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
+    docker-compose run --rm workflow-service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .workflow-env
+
+    # Obtain the React application key.
+    # COPY this to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable:
+    docker-compose run --rm app-service invoke create-application-key -n "react client" -p REACT_CLIENT
+
+    # Create an super admin user:
+    docker-compose run --rm auth-service flask shell
+    from app import models, services
+    u = services.create_user('admin@example.com', '1234567890', 'admin', 'user')
+    u.is_system_admin = True
+    models.db.session.commit()
+
+    # bring up all the services!
+    docker-compose up
+
 
 Git Subtree
 -----------
