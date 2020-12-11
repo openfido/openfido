@@ -531,7 +531,7 @@ def workflow_pipeline_update(
     methods=["DELETE"],
 )
 @any_application_required
-@validate_organization()
+@validate_organization(False)
 def workflow_pipeline_delete(
     organization_uuid, organization_workflow_uuid, organization_workflow_pipeline_uuid
 ):
