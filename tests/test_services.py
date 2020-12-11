@@ -25,6 +25,13 @@ LINE = {
 
 
 def _test_empty(method, session, extra_param=''):
+    workflow_json = {
+        "created_at": "2020-12-10T16:39:01.189231",
+        "description": EMPTY["description"],
+        "name": EMPTY["name"],
+        "updated_at": "2020-12-10T16:39:30.324064",
+        "uuid": "workflow-1"
+    }
     responses.add(
         method,
         f"http://app-api/v1/organizations/organization-1/workflows{extra_param}",
@@ -34,34 +41,41 @@ def _test_empty(method, session, extra_param=''):
                 "description": EMPTY["description"],
             })
         ],
-        json={
-            "created_at": "2020-12-10T16:39:01.189231",
-            "description": EMPTY["description"],
-            "name": EMPTY["name"],
-            "updated_at": "2020-12-10T16:39:30.324064",
-            "uuid": "workflow-1"
-        },
+        json=workflow_json,
     )
     responses.add(
         responses.GET,
         f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines",
         json=[],
     )
+    # view the results:
+    responses.add(
+        responses.GET,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
+        json=workflow_json,
+    )
 
 
 @responses.activate
 def test_create_workflow_empty(session):
     _test_empty(responses.POST, session)
-    assert services.create_workflow(session, 'http://app-api', EMPTY) == 'workflow-1'
+    services.create_workflow(session, 'http://app-api', EMPTY)
 
 
 @responses.activate
 def test_update_workflow_empty(session):
     _test_empty(responses.PUT, session, '/workflow-1')
-    assert services.update_workflow(session, 'http://app-api', 'workflow-1', EMPTY) == 'workflow-1'
+    services.update_workflow(session, 'http://app-api', 'workflow-1', EMPTY)
 
 
 def _test_line(method, session, extra_param=''):
+    workflow_json = {
+        "created_at": "2020-12-10T16:39:01.189231",
+        "description": LINE["description"],
+        "name": LINE["name"],
+        "updated_at": "2020-12-10T16:39:30.324064",
+        "uuid": "workflow-1"
+    }
     responses.add(
         method,
         f"http://app-api/v1/organizations/organization-1/workflows{extra_param}",
@@ -71,13 +85,7 @@ def _test_line(method, session, extra_param=''):
                 "description": LINE["description"],
             })
         ],
-        json={
-            "created_at": "2020-12-10T16:39:01.189231",
-            "description": LINE["description"],
-            "name": LINE["name"],
-            "updated_at": "2020-12-10T16:39:30.324064",
-            "uuid": "workflow-1"
-        },
+        json=workflow_json,
     )
     responses.add(
         responses.GET,
@@ -112,28 +120,60 @@ def _test_line(method, session, extra_param=''):
                 })
             ],
         )
-        responses.add(
-            responses.PUT,
-            f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{pipeline['uuid']}",
-            json={},
-            match=[
-                responses.json_params_matcher({
-                    'pipeline_uuid': pipeline['uuid'],
-                    'source_workflow_pipelines': [f"workflow-{p}" for p in pipeline.get('dependencies', [])],
-                    'destination_workflow_pipelines': [],
-                })
-            ],
-        )
+
+    responses.add(
+        responses.PUT,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{LINE['pipelines'][0]['uuid']}",
+        json={},
+        match=[
+            responses.json_params_matcher({
+                'pipeline_uuid': LINE['pipelines'][0]['uuid'],
+                'source_workflow_pipelines': [],
+                'destination_workflow_pipelines': [f"workflow-{LINE['pipelines'][1]['uuid']}"],
+            })
+        ],
+    )
+    responses.add(
+        responses.PUT,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{LINE['pipelines'][1]['uuid']}",
+        json={},
+        match=[
+            responses.json_params_matcher({
+                'pipeline_uuid': LINE['pipelines'][1]['uuid'],
+                'source_workflow_pipelines': [f"workflow-{LINE['pipelines'][0]['uuid']}"],
+                'destination_workflow_pipelines': [],
+            })
+        ],
+    )
+    # view the results:
+    responses.add(
+        responses.GET,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1",
+        json=workflow_json,
+    )
+    responses.add(
+        responses.GET,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{LINE['pipelines'][0]['uuid']}",
+        json={
+            "source_workflow_pipelines": [],
+        },
+    )
+    responses.add(
+        responses.GET,
+        f"http://app-api/v1/organizations/organization-1/workflows/workflow-1/pipelines/workflow-{LINE['pipelines'][1]['uuid']}",
+        json={
+            "source_workflow_pipelines": [],
+        },
+    )
 
 
 @responses.activate
 def test_create_workflow_line(session):
     _test_line(responses.POST, session)
+    services.create_workflow(session, 'http://app-api', LINE)
 
-    assert services.create_workflow(session, 'http://app-api', LINE) == 'workflow-1'
 
 @responses.activate
 def test_update_workflow_line(session):
     _test_line(responses.PUT, session, '/workflow-1')
-
-    assert services.update_workflow(session, 'http://app-api', 'workflow-1', LINE) == 'workflow-1'
+    services.update_workflow(session, 'http://app-api', 'workflow-1', LINE)
