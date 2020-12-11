@@ -1251,3 +1251,248 @@ def test_get_charts(
             "updated_at": chart.updated_at.isoformat(),
         }
     ]
+
+
+@responses.activate
+def test_update_chart_errors(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    org_pipeline_uuid = organization_pipeline.uuid
+    org_pipeline_run_uuid = organization_pipeline_run.uuid
+    artifact_chart_uuid = chart.uuid
+
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/1234/runs/{org_pipeline_run_uuid}/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/1234/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/{org_pipeline_run_uuid}/charts/1234",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.update_artifact_chart")
+@responses.activate
+def test_update_chart_error_503(
+    mock_update,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_update.side_effect = HTTPError("an error")
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts/1234",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_update_chart(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    org_pipeline_uuid = organization_pipeline.uuid
+    org_pipeline_run_uuid = organization_pipeline_run.uuid
+    artifact_chart_uuid = chart.uuid
+
+    updated_name = "updated_name"
+    result = client.put(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/{org_pipeline_run_uuid}/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+        json={
+            "name": updated_name,
+        },
+    )
+
+    assert result.status_code == 200
+    assert result.json == {
+        "uuid": chart.uuid,
+        "name": updated_name,
+        "artifact": FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0],
+        "chart_type_code": chart.chart_type_code,
+        "chart_config": chart.chart_config,
+        "created_at": chart.created_at.isoformat(),
+        "updated_at": chart.updated_at.isoformat(),
+    }
+
+
+@responses.activate
+def test_delete_chart_errors(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+
+    db.session.commit()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    artifact_chart_uuid = chart.uuid
+    org_pipeline_uuid = organization_pipeline.uuid
+    org_pipeline_run_uuid = organization_pipeline_run.uuid
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/1234/runs/{org_pipeline_run_uuid}/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/1234/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/{org_pipeline_run_uuid}/charts/1234",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 400
+
+
+@patch("app.pipelines.routes.delete_artifact_chart")
+@responses.activate
+def test_delete_chart_error_503(
+    mock_update,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    mock_update.side_effect = HTTPError("an error")
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}/charts/1234",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 503
+
+
+@responses.activate
+def test_delete_chart(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+    artifact_uuid = FINISHED_PIPELINE_RUN_RESPONSE_JSON["artifacts"][0]["uuid"]
+
+    chart = ArtifactChart(
+        name="a chart",
+        artifact_uuid=artifact_uuid,
+        chart_type_code="ACODE",
+        chart_config="{}",
+    )
+    organization_pipeline_run.artifact_charts.append(chart)
+    db.session.commit()
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+        json=FINISHED_PIPELINE_RUN_RESPONSE_JSON,
+    )
+
+    org_pipeline_uuid = organization_pipeline.uuid
+    org_pipeline_run_uuid = organization_pipeline_run.uuid
+    artifact_chart_uuid = chart.uuid
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{org_pipeline_uuid}/runs/{org_pipeline_run_uuid}/charts/{artifact_chart_uuid}",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    deleted_chart = ArtifactChart.query.get(chart.id)
+
+    assert result.status_code == 200
+    assert deleted_chart.is_deleted is True

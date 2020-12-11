@@ -366,6 +366,50 @@ def create_artifact_chart(organization_pipeline_run, chart_json):
     return _serialize_artifact_chart(chart, artifact)
 
 
+def update_artifact_chart(
+    organization_pipeline_run, artifact_chart_uuid, chart_json={}
+):
+    """Update an ArtifactChart associated with an OrganizationPipelineRun."""
+
+    target_chart = None
+
+    for chart in organization_pipeline_run.artifact_charts:
+        if chart.uuid == artifact_chart_uuid:
+            target_chart = chart
+            break
+
+    if not target_chart:
+        raise ValueError("Unable to find chart")
+
+    # fall back for empty name.
+    name = chart_json.get("name", target_chart.name)
+
+    target_chart.name = name
+    db.session.commit()
+
+    artifact = _fetch_artifact(organization_pipeline_run, target_chart.artifact_uuid)
+
+    return _serialize_artifact_chart(target_chart, artifact)
+
+
+def delete_artifact_chart(organization_pipeline_run, artifact_chart_uuid):
+    """Delete an ArtifactChart associated with an OrganizationPipelineRun."""
+
+    target_chart = None
+
+    for chart in organization_pipeline_run.artifact_charts:
+        if chart.uuid == artifact_chart_uuid:
+            target_chart = chart
+            break
+
+    if not target_chart:
+        raise ValueError("Unable to find chart")
+
+    target_chart.is_deleted = True
+
+    db.session.commit()
+
+
 def fetch_artifact_charts(organization_pipeline_run):
     """Fetch all ArtifactChart records associatedwith an OrganizationPipelineRun.
 
@@ -373,6 +417,10 @@ def fetch_artifact_charts(organization_pipeline_run):
     """
     results = []
     for chart in organization_pipeline_run.artifact_charts:
+        # skip deleted charts
+        if chart.is_deleted:
+            continue
+
         artifact = _fetch_artifact(organization_pipeline_run, chart.artifact_uuid)
         results.append(_serialize_artifact_chart(chart, artifact))
     return results
