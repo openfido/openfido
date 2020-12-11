@@ -29,8 +29,8 @@ class OrganizationWorkflowPipeline(CommonColumnsMixin, db.Model):
 
     organization_workflow = db.relationship(
         OrganizationWorkflow,
-        backref=db.backref("organization_workflow_pipeline"),
-        primaryjoin="remote(OrganizationWorkflow.id) == foreign(OrganizationWorkflowPipeline.id)",
+        backref=db.backref("organization_workflow_pipelines"),
+        primaryjoin="remote(OrganizationWorkflow.uuid) == foreign(OrganizationWorkflowPipeline.organization_workflow_uuid)",
     )
 
 
