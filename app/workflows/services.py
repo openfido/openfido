@@ -315,12 +315,14 @@ def fetch_workflow_pipelines(organization_uuid, organization_workflow_uuid):
         }
 
         wp_to_owp = {
-            owp.workflow_pipeline_uuid: owp for owp in organization_workflow.organization_workflow_pipelines
+            owp.workflow_pipeline_uuid: owp
+            for owp in organization_workflow.organization_workflow_pipelines
         }
 
         for workflow_pipeline in json_value:
             workflow_pipeline = _workflow_pipeline_to_org_wp(
-                workflow_pipeline, wp_to_owp[workflow_pipeline["uuid"]])
+                workflow_pipeline, wp_to_owp[workflow_pipeline["uuid"]]
+            )
 
         return json_value
     except ValueError as value_error:
@@ -330,10 +332,12 @@ def fetch_workflow_pipelines(organization_uuid, organization_workflow_uuid):
 
 
 def _workflow_pipeline_to_org_wp(workflow_pipeline, organization_workflow_pipeline):
-    """ Convert a workflow pipeline from the the workflow server, to its
-    equivalent OrganizationWorkflowPipeline. """
+    """Convert a workflow pipeline from the the workflow server, to its
+    equivalent OrganizationWorkflowPipeline."""
     organization_workflow_pipeline_uuid = organization_workflow_pipeline.uuid
-    organization_workflow_uuid = organization_workflow_pipeline.organization_workflow.uuid
+    organization_workflow_uuid = (
+        organization_workflow_pipeline.organization_workflow.uuid
+    )
     org_pipeline = find_organization_pipeline_by_id(
         organization_workflow_pipeline.organization_pipeline_id
     )
@@ -341,17 +345,17 @@ def _workflow_pipeline_to_org_wp(workflow_pipeline, organization_workflow_pipeli
     workflow_pipeline["uuid"] = organization_workflow_pipeline_uuid
     workflow_pipeline["pipeline_uuid"] = org_pipeline.uuid
 
-    owp_to_op = {
-        organization_workflow_pipeline.uuid: org_pipeline.uuid
-    }
+    owp_to_op = {organization_workflow_pipeline.uuid: org_pipeline.uuid}
     all_wps = (
-        workflow_pipeline["source_workflow_pipelines"] +
-        workflow_pipeline["destination_workflow_pipelines"])
+        workflow_pipeline["source_workflow_pipelines"]
+        + workflow_pipeline["destination_workflow_pipelines"]
+    )
     for uuid in all_wps:
         if uuid in owp_to_op:
             continue
         owp = find_organization_workflow_pipeline_by_workflow_pipeline_uuid(
-            organization_workflow_uuid, uuid)
+            organization_workflow_uuid, uuid
+        )
         owp_to_op[uuid] = owp.uuid
 
     for key in ["source_workflow_pipelines", "destination_workflow_pipelines"]:
@@ -391,7 +395,9 @@ def fetch_workflow_pipeline(
         workflow_pipeline = response.json()
         response.raise_for_status()
 
-        return _workflow_pipeline_to_org_wp(workflow_pipeline, organization_workflow_pipeline)
+        return _workflow_pipeline_to_org_wp(
+            workflow_pipeline, organization_workflow_pipeline
+        )
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:

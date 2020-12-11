@@ -650,7 +650,7 @@ def test_update_workflow_pipeline_invalid_org_workflow(
                 "pipeline_uuid": organization_pipeline.pipeline_uuid,
                 "destination_workflow_pipelines": [],
                 "source_workflow_pipelines": [],
-            }
+            },
         )
 
 
@@ -666,7 +666,7 @@ def test_update_workflow_pipeline_invalid_org_pipeline(
                 "pipeline_uuid": organization_pipeline.pipeline_uuid,
                 "destination_workflow_pipelines": [],
                 "source_workflow_pipelines": [],
-            }
+            },
         )
 
 
