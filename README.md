@@ -122,7 +122,5 @@ following command:
     invoke create-application-key -n "local worker" -p PIPELINES_WORKER
 
 ## Deployment
-**TODO**
 
-## Provisioning
-**TODO**
+See [openfido terraform docs](https://github.com/slacgismo/openfido/blob/master/terraform/provisioning.md).
