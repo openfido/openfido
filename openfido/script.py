@@ -43,6 +43,11 @@ def main():
         description='View a Workflow.')
     view_workflow_parser.add_argument('uuid', type=str, help="Workflow UUID")
 
+    dot_workflow_parser = workflow_subparsers.add_parser(
+        'dot', help='Graphviz dot file of a Workflow',
+        description='Graphviz dot file of a Workflow')
+    dot_workflow_parser.add_argument('uuid', type=str, help="Workflow UUID")
+
     create_workflow_parser = workflow_subparsers.add_parser(
         'create', help='Create a Workflow',
         description='Create a new Workflow.')
@@ -72,6 +77,8 @@ def main():
     services.login(auth_session, app_session, args.auth_service, args.email, args.password)
 
     if args.command == 'workflow':
+        if args.subcommand == 'dot':
+            return services.dot_workflow(app_session, args.app_service, args.uuid)
         if args.subcommand == 'view':
             return services.view_workflow(app_session, args.app_service, args.uuid)
         if args.subcommand == 'create':
