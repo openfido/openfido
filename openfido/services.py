@@ -38,6 +38,17 @@ def login(auth_session, app_session, api_url, email, password):
     app_session.headers['X-Organization'] = orgs_json[0]["uuid"]
 
 
+def list_workflows(app_session, app_url):
+    workflows_json = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows",
+    )
+    for workflow in workflows_json:
+        print(f"Name: {workflow['name']}")
+        print(f"ID: {workflow['uuid']}")
+        print()
+
+
 def dot_workflow(app_session, app_url, uuid):
     """ Create a graphviz dot file. """
     workflow_json = _call_api(
