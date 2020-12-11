@@ -1,5 +1,6 @@
 import copy
 
+from marshmallow.exceptions import ValidationError
 from unittest.mock import patch
 
 import pytest
@@ -20,6 +21,8 @@ from app.workflows.services import (
     fetch_workflow_pipeline,
     update_workflow_pipeline,
     delete_workflow_pipeline,
+    create_workflow_run,
+    fetch_workflow_run,
 )
 from application_roles.decorators import ROLES_KEY
 from requests import HTTPError
@@ -28,9 +31,19 @@ from ..conftest import (
     ORGANIZATION_UUID,
     ORGANIZATION_WORKFLOW_PIPELINE_UUID,
     PIPELINE_UUID,
+    PIPELINE_RUN_UUID,
     WORKFLOW_UUID,
     WORKFLOW_PIPELINE_UUID,
     WORKFLOW_PIPELINE_RESPONSE_UUID,
+    ORGANIZATION_WORKFLOW_RUN_UUID,
+    ORGANIZATION_WORKFLOW_PIPELINE_RUN_UUID,
+    WORKFLOW_RUN_UUID,
+    WORKFLOW_PIPELINE_RUN_UUID,
+)
+
+from ..pipelines.test_services import (
+    PIPELINE_RUN_RESPONSE_JSON,
+    PIPELINE_RUN_INPUT_FILE_JSON,
 )
 
 WORKFLOW_JSON = {
@@ -55,6 +68,65 @@ WORKFLOW_PIPELINE_RESPONSE_JSON = {
     "source_workflow_pipelines": [WORKFLOW_PIPELINE_UUID],
     "destination_workflow_pipelines": [WORKFLOW_PIPELINE_UUID],
     "uuid": WORKFLOW_PIPELINE_UUID,
+}
+WORKFLOW_PIPELINE_RUN_RESPONSE_JSON = {
+    "uuid": WORKFLOW_PIPELINE_RUN_UUID,
+    "created_at": "2020-08-05T08:15:30-05:00",
+    "status": "NOT_STARTED",
+    "workflow_pipeline_runs": [
+        {
+            "uuid": WORKFLOW_RUN_UUID,
+            "pipeline_run": {
+                "uuid": PIPELINE_RUN_UUID,
+                "sequence": 1,
+                "created_at": "2020-08-05T08:15:30-05:00",
+                "inputs": [
+                    {"uuid": "abc123", "name": "file.csv", "url": "https://myfile"},
+                    {"uuid": "abc123", "name": "file.csv", "url": "https://myfile"},
+                ],
+                "states": [
+                    {"state": "NOT_STARTED", "created_at": "2020-08-05T08:15:30-05:00"}
+                ],
+            },
+        }
+    ],
+}
+
+ORGANIZATION_WORKFLOW_RUN_RESPONSE = {
+    "uuid": "c4e16220c35547d8bb1734e443f05ef4",
+    "created_at": "2020-08-05T08:15:30-05:00",
+    "status": "NOT_STARTED",
+    "workflow_pipeline_runs": [
+        {
+            "uuid": "de24e7e32aed48719e313911509353a2",
+            "pipeline_run": {
+                "created_at": "2020-10-28T22:01:48.950370",
+                "inputs": [
+                    {
+                        "name": "00000000000000000000000000000000organization_pipeline_input_file.csv",
+                        "url": "http://somefileurl.com",
+                        "uuid": "1a393d3d847d41b4bbf006738bb576c5",
+                    }
+                ],
+                "sequence": 1,
+                "states": [
+                    {"created_at": "2020-10-28T22:01:48.951140", "state": "QUEUED"},
+                    {
+                        "created_at": "2020-10-28T22:01:48.955688",
+                        "state": "NOT_STARTED",
+                    },
+                    [{"created_at": "2020-10-28T22:02:48.955688", "state": "RUNNING"}],
+                    [
+                        {
+                            "created_at": "2020-10-28T22:03:48.955688",
+                            "state": "COMPLETED",
+                        }
+                    ],
+                ],
+                "uuid": "d6c42c749a1643aba0217c02e177625f",
+            },
+        }
+    ],
 }
 
 
@@ -300,7 +372,7 @@ def test_delete_workflow(app, organization_workflow):
 def test_create_workflow_pipeline_invalid_org_workflow(
     app, organization_workflow, organization_pipeline, organization_workflow_pipeline
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         create_workflow_pipeline(organization_workflow.organization_uuid, "1234", {})
 
 
@@ -321,14 +393,7 @@ def test_create_workflow_pipeline_invalid_org_pipeline(
 def test_create_workflow_pipeline_bad_json(
     app, organization_workflow, organization_pipeline, organization_workflow_pipeline
 ):
-    responses.add(
-        responses.POST,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}/pipelines",
-        body="notjson",
-        status=503,
-    )
-
-    with pytest.raises(HTTPError):
+    with pytest.raises(ValidationError):
         create_workflow_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
@@ -411,7 +476,9 @@ def test_create_workflow_pipeline_invalid_org_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
             {
-                "pipeline_uuid": "1234",
+                "pipeline_uuid": "1" * 32,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
             },
         )
 
@@ -579,7 +646,11 @@ def test_update_workflow_pipeline_invalid_org_workflow(
             organization_workflow.organization_uuid,
             "1234",
             organization_workflow_pipeline.uuid,
-            {},
+            {
+                "pipeline_uuid": organization_pipeline.pipeline_uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
+            }
         )
 
 
@@ -591,7 +662,11 @@ def test_update_workflow_pipeline_invalid_org_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
             organization_workflow_pipeline.uuid,
-            {"pipeline_uuid": "1234"},
+            {
+                "pipeline_uuid": organization_pipeline.pipeline_uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
+            }
         )
 
 
@@ -605,6 +680,8 @@ def test_update_workflow_pipeline_invalid_org_workflow_pipeline(
             "1234",
             {
                 "pipeline_uuid": organization_pipeline.uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
             },
         )
 
@@ -807,3 +884,218 @@ def test_delete_workflow_pipeline(
     ).first()
 
     assert ow_pipeline.is_deleted is True
+
+
+def test_create_workflow_run_invalid_org_workflow(app, organization_workflow):
+    with pytest.raises(ValueError):
+        create_workflow_run(
+            organization_workflow.organization_uuid,
+            "1234",
+            PIPELINE_RUN_INPUT_FILE_JSON,
+        )
+
+
+def test_create_workflow_run_invalid_no_pipelines(
+    app, organization_workflow, monkeypatch
+):
+    monkeypatch.setattr(OrganizationWorkflow, "organization_workflow_pipelines", [])
+
+    with pytest.raises(ValueError):
+        create_workflow_run(
+            organization_workflow.organization_uuid,
+            organization_workflow.uuid,
+            PIPELINE_RUN_INPUT_FILE_JSON,
+        )
+
+
+@responses.activate
+def test_create_workflow_run_bad_json(
+    app, organization_workflow, organization_workflow_pipeline
+):
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs",
+        body="notjson",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        create_workflow_run(
+            organization_workflow.organization_uuid,
+            organization_workflow.uuid,
+            PIPELINE_RUN_INPUT_FILE_JSON,
+        )
+
+
+@responses.activate
+def test_create_workflow_run_not_found(
+    app, organization_workflow, organization_workflow_pipeline
+):
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs",
+        json={"not": "found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        create_workflow_run(
+            organization_workflow.organization_uuid,
+            organization_workflow.uuid,
+            PIPELINE_RUN_INPUT_FILE_JSON,
+        )
+
+
+@patch("app.workflows.services.create_url")
+@patch("app.workflows.services.fetch_pipeline_run")
+@responses.activate
+def test_create_workflow_run(
+    mock_fetch_pipeline_run,
+    mock_url,
+    app,
+    organization_workflow,
+    organization_workflow_pipeline,
+    organization_pipeline_run,
+    organization_pipeline,
+    organization_pipeline_input_file,
+    organization_workflow_run,
+    organization_workflow_pipeline_run,
+):
+    mock_fetch_pipeline_run.return_value = dict(PIPELINE_RUN_RESPONSE_JSON)
+    mock_url.return_value = "http://somefileurl.com"
+
+    wf_uuid = organization_workflow.workflow_uuid
+    wf_pipeline_uuid = organization_workflow_pipeline.workflow_pipeline_uuid
+
+    responses.add(
+        responses.POST,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs",
+        json=WORKFLOW_PIPELINE_RUN_RESPONSE_JSON,
+        status=200,
+    )
+
+    new_org_workflow_run = create_workflow_run(
+        organization_workflow.organization_uuid,
+        organization_workflow.uuid,
+        PIPELINE_RUN_INPUT_FILE_JSON,
+    )
+
+    # update to use newly created uuids
+    org_wf_run_uuid = new_org_workflow_run["workflow_pipeline_runs"][0]["uuid"]
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE["uuid"] = new_org_workflow_run["uuid"]
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE["created_at"] = new_org_workflow_run[
+        "created_at"
+    ]
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE["workflow_pipeline_runs"][0][
+        "uuid"
+    ] = org_wf_run_uuid
+
+    assert new_org_workflow_run == ORGANIZATION_WORKFLOW_RUN_RESPONSE
+
+
+def test_workflow_run_invalid_org_workflow(
+    app, organization_workflow, organization_workflow_run
+):
+    with pytest.raises(ValueError):
+        fetch_workflow_run(
+            organization_workflow.organization_uuid, organization_workflow.uuid, "1234"
+        )
+
+
+@responses.activate
+def test_workflow_run_bad_json(
+    app,
+    organization_workflow,
+    organization_workflow_pipeline,
+    organization_workflow_run,
+):
+    wf_uuid = organization_workflow.workflow_uuid
+    wfr_uuid = organization_workflow_run.workflow_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs/{wfr_uuid}",
+        body="notjson",
+        status=503,
+    )
+
+    with pytest.raises(HTTPError):
+        fetch_workflow_run(
+            organization_workflow.organization_uuid,
+            organization_workflow.uuid,
+            organization_workflow_run.uuid,
+        )
+
+
+@responses.activate
+def test_workflow_run_not_found(
+    app,
+    organization_workflow,
+    organization_workflow_pipeline,
+    organization_workflow_run,
+):
+    wf_uuid = organization_workflow.workflow_uuid
+    wfr_uuid = organization_workflow_run.workflow_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs/{wfr_uuid}",
+        json={"not": "found"},
+        status=404,
+    )
+
+    with pytest.raises(ValueError):
+        fetch_workflow_run(
+            organization_workflow.organization_uuid,
+            organization_workflow.uuid,
+            organization_workflow_run.uuid,
+        )
+
+
+@patch("app.workflows.services.create_url")
+@patch("app.workflows.services.fetch_pipeline_run")
+@responses.activate
+def test_fetch_workflow_run(
+    mock_fetch_pipeline_run,
+    mock_url,
+    app,
+    organization_workflow,
+    organization_workflow_pipeline,
+    organization_pipeline_run,
+    organization_pipeline,
+    organization_pipeline_input_file,
+    organization_workflow_run,
+    organization_workflow_pipeline_run,
+):
+    mock_fetch_pipeline_run.return_value = dict(PIPELINE_RUN_RESPONSE_JSON)
+    mock_url.return_value = "http://somefileurl.com"
+
+    wf_uuid = organization_workflow.workflow_uuid
+    wfr_uuid = organization_workflow_run.workflow_run_uuid
+
+    responses.add(
+        responses.GET,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{wf_uuid}/runs/{wfr_uuid}",
+        json=WORKFLOW_PIPELINE_RUN_RESPONSE_JSON,
+        status=200,
+    )
+
+    org_workflow_run = fetch_workflow_run(
+        organization_workflow.organization_uuid,
+        organization_workflow.uuid,
+        organization_workflow_run.uuid,
+    )
+
+    org_wf_run_uuid = org_workflow_run["workflow_pipeline_runs"][0]["uuid"]
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE["uuid"] = organization_workflow_run.uuid
+    ORGANIZATION_WORKFLOW_RUN_RESPONSE["workflow_pipeline_runs"][0][
+        "uuid"
+    ] = organization_workflow_run.uuid
+
+    assert org_workflow_run == ORGANIZATION_WORKFLOW_RUN_RESPONSE

@@ -86,7 +86,7 @@ class ArtifactChart(CommonColumnsMixin, db.Model):
     __tablename__ = "artifact_chart"
 
     name = db.Column(db.String(128), nullable=False)
-
+    is_deleted = db.Column(db.Boolean(), default=False, nullable=True)
     organization_pipeline_run_id = db.Column(
         db.Integer, db.ForeignKey("organization_pipeline_run.id"), nullable=False
     )
