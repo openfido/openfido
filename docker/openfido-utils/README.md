@@ -66,9 +66,10 @@ Here is a sample of its existing commands (to aid working with workflows):
     Create and monitory workflows.
 
     positional arguments:
-      {view,dot,create,update}
+      {view,list,dot,create,update}
                             workflow commands
         view                View a Workflow
+        list                List Workflows
         dot                 Graphviz dot file of a Workflow
         create              Create a Workflow
         update              Update a Workflow
