@@ -48,7 +48,7 @@ class WorkflowPipelineSchema(Schema):
 
     def dump_sources(obj):
         """ dump the source uuids of the from uuid. """
-        return [wp.to_workflow_pipeline.uuid for wp in obj.source_workflow_pipelines]
+        return [wp.from_workflow_pipeline.uuid for wp in obj.source_workflow_pipelines]
 
     source_workflow_pipelines = fields.Function(dump_sources)
 
