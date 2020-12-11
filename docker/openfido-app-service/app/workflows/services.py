@@ -1,3 +1,4 @@
+import logging
 import requests
 
 from flask import current_app
@@ -22,9 +23,13 @@ from app.workflows.queries import (
     find_organization_workflows,
     find_organization_workflow_pipeline,
     find_organization_workflow_pipelines,
+    find_organization_workflow_pipeline_by_workflow_pipeline_uuid
 )
 
 from .schemas import CreateWorkflowPipelineSchema
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("workflows.services")
 
 
 def create_workflow(organization_uuid, request_json):
@@ -249,7 +254,6 @@ def create_workflow_pipeline(
 
     try:
         json_value = response.json()
-
         response.raise_for_status()
 
         new_org_workflow_pipeline = OrganizationWorkflowPipeline(
@@ -362,29 +366,34 @@ def fetch_workflow_pipeline(
     )
 
     try:
-        workflow = response.json()
+        workflow_pipeline = response.json()
         response.raise_for_status()
 
         org_pipeline = find_organization_pipeline_by_id(
             organization_workflow_pipeline.organization_pipeline_id
         )
 
-        org_workflow_pipelines = {
-            ow_p.workflow_pipeline_uuid: ow_p.uuid
-            for ow_p in org_pipeline.organization_workflow_pipelines
-        }
+        workflow_pipeline["uuid"] = organization_workflow_pipeline_uuid
+        workflow_pipeline["pipeline_uuid"] = org_pipeline.uuid
 
-        workflow["uuid"] = org_workflow_pipelines[workflow["uuid"]]
-        workflow["pipeline_uuid"] = org_pipeline.uuid
+        # Assign the app server's UUID for workflow_pipeline uuids.
+        fetched_wp_to_local_wp = {
+            organization_workflow_pipeline.uuid: org_pipeline.uuid
+        }
+        for uuid in workflow_pipeline["source_workflow_pipelines"] + workflow_pipeline["destination_workflow_pipelines"]:
+            if uuid in fetched_wp_to_local_wp:
+                continue
+            owp = find_organization_workflow_pipeline_by_workflow_pipeline_uuid(organization_workflow_uuid, uuid)
+            fetched_wp_to_local_wp[uuid] = owp.uuid
 
         for key in ["source_workflow_pipelines", "destination_workflow_pipelines"]:
-            workflow[key] = [org_workflow_pipelines[uuid] for uuid in workflow[key]]
+            workflow_pipeline[key] = [fetched_wp_to_local_wp[uuid] for uuid in workflow_pipeline[key]]
 
-        return workflow
+        return workflow_pipeline
     except ValueError as value_error:
         raise HTTPError("Non JSON payload returned") from value_error
     except HTTPError as http_error:
-        raise ValueError(workflow) from http_error
+        raise ValueError(workflow_pipeline) from http_error
 
 
 def update_workflow_pipeline(
@@ -429,9 +438,13 @@ def update_workflow_pipeline(
     dest_org_workflow_pipelines = data.get("destination_workflow_pipelines", [])
 
     # workflow pipelines
+    if len(set(src_org_workflow_pipelines) - set(org_workflow_pipelines)) > 0:
+        raise ValueError("Invalid UUIDs provided to source_workflow_pipelines")
     src_workflow_pipelines = [
         org_workflow_pipelines[sp_uuid] for sp_uuid in src_org_workflow_pipelines
     ]
+    if len(set(dest_org_workflow_pipelines) - set(org_workflow_pipelines)) > 0:
+        raise ValueError("Invalid UUIDs provided to destination_workflow_pipelines")
     dest_workflow_pipelines = [
         org_workflow_pipelines[dp_uuid] for dp_uuid in dest_org_workflow_pipelines
     ]
