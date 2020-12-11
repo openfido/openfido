@@ -25,7 +25,56 @@ To test this system:
 
 ## Deploying
 
-TODO build setup.py
+To build this project, and deploy it:
+
+    python setup.py install
+
+## Openfido command
+
+This project also includes a command called 'openfido'. (Use the installation
+instructions above to install it.)
+
+Here is a sample of its existing commands (to aid working with workflows):
+
+    openfido --email ... --password ... --app-key ... --help
+
+    usage: openfido [-h] [--log LOG] [--app-service APP_SERVICE] [--auth-service AUTH_SERVICE] --email EMAIL --password PASSWORD --app-key APP_KEY {workflow} ...
+
+    Interract with openFIDO services
+
+    positional arguments:
+      {workflow}            sub-command help
+        workflow            Manage Workflows
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --log LOG, -l LOG     Log level (default: WARN)
+      --app-service APP_SERVICE, -ss APP_SERVICE
+                            App API URL
+      --auth-service AUTH_SERVICE, -as AUTH_SERVICE
+                            Auth API URL
+      --email EMAIL, -e EMAIL
+                            OpenFIDO email
+      --password PASSWORD, -p PASSWORD
+                            OpenFIDO password
+      --app-key APP_KEY, -ak APP_KEY
+                            OpenFIDO App API application token
+
+
+    openfido --email ... --password ... --app-key ... workflow --help
+
+    Create and monitory workflows.
+
+    positional arguments:
+      {view,dot,create,update}
+                            workflow commands
+        view                View a Workflow
+        dot                 Graphviz dot file of a Workflow
+        create              Create a Workflow
+        update              Update a Workflow
+
+    optional arguments:
+      -h, --help            show this help message and exit
 
 ## Flask Usage
 

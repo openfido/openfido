@@ -38,6 +38,34 @@ def login(auth_session, app_session, api_url, email, password):
     app_session.headers['X-Organization'] = orgs_json[0]["uuid"]
 
 
+def dot_workflow(app_session, app_url, uuid):
+    """ Create a graphviz dot file. """
+    workflow_json = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}",
+    )
+    workflow_pipelines = _call_api(
+        app_session,
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+    )
+
+    print("digraph G {")
+    print('  labelloc="t";')
+    print(f"  label=\"{workflow_json['name']} ({workflow_json['uuid']})\";")
+    print(f"  graph[ranksep=2,splines=true];")
+
+    for wp in workflow_pipelines:
+        workflow_pipeline = _call_api(
+            app_session,
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines/{wp['uuid']}"
+        )
+        # TODO fetch name.
+        print(f"  \"{wp['uuid']}\" {{}};")
+        for source in workflow_pipeline["source_workflow_pipelines"]:
+            print(f"  \"{source}\" -> \"{wp['uuid']}\";")
+    print("}")
+
+
 def view_workflow(app_session, app_url, uuid):
     workflow_json = _call_api(
         app_session,
