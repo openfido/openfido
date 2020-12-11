@@ -1,19 +1,34 @@
-version: 2.1
-
-orbs:
-  python: circleci/python@0.2.1
-
+version: 2
 jobs:
-  build-and-test:
-    executor: python/default
+  build:
+    docker:
+      - image: python:3.8
+    environment:
+      PIPENV_VENV_IN_PROJECT: true
+    working_directory: ~/my-project
     steps:
       - checkout
-      - run: pip install -r platform/requirements.txt
-      - run: 
-          name: Test
-          command: ./platform/openfido/manage.py test
-
-workflows:
-  main:
-    jobs:
-      - build-and-test
+      - run:
+          command: |
+            apt-get update -qq
+            apt-get install -y pipenv
+            pip install virtualenv
+      - restore_cache:
+          keys:
+            - project-pipfile-{{ checksum "Pipfile.lock" }}
+      - run:
+          command: pipenv install --dev
+      - save_cache:
+          key: project-pipfile-{{ checksum "Pipfile.lock" }}
+          paths:
+            - .venv
+      - run:
+          command: |
+            mkdir test-results
+            pipenv run invoke test --junit --enforce-percent=50
+      - store_test_results:
+          path: test-results
+      - run:
+          command: pipenv run invoke style
+      - run:
+          command: pipenv run invoke lint --fail-under=8

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd /opt/minio
-source ./env
-
-/opt/minio/minio server /var/opt/minio
