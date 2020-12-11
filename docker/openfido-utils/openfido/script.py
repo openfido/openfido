@@ -20,11 +20,11 @@ def main():
         help="Log level (default: WARN)")
 
     parser.add_argument(
-        '--app-service', '-ss', default="https://api-staging.openfido.org",
+        '--app-service', '-ss', default="https://api.openfido.org",
         help="App API URL")
 
     parser.add_argument(
-        '--auth-service', '-as', default="https://auth-staging.openfido.org",
+        '--auth-service', '-as', default="https://auth.openfido.org",
         help="Auth API URL")
 
     parser.add_argument('--email', '-e', help="OpenFIDO email", required=True)
