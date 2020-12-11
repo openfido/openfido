@@ -1,5 +1,7 @@
 import logging
 
+from collections import defaultdict
+
 logger = logging.getLogger('openfido.services')
 
 def _call_api(session, url, method="get", json_data=None):
@@ -55,51 +57,79 @@ def view_workflow(app_session, app_url, uuid):
             app_session,
             f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines/{wp['uuid']}"
         )
-        print(f"ID: {wp['uuid']}")
-        print("Dependencies:")
+        # TODO fetch name.
+        print(f"ID: {wp['uuid']} ({wp['pipeline_uuid']})")
+        if len(workflow_pipeline["source_workflow_pipelines"]) > 0:
+            print("Dependencies:")
+        for source in workflow_pipeline["source_workflow_pipelines"]:
+            print(source)
 
 
-def _update_workflow_pipelines(app_session, app_url, create_workflow_data, uuid):
+def _update_workflow_pipelines(app_session, app_url, create_workflow_data, workflow_uuid):
     workflow_pipelines = _call_api(
         app_session,
-        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{workflow_uuid}/pipelines"
     )
 
-    # TODO compare the sets.
-
     # Create a workflow pipeline in the workflow if it doesn't already exist:
-    for pipeline in create_workflow_data['pipelines']:
-        if pipeline['uuid'] not in [wp['pipeline_uuid'] for wp in workflow_pipelines]:
-            _call_api(
-                app_session,
-                f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines",
-                'post',
-                {
-                    'pipeline_uuid': pipeline['uuid'],
-                    'source_workflow_pipelines': [],
-                    'destination_workflow_pipelines': [],
-                }
-            )
+    server_pipelines = {wp['pipeline_uuid'] for wp in workflow_pipelines}
+    data_pipelines = {p['uuid'] for p in create_workflow_data['pipelines']}
+    print(server_pipelines)
+    print(data_pipelines)
+    for pipeline_uuid in data_pipelines - server_pipelines:
+        _call_api(
+            app_session,
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{workflow_uuid}/pipelines",
+            'post',
+            {
+                'pipeline_uuid': pipeline_uuid,
+                'source_workflow_pipelines': [],
+                'destination_workflow_pipelines': [],
+            }
+        )
 
-    # TODO remove workflow pipelines when relationships are gone.
+    # Remove any pipelines that should no longer exist:
+    for pipeline_uuid in server_pipelines - data_pipelines:
+        wp = next(wp['uuid'] for wp in workflow_pipelines if wp['pipeline_uuid'] == pipeline_uuid)
+        _call_api(
+            app_session,
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{workflow_uuid}/pipelines/{wp}",
+            'delete'
+        )
 
     workflow_pipelines = _call_api(
         app_session,
-        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines"
+        f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{workflow_uuid}/pipelines"
     )
 
     # Update the workflow pipeline relationships
+    pipeline_to_workflow_pipeline = {
+        wp['pipeline_uuid']: wp['uuid'] for wp in workflow_pipelines
+    }
+    source_to_dests = defaultdict(list)
+    dests_to_sources = defaultdict(list)
+    for pipeline in create_workflow_data['pipelines']:
+        pipeline_wp = pipeline_to_workflow_pipeline[pipeline['uuid']]
+        for dependency in pipeline.get('dependencies', []):
+            dependency_wp = pipeline_to_workflow_pipeline[dependency]
+            source_to_dests[dependency].append(pipeline_wp)
+            dests_to_sources[pipeline['uuid']].append(dependency_wp)
+
+    logger.debug("source_to_dests")
+    logger.debug(source_to_dests)
+    logger.debug("dests_to_sources")
+    logger.debug(dests_to_sources)
+
     for pipeline in create_workflow_data['pipelines']:
         workflow_pipeline_uuid = next(wp['uuid'] for wp in workflow_pipelines if wp['pipeline_uuid'] == pipeline['uuid'])
-        dependencies = pipeline.get('dependencies', [])
         _call_api(
             app_session,
-            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{uuid}/pipelines/{workflow_pipeline_uuid}",
+            f"{app_url}/v1/organizations/{app_session.headers['X-Organization']}/workflows/{workflow_uuid}/pipelines/{workflow_pipeline_uuid}",
             'put',
             {
                 'pipeline_uuid': pipeline['uuid'],
-                'source_workflow_pipelines': [wp['uuid'] for wp in workflow_pipelines if wp['pipeline_uuid'] in dependencies],
-                'destination_workflow_pipelines': [],
+                'source_workflow_pipelines': dests_to_sources[pipeline['uuid']],
+                'destination_workflow_pipelines': source_to_dests[pipeline['uuid']]
             }
         )
 
@@ -118,7 +148,7 @@ def create_workflow(app_session, app_url, create_workflow_data):
 
     _update_workflow_pipelines(app_session, app_url, create_workflow_data, workflow_json["uuid"])
 
-    return workflow_json["uuid"]
+    view_workflow(app_session, app_url, workflow_json["uuid"])
 
 
 def update_workflow(app_session, app_url, uuid, create_workflow_data):
@@ -135,4 +165,4 @@ def update_workflow(app_session, app_url, uuid, create_workflow_data):
 
     _update_workflow_pipelines(app_session, app_url, create_workflow_data, uuid)
 
-    return uuid
+    view_workflow(app_session, app_url, uuid)
