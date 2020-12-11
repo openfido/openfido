@@ -1,0 +1,31 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+black = "*"
+pylint-flask-sqlalchemy = "*"
+invoke = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+boto3 = "*"
+simplejson = "*"
+pytest-mock = "*"
+pylint = "*"
+pylint-flask-sqlalchemy = "*"
+invoke = "*"
+black = "*"
+regex = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
