@@ -15,6 +15,20 @@ Summary: Common [Flask](https://flask.palletsprojects.com/en/1.1.x/) blueprints 
 
 ## Development
 
+To test this system:
+
+    pipenv shell
+    pipenv install --dev
+
+    # run all tests and styling (as CircleCI)
+    pipenv precommit
+
+## Deploying
+
+TODO build setup.py
+
+## Flask Usage
+
 This package includes a subset of libraries for role-based application
 authentication. To use it, simply include this library in your project's
 dependencies:
