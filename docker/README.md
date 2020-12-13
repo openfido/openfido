@@ -34,6 +34,11 @@ To build the image yourself, issue the following command:
     # access (to access other openslac private repositories)
     docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido/openfido .
 
+
+Once you've logged into the docker hub account you can push your built images:
+
+    docker push openfido/openfido
+
 Development
 -----------
 
