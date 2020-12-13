@@ -77,6 +77,22 @@ Here is a sample of its existing commands (to aid working with workflows):
     optional arguments:
       -h, --help            show this help message and exit
 
+The format required by this command line tool [documented here](https://docs.google.com/document/d/13gsyF0nshtw6b8iiW70NqQQNW4RyysqnjEOyykm7MS4/edit). In summary:
+
+    {
+      “name”: “My Workflow”,
+      “description”: “A workflow that does cool things”,
+      “pipelines”: [
+        { 
+    “id”: “abc1234”,
+    },
+    { 
+    “id”: “abc1235”,
+    “dependencies”: [“abc1234”]
+    },
+      ]
+    }
+
 ## Flask Usage
 
 This package includes a subset of libraries for role-based application
