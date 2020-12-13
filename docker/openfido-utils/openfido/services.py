@@ -113,8 +113,6 @@ def _update_workflow_pipelines(app_session, app_url, create_workflow_data, workf
     # Create a workflow pipeline in the workflow if it doesn't already exist:
     server_pipelines = {wp['pipeline_uuid'] for wp in workflow_pipelines}
     data_pipelines = {p['uuid'] for p in create_workflow_data['pipelines']}
-    print(server_pipelines)
-    print(data_pipelines)
     for pipeline_uuid in data_pipelines - server_pipelines:
         _call_api(
             app_session,
