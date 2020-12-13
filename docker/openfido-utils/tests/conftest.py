@@ -35,7 +35,7 @@ def app():
 @pytest.fixture
 def session():
     session = requests.Session()
-    session.headers['Workflow-API-Key'] = 'workflow-api-key'
-    session.headers['X-Organization'] = 'organization-1'
+    session.headers["Workflow-API-Key"] = "workflow-api-key"
+    session.headers["X-Organization"] = "organization-1"
 
     return session
