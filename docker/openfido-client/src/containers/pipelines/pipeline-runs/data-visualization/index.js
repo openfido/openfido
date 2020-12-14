@@ -3,13 +3,14 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Spin, Slider } from 'antd';
 import styled from 'styled-components';
+import _ from 'lodash';
+import moment from 'moment';
 
 import { getCharts, setGraphMinMax } from 'actions/charts';
 import { CHART_TYPES, TOTAL_GRAPH_POINTS } from 'config/charts';
 import LoadingFilled from 'icons/LoadingFilled';
 import {
   StyledH2,
-  StyledH4,
   StyledButton,
   StyledTitle,
   StyledText,
@@ -19,6 +20,7 @@ import { getPipelines, getPipelineRun } from 'actions/pipelines';
 import OverviewTabMenu from '../overview-tab-menu';
 import AddChartPopup from '../add-chart-popup';
 import ComposedCsvChart from '../composed-csv-chart';
+import EditChart from './edit-chart';
 
 const StyledDataVisualization = styled.div`
   padding: 16px 20px;
@@ -143,6 +145,8 @@ const DataVisualization = () => {
     dispatch(getCharts(currentOrg, pipelineInView, pipelineRunSelectedUuid));
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, dispatch, charts]);
 
+  const sortedPipelineRunCharts = pipelineRunCharts ? _.sortBy(pipelineRunCharts, (c) => moment.utc(c.created_at)).reverse() : [];
+
   return (
     <>
       <StyledTitle>
@@ -174,14 +178,18 @@ const DataVisualization = () => {
         >
           Add A Chart
         </AddChartButton>
-        {pipelineRunCharts && pipelineRunCharts.map(({
+        {sortedPipelineRunCharts && sortedPipelineRunCharts.map(({
           artifact, name: title, chart_type_code, chart_config,
         }, chartIndex) => {
           const chartDataLength = chartDatum[artifact.url] && chartDatum[artifact.url].chartData.length;
 
           return (
             <section key={`${title}${artifact && artifact.uuid}${chart_type_code}${Math.random()}`}>
-              <StyledH4 color="black">{title}</StyledH4>
+              <EditChart
+                chart={sortedPipelineRunCharts[chartIndex]}
+                pipelineRun={currentPipelineRun}
+                pipelineUuid={pipelineInView}
+              />
               {(getChartsInProgress || processArtifactInProgress) && !(artifact.url in chartDatum) && (
                 <Spin indicator={<LoadingFilled spin />} />
               )}

@@ -51,7 +51,7 @@ const StyledForm = styled.form`
   input {
     &.unfocusable {
       pointer-events: none;
-    }  
+    }
   }
 `;
 

@@ -8,6 +8,8 @@ import {
   PROCESS_ARTIFACT_IN_PROGRESS,
   PROCESS_ARTIFACT_FAILED,
   SET_GRAPH_MIN_MAX,
+  UPDATE_CHART,
+  DELETE_CHART,
 } from 'actions';
 
 const DEFAULT_STATE = {
@@ -132,6 +134,41 @@ export default (state = DEFAULT_STATE, action) => {
         graphMinMax: {
           ...state.graphMinMax,
           [pipeline_run_uuid]: pipelineRunGraphMinMax,
+        },
+      };
+    }
+    case UPDATE_CHART: {
+      const pipelineRunCharts = state.charts[action.payload.pipelineRunUuid];
+
+      pipelineRunCharts.forEach((chart) => {
+        if (chart.uuid === action.payload.chartUuid) {
+          chart.name = action.payload.name; // eslint-disable-line no-param-reassign
+        }
+      });
+
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+        },
+        charts: {
+          ...state.charts,
+          [action.payload.pipelineRunUuid]: pipelineRunCharts,
+        },
+      };
+    }
+    case DELETE_CHART: {
+      const pipelineRunCharts = state.charts[action.payload.pipelineRunUuid];
+
+      return {
+        ...state,
+        messages: {
+          ...DEFAULT_STATE.messages,
+          deleteChartError: action.payload,
+        },
+        charts: {
+          ...state.charts,
+          [action.payload.pipelineRunUuid]: pipelineRunCharts.filter((chart) => action.payload.chartUuid !== chart.uuid),
         },
       };
     }
