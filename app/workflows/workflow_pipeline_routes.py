@@ -252,7 +252,11 @@ def list_workflow_pipelines(workflow_uuid):
         return {}, 404
 
     return jsonify(
-        [WorkflowPipelineSchema().dump(wp) for wp in workflow.workflow_pipelines]
+        [
+            WorkflowPipelineSchema().dump(wp)
+            for wp in workflow.workflow_pipelines
+            if not wp.is_deleted
+        ]
     )
 
 

@@ -262,6 +262,10 @@ def delete_workflow_pipeline(workflow_uuid, workflow_pipeline_uuid):
         raise ValueError("no workflow_pipeline found")
 
     workflow_pipeline.is_deleted = True
+    for dependency in workflow_pipeline.source_workflow_pipelines:
+        db.session.delete(dependency)
+    for dependency in workflow_pipeline.dest_workflow_pipelines:
+        db.session.delete(dependency)
     db.session.commit()
 
 

@@ -41,7 +41,7 @@ def lint(c, fail_under=0):
 
 @task
 def precommit(c, fix=False):
-    test(c, junit=True, enforce_percent=100)
+    test(c, junit=True, enforce_percent=99)
     style(c, fix=fix)
     lint(c, fail_under=9)
 
