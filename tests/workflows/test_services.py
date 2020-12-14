@@ -1,5 +1,6 @@
 import copy
 
+from marshmallow.exceptions import ValidationError
 from unittest.mock import patch
 
 import pytest
@@ -371,7 +372,7 @@ def test_delete_workflow(app, organization_workflow):
 def test_create_workflow_pipeline_invalid_org_workflow(
     app, organization_workflow, organization_pipeline, organization_workflow_pipeline
 ):
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         create_workflow_pipeline(organization_workflow.organization_uuid, "1234", {})
 
 
@@ -392,14 +393,7 @@ def test_create_workflow_pipeline_invalid_org_pipeline(
 def test_create_workflow_pipeline_bad_json(
     app, organization_workflow, organization_pipeline, organization_workflow_pipeline
 ):
-    responses.add(
-        responses.POST,
-        f"{app.config[WORKFLOW_HOSTNAME]}/v1/workflows/{organization_workflow.workflow_uuid}/pipelines",
-        body="notjson",
-        status=503,
-    )
-
-    with pytest.raises(HTTPError):
+    with pytest.raises(ValidationError):
         create_workflow_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
@@ -482,7 +476,9 @@ def test_create_workflow_pipeline_invalid_org_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
             {
-                "pipeline_uuid": "1234",
+                "pipeline_uuid": "1" * 32,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
             },
         )
 
@@ -650,7 +646,11 @@ def test_update_workflow_pipeline_invalid_org_workflow(
             organization_workflow.organization_uuid,
             "1234",
             organization_workflow_pipeline.uuid,
-            {},
+            {
+                "pipeline_uuid": organization_pipeline.pipeline_uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
+            },
         )
 
 
@@ -662,7 +662,11 @@ def test_update_workflow_pipeline_invalid_org_pipeline(
             organization_workflow.organization_uuid,
             organization_workflow.uuid,
             organization_workflow_pipeline.uuid,
-            {"pipeline_uuid": "1234"},
+            {
+                "pipeline_uuid": organization_pipeline.pipeline_uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
+            },
         )
 
 
@@ -676,6 +680,8 @@ def test_update_workflow_pipeline_invalid_org_workflow_pipeline(
             "1234",
             {
                 "pipeline_uuid": organization_pipeline.uuid,
+                "destination_workflow_pipelines": [],
+                "source_workflow_pipelines": [],
             },
         )
 

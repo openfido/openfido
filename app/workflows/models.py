@@ -12,13 +12,6 @@ class OrganizationWorkflow(CommonColumnsMixin, db.Model):
     workflow_uuid = db.Column(db.String(32), nullable=False, server_default="")
     is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
-    organization_workflow_pipelines = db.relationship(
-        "OrganizationWorkflowPipeline",
-        backref=db.backref("organization_workflow_pipeline"),
-        lazy="immediate",
-        primaryjoin="foreign(OrganizationWorkflow.id) == remote(OrganizationWorkflowPipeline.id)",
-    )
-
 
 class OrganizationWorkflowPipeline(CommonColumnsMixin, db.Model):
     """ Organization workflow pipeline. """
@@ -36,9 +29,9 @@ class OrganizationWorkflowPipeline(CommonColumnsMixin, db.Model):
 
     organization_workflow = db.relationship(
         OrganizationWorkflow,
-        backref=db.backref("organization_workflow_pipeline"),
+        backref=db.backref("organization_workflow_pipelines"),
         lazy="immediate",
-        primaryjoin="remote(OrganizationWorkflow.id) == foreign(OrganizationWorkflowPipeline.id)",
+        primaryjoin="remote(OrganizationWorkflow.uuid) == foreign(OrganizationWorkflowPipeline.organization_workflow_uuid)",
     )
 
     organization_workflow_pipeline_runs = db.relationship(

@@ -48,6 +48,18 @@ def find_organization_workflow_pipeline(
     ).one_or_none()
 
 
+def find_organization_workflow_pipeline_by_workflow_pipeline_uuid(
+    organization_workflow_uuid, workflow_pipeline_uuid
+):
+    """Fetches an OrganizationWorkflowPipeline associated with an organization pipeline. """
+    return OrganizationWorkflowPipeline.query.filter(
+        OrganizationWorkflowPipeline.organization_workflow_uuid
+        == organization_workflow_uuid,
+        OrganizationWorkflowPipeline.workflow_pipeline_uuid == workflow_pipeline_uuid,
+        OrganizationWorkflowPipeline.is_deleted == False,
+    ).one_or_none()
+
+
 def find_organization_workflow_run(
     organization_workflow_uuid, organization_workflow_run_uuid
 ):
