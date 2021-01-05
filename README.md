@@ -4,13 +4,13 @@ This project is funded by the California Energy Commission under EPIC grant EPC-
 
 SLAC National Accelerator Laboratory is operated by Stanford University for the US Department of Energy under Contract DE-AC02-76SF00515.
 
-## Development
+## Users
 
-TODO
+Users should consult the [online documentation](http://help.openfido.org/)
 
-## Provisioning
+## Pipeline Developers
 
-TODO
+Pipeline developers should consult the [pipeline developer documents](http://help.openfido.org/_page.html?owner=slacgismo&project=openfido&branch=master&folder=/Pipeline%20Developer&doc=/Pipeline%20Developer/How%20to%20create%20an%20OpenFIDO%20Pipeline.md)
 
 ### Docker
 
