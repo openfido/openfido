@@ -13,7 +13,7 @@ First, please clone the following OpenFIDO repositories into the same directory 
 
 Navigate into the openfido-app-service on your terminal.
 
-A convenient way to step up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
+A convenient way to set up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
 ```
     export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
