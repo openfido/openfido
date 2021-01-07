@@ -25,7 +25,7 @@ Configure the auth service admin account:
 ```
 
 Because these repositories make use of private github repositories, they
-need access to an SSH key that you have configured for github access:
+need access to an SSH key that you have configured for github access.
 
 See latest instructions on how to generate an ssh key for your GitHub account on the GitHub docs.
 
