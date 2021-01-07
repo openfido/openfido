@@ -11,7 +11,7 @@ First, please clone the following OpenFIDO repositories into the same folder:
 
 ## Backend Setup
 
-First, navigate into the openfido-app-service folder on your terminal.
+Navigate into the openfido-app-service folder on your terminal.
 
 A convenient way to step up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
 ```
