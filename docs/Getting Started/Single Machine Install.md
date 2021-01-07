@@ -34,7 +34,7 @@ From docs.github.com:
     ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
-IMPORTANT: When prompted to enter a passphrase, please press "Enter" for an empty passphrase.<br />
+**IMPORTANT:** When prompted to enter a passphrase, please press "Enter" for an empty passphrase.<br />
 Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your ssh key on.<br />
 Lastly, add this ssh key to your GitHub account that has access to openfido-utils.<br />
 
