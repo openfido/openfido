@@ -65,7 +65,7 @@ Obtain the React application key:
 
 Then, copy the React application key to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable.
 
-Create an super admin user:
+Create a super admin user:
 ```
     docker-compose run --rm auth-service flask shell
     >>> from app import models, services
