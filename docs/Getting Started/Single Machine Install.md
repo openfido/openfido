@@ -34,9 +34,9 @@ From docs.github.com:
     ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
-IMPORTANT: When prompted to enter a passphrase, please press "Enter" for an empty passphrase.
-Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your ssh key on.
-Lastly, add this ssh key to your GitHub account that has access to openfido-utils.
+IMPORTANT: When prompted to enter a passphrase, please press "Enter" for an empty passphrase.<br />
+Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your ssh key on.<br />
+Lastly, add this ssh key to your GitHub account that has access to openfido-utils.<br />
 
 Please note that you will need to run the build command each time any major updates occur to the service that require a rebuild, such as changes to the Pipfile.
 ```
@@ -87,5 +87,5 @@ Open another tab and navigate into the openfido-client folder.
     npm start
 ```
 
-Navigate to http://localhost:3000/ and sign in with the super admin user. 
+Navigate to http://localhost:3000/ and sign in with the super admin user.<br />
 For first time step up, you will need to create an organization under settings.
