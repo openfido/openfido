@@ -63,7 +63,7 @@ Obtain the React application key:
     docker-compose run --rm app-service invoke create-application-key -n "react client" -p REACT_CLIENT
 ```
 
-Then, copy the react api key to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable.
+Then, copy the React application key to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable.
 
 Create an super admin user:
 ```
