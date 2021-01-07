@@ -1,4 +1,4 @@
-Openfido is made of several microservices split into different repositories. You can opt to only run one service at a time. The details for development on each service are documented in their corresponding respositories. This documentation is a step-by-step to getting all the services running on your local machine.
+OpenFIDO is made of several microservices split into different repositories. You can opt to only run one service at a time. The details for development on each service are documented in their corresponding respositories. This documentation is a step-by-step to getting all the services running on your local machine together.
 
 First, please clone the following openfido repositories in the same folder:
 * [openfido-app-service](https://github.com/slacgismo/openfido-app-service)
@@ -7,16 +7,26 @@ First, please clone the following openfido repositories in the same folder:
 * [openfido-workflow-service](https://github.com/slacgismo/openfido-workflow-service)
 * [openfido-client](https://github.com/slacgismo/openfido-client)
 
+## Backend Setup
 A convenient way to step up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
-
     export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
 
-Configure the auth service admin account
+Configure the auth service admin account:
     cp ../openfido-auth-service/.env.example .auth-env
 
 Because these repositories make use of private github repositories, they
 need access to an SSH key that you have configured for github access:
+
+See latest instructions on how to generate an ssh key for your GitHub account on the GitHub docs.
+
+From docs.github.com:
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+
+IMPORTANT: When prompted to enter a passphrase, please press "Enter" for an empty passphrase.
+Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your ssh key on.
+Lastly, add this ssh key to your GitHub account that has access to openfido-utils.
+Please note that you will need to run the build command each time any major updates occur to the service that require a rebuild, such as changes to the Pipfile.
     touch .worker-env
     touch ../openfido-auth-service/.env
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
@@ -30,7 +40,7 @@ Configure the workflow service access tokens:
     docker-compose run --rm workflow-service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
     docker-compose run --rm workflow-service invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/WORKFLOW_/' > .env
 
-Obtain the React application key.
+Obtain the React application key:
     docker-compose run --rm app-service invoke create-application-key -n "react client" -p REACT_CLIENT
 
 Then, copy the react api key to openfido-client/src/config/index.js to the API_TOKEN_DEVELOPMENT variable.
@@ -45,16 +55,12 @@ Create an super admin user:
 Bring up all the services!
     docker-compose up
 
-To get the frontend running...
-open another tab and navigate into the openfido-client repo
+## Frontend Setup
+Open another tab and navigate into the openfido-client folder.
     conda create -n venv_ofclient
     conda activate venv_ofclient
     npm install
     npm start
 
-If the frontend is running, navigate to http://localhost:3000/ and sign in with the super admin user. For first time step up, you will need to create an organization under settings.
-
-
-## Deployment
-
-See [openfido terraform docs](https://github.com/slacgismo/openfido/blob/master/terraform/provisioning.md).
+Navigate to http://localhost:3000/ and sign in with the super admin user. 
+For first time step up, you will need to create an organization under settings.
