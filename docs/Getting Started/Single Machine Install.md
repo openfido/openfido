@@ -87,5 +87,5 @@ Open another tab on your terminal and navigate into openfido-client.
     npm start
 ```
 
-Navigate to http://localhost:3000/ and sign in with the super admin user.<br />
-For first time step up, you will need to create an organization under settings.
+Navigate to http://localhost:3000/ and sign in with the super admin user. :grin: <br />
+For first-time setup, you will need to create an organization under settings. 
