@@ -1,4 +1,6 @@
-OpenFIDO is made of several microservices split into different repositories. You can opt to only run one service at a time. The details for development on each service are documented in their corresponding respositories. This documentation is a step-by-step to getting all the services running on your local machine together.
+OpenFIDO is made of several microservices split into different repositories. You can opt to only run one service at a time. The details for development on each service are documented in their corresponding respositories. 
+
+This documentation is a step-by-step to getting all the services running on your local machine together.
 
 First, please clone the following openfido repositories in the same folder:
 * [openfido-app-service](https://github.com/slacgismo/openfido-app-service)
