@@ -2,7 +2,7 @@ OpenFIDO is made of several microservices split into different repositories. You
 
 This documentation is a step-by-step to getting all the services running on your local machine together.
 
-First, please clone the following OpenFIDO repositories into the same directory:
+First, please clone the following OpenFIDO repositories into the same directory on your machine:
 * [openfido-app-service](https://github.com/slacgismo/openfido-app-service)
 * [openfido-auth-service](https://github.com/slacgismo/openfido-auth-service)
 * [openfido-utils](https://github.com/slacgismo/openfido-utils)
