@@ -2,7 +2,7 @@ OpenFIDO is made of several microservices split into different repositories. You
 
 This documentation is a step-by-step to getting all the services running on your local machine together.
 
-First, please clone the following OpenFIDO repositories into the same folder:
+First, please clone the following OpenFIDO repositories into the same directory:
 * [openfido-app-service](https://github.com/slacgismo/openfido-app-service)
 * [openfido-auth-service](https://github.com/slacgismo/openfido-auth-service)
 * [openfido-utils](https://github.com/slacgismo/openfido-utils)
@@ -11,7 +11,7 @@ First, please clone the following OpenFIDO repositories into the same folder:
 
 ## Backend Setup
 
-Navigate into the openfido-app-service folder on your terminal.
+Navigate into the openfido-app-service on your terminal.
 
 A convenient way to step up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
 ```
