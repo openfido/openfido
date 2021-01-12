@@ -81,8 +81,6 @@ Bring up all the services!
 ## Frontend Setup
 Open another tab on your terminal and navigate into openfido-client.
 ```
-    conda create -n venv_ofclient
-    conda activate venv_ofclient
     npm install
     npm start
 ```
