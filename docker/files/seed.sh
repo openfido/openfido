@@ -93,10 +93,21 @@ if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
 
   invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/app-keys/worker-client
   invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/app-keys/pipelines-client
-  EXAMPLE_UUID=$(invoke create-pipeline -n "Example" -e master -p openfido.sh -e "python:3" -r "https://github.com/PresencePG/presence-pipeline-example.git" )
-  ABSORPTION_UUID=$(invoke create-pipeline -n "Absorption" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-absorption-pipeline.git" )
-  ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-anticipation-pipeline.git" )
-  RECOVERY_UUID=$(invoke create-pipeline -n "Recovery" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-recovery-pipeline.git" )
+
+  for ID in $(cut -f1 -d, < initial-db ); do
+    RECORD=$(grep ^$ID < initial-db)
+    NAME=$(echo $RECORD | cut -f2 -d,)
+    DOCKERHUB=$(echo $RECORD | cut -f3 -d,)
+    GITHUB=$(echo $RECORD | cut -f4 -d,)
+    BRANCH=$(echo $RECORD | cut -f5 -d,)
+    SCRIPT=$(echo $RECORD | cut -f6 -d,)
+    UUID=${UUID:-} $ID:$(invoke create-pipeline -n "$NAME" -e "$BRANCH" -p "$SCRIPT" -e "$DOCKERHUB" -r "$SCRIPT")
+  done 
+
+  #EXAMPLE_UUID=$(invoke create-pipeline -n "Example" -e master -p openfido.sh -e "python:3" -r "https://github.com/PresencePG/presence-pipeline-example.git" )
+  #ABSORPTION_UUID=$(invoke create-pipeline -n "Absorption" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-absorption-pipeline.git" )
+  #ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-anticipation-pipeline.git" )
+  #RECOVERY_UUID=$(invoke create-pipeline -n "Recovery" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-recovery-pipeline.git" )
 
   cd /opt/openfido-app-service
   source /opt/openfido-app-service/env
@@ -104,10 +115,10 @@ if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
   flask db upgrade
 
   invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^.*=\(.*\)$/export const API_TOKEN="\1"/' > /opt/app-keys/react-client
-  invoke create-organization-pipeline -o $ORG_UUID -p $EXAMPLE_UUID
-  invoke create-organization-pipeline -o $ORG_UUID -p $ABSORPTION_UUID
-  invoke create-organization-pipeline -o $ORG_UUID -p $ANTICIPATION_UUID
-  invoke create-organization-pipeline -o $ORG_UUID -p $RECOVERY_UUID
+
+  for RECORD in $UUID; do
+    invoke create-organization-pipeline -o ${RECORD%:*} -p ${RECORD##*:}
+  done 
 
   nohup rabbitmq-server start &
   RABBIT_PID=$!
