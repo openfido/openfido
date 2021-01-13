@@ -1,17 +1,31 @@
-OpenFIDO is made of several microservices split into different repositories. You can opt to only run one service at a time. The details for development on each service are documented in their corresponding respositories. 
+OpenFIDO is made of several microservices (app service, auth service, client, utils, and workflow service). This repository brings all these services together. You can check out each service and how to run them individually under their separate directories in [openfido/docker](https://github.com/slacgismo/openfido/tree/master/docker). 
 
-This documentation is a step-by-step to getting all the services running on your local machine together.
+If you would like a simple setup to see how the app runs locally, you can run the command below on your terminal. You can also check out this docker command [here](https://github.com/slacgismo/openfido/blob/master/docker/README.md).
+```
+    docker run --rm \
+      -v /tmp:/tmp \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -p 127.0.0.1:5001:5001 \
+      -p 127.0.0.1:5002:5002 \
+      -p 127.0.0.1:5003:5003 \
+      -p 127.0.0.1:9000:9000 \
+      -p 127.0.0.1:3000:3000 \
+      openfido/openfido
+```
 
-First, please clone the following OpenFIDO repositories into the same directory on your machine:
-* [openfido-app-service](https://github.com/slacgismo/openfido-app-service)
-* [openfido-auth-service](https://github.com/slacgismo/openfido-auth-service)
-* [openfido-utils](https://github.com/slacgismo/openfido-utils)
-* [openfido-workflow-service](https://github.com/slacgismo/openfido-workflow-service)
-* [openfido-client](https://github.com/slacgismo/openfido-client)
+The following documentation is a step-by-step on how to run the services together for local development purposes.  
+
+First, please clone the OpenFIDO repository if you have not already:
+```
+git clone https://github.com/slacgismo/openfido.git
+```
 
 ## Backend Setup
 
 Navigate into the openfido-app-service on your terminal.
+```
+cd docker/openfido-app-service
+```
 
 A convenient way to set up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
 ```
@@ -34,15 +48,24 @@ From docs.github.com:
     ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
-**IMPORTANT:** When prompted to enter a passphrase, please press "Enter" for an empty passphrase.<br />
-Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your ssh key on.<br />
-Lastly, add this ssh key to your GitHub account that has access to openfido-utils.<br />
+**IMPORTANT:** When prompted to enter a passphrase, please press "Enter" for an empty passphrase.
 
+Add this ssh key to your GitHub account that has access to openfido-utils.
+To do this, sign into your corresponding Github account and navigate to https://github.com/settings/ssh/new. Inside the key body, add your SSH public key.</br>
+You will need to remember your private ID RSA for a later step.
+
+If you forget what you named your ssh keys, you can list the file names on your terminal:
+```
+ls -al ~/.ssh
+```
 Please note that you will need to run the build command each time any major updates occur to the service that require a rebuild, such as changes to the Pipfile.
 ```
     touch .worker-env
     touch ../openfido-auth-service/.env
-    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)"
+
+Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your private ssh key on.</br>
+```
+    docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/<YOUR_ID_RSA_HERE>)"
 ```
 
 Initialize all the databases for all the services:
@@ -74,13 +97,22 @@ Create a super admin user:
     >>> models.db.session.commit()
 ```
 Bring up all the services!
+You will only need to run this command to bring up the backend services from now on.
 ```
     docker-compose up
 ```
 
+The local setup of OpenFIDO uses minIO to act as an object storage service. You can read more about minIO [here](https://min.io/). Artifact and input links during a pipeline run are currently configured to navigate to blobstorage:9000. In order to enable the capability of downloading from these links, you will need to edit your /etc/hosts file to add blobstorage as a recognizable url name for localhost. The following are the terminal commands to do this for *nix platform.
+
+```
+sudo nano /etc/hosts
+```
+Next to 127.0.0.1, you should see "localhost". Please type in "blobstorage" after localhost. Then click CTRL + o to save the changes to /etc/hosts, and CTRL + x to exit the file.
+
 ## Frontend Setup
 Open another tab on your terminal and navigate into openfido-client.
 ```
+    cd ../openfido-client
     npm install
     npm start
 ```
