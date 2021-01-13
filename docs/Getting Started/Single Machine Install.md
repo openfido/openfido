@@ -13,7 +13,7 @@ You can also check out this docker command [here](https://github.com/slacgismo/o
       -p 127.0.0.1:3000:3000 \
       openfido/openfido
 ```
-
+## Development Setup
 The following documentation is a step-by-step on how to run the services together for local development purposes.  
 
 First, please clone the OpenFIDO repository if you have not already:
@@ -64,7 +64,7 @@ Please note that you will need to run the build command each time any major upda
     touch .worker-env
     touch ../openfido-auth-service/.env
 ```
-Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your private ssh key on. </br>
+Replace <YOUR_ID_RSA_HERE> with the file name where you saved your private ssh key. </br>
 ```
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/<YOUR_ID_RSA_HERE>)"
 ```
