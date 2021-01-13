@@ -1,6 +1,7 @@
 OpenFIDO is made of several microservices (app service, auth service, client, utils, and workflow service). This repository brings all these services together. You can check out each service and how to run them individually under their separate directories in [openfido/docker](https://github.com/slacgismo/openfido/tree/master/docker). 
 
-If you would like a simple setup to see how the app runs locally, you can run the command below on your terminal. You can also check out this docker command [here](https://github.com/slacgismo/openfido/blob/master/docker/README.md).
+If you would like a simple setup to see how the app runs locally, you can run the command below on your terminal.</br>
+You can also check out this docker command [here](https://github.com/slacgismo/openfido/blob/master/docker/README.md).
 ```
     docker run --rm \
       -v /tmp:/tmp \
@@ -51,7 +52,7 @@ From docs.github.com:
 **IMPORTANT:** When prompted to enter a passphrase, please press "Enter" for an empty passphrase.
 
 Add this ssh key to your GitHub account that has access to openfido-utils.
-To do this, sign into your corresponding Github account and navigate to https://github.com/settings/ssh/new. Inside the key body, add your SSH public key.</br>
+To do this, sign into your corresponding Github account and navigate to https://github.com/settings/ssh/new. Inside the key body, add your SSH public key. </br>
 You will need to remember your private ID RSA for a later step.
 
 If you forget what you named your ssh keys, you can list the file names on your terminal:
@@ -62,8 +63,8 @@ Please note that you will need to run the build command each time any major upda
 ```
     touch .worker-env
     touch ../openfido-auth-service/.env
-
-Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your private ssh key on.</br>
+```
+Replace <YOUR_ID_RSA_HERE> with the file name that you had saved your private ssh key on. </br>
 ```
     docker-compose build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/<YOUR_ID_RSA_HERE>)"
 ```
@@ -96,13 +97,13 @@ Create a super admin user:
     >>> u.is_system_admin = True
     >>> models.db.session.commit()
 ```
-Bring up all the services!
+Bring up all the services! </br>
 You will only need to run this command to bring up the backend services from now on.
 ```
     docker-compose up
 ```
 
-The local setup of OpenFIDO uses minIO to act as an object storage service. You can read more about minIO [here](https://min.io/). Artifact and input links during a pipeline run are currently configured to navigate to blobstorage:9000. In order to enable the capability of downloading from these links, you will need to edit your /etc/hosts file to add blobstorage as a recognizable url name for localhost. The following are the terminal commands to do this for *nix platform.
+**NOTE:** The local setup of OpenFIDO uses [minIO](https://min.io/) to act as an object storage service. Artifact and input links during a pipeline run are currently configured to navigate to blobstorage:9000. In order to enable the capability of downloading from these links, you will need to edit your /etc/hosts file to add blobstorage as a recognizable url name for localhost. The following are the terminal commands to do this for *nix platform.
 
 ```
 sudo nano /etc/hosts
