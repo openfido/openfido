@@ -13,6 +13,9 @@ You can also check out this docker command [here](https://github.com/slacgismo/o
       -p 127.0.0.1:3000:3000 \
       openfido/openfido
 ```
+It will take a few minutes to set and seed the initial databases. </br>
+You can then visit http://127.0.0.1:3000 and login with username admin@example.com and password 1234567890. Several pipelines are created in an 'OpenFIDO' organization.
+
 ## Development Setup
 The following documentation is a step-by-step on how to run the services together for local development purposes.  
 
