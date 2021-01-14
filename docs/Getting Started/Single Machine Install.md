@@ -23,14 +23,14 @@ The following documentation is a step-by-step on how to run the services togethe
 
 First, please clone the OpenFIDO repository if you have not already:
 ```
-git clone https://github.com/slacgismo/openfido.git
+    git clone https://github.com/slacgismo/openfido.git
 ```
 
 ## Backend Setup
 
 Navigate into the openfido-app-service on your terminal.
 ```
-cd docker/openfido-app-service
+    cd docker/openfido-app-service
 ```
 
 A convenient way to set up these services locally is by setting environmental variables that tell docker-compose which files to use, and where each project is:
@@ -62,7 +62,7 @@ You will need to remember your private ID RSA for a later step.
 
 If you forget what you named your ssh keys, you can list the file names on your terminal:
 ```
-ls -al ~/.ssh
+    ls -al ~/.ssh
 ```
 Please note that you will need to run the build command each time any major updates occur to the service that require a rebuild, such as changes to the Pipfile.
 ```
@@ -108,10 +108,10 @@ You will only need to run this command to bring up the backend services from now
     docker-compose up
 ```
 
-**NOTE:** The local setup of OpenFIDO uses [minIO](https://min.io/) to act as an object storage service. Artifact and input links during a pipeline run are currently configured to navigate to blobstorage:9000. In order to enable the capability of downloading from these links, you will need to edit your /etc/hosts file to add blobstorage as a recognizable url name for localhost. The following are the terminal commands to do this for *nix platform.
+**NOTE:** The local setup of OpenFIDO uses [minIO](https://min.io/) to act as an object storage service. Artifact and input links during a pipeline run are currently configured to navigate to blobstorage:9000. In order to enable the capability of downloading from these links, you will need to edit your /etc/hosts file to add blobstorage as a recognizable url name for localhost. The following steps are how to do this for *nix platforms.
 
 ```
-sudo nano /etc/hosts
+    sudo nano /etc/hosts
 ```
 Next to 127.0.0.1, you should see "localhost". Please type in "blobstorage" after localhost. Then click CTRL + o to save the changes to /etc/hosts, and CTRL + x to exit the file.
 
