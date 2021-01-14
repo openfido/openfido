@@ -1,5 +1,6 @@
 OpenFIDO is made of several microservices (app service, auth service, client, utils, and workflow service). This repository brings all these services together. You can check out each service and how to run them individually under their separate directories in [openfido/docker](https://github.com/slacgismo/openfido/tree/master/docker). 
 
+## Quickstart
 If you would like a simple setup to see how the app runs locally, you can run the command below on your terminal.</br>
 You can also check out this docker command [here](https://github.com/slacgismo/openfido/blob/master/docker/README.md).
 ```
