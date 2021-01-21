@@ -46,7 +46,7 @@ export const getLimitedDataPointsForGraph = ({
   timeSubsetData.forEach((point, index) => {
     const nth = Math.ceil((index * totalGraphPoints) / timeSubsetData.length);
 
-    if (limitedDataSet.length + 1 === nth) {
+    if (limitedDataSet.length + 1 <= nth) {
       limitedDataSet.push(timeSubsetData[index]);
     }
   });
