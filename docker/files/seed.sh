@@ -94,9 +94,9 @@ if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
   invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/app-keys/worker-client
   invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/app-keys/pipelines-client
   ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:latest" -r "https://github.com/openfido/grip-anticipation.git" )
-  CONVERTERS_UUID=$(invoke create-pipeline -n "Converters" -e master -p openfido.sh -e "slacgismo/gridlabd:master" -r "https://github.com/openfido/hipas-converters.git" )
+  CONVERTERS_UUID=$(invoke create-pipeline -n "Converters" -e master -p openfido.sh -e "slacgismo/gridlabd:latest" -r "https://github.com/openfido/hipas-converters.git" )
   CYME_UUID=$(invoke create-pipeline -n "CYME Extract" -e master -p openfido.sh -e "ubuntu:20.04" -r "https://github.com/openfido/cyme-extract.git" )
-  ICA_UUID=$(invoke create-pipeline -n "ICA (California)" -e master -p openfido.sh -e "slacgismo/gridlabd:master" -r "https://github.com/openfido/ica-analysis.git" )
+  ICA_UUID=$(invoke create-pipeline -n "ICA (California)" -e master -p openfido.sh -e "slacgismo/gridlabd:latest" -r "https://github.com/openfido/ica-analysis.git" )
 
   cd /opt/openfido-app-service
   source /opt/openfido-app-service/env
