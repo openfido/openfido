@@ -93,10 +93,10 @@ if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
 
   invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/export WORKER_/' > /opt/app-keys/worker-client
   invoke create-application-key -n "local client" -p PIPELINES_CLIENT | sed 's/^/export WORKFLOW_/' > /opt/app-keys/pipelines-client
-  EXAMPLE_UUID=$(invoke create-pipeline -n "Example" -e master -p openfido.sh -e "python:3" -r "https://github.com/PresencePG/presence-pipeline-example.git" )
-  ABSORPTION_UUID=$(invoke create-pipeline -n "Absorption" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-absorption-pipeline.git" )
-  ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-anticipation-pipeline.git" )
-  RECOVERY_UUID=$(invoke create-pipeline -n "Recovery" -e master -p openfido.sh -e "slacgrip/master:200527" -r "https://github.com/PresencePG/grip-recovery-pipeline.git" )
+  ANTICIPATION_UUID=$(invoke create-pipeline -n "Anticipation" -e master -p openfido.sh -e "slacgrip/master:latest" -r "https://github.com/openfido/grip-anticipation.git" )
+  CONVERTERS_UUID=$(invoke create-pipeline -n "Converters" -e master -p openfido.sh -e "slacgismo/gridlabd:latest" -r "https://github.com/openfido/hipas-converters.git" )
+  CYME_UUID=$(invoke create-pipeline -n "CYME Extract" -e master -p openfido.sh -e "ubuntu:20.04" -r "https://github.com/openfido/cyme-extract.git" )
+  ICA_UUID=$(invoke create-pipeline -n "ICA (California)" -e master -p openfido.sh -e "slacgismo/gridlabd:latest" -r "https://github.com/openfido/ica-analysis.git" )
 
   cd /opt/openfido-app-service
   source /opt/openfido-app-service/env
@@ -104,10 +104,10 @@ if [ -z "$(ls -A "/opt/app-keys/react-client")" ]; then
   flask db upgrade
 
   invoke create-application-key -n "react client" -p REACT_CLIENT | sed 's/^.*=\(.*\)$/export const API_TOKEN="\1"/' > /opt/app-keys/react-client
-  invoke create-organization-pipeline -o $ORG_UUID -p $EXAMPLE_UUID
-  invoke create-organization-pipeline -o $ORG_UUID -p $ABSORPTION_UUID
   invoke create-organization-pipeline -o $ORG_UUID -p $ANTICIPATION_UUID
-  invoke create-organization-pipeline -o $ORG_UUID -p $RECOVERY_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $CONVERTERS_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $CYME_UUID
+  invoke create-organization-pipeline -o $ORG_UUID -p $ICA_UUID
 
   nohup rabbitmq-server start &
   RABBIT_PID=$!
