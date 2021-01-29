@@ -9,7 +9,7 @@ services:
     volumes:
       - ./uploads:/data:delegated
     ports:
-      - "10000:9000"
+      - "9000:9000"
   workflow-queue:
     build:
       context: ../openfido-workflow-service/
