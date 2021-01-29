@@ -76,7 +76,7 @@ export const getCharts = (organization_uuid, pipeline_uuid, pipeline_run_uuid) =
               chartScales,
               chartIndex,
               minIndex: 0,
-              maxIndex: chartData.length - 1,
+              maxIndex: chartData.length,
               pipeline_run_uuid,
             });
           })
