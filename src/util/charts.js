@@ -18,7 +18,7 @@ const DATE_FORMATS = [
 ];
 
 export const toUnixTime = (str) => moment(str, DATE_FORMATS).unix();
-export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
+export const validDateString = (str) => moment(str, DATE_FORMATS, true).isValid();
 
 export const getLimitedDataPointsForGraph = ({
   data,
@@ -84,7 +84,6 @@ export const parseCsvData = (data) => {
       .on('error', reject)
       .on('data', (row) => {
         const rowData = { ...row };
-
         Object.keys(rowData).forEach((column) => {
           if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
             rowData[column] = parseFloat(rowData[column]);
