@@ -314,6 +314,50 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     except HTTPError as http_error:
         raise ValueError(created_pipeline) from http_error
 
+def delete_pipeline_run(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
+    """Delete a OrganizationPipelineRun.
+
+    Note: assumes that the organization_uuid has already been verified (by
+    validate_organization() mixin)
+
+    Raises a an HTTPError when there is some unrecoverable downstream error.
+    Raises a ValueError when there is some downstream error (its
+    args[0] contains the json message from the backing server)
+    """
+    org_pipeline = find_organization_pipeline(
+        organization_uuid, organization_pipeline_uuid
+    )
+
+    if not org_pipeline:
+        raise ValueError({"message": "organizational_pipeline_uuid not found"})
+
+    org_pipeline_run = next(
+        filter(
+            lambda r: r.uuid == organization_pipeline_run_uuid,
+            org_pipeline.organization_pipeline_runs,
+        )
+    )
+
+    response = requests.delete(
+        f"{current_app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{org_pipeline.pipeline_uuid}/runs/{org_pipeline_run.pipeline_run_uuid}",
+        headers={
+            "Content-Type": "application/json",
+            ROLES_KEY: current_app.config[WORKFLOW_API_TOKEN],
+        },
+    )
+
+    try:
+        response.raise_for_status()
+        org_pipeline_run.is_deleted = True
+        db.session.commit()
+
+    except ValueError as value_error:
+        raise HTTPError("Non JSON payload returned") from value_error
+    except HTTPError as http_error:
+        raise ValueError(response.json()) from http_error
+
 
 def _fetch_artifact(organization_pipeline_run, artifact_uuid):
     pipeline_run = fetch_pipeline_run(

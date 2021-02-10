@@ -326,3 +326,4 @@ docker/.worker-env
 docker/.workflow-env
 *.env
 *.workflow-env
+uploads

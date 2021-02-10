@@ -67,6 +67,8 @@ class OrganizationPipelineRun(CommonColumnsMixin, db.Model):
     share_password_hash = db.Column(db.String(127), nullable=True)
     share_password_salt = db.Column(db.String(127), nullable=True)
 
+    is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
+
     organization_pipeline_run_post_processing_states = db.relationship(
         "OrganizationPipelineRunPostProcessingState",
         backref="organization_pipeline_run",

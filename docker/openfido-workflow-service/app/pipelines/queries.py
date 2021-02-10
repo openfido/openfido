@@ -51,6 +51,7 @@ def find_pipeline_run(uuid):
         .filter(
             and_(
                 PipelineRun.uuid == uuid,
+                PipelineRun.is_deleted == False,
                 Pipeline.is_deleted == False,
             )
         )

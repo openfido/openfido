@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -17,6 +17,8 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
+import DeleteOutlined from 'icons/DeleteOutlined';
+import DeletePipelineRunPopup from '../delete-pipeline-run-popup';
 
 const RunMenu = styled(Menu)`
   overflow-y: scroll;
@@ -58,6 +60,9 @@ const RunItem = styled(Menu.Item)`
     }
     h5 {
       grid-column: 1;
+    }
+    button {
+      grid-column: 3;
     }
     mark {
       grid-column: 3;
@@ -126,10 +131,29 @@ const Caret = styled.div`
 `;
 
 const RunsList = ({
-  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun,
+  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun, currentPipeline
 }) => {
+  const [showDeleteRunPopup, setShowDeleteRunPopup] = useState(false);
+  const [hasBeenDeleted, setHasBeenDeleted] = useState(false);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
-
+  console.log("CURRENT PIPELINE")
+  console.log(currentPipeline)
+  const pipelines = useSelector((state) => state.pipelines.pipelines);
+  const currentPipelineName = pipelines && pipelines.find((pipeline) => pipeline.uuid === currentPipeline).name;
+  console.log("WHAT")
+  console.log(currentPipelineName)
+  const openDeleteRunPopup = () => {
+    setShowDeleteRunPopup(true);
+  };
+  
+  const closeDeleteRunPopup = () => {
+    setShowDeleteRunPopup(false);
+  };
+  
+  const onPermanentlyDeleteClicked = () => {
+    setShowDeleteRunPopup(false);
+    setHasBeenDeleted(true);
+  };
   return (
     <>
       <StyledH2 color="black">
@@ -167,6 +191,9 @@ const RunsList = ({
                   {startedAt.format('M/D/YY')}
                 </StyledText>
               )}
+              <StyledButton type="text" size="small" onClick={openDeleteRunPopup} width={70}>
+                <DeleteOutlined color="gray20" onClick={openDeleteRunPopup}/>
+              </StyledButton>
               <StyledH5>Duration:</StyledH5>
               {duration && (
                 <StyledText size="middle" color="gray">
@@ -175,6 +202,16 @@ const RunsList = ({
               )}
               {currentPipelineRun === run_uuid && <Caret bgcolor={STATUS_LEGEND[status]} />}
             </div>
+            {showDeleteRunPopup && (
+              <DeletePipelineRunPopup
+                handleOk={onPermanentlyDeleteClicked}
+                handleCancel={closeDeleteRunPopup}
+                pipelineUUID={currentPipeline}
+                pipelineRunUUID={currentPipelineRun}
+                pipelineName={currentPipelineName}
+                pipelineRunNumber={sequence}
+              />
+            )}
           </RunItem>
         ))}
       </RunMenu>
@@ -189,6 +226,9 @@ RunsList.propTypes = {
   })),
   currentPipelineRun: PropTypes.string,
   onSelectPipelineRun: PropTypes.func.isRequired,
+  currentPipeline: PropTypes.string,
+  currentPipelineName: PropTypes.string,
+  currentOrg: PropTypes.string
 };
 
 RunsList.defaultProps = {

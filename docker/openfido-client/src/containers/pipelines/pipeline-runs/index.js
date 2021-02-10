@@ -175,6 +175,7 @@ const PipelineRuns = () => {
             pipelineRuns={pipelineRuns}
             currentPipelineRun={currentPipelineRun}
             onSelectPipelineRun={onSelectPipelineRun}
+            currentPipeline={pipelineInView}
           />
         </AllRunsSection>
         <OverviewSection>
