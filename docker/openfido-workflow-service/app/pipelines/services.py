@@ -47,6 +47,9 @@ def delete_pipeline(pipeline_uuid):
 
 def delete_pipeline_run(pipeline_uuid, pipeline_run_uuid):
     """ Delete a pipeline run. """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        raise ValueError("pipeline not found")
 
     pipeline_run = find_pipeline_run(pipeline_run_uuid)
     if pipeline_run is None:
