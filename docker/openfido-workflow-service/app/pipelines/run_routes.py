@@ -288,7 +288,7 @@ def get_runs(pipeline_uuid):
         logger.warning("no pipeline found")
         return {}, 404
 
-    return jsonify([PipelineRunSchema().dump(pr) for pr in pipeline.pipeline_runs])
+    return jsonify([PipelineRunSchema().dump(pr) for pr in pipeline.pipeline_runs if not pr.is_deleted])
 
 
 @run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])

@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
-import styled from 'styled-components';
-import { Space } from 'antd';
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
+import styled from "styled-components";
+import { Space } from "antd";
 
-import { requestDeletePipelineRun } from 'services';
-import CloseOutlined from 'icons/CloseOutlined';
-import AlertOutlined from 'icons/AlertOutlined';
-import {
-  StyledH2,
-  StyledModal,
-  StyledButton,
-  StyledText,
-} from 'styles/app';
+import { requestDeletePipelineRun } from "services";
+import CloseOutlined from "icons/CloseOutlined";
+import AlertOutlined from "icons/AlertOutlined";
+import { 
+  StyledH2, 
+  StyledModal, 
+  StyledButton, 
+  StyledText } from "styles/app";
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -43,14 +42,18 @@ const Modal = styled(StyledModal)`
   }
 `;
 
-
 const DeletePipelineRunPopup = ({
-  handleOk, handleCancel, pipelineUUID, pipelineName, pipelineRunUUID, pipelineRunNumber
+  handleCancel,
+  pipelineUUID,
+  pipelineName,
+  pipelineRunUUID,
+  pipelineRunNumber,
+  handleOk,
 }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const [loading, setLoading] = useState(false);
 
-  const onPermanentlyDeleteClicked = () => {
+  const deletePipelineRun = () => {
     if (!loading) {
       setLoading(true);
       requestDeletePipelineRun(currentOrg, pipelineUUID, pipelineRunUUID)
@@ -74,7 +77,7 @@ const DeletePipelineRunPopup = ({
         width={390}
       >
         {
-         <>
+          <>
             <StyledH2 color="pink">
               <StyledText color="pink">
                 ALERT
@@ -85,12 +88,11 @@ const DeletePipelineRunPopup = ({
               <StyledText color="gray" size="large">
                 You are about to delete
                 <br />
-                  <StyledText color="pink">Pipeline Run #{pipelineRunNumber} of {pipelineName}</StyledText>
-                <br />
-                {' '}
-                <strong>This action cannot be undone.</strong>
-                {' '}
-                Please be certain.
+                <StyledText color="pink">
+                  Pipeline Run #{pipelineRunNumber} of {pipelineName}
+                </StyledText>
+                <br /> <strong>This action cannot be undone.</strong> Please be
+                certain.
               </StyledText>
               <StyledButton
                 size="middle"
@@ -104,24 +106,27 @@ const DeletePipelineRunPopup = ({
                   DELETE
                 </div>
               </StyledButton>
-              <StyledButton type="text" color="transparent">
+              <StyledButton
+                type="text"
+                color="transparent"
+                onClick={deletePipelineRun}
+              >
                 <StyledText
                   size="large"
                   fontweight={500}
                   align="center"
                   display="block"
                   color="pink"
-                  onClick={onPermanentlyDeleteClicked}
                 >
                   Yes, I am certain that
-                  <br />
-                  I want to delete
+                  <br />I want to delete
                 </StyledText>
               </StyledButton>
             </Space>
           </>
         }
       </Modal>
+
   );
 };
 
@@ -131,7 +136,7 @@ DeletePipelineRunPopup.propTypes = {
   pipelineUUID: PropTypes.string.isRequired,
   pipelineName: PropTypes.string.isRequired,
   pipelineRunUUID: PropTypes.string.isRequired,
-  pipelineRunNumber: PropTypes.number.isRequired
+  pipelineRunNumber: PropTypes.number.isRequired,
 };
 
 export default DeletePipelineRunPopup;

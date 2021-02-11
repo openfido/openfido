@@ -131,17 +131,13 @@ const Caret = styled.div`
 `;
 
 const RunsList = ({
-  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun, currentPipeline
+  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun, currentPipeline, handleSuccess
 }) => {
   const [showDeleteRunPopup, setShowDeleteRunPopup] = useState(false);
-  const [hasBeenDeleted, setHasBeenDeleted] = useState(false);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
-  console.log("CURRENT PIPELINE")
-  console.log(currentPipeline)
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   const currentPipelineName = pipelines && pipelines.find((pipeline) => pipeline.uuid === currentPipeline).name;
-  console.log("WHAT")
-  console.log(currentPipelineName)
+
   const openDeleteRunPopup = () => {
     setShowDeleteRunPopup(true);
   };
@@ -152,8 +148,9 @@ const RunsList = ({
   
   const onPermanentlyDeleteClicked = () => {
     setShowDeleteRunPopup(false);
-    setHasBeenDeleted(true);
+    handleSuccess();
   };
+
   return (
     <>
       <StyledH2 color="black">
@@ -221,6 +218,7 @@ const RunsList = ({
 
 RunsList.propTypes = {
   openStartRunPopup: PropTypes.func.isRequired,
+  handleSuccess: PropTypes.func.isRequired,
   pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
 
   })),
