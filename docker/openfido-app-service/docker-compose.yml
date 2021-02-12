@@ -23,8 +23,6 @@ services:
     environment:
       POSTGRES_DB: workflowservice
       POSTGRES_PASSWORD: dev-password
-    ports:
-      - "5435:5432"
   workflow-service:
     build: ../openfido-workflow-service/
     environment:
@@ -76,8 +74,6 @@ services:
     environment:
       POSTGRES_DB: accountservices
       POSTGRES_PASSWORD: dev-password
-    ports:
-      - "5434:5432"
   auth-service:
     build: ../openfido-auth-service
     command: flask run -h 0.0.0.0
@@ -109,8 +105,6 @@ services:
     environment:
       POSTGRES_DB: appservice
       POSTGRES_PASSWORD: dev-password
-    ports:
-      - "5433:5432"
   app-service:
     build: .
     environment:
