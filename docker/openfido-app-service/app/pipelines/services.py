@@ -525,8 +525,7 @@ def fetch_pipeline_run(
     org_pipeline_run = next(
         filter(
             lambda r: r.uuid == organization_pipeline_run_uuid,
-            org_pipeline.organization_pipeline_runs,
-            
+            org_pipeline.organization_pipeline_runs
         )
     )
 
