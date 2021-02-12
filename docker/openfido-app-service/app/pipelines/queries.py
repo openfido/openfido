@@ -65,7 +65,6 @@ def find_organization_pipeline_run(organization_pipeline_id, uuid):
             or_(
                 OrganizationPipelineRun.pipeline_run_uuid == uuid,
                 OrganizationPipelineRun.uuid == uuid,
-                OrganizationPipelineRun.is_deleted == False,
             ),
         )
     ).one_or_none()
@@ -94,6 +93,7 @@ def search_organization_pipeline_runs(organization_pipeline_id, uuids):
         and_(
             OrganizationPipelineRun.organization_pipeline_id
             == organization_pipeline_id,
+            OrganizationPipelineRun.is_deleted == False,
             or_(
                 OrganizationPipelineRun.pipeline_run_uuid.in_(uuids),
                 OrganizationPipelineRun.uuid.in_(uuids),

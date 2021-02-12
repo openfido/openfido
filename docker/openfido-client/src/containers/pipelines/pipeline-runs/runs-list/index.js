@@ -150,7 +150,8 @@ const RunsList = ({
     setShowDeleteRunPopup(false);
     handleSuccess();
   };
-
+  console.log("PIPELINE RUNS")
+  console.log(pipelineRuns)
   return (
     <>
       <StyledH2 color="black">
@@ -189,7 +190,7 @@ const RunsList = ({
                 </StyledText>
               )}
               <StyledButton type="text" size="small" onClick={openDeleteRunPopup} width={70}>
-                <DeleteOutlined color="gray20" onClick={openDeleteRunPopup}/>
+                <DeleteOutlined color="Gray20" onClick={openDeleteRunPopup}/>
               </StyledButton>
               <StyledH5>Duration:</StyledH5>
               {duration && (
@@ -208,7 +209,8 @@ const RunsList = ({
                 pipelineName={currentPipelineName}
                 pipelineRunNumber={sequence}
               />
-            )}
+              )
+            }
           </RunItem>
         ))}
       </RunMenu>
