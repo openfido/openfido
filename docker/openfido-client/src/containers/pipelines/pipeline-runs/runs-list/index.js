@@ -150,8 +150,7 @@ const RunsList = ({
     setShowDeleteRunPopup(false);
     handleSuccess();
   };
-  console.log("PIPELINE RUNS")
-  console.log(pipelineRuns)
+
   return (
     <>
       <StyledH2 color="black">
