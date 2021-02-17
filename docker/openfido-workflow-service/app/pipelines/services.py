@@ -45,6 +45,25 @@ def delete_pipeline(pipeline_uuid):
     db.session.commit()
 
 
+def delete_pipeline_run(pipeline_uuid, pipeline_run_uuid):
+    """ Delete a pipeline run. """
+    pipeline = find_pipeline(pipeline_uuid)
+    if pipeline is None:
+        raise ValueError("pipeline not found")
+
+    pipeline_run = find_pipeline_run(pipeline_run_uuid)
+    if pipeline_run is None:
+        raise ValueError("pipeline run not found")
+
+    from ..workflows.queries import pipeline_has_workflow_pipeline
+
+    if pipeline_has_workflow_pipeline(pipeline_run.pipeline_id):
+        raise ValueError("pipeline run has an associated workflow pipeline")
+
+    pipeline_run.is_deleted = True
+    db.session.commit()
+
+
 def create_pipeline(pipeline_json):
     """Create a Pipeline.
 

@@ -76,8 +76,18 @@ def test_find_pipeline_run(app, pipeline, mock_execute_pipeline):
 
     assert find_pipeline_run(pipeline_run.uuid) == pipeline_run
 
-    # does not rutern a pipeline run if the pipeline is soft-deleted
+    # does not return a pipeline run if the pipeline is soft-deleted
     pipeline.is_deleted = True
+    db.session.commit()
+
+    assert find_pipeline_run(pipeline_run.uuid) is None
+
+
+def test_find_pipeline_run_is_deleted(app, pipeline, mock_execute_pipeline):
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+
+    # does not return a pipeline run if the pipeline run is soft-deleted
+    pipeline_run.is_deleted = True
     db.session.commit()
 
     assert find_pipeline_run(pipeline_run.uuid) is None
