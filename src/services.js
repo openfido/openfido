@@ -140,6 +140,10 @@ export const requestGetPipelineRun = (organization_uuid, pipeline_uuid, pipeline
   ApiClient.get(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}`, appToken)
 );
 
+export const requestDeletePipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uuid) => (
+  ApiClient.delete(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}`, appToken)
+);
+
 export const requestCreatePipelineRunArtifact = (organization_uuid, pipeline_uuid, pipeline_run_uuid, title, artifact_uuid, chart_type_code, chart_config) => (
   ApiClient.post(`${baseUrl.app}/organizations/${organization_uuid}/pipelines/${pipeline_uuid}/runs/${pipeline_run_uuid}/charts`, {
     name: title,
