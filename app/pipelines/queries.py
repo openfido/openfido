@@ -61,6 +61,7 @@ def find_organization_pipeline_run(organization_pipeline_id, uuid):
         and_(
             OrganizationPipelineRun.organization_pipeline_id
             == organization_pipeline_id,
+            OrganizationPipelineRun.is_deleted == False,
             or_(
                 OrganizationPipelineRun.pipeline_run_uuid == uuid,
                 OrganizationPipelineRun.uuid == uuid,
@@ -77,6 +78,7 @@ def find_latest_organization_pipeline_run(organization_pipeline_id):
             OrganizationPipelineRun.organization_pipeline_id
             == organization_pipeline_id,
             OrganizationPipeline.is_deleted == False,
+            OrganizationPipelineRun.is_deleted == False
         )
         .order_by(OrganizationPipelineRun.created_at.desc())
         .first()
@@ -92,6 +94,7 @@ def search_organization_pipeline_runs(organization_pipeline_id, uuids):
         and_(
             OrganizationPipelineRun.organization_pipeline_id
             == organization_pipeline_id,
+            OrganizationPipelineRun.is_deleted == False,
             or_(
                 OrganizationPipelineRun.pipeline_run_uuid.in_(uuids),
                 OrganizationPipelineRun.uuid.in_(uuids),
