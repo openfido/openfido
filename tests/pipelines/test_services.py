@@ -108,6 +108,21 @@ def test_delete_pipeline_has_workflow(app, pipeline, workflow, workflow_pipeline
     assert not pipeline.is_deleted
 
 
+def test_delete_pipeline_run(app, pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    services.delete_pipeline_run(pipeline.uuid, pipeline_run.uuid)
+
+    assert pipeline_run.is_deleted
+
+
+def test_delete_pipeline_run_has_workflow(app, pipeline, workflow, workflow_pipeline):
+    pipeline_run = services.create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    with pytest.raises(ValueError):
+        services.delete_pipeline_run(pipeline.uuid, pipeline_run.uuid)
+
+    assert not pipeline_run.is_deleted
+
+
 def test_create_pipeline_bad_input(app):
     with pytest.raises(ValidationError):
         pipeline_run = services.create_pipeline_run("no-id", INVALID_CALLBACK_INPUT)

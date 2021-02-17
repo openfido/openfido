@@ -106,6 +106,7 @@ class PipelineRun(CommonColumnsMixin, db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     std_out = db.Column(db.Unicode, nullable=True)
     std_err = db.Column(db.Unicode, nullable=True)
+    is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
 
     pipeline_id = db.Column(db.Integer, db.ForeignKey("pipeline.id"), nullable=False)
 
