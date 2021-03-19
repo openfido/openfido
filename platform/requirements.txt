@@ -1,4 +1,4 @@
 requests
-Django==3.0.3
+Django==3.1.6
 djangorestframework
 psycopg2
