@@ -24,9 +24,9 @@ run_bp = Blueprint("pipeline-runs", __name__)
 @verify_content_type_and_params(["inputs"], ["callback_url"])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def create_run(pipeline_uuid):
+  #CHECKED
     """Create a new pipeline run.
     ---
-
     tags:
       - pipeline runs
     parameters:
@@ -120,7 +120,6 @@ def create_run(pipeline_uuid):
 def get_run(pipeline_uuid, pipeline_run_uuid):
     """Get a pipeline run.
     ---
-
     tags:
       - pipeline runs
     parameters:
