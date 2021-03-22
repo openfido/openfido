@@ -34,7 +34,6 @@ organization_pipeline_bp = Blueprint("organization-pipelines", __name__)
 @any_application_required
 @validate_organization()
 def create(organization_uuid):
-  #CHECKED
     """Create a Organization Pipeline.
     ---
     tags:
@@ -104,7 +103,6 @@ def create(organization_uuid):
 @any_application_required
 @validate_organization()
 def update(organization_uuid, organization_pipeline_uuid):
-  #CHECKED
     """Update Organization Pipeline.
     ---
     tags:
@@ -841,7 +839,8 @@ def update_chart(
         description: "Updated Chart"
         content:
           application/json:
-            type: object
+            schema:
+              type: object
               properties:
                 uuid:
                   type: string
