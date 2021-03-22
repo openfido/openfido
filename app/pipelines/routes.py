@@ -36,7 +36,6 @@ organization_pipeline_bp = Blueprint("organization-pipelines", __name__)
 def create(organization_uuid):
     """Create a Organization Pipeline.
     ---
-
     tags:
       - pipelines
     parameters:
@@ -840,7 +839,8 @@ def update_chart(
         description: "Updated Chart"
         content:
           application/json:
-            type: object
+            schema:
+              type: object
               properties:
                 uuid:
                   type: string
