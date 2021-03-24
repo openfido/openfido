@@ -191,23 +191,15 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
 def delete_run(pipeline_uuid, pipeline_run_uuid):
     """Delete a pipeline run.
     ---
+
     tags:
-      - pipelines
+      - pipeline runs
     parameters:
       - in: header
         name: Workflow-API-Key
         description: Requires key type PIPELINES_CLIENT
         schema:
           type: string
-    parameters:
-      - name: pipeline_uuid
-        in: path
-        required: true
-        description: UUID of a pipeline.
-      - name: pipeline_run_uuid
-        in: path
-        required: true
-        description: UUID of a pipeline run.
     responses:
       "200":
         description: "Deleted"
