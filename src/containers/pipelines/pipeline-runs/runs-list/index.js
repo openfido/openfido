@@ -222,11 +222,9 @@ RunsList.propTypes = {
   pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
 
   })),
-  currentPipelineRun: PropTypes.string,
+  currentPipelineRun: PropTypes.string.isRequired,
   onSelectPipelineRun: PropTypes.func.isRequired,
-  currentPipeline: PropTypes.string,
-  currentPipelineName: PropTypes.string,
-  currentOrg: PropTypes.string,
+  currentPipeline: PropTypes.string
 };
 
 RunsList.defaultProps = {
