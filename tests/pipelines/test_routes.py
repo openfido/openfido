@@ -10,7 +10,10 @@ from app.pipelines.models import (
     OrganizationPipelineInputFile,
     db,
 )
-from app.pipelines.queries import find_organization_pipelines, find_organization_pipeline_run
+from app.pipelines.queries import (
+    find_organization_pipelines,
+    find_organization_pipeline_run,
+)
 from app.utils import ApplicationsEnum
 from application_roles.decorators import ROLES_KEY
 from application_roles.services import create_application
@@ -777,6 +780,7 @@ def test_pipeline_run(
     assert result.status_code == 200
     assert result.json == json_response
 
+
 @responses.activate
 def test_delete_pipeline(app, client, client_application, organization_pipeline):
     responses.add(
@@ -798,11 +802,7 @@ def test_delete_pipeline(app, client, client_application, organization_pipeline)
 
 @responses.activate
 def test_delete_pipeline_run(
-    app,
-    client,
-    client_application,
-    organization_pipeline,
-    organization_pipeline_run
+    app, client, client_application, organization_pipeline, organization_pipeline_run
 ):
 
     responses.add(
@@ -820,16 +820,26 @@ def test_delete_pipeline_run(
     )
 
     assert result.status_code == 200
-    assert find_organization_pipeline_run(ORGANIZATION_UUID, organization_pipeline_run.uuid) == None
+    assert (
+        find_organization_pipeline_run(
+            ORGANIZATION_UUID, organization_pipeline_run.uuid
+        )
+        == None
+    )
 
 
 @patch("app.pipelines.routes.delete_pipeline_run")
 @responses.activate
 def test_delete_pipeline_run_http_error(
-    delete_mock, app, client, client_application, organization_pipeline, organization_pipeline_run
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
 ):
     delete_mock.side_effect = HTTPError("something is wrong")
-    
+
     result = client.delete(
         f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}",
         content_type="application/json",
@@ -845,7 +855,12 @@ def test_delete_pipeline_run_http_error(
 @patch("app.pipelines.routes.delete_pipeline_run")
 @responses.activate
 def test_delete_pipeline_run_bad_response(
-    delete_mock, app, client, client_application, organization_pipeline, organization_pipeline_run
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
 ):
     message = {"message": "error"}
     delete_mock.side_effect = ValueError(message)

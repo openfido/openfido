@@ -314,6 +314,7 @@ def create_pipeline_run(organization_uuid, pipeline_uuid, request_json):
     except HTTPError as http_error:
         raise ValueError(created_pipeline) from http_error
 
+
 def delete_pipeline_run(
     organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
 ):
@@ -525,7 +526,7 @@ def fetch_pipeline_run(
     org_pipeline_run = next(
         filter(
             lambda r: r.uuid == organization_pipeline_run_uuid,
-            org_pipeline.organization_pipeline_runs
+            org_pipeline.organization_pipeline_runs,
         )
     )
 

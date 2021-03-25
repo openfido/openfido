@@ -553,13 +553,16 @@ def pipeline_run(
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
 
+
 @organization_pipeline_bp.route(
     "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>",
     methods=["DELETE"],
 )
 @any_application_required
 @validate_organization(False)
-def delete_run(organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid):
+def delete_run(
+    organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
+):
     """Delete a Organization Pipeline Run.
     ---
     tags:
@@ -577,12 +580,17 @@ def delete_run(organization_uuid, organization_pipeline_uuid, organization_pipel
         description: "Bad request"
     """
     try:
-        delete_pipeline_run(organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid)
+        delete_pipeline_run(
+            organization_uuid,
+            organization_pipeline_uuid,
+            organization_pipeline_run_uuid,
+        )
         return {}, 200
     except ValueError as value_error:
         return jsonify(value_error.args[0]), 400
     except HTTPError as http_error:
         return {"message": http_error.args[0]}, 503
+
 
 @organization_pipeline_bp.route(
     "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>/console",
