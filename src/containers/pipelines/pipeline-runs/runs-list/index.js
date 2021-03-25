@@ -216,10 +216,10 @@ const RunsList = ({
   );
 };
 
-
 RunsList.defaultProps = {
   pipelineRuns: [],
   currentPipelineRun: null,
+  currentPipeline: null,
 };
 
 RunsList.propTypes = {
