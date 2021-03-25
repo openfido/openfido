@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
-import styled from "styled-components";
-import { Space } from "antd";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+import { Space } from 'antd';
 
-import { requestDeletePipelineRun } from "services";
-import CloseOutlined from "icons/CloseOutlined";
-import AlertOutlined from "icons/AlertOutlined";
-import { 
-  StyledH2, 
-  StyledModal, 
-  StyledButton, 
-  StyledText } from "styles/app";
+import { requestDeletePipelineRun } from 'services';
+import CloseOutlined from 'icons/CloseOutlined';
+import AlertOutlined from 'icons/AlertOutlined';
+import {
+  StyledH2,
+  StyledModal,
+  StyledButton,
+  StyledText,
+} from 'styles/app';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -67,65 +68,73 @@ const DeletePipelineRunPopup = ({
   };
 
   return (
-      <Modal
-        visible
-        footer={null}
-        mask={false}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        closeIcon={<CloseOutlined />}
-        width={390}
-      >
-        {
-          <>
-            <StyledH2 color="pink">
-              <StyledText color="pink">
-                ALERT
-                <AlertOutlined />
-              </StyledText>
-            </StyledH2>
-            <Space direction="vertical" size={36} align="center">
-              <StyledText color="gray" size="large">
-                You are about to delete
-                <br />
-                <StyledText color="pink">
-                  Pipeline Run #{pipelineRunNumber} of {pipelineName}
-                </StyledText>
-                <br /> <strong>This action cannot be undone.</strong> Please be
-                certain.
-              </StyledText>
-              <StyledButton
-                size="middle"
-                color="blue"
-                width={108}
-                onClick={handleCancel}
-              >
-                <div>
-                  DO NOT
-                  <br />
-                  DELETE
-                </div>
-              </StyledButton>
-              <StyledButton
-                type="text"
-                color="transparent"
-                onClick={deletePipelineRun}
-              >
-                <StyledText
-                  size="large"
-                  fontweight={500}
-                  align="center"
-                  display="block"
-                  color="pink"
-                >
-                  Yes, I am certain that
-                  <br />I want to delete
-                </StyledText>
-              </StyledButton>
-            </Space>
-          </>
-        }
-      </Modal>
+    <Modal
+      visible
+      footer={null}
+      mask={false}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      closeIcon={<CloseOutlined />}
+      width={390}
+    >
+      <>
+        <StyledH2 color="pink">
+          <StyledText color="pink">
+            ALERT
+            <AlertOutlined />
+          </StyledText>
+        </StyledH2>
+        <Space direction="vertical" size={36} align="center">
+          <StyledText color="gray" size="large">
+            You are about to delete
+            <br />
+            <StyledText color="pink">
+              Pipeline Run #
+              {pipelineRunNumber}
+              {' '}
+              of
+              {' '}
+              {pipelineName}
+            </StyledText>
+            <br />
+            {' '}
+            <strong>This action cannot be undone.</strong>
+            {' '}
+            Please be
+            certain.
+          </StyledText>
+          <StyledButton
+            size="middle"
+            color="blue"
+            width={108}
+            onClick={handleCancel}
+          >
+            <div>
+              DO NOT
+              <br />
+              DELETE
+            </div>
+          </StyledButton>
+          <StyledButton
+            type="text"
+            color="transparent"
+            onClick={deletePipelineRun}
+          >
+            <StyledText
+              size="large"
+              fontweight={500}
+              align="center"
+              display="block"
+              color="pink"
+            >
+              Yes, I am certain that
+              <br />
+              I want to delete
+            </StyledText>
+          </StyledButton>
+        </Space>
+      </>
+    </Modal>
 
   );
 };
