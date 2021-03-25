@@ -210,6 +210,7 @@ def test_get_pipeline_run(client, pipeline, client_application, mock_execute_pip
     )
     assert result.status_code == 404
 
+
 def test_remove_pipeline_run(
     client, pipeline, client_application, mock_execute_pipeline
 ):
@@ -238,6 +239,7 @@ def test_remove_pipeline_run(
     )
     assert result.status_code == 200
     assert find_pipeline_run(pipeline_run.uuid) is None
+
 
 def test_list_pipeline_runs(
     client, pipeline, client_application, mock_execute_pipeline
