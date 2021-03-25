@@ -157,6 +157,10 @@ const PipelineRuns = () => {
     if (runStarted) dispatch(getPipelineRuns(currentOrg, pipelineInView));
   };
 
+  const handleDeletePipelineRunSuccess = () => {
+    dispatch(getPipelineRuns(currentOrg, pipelineInView));
+  };
+
   return (
     <React.Fragment key={pipelineInView}>
       <StyledTitle>
@@ -175,6 +179,8 @@ const PipelineRuns = () => {
             pipelineRuns={pipelineRuns}
             currentPipelineRun={currentPipelineRun}
             onSelectPipelineRun={onSelectPipelineRun}
+            currentPipeline={pipelineInView}
+            handleSuccess={handleDeletePipelineRunSuccess}
           />
         </AllRunsSection>
         <OverviewSection>

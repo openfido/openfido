@@ -10,7 +10,7 @@ import {
 export const getGraphInterval = (totalPoints) => {
   const numberOfPoints = parseInt(totalPoints, 10);
 
-  return numberOfPoints > 10 ? Math.ceil(numberOfPoints / 8.0) : 1; // good for 1-8 ticks - 836px cartesian grid
+  return numberOfPoints > 8 ? Math.ceil(numberOfPoints / 8.0) : 'preserveStartEnd'; // good for 1-8 ticks - 836px cartesian grid
 };
 
 const DATE_FORMATS = [
@@ -18,7 +18,7 @@ const DATE_FORMATS = [
 ];
 
 export const toUnixTime = (str) => moment(str, DATE_FORMATS).unix();
-export const validDateString = (str) => moment(str, DATE_FORMATS).isValid();
+export const validDateString = (str) => moment(str, DATE_FORMATS, true).isValid();
 
 export const getLimitedDataPointsForGraph = ({
   data,
@@ -46,7 +46,7 @@ export const getLimitedDataPointsForGraph = ({
   timeSubsetData.forEach((point, index) => {
     const nth = Math.ceil((index * totalGraphPoints) / timeSubsetData.length);
 
-    if (limitedDataSet.length + 1 === nth) {
+    if (limitedDataSet.length + 1 <= nth) {
       limitedDataSet.push(timeSubsetData[index]);
     }
   });
@@ -84,7 +84,6 @@ export const parseCsvData = (data) => {
       .on('error', reject)
       .on('data', (row) => {
         const rowData = { ...row };
-
         Object.keys(rowData).forEach((column) => {
           if (rowData[column].match(/^[+-]?\d+([,.]\d+)?(e[+-]\d+)?$/)) {
             rowData[column] = parseFloat(rowData[column]);
