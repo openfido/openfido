@@ -77,6 +77,17 @@ def test_find_organization_pipeline_run(
 
     assert pipeline_run == organization_pipeline_run
 
+    # deleted pipeline runs are not returned
+    pipeline_run.is_deleted = True
+    db.session.commit()
+
+    assert (
+        find_organization_pipeline_run(
+            organization_pipeline.id, organization_pipeline_run.pipeline_run_uuid
+        )
+        is None
+    )
+
 
 def test_find_latest_organization_pipeline_run(
     app, organization_pipeline, organization_pipeline_run

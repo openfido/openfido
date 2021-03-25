@@ -10,7 +10,10 @@ from app.pipelines.models import (
     OrganizationPipelineInputFile,
     db,
 )
-from app.pipelines.queries import find_organization_pipelines
+from app.pipelines.queries import (
+    find_organization_pipelines,
+    find_organization_pipeline_run,
+)
 from app.utils import ApplicationsEnum
 from application_roles.decorators import ROLES_KEY
 from application_roles.services import create_application
@@ -776,6 +779,101 @@ def test_pipeline_run(
 
     assert result.status_code == 200
     assert result.json == json_response
+
+
+@responses.activate
+def test_delete_pipeline(app, client, client_application, organization_pipeline):
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}",
+    )
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 200
+    assert set(find_organization_pipelines(ORGANIZATION_UUID)) == set()
+
+
+@responses.activate
+def test_delete_pipeline_run(
+    app, client, client_application, organization_pipeline, organization_pipeline_run
+):
+
+    responses.add(
+        responses.DELETE,
+        f"{app.config[WORKFLOW_HOSTNAME]}/v1/pipelines/{organization_pipeline.pipeline_uuid}/runs/{organization_pipeline_run.pipeline_run_uuid}",
+    )
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+
+    assert result.status_code == 200
+    assert (
+        find_organization_pipeline_run(
+            ORGANIZATION_UUID, organization_pipeline_run.uuid
+        )
+        == None
+    )
+
+
+@patch("app.pipelines.routes.delete_pipeline_run")
+@responses.activate
+def test_delete_pipeline_run_http_error(
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    delete_mock.side_effect = HTTPError("something is wrong")
+
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 503
+    assert result.json == {"message": "something is wrong"}
+
+
+@patch("app.pipelines.routes.delete_pipeline_run")
+@responses.activate
+def test_delete_pipeline_run_bad_response(
+    delete_mock,
+    app,
+    client,
+    client_application,
+    organization_pipeline,
+    organization_pipeline_run,
+):
+    message = {"message": "error"}
+    delete_mock.side_effect = ValueError(message)
+    result = client.delete(
+        f"/v1/organizations/{ORGANIZATION_UUID}/pipelines/{organization_pipeline.uuid}/runs/{organization_pipeline_run.uuid}",
+        content_type="application/json",
+        headers={
+            "Authorization": f"Bearer {JWT_TOKEN}",
+            ROLES_KEY: client_application.api_key,
+        },
+    )
+    assert result.status_code == 400
+    assert result.json == {"message": "error"}
 
 
 @patch("app.pipelines.routes.fetch_pipeline_run")
