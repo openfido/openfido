@@ -216,20 +216,20 @@ const RunsList = ({
   );
 };
 
-RunsList.propTypes = {
-  openStartRunPopup: PropTypes.func.isRequired,
-  handleSuccess: PropTypes.func.isRequired,
-  pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
-
-  })),
-  currentPipelineRun: PropTypes.string.isRequired,
-  onSelectPipelineRun: PropTypes.func.isRequired,
-  currentPipeline: PropTypes.string
-};
 
 RunsList.defaultProps = {
   pipelineRuns: [],
   currentPipelineRun: null,
+};
+
+RunsList.propTypes = {
+  openStartRunPopup: PropTypes.func.isRequired,
+  handleSuccess: PropTypes.func.isRequired,
+  pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
+  })),
+  currentPipelineRun: PropTypes.string,
+  onSelectPipelineRun: PropTypes.func.isRequired,
+  currentPipeline: PropTypes.string,
 };
 
 export default RunsList;
