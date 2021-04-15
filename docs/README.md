@@ -9,7 +9,7 @@ localhost% curl -sL https://raw.githubusercontent.com/openfido/cli/main/install.
 localhost% openfido server start
 ~~~
 
-
+The start up process can take several minutes. Once the server is running, you can open a browser using the command `openfido server open` or navigate to `http://localhost:3000/`.  The default administrator username is `admin@example.com` and password is `1234567890`.  If you make this server accessible to other users, we strongly recommend you change the admin username and password immediately.
 
 ## Available Pipelines
 
