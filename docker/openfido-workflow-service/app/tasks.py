@@ -125,7 +125,7 @@ def execute_pipeline(
             outputdir = join(tmpdir, "output")
 
             executor.run(f"docker pull {docker_image_url}", tmpdir)
-            executor.run(f"git clone {repository_ssh_url} gitrepo", tmpdir)
+            executor.run(f"git clone --depth 1 {repository_ssh_url} gitrepo", tmpdir)
             executor.run(f"git checkout {repository_branch}", gitdir)
 
             if not os.path.exists(join(gitdir, repository_script)):
