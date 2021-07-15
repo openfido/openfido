@@ -80,7 +80,6 @@ def test_find_organization_pipeline_run(
     # deleted pipeline runs are not returned
     pipeline_run.is_deleted = True
     db.session.commit()
-    
     assert (
         find_organization_pipeline_run(
             organization_pipeline.id, organization_pipeline_run.pipeline_run_uuid
