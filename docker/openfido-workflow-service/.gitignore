@@ -1,0 +1,7 @@
+.vimrc
+__pycache__
+.coverage
+htmlcov
+test-results
+uploads
+.worker-env

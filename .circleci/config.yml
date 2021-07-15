@@ -1,0 +1,19 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-and-test:
+    executor: python/default
+    steps:
+      - checkout
+      - run: pip install -r platform/requirements.txt
+      - run: 
+          name: Test
+          command: ./platform/openfido/manage.py test
+
+workflows:
+  main:
+    jobs:
+      - build-and-test

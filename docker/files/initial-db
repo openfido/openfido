@@ -1,0 +1,7 @@
+#
+# Initial OpenFIDO database for first-time setup
+#
+# Recid,Name,dockerhub,github,branch,script
+1,Integration Capacity Analysis,slacgismo/gridlabd:develop-ica,openfido/ica-analysis,openfido.sh
+2,CYME Data Extraction,ubuntu:20.04,openfido/cyme-extract,openfido.sh
+3,HiPAS Converters,ubuntu:20.04,openfido/hipas-converters,openfido.sh
