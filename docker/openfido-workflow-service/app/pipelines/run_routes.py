@@ -12,7 +12,7 @@ from .services import (
     create_pipeline_run_artifact,
     update_pipeline_run_output,
     update_pipeline_run_state,
-    delete_pipeline_run
+    delete_pipeline_run,
 )
 
 logger = logging.getLogger("pipeline-runs")
@@ -222,6 +222,35 @@ def delete_run(pipeline_uuid, pipeline_run_uuid):
             "message": "Unable to delete workflow pipeline run",
         }, 400
 
+@run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["DELETE"])
+@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
+def delete_run(pipeline_uuid, pipeline_run_uuid):
+    """Delete a pipeline run.
+    ---
+
+    tags:
+      - pipeline runs
+    parameters:
+      - in: header
+        name: Workflow-API-Key
+        description: Requires key type PIPELINES_CLIENT
+        schema:
+          type: string
+    responses:
+      "200":
+        description: "Deleted"
+      "400":
+        description: "Bad request"
+    """
+    try:
+        delete_pipeline_run(pipeline_uuid, pipeline_run_uuid)
+        return {}, 200
+    except ValueError:
+        return {
+            "message": "Unable to delete workflow pipeline run",
+        }, 400
+
+
 @run_bp.route("/<pipeline_uuid>/runs", methods=["GET"])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
 def get_runs(pipeline_uuid):
@@ -288,7 +317,13 @@ def get_runs(pipeline_uuid):
         logger.warning("no pipeline found")
         return {}, 404
 
-    return jsonify([PipelineRunSchema().dump(pr) for pr in pipeline.pipeline_runs if not pr.is_deleted])
+    return jsonify(
+        [
+            PipelineRunSchema().dump(pr)
+            for pr in pipeline.pipeline_runs
+            if not pr.is_deleted
+        ]
+    )
 
 
 @run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>/console", methods=["GET"])
