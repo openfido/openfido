@@ -51,6 +51,8 @@ subtree.
     export DOCKER_BUILDKIT=1
     export COMPOSE_DOCKER_CLI_BUILD=1
 
+    cp openfido-auth-service/.env.example .auth-env
+
     touch .worker-env
     touch openfido-auth-service/.env
 
@@ -60,7 +62,7 @@ subtree.
 
     # Initialize all the databases for all the services:
     docker-compose run --rm auth-service flask db upgrade
-    docker-compose run --rm workflow-service flask db upgrade 
+    docker-compose run --rm workflow-service flask db upgrade
     docker-compose run --rm app-service flask db upgrade
 
     # Configure the workflow service access tokens:
@@ -80,6 +82,11 @@ subtree.
 
     # bring up all the services!
     docker-compose up
+
+    # Navigate to localhost:3000
+    # email: admin@example.com
+    # password: 1234567890
+    # Create an organization once logged in under settings/Edit Organization
 
 
 Git Subtree
