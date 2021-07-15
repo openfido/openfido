@@ -88,6 +88,8 @@ subtree.
     # password: 1234567890
     # Create an organization once logged in under settings/Edit Organization
 
+Note: To troubleshoot, delete all the local docker containers and restart the process again
+
 
 Git Subtree
 -----------
