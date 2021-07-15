@@ -158,7 +158,7 @@ const PipelineRuns = () => {
   };
 
   const handleDeletePipelineRunSuccess = () => {
-    dispatch(getPipelineRuns(currentOrg, pipelineInView))
+    dispatch(getPipelineRuns(currentOrg, pipelineInView));
   };
 
   return (
