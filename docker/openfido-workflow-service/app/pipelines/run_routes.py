@@ -186,41 +186,6 @@ def get_run(pipeline_uuid, pipeline_run_uuid):
 
     return jsonify(PipelineRunSchema().dump(pipeline_run))
 
-@run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["DELETE"])
-@permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])
-def delete_run(pipeline_uuid, pipeline_run_uuid):
-    """Delete a pipeline run.
-    ---
-    tags:
-      - pipelines
-    parameters:
-      - in: header
-        name: Workflow-API-Key
-        description: Requires key type PIPELINES_CLIENT
-        schema:
-          type: string
-    parameters:
-      - name: pipeline_uuid
-        in: path
-        required: true
-        description: UUID of a pipeline.
-      - name: pipeline_run_uuid
-        in: path
-        required: true
-        description: UUID of a pipeline run.
-    responses:
-      "200":
-        description: "Deleted"
-      "400":
-        description: "Bad request"
-    """
-    try:
-        delete_pipeline_run(pipeline_uuid, pipeline_run_uuid)
-        return {}, 200
-    except ValueError:
-        return {
-            "message": "Unable to delete workflow pipeline run",
-        }, 400
 
 @run_bp.route("/<pipeline_uuid>/runs/<pipeline_run_uuid>", methods=["DELETE"])
 @permissions_required([SystemPermissionEnum.PIPELINES_CLIENT])

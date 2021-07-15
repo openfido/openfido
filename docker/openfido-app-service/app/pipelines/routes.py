@@ -559,37 +559,6 @@ def pipeline_run(
 )
 @any_application_required
 @validate_organization(False)
-def delete_run(organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid):
-    """Delete a Organization Pipeline Run.
-    ---
-    tags:
-      - pipeline runs
-    parameters:
-      - in: header
-        name: Workflow-API-Key
-        description: Requires key type REACT_CLIENT
-        schema:
-          type: string
-    responses:
-      "200":
-        description: "Deleted OrganizationPipelineRun"
-      "400":
-        description: "Bad request"
-    """
-    try:
-        delete_pipeline_run(organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid)
-        return {}, 200
-    except ValueError as value_error:
-        return jsonify(value_error.args[0]), 400
-    except HTTPError as http_error:
-        return {"message": http_error.args[0]}, 503
-
-@organization_pipeline_bp.route(
-    "/<organization_uuid>/pipelines/<organization_pipeline_uuid>/runs/<organization_pipeline_run_uuid>",
-    methods=["DELETE"],
-)
-@any_application_required
-@validate_organization(False)
 def delete_run(
     organization_uuid, organization_pipeline_uuid, organization_pipeline_run_uuid
 ):
