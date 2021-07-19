@@ -35,7 +35,7 @@ const RunMenu = styled(Menu)`
     .ant-menu-item-selected, .ant-menu-item-active {
       background-color: transparent;
     }
-  } 
+  }
 `;
 
 const RunItem = styled(Menu.Item)`
@@ -121,8 +121,8 @@ const StatusText = styled.mark`
 `;
 
 const Caret = styled.div`
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-top: 14px solid transparent;
   border-bottom: 14px solid transparent;
   border-left: 14px solid ${({ bgcolor }) => (bgcolor in colors ? colors[bgcolor] : '')};
@@ -141,11 +141,11 @@ const RunsList = ({
   const openDeleteRunPopup = () => {
     setShowDeleteRunPopup(true);
   };
-  
+
   const closeDeleteRunPopup = () => {
     setShowDeleteRunPopup(false);
   };
-  
+
   const onPermanentlyDeleteClicked = () => {
     setShowDeleteRunPopup(false);
     handleSuccess();

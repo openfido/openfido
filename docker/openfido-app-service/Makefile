@@ -11,9 +11,9 @@ logs:
 	docker-compose logs -f --tail=50
 
 upgrade-dbs:
-	docker-compose run --rm auth_service flask db upgrade
-	docker-compose run --rm workflow_service flask db upgrade
-	docker-compose run --rm app_service flask db upgrade
+	docker-compose run --rm auth-service flask db upgrade
+	docker-compose run --rm workflow-service flask db upgrade
+	docker-compose run --rm app-service flask db upgrade
 
 access-tokens:
 	docker-compose run --rm workflow_service invoke create-application-key -n "local worker" -p PIPELINES_WORKER | sed 's/^/WORKER_/' > .worker-env
