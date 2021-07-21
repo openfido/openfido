@@ -239,6 +239,36 @@ def test_remove_pipeline_run(
     assert result.status_code == 200
     assert find_pipeline_run(pipeline_run.uuid) is None
 
+def test_remove_pipeline_run(
+    client, pipeline, client_application, mock_execute_pipeline
+):
+    db.session.commit()
+    pipeline_run = create_pipeline_run(pipeline.uuid, VALID_CALLBACK_INPUT)
+    db.session.commit()
+
+    result = client.delete(
+        "/v1/pipelines/no-id/runs/no-id",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+    # no such pipeline_run_id
+    result = client.delete(
+        f"/v1/pipelines/{pipeline.uuid}/runs/no-id",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 400
+
+    # successfully delete a pipeline_run
+    result = client.delete(
+        f"/v1/pipelines/{pipeline.uuid}/runs/{pipeline_run.uuid}",
+        content_type="application/json",
+        headers={ROLES_KEY: client_application.api_key},
+    )
+    assert result.status_code == 200
+    assert find_pipeline_run(pipeline_run.uuid) is None
+
+
 def test_list_pipeline_runs(
     client, pipeline, client_application, mock_execute_pipeline
 ):

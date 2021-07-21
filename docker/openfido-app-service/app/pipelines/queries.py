@@ -78,7 +78,7 @@ def find_latest_organization_pipeline_run(organization_pipeline_id):
             OrganizationPipelineRun.organization_pipeline_id
             == organization_pipeline_id,
             OrganizationPipeline.is_deleted == False,
-            OrganizationPipelineRun.is_deleted == False
+            OrganizationPipelineRun.is_deleted == False,
         )
         .order_by(OrganizationPipelineRun.created_at.desc())
         .first()

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -131,7 +131,7 @@ const Caret = styled.div`
 `;
 
 const RunsList = ({
-  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun, currentPipeline, handleSuccess
+  openStartRunPopup, pipelineRuns, currentPipelineRun, onSelectPipelineRun, currentPipeline, handleSuccess,
 }) => {
   const [showDeleteRunPopup, setShowDeleteRunPopup] = useState(false);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
@@ -141,11 +141,11 @@ const RunsList = ({
   const openDeleteRunPopup = () => {
     setShowDeleteRunPopup(true);
   };
-  
+
   const closeDeleteRunPopup = () => {
     setShowDeleteRunPopup(false);
   };
-  
+
   const onPermanentlyDeleteClicked = () => {
     setShowDeleteRunPopup(false);
     handleSuccess();
@@ -189,7 +189,7 @@ const RunsList = ({
                 </StyledText>
               )}
               <StyledButton type="text" size="small" onClick={openDeleteRunPopup} width={70}>
-                <DeleteOutlined color="Gray20" onClick={openDeleteRunPopup}/>
+                <DeleteOutlined color="Gray20" onClick={openDeleteRunPopup} />
               </StyledButton>
               <StyledH5>Duration:</StyledH5>
               {duration && (
@@ -208,8 +208,7 @@ const RunsList = ({
                 pipelineName={currentPipelineName}
                 pipelineRunNumber={sequence}
               />
-              )
-            }
+            )}
           </RunItem>
         ))}
       </RunMenu>
@@ -217,22 +216,20 @@ const RunsList = ({
   );
 };
 
+RunsList.defaultProps = {
+  pipelineRuns: [],
+  currentPipelineRun: null,
+  currentPipeline: null,
+};
+
 RunsList.propTypes = {
   openStartRunPopup: PropTypes.func.isRequired,
   handleSuccess: PropTypes.func.isRequired,
   pipelineRuns: PropTypes.arrayOf(PropTypes.shape({
-
   })),
   currentPipelineRun: PropTypes.string,
   onSelectPipelineRun: PropTypes.func.isRequired,
   currentPipeline: PropTypes.string,
-  currentPipelineName: PropTypes.string,
-  currentOrg: PropTypes.string
-};
-
-RunsList.defaultProps = {
-  pipelineRuns: [],
-  currentPipelineRun: null,
 };
 
 export default RunsList;
