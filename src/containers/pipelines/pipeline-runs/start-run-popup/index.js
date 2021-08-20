@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from "axios";
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -17,6 +18,7 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
+import PipelineForm from 'util/pipelineForm';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -147,12 +149,11 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
+const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
   const inputFiles = useSelector((state) => state.pipelines.inputFiles);
-
   const [uploadBoxDragged, setUploadBoxDragged] = useState(false);
 
   const onInputsChangedOrDropped = (e) => {
@@ -188,7 +189,8 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
         inputUuids.push(input_uuid);
       });
     }
-
+    console.log(inputFiles)
+    console.log("INPUT UUID", inputUuids)
     requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
       .then(() => {
         handleOk(true);
@@ -205,6 +207,76 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
     dispatch(clearInputFiles());
   };
 
+  const handleInputFormSubmit = async (e, data, fileName) => {
+    e.preventDefault();
+    console.log("STARTED")
+    console.log(fileName)
+    await dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, data));
+    console.log("DONE")
+
+  }
+
+  const inputForm = () => {
+
+    // get config from github
+    // console.log("AXIOS", configUrl)
+    // await axios.get(configUrl)
+    // .then((response) => {
+    //   console.log("RESPONSE", response)
+    //   const data1 = response.data;
+    //   console.log("DATA", data1)
+    // })
+    // console.log("YOOO")
+    const data = {
+      "config.csv" : {
+        "City": {
+          "optionsMulti": [
+            "ABI", "ALB", "AMA", "ATL", "AUS",
+            "BDL", "BDR", "BFL", "BNA", "BOS", "BTW", "BUF", "BWI",
+            "CHS", "CLE", "CLT", "CRP", "CRW", "CYS",
+            "DEN", "DFW", "DLH", "DTW",
+            "ECG", "FAR", "GAI", "GEI", "GRB",
+            "IAH",
+            "JAX",
+            "LAX", "LIT",
+            "MAG", "MCI", "MIA", "MKE", "MSG", "MSP", "MSY",
+            "NYC",
+            "OKC", "OMA", "ONT", "ORG", "ORH",
+            "PDX", "PHL", "PHX", "PIT", "PSP", "PVD", "PWM",
+            "RST",
+            "SAT", "SDF", "SEA", "SFO", "SLC", "SMF", "SPS", "STL", "SYR",
+            "TYR",
+            "YFC", "YHZ", "YOW", "YQB", "YQT", "YSB", "YUL", "YUY", "YYC", "YYZ", "YZV"
+          ]
+        },
+        "Season" : {
+          "optionsMulti": [
+            "Spring", "Summer", "Fall", "Winter"
+          ]
+        },
+        "Feeder" : {
+          "optionsMulti" : [
+            "Residential", "Commercial", "Mixed", "Rural"
+          ]
+        },
+        "Intermediate Results" : {
+          "optionsMulti" : [
+            "weather", "loadshape"
+          ]
+        }
+      }
+    }
+
+    return (
+      <>
+        <PipelineForm
+          data={ data }
+          onInputFormSubmit={ handleInputFormSubmit }
+        />
+      </>
+    )
+  }
+
   return (
     <Modal
       visible
@@ -218,6 +290,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
       title="Start a run"
     >
       <StyledForm onSubmit={onStartRunClicked}>
+        { inputForm() }
         <UploadSection>
           <UploadBox
             onDragOver={onUploadBoxDragOverOrEnter}
@@ -274,6 +347,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  configUrl: PropTypes.string.isRequired,
 };
 
 export default StartRunPopup;
