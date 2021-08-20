@@ -47,7 +47,7 @@ const AllRunsSection = styled.section`
     top: calc(50% - 8px);
     left: calc(50% - 8px);
   }
-  h2 { 
+  h2 {
      width: 100%;
      padding-bottom: 3px;
      padding-left: 16px;
@@ -101,6 +101,14 @@ const PipelineRuns = () => {
   const [showStartRunPopup, setStartRunPopup] = useState(false);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
+  let configUrl = null
+  if (pipelines !== null) {
+    pipelines.map((pipeline)=>{
+      if (pipeline.uuid === pipelineInView) {
+        configUrl = pipeline.repository_ssh_url.replace(".git", "").replace("github", "raw.githubusercontent") + "/" + pipeline.repository_branch + "/openfido_start.json"
+      }
+    })
+  }
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
   const currentPipelineRun = useSelector((state) => state.pipelines.currentPipelineRunUuids[pipelineInView]);
@@ -217,6 +225,7 @@ const PipelineRuns = () => {
           handleOk={closeStartRunPopup}
           handleCancel={closeStartRunPopup}
           pipeline_uuid={pipelineInView}
+          configUrl = {configUrl}
         />
       )}
     </React.Fragment>

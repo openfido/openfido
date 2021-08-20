@@ -1,0 +1,22 @@
+{
+  "file1Name.csv" : {
+    "key1" : {
+      // "optionsSingle", "optionsMulti", "textField", "dateField", "integerField", "floatField"
+      "type" : "optionsSingle",
+      "values" : [
+        "a", "b", "c"
+      ],
+      // pattern is regex
+      "validate" : "pattern"
+    }
+  },
+  "config.glm" : [
+      "clock {",
+      "  starttime ${STARTIME};",
+      "  stoptime ${STOPTIME};",
+      "}"
+  ],
+  "modify.csv" : [
+      "object_name,property_name,new_value",
+  ]
+}
