@@ -226,41 +226,45 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl }) => 
     //   const data1 = response.data;
     //   console.log("DATA", data1)
     // })
-    // console.log("YOOO")
+
     const data = {
       "config.csv" : {
-        "City": {
-          "optionsMulti": [
-            "ABI", "ALB", "AMA", "ATL", "AUS",
-            "BDL", "BDR", "BFL", "BNA", "BOS", "BTW", "BUF", "BWI",
-            "CHS", "CLE", "CLT", "CRP", "CRW", "CYS",
-            "DEN", "DFW", "DLH", "DTW",
-            "ECG", "FAR", "GAI", "GEI", "GRB",
-            "IAH",
-            "JAX",
-            "LAX", "LIT",
-            "MAG", "MCI", "MIA", "MKE", "MSG", "MSP", "MSY",
-            "NYC",
-            "OKC", "OMA", "ONT", "ORG", "ORH",
-            "PDX", "PHL", "PHX", "PIT", "PSP", "PVD", "PWM",
-            "RST",
-            "SAT", "SDF", "SEA", "SFO", "SLC", "SMF", "SPS", "STL", "SYR",
-            "TYR",
-            "YFC", "YHZ", "YOW", "YQB", "YQT", "YSB", "YUL", "YUY", "YYC", "YYZ", "YZV"
-          ]
-        },
+        "City" : {
+          "type" : "optionsMulti",
+          "values" : [
+              "ABI", "ALB", "AMA", "ATL", "AUS",
+              "BDL", "BDR", "BFL", "BNA", "BOS", "BTW", "BUF", "BWI",
+              "CHS", "CLE", "CLT", "CRP", "CRW", "CYS",
+              "DEN", "DFW", "DLH", "DTW",
+              "ECG", "FAR", "GAI", "GEI", "GRB",
+              "IAH",
+              "JAX",
+              "LAX", "LIT",
+              "MAG", "MCI", "MIA", "MKE", "MSG", "MSP", "MSY",
+              "NYC",
+              "OKC", "OMA", "ONT", "ORG", "ORH",
+              "PDX", "PHL", "PHX", "PIT", "PSP", "PVD", "PWM",
+              "RST",
+              "SAT", "SDF", "SEA", "SFO", "SLC", "SMF", "SPS", "STL", "SYR",
+              "TYR",
+              "YFC", "YHZ", "YOW", "YQB", "YQT", "YSB", "YUL", "YUY", "YYC", "YYZ", "YZV"
+            ]
+          },
         "Season" : {
-          "optionsMulti": [
+          "type" : "optionsMulti",
+          "values" : [
             "Spring", "Summer", "Fall", "Winter"
           ]
         },
         "Feeder" : {
-          "optionsMulti" : [
+          "type" : "optionsMulti",
+          "values" : [
             "Residential", "Commercial", "Mixed", "Rural"
           ]
         },
         "Intermediate Results" : {
-          "optionsMulti" : [
+          "type" : "optionsMulti",
+          "values" : [
             "weather", "loadshape"
           ]
         }

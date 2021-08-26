@@ -59,6 +59,24 @@ class PipelineForm extends React.Component {
     this.setState({ [field]: event.target.value });
   };
 
+  optionsMulti = (key) => {
+    return (
+      <select className="form-control" name={ key } id={ key } onChange={(e) => this.update(key , e)} multiple>
+        {
+          this.state.data[this.state.fileName][key]["values"].map((option)=>{
+            return(
+              <>
+                <option value={ option }>
+                  { option }
+                </option>
+              </>
+            )
+          })
+        }
+      </select>
+    )
+  };
+
   render() {
     if (this.state.keys) {
       return (
@@ -69,19 +87,12 @@ class PipelineForm extends React.Component {
                 return (
                   <>
                     <label for={ key }> { key }: </label>
-                    <select className="form-control" name={ key } id={ key } onChange={(e) => this.update(key , e)} multiple>
-                      {
-                        this.state.data[this.state.fileName][key]["optionsMulti"].map((option)=>{
-                          return(
-                            <>
-                              <option value={ option }>
-                                { option }
-                              </option>
-                            </>
-                          )
-                        })
-                      }
-                    </select>
+                    { (this.state.data[this.state.fileName][key]["type"] === "optionsMulti")
+                      ?
+                      this.optionsMulti(key)
+                      :
+                      null
+                    }
                     <br/>
                   </>
                 )
