@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import {
@@ -9,12 +9,13 @@ import {
 import {
   uploadInputFile,
 } from 'actions/pipelines';
+import MultiSelect from "react-multi-select-component";
 
 const PipelineFormStyled = styled.div`
   width: 90%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: left;
 `;
 
 class PipelineForm extends React.Component {
@@ -23,33 +24,48 @@ class PipelineForm extends React.Component {
     this.state = {};
   }
 
-  componentWillMount() {
-    const data = this.props.data
-    const fileName = Object.keys(data)[0]
-    const keys = Object.keys(data[fileName])
-    let formState = {
-      data: data,
-      fileName: fileName,
-      keys: keys
+  componentDidUpdate(prevProps, prevState) {
+    if ((Object.keys(prevProps.data).length === 0) && (Object.keys(this.props.data).length !== 0)) {
+      const data = this.props.data
+      const fileName = Object.keys(data)[0]
+      const keys = Object.keys(data[fileName])
+      let formState = {
+        data: data,
+        fileName: fileName,
+        keys: keys
+      }
+      keys.map((key)=>{
+        if (data[fileName][key]["type"] === "optionsMulti") {
+          formState.[key] = [];
+        } else {
+          formState.[key] = null;
+        }
+      })
+      this.setState(formState)
     }
-    keys.map((key)=>{
-      formState.[key] = null;
-    })
-    this.setState(formState)
   };
 
   toCsv = (e) => {
     let data = this.state
     const fileName = data.fileName
     // since state was dynamically created, accessing form data by
-    // elminiating the ones we know exists
+    // eliminating the ones we know exists
     delete data.data
     delete data.keys
     delete data.fileName
 
     let csvFormat = ""
     Object.keys(data).forEach(function(key) {
-      csvFormat += key + "," + data[key] + "\n"
+      // since the selected values are multiValue]
+      let values = "";
+      if (Array.isArray(data[key])) {
+        data[key].map((x) => {
+          values += x.value + " "
+        });
+      } else {
+        values = data[key]
+      }
+      csvFormat += key + "," + values.trim() + "\n"
     })
     let arrayBuffer = new TextEncoder("utf-8").encode(csvFormat);
     this.props.onInputFormSubmit(e, arrayBuffer, fileName)
@@ -59,42 +75,80 @@ class PipelineForm extends React.Component {
     this.setState({ [field]: event.target.value });
   };
 
+  validatInput = (e, key) => {
+    let value = e.target.value
+    debugger;
+  }
+
   optionsMulti = (key) => {
-    return (
-      <select className="form-control" name={ key } id={ key } onChange={(e) => this.update(key , e)} multiple>
-        {
-          this.state.data[this.state.fileName][key]["values"].map((option)=>{
-            return(
-              <>
-                <option value={ option }>
-                  { option }
-                </option>
-              </>
-            )
-          })
-        }
-      </select>
-    )
+    let options = []
+    this.state.data[this.state.fileName][key]["values"].map((option)=>{
+      options.push({label: option, value: option})
+    })
+    return options
   };
 
   render() {
     if (this.state.keys) {
       return (
         <PipelineFormStyled>
-          <div className="form-row pipelineForm">
+          <div className="pipelineForm row">
             {
               this.state.keys.map((key)=>{
                 return (
-                  <>
+                  <div className="col-md-6">
+                    <br />
                     <label for={ key }> { key }: </label>
                     { (this.state.data[this.state.fileName][key]["type"] === "optionsMulti")
                       ?
-                      this.optionsMulti(key)
+                      <>
+                        <MultiSelect
+                          options={ this.optionsMulti(key) }
+                          value={ this.state[key] }
+                          onChange={ (e) => this.setState({[key]: e}) }
+                          labelledBy="Select"
+                        />
+                      </>
                       :
                       null
                     }
-                    <br/>
-                  </>
+                    { (this.state.data[this.state.fileName][key]["type"] === "textField")
+                      ?
+                      <div className="form-group">
+                        <input
+                          className="form-control"
+                          type="text"
+                          onChange={ (e) => this.setState({[key]: e.target.value}) }
+                        />
+                      </div>
+                      :
+                      null
+                    }
+                    { (this.state.data[this.state.fileName][key]["type"] === "integerField")
+                      ?
+                      <div className="form-group">
+                        <input
+                          className="form-control"
+                          type="number"
+                          onChange={ (e) => this.setState({[key]: e.target.value}) }
+                        />
+                      </div>
+                      :
+                      null
+                    }
+                    { (this.state.data[this.state.fileName][key]["type"] === "dateField")
+                      ?
+                      <div className="form-group">
+                        <input
+                          className="form-control"
+                          type="datetime-local"
+                          onChange={ (e) => this.setState({[key]: e.target.value}) }
+                        />
+                      </div>
+                      :
+                      null
+                    }
+                  </div>
                 )
               })
             }
@@ -111,13 +165,12 @@ class PipelineForm extends React.Component {
           <br />
         </PipelineFormStyled>
       );
+    } else {
+      return (
+        <>
+        </>
+      )
     }
-  else {
-    return (
-      <>
-      </>
-    )
-  }
   }
 }
 
