@@ -228,7 +228,7 @@ export default (state = DEFAULT_STATE, action) => {
         messages: DEFAULT_STATE.messages,
         inputFiles,
       };
-    }
+    };
     case CLEAR_INPUT_FILES:
       return {
         ...state,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import axios from "axios";
 
 import {
   PIPELINE_STATES,
@@ -12,6 +13,7 @@ import {
   getPipelineRuns,
   getPipelineRun,
   getPipelines,
+  getPipelineConfigData,
 } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
@@ -124,6 +126,7 @@ const PipelineRuns = () => {
       && pipelineRunSelected.states.length
       && pipelineRunSelected.states[pipelineRunSelected.states.length - 1].state
   );
+  // dispatch(getPipelineConfigData(configUrl));
 
   useEffect(() => {
     if (!pipelines) {
