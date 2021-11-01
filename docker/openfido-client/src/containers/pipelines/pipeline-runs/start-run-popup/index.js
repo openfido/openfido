@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import axios from "axios";
 
 import { requestStartPipelineRun } from 'services';
 import {
@@ -17,6 +18,7 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
+import PipelineForm from 'util/pipelineForm';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -147,12 +149,19 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
+const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
+  // get config from github
+  // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
+  const [data, setData] = useState({})
+  useEffect( () => {
+      axios.get(configUrl).then((response) => {
+        setData(response.data)
+      })
+   }, []);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
   const inputFiles = useSelector((state) => state.pipelines.inputFiles);
-
   const [uploadBoxDragged, setUploadBoxDragged] = useState(false);
 
   const onInputsChangedOrDropped = (e) => {
@@ -188,7 +197,6 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
         inputUuids.push(input_uuid);
       });
     }
-
     requestStartPipelineRun(currentOrg, pipeline_uuid, inputUuids)
       .then(() => {
         handleOk(true);
@@ -205,6 +213,12 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
     dispatch(clearInputFiles());
   };
 
+  const handleInputFormSubmit = async (e, data, fileName) => {
+    e.preventDefault();
+    await dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, data));
+  };
+
+
   return (
     <Modal
       visible
@@ -218,6 +232,11 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid }) => {
       title="Start a run"
     >
       <StyledForm onSubmit={onStartRunClicked}>
+        <PipelineForm
+          data={data}
+          onInputFormSubmit={(e, arrayBuffer, fileName) => handleInputFormSubmit(e, arrayBuffer, fileName)}
+        >
+        </PipelineForm>
         <UploadSection>
           <UploadBox
             onDragOver={onUploadBoxDragOverOrEnter}
@@ -274,6 +293,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  configUrl: PropTypes.string.isRequired,
 };
 
 export default StartRunPopup;
