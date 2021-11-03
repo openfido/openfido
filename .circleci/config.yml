@@ -14,9 +14,6 @@ jobs:
           name: Install Dependencies
           command: npm install
       - run:
-          name: Run Lint
-          command: npm run lint
-      - run:
           name: Build
           command: npm run build
       - run:
