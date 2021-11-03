@@ -18,7 +18,9 @@ jobs:
           command: npm run lint
       - run:
           name: Build
-          command: npm run build
+          command: |
+            node --openssl-legacy-provider ./node_modules/.bin/gatsby build
+            npm run build
       - run:
           name: Move Build to tmb
           command: |
