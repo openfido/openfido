@@ -27,11 +27,20 @@ class PipelineForm extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if ((Object.keys(prevProps.data).length === 0) && (Object.keys(this.props.data).length !== 0)) {
       const data = this.props.data
-      const fileName = Object.keys(data)[0]
+      // get fileNames to specify what files are needed if input fields are not specified
+      const fileNames = Object.keys(data)
+      let fileNamesStr = ""
+      fileNames.map((key)=>{
+        fileNamesStr += (" " + key + ",")
+      })
+      // remove last comma from string
+      const fileNamesString = fileNamesStr.slice(0, -1);
+      const fileName = fileNames[0]
       const keys = Object.keys(data[fileName])
       let formState = {
         data: data,
         fileName: fileName,
+        fileNamesString: fileNamesString,
         keys: keys
       }
       keys.map((key)=>{
@@ -91,79 +100,85 @@ class PipelineForm extends React.Component {
   render() {
     if (this.state.keys) {
       return (
-        <PipelineFormStyled>
-          <div className="pipelineForm row">
-            {
-              this.state.keys.map((key)=>{
-                return (
-                  <div className="col-md-6">
-                    <br />
-                    <label for={ key }> { key }: </label>
-                    { (this.state.data[this.state.fileName][key]["type"] === "optionsMulti")
-                      ?
-                      <>
-                        <MultiSelect
-                          options={ this.optionsMulti(key) }
-                          value={ this.state[key] }
-                          onChange={ (e) => this.setState({[key]: e}) }
-                          labelledBy="Select"
-                        />
-                      </>
-                      :
-                      null
-                    }
-                    { (this.state.data[this.state.fileName][key]["type"] === "textField")
-                      ?
-                      <div className="form-group">
-                        <input
-                          className="form-control"
-                          type="text"
-                          onChange={ (e) => this.setState({[key]: e.target.value}) }
-                        />
-                      </div>
-                      :
-                      null
-                    }
-                    { (this.state.data[this.state.fileName][key]["type"] === "integerField")
-                      ?
-                      <div className="form-group">
-                        <input
-                          className="form-control"
-                          type="number"
-                          onChange={ (e) => this.setState({[key]: e.target.value}) }
-                        />
-                      </div>
-                      :
-                      null
-                    }
-                    { (this.state.data[this.state.fileName][key]["type"] === "dateField")
-                      ?
-                      <div className="form-group">
-                        <input
-                          className="form-control"
-                          type="datetime-local"
-                          onChange={ (e) => this.setState({[key]: e.target.value}) }
-                        />
-                      </div>
-                      :
-                      null
-                    }
-                  </div>
-                )
-              })
-            }
+        <>
+          <div>
+          Required Files Are:
+          { this.state.fileNamesString }
           </div>
-          <br />
-          <StyledButton
-            aria-label="Start Run button"
-            size="middle"
-            color="blue"
-            width={108}
-            onClick={ e => this.toCsv(e) }>
-            Create Inputs
-          </StyledButton>
-          <br />
-        </PipelineFormStyled>
+          <PipelineFormStyled>
+            <div className="pipelineForm row">
+              {
+                this.state.keys.map((key)=>{
+                  return (
+                    <div className="col-md-6">
+                      <br />
+                      <label for={ key }> { key }: </label>
+                      { (this.state.data[this.state.fileName][key]["type"] === "optionsMulti")
+                        ?
+                        <>
+                          <MultiSelect
+                            options={ this.optionsMulti(key) }
+                            value={ this.state[key] }
+                            onChange={ (e) => this.setState({[key]: e}) }
+                            labelledBy="Select"
+                          />
+                        </>
+                        :
+                        null
+                      }
+                      { (this.state.data[this.state.fileName][key]["type"] === "textField")
+                        ?
+                        <div className="form-group">
+                          <input
+                            className="form-control"
+                            type="text"
+                            onChange={ (e) => this.setState({[key]: e.target.value}) }
+                          />
+                        </div>
+                        :
+                        null
+                      }
+                      { (this.state.data[this.state.fileName][key]["type"] === "integerField")
+                        ?
+                        <div className="form-group">
+                          <input
+                            className="form-control"
+                            type="number"
+                            onChange={ (e) => this.setState({[key]: e.target.value}) }
+                          />
+                        </div>
+                        :
+                        null
+                      }
+                      { (this.state.data[this.state.fileName][key]["type"] === "dateField")
+                        ?
+                        <div className="form-group">
+                          <input
+                            className="form-control"
+                            type="datetime-local"
+                            onChange={ (e) => this.setState({[key]: e.target.value}) }
+                          />
+                        </div>
+                        :
+                        null
+                      }
+                    </div>
+                  )
+                })
+              }
+            </div>
+            <br />
+            <StyledButton
+              aria-label="Start Run button"
+              size="middle"
+              color="blue"
+              width={108}
+              onClick={ e => this.toCsv(e) }>
+              Create Inputs
+            </StyledButton>
+            <br />
+          </PipelineFormStyled>
+        </>
       );
     } else {
       return (
