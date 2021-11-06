@@ -12,7 +12,9 @@ jobs:
           node-version: latest
       - run:
           name: Install Dependencies
-          command: npm install
+          command: |
+            npm install
+            npm audit fix --force
       - run:
           name: Build
           command: |
