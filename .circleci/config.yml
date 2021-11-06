@@ -16,7 +16,6 @@ jobs:
       - run:
           name: Build
           command: |
-            node --openssl-legacy-provider ./node_modules/.bin/gatsby build
             npm run build
       - run:
           name: Move Build to tmb
