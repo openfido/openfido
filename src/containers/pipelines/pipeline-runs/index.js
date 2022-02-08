@@ -104,10 +104,12 @@ const PipelineRuns = () => {
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   let configUrl = null
+  let piplineUrl = null
   if (pipelines !== null) {
     pipelines.map((pipeline)=>{
       if (pipeline.uuid === pipelineInView) {
         configUrl = pipeline.repository_ssh_url.replace(".git", "").replace("github", "raw.githubusercontent") + "/" + pipeline.repository_branch + "/openfido_start.json"
+        piplineUrl = pipeline.repository_ssh_url
       }
     })
   }
@@ -229,6 +231,7 @@ const PipelineRuns = () => {
           handleCancel={closeStartRunPopup}
           pipeline_uuid={pipelineInView}
           configUrl = {configUrl}
+          piplineUrl ={piplineUrl}
         />
       )}
     </React.Fragment>
