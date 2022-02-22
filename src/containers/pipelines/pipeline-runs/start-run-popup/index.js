@@ -300,6 +300,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  piplineUrl: PropTypes.string.isRequired,
   configUrl: PropTypes.string.isRequired,
 };
 
