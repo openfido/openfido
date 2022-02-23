@@ -27,7 +27,7 @@ class PipelineForm extends React.Component {
       // get fileNames to specify what files are needed if input fields are not specified
       const fileNames = Object.keys(data)
       let fileNamesStr = ""
-      fileNames.map((key)=>{
+      fileNames.forEach((key)=>{
         fileNamesStr += (" " + key + ",")
       })
       // remove last comma from string
@@ -40,7 +40,7 @@ class PipelineForm extends React.Component {
         fileNamesString: fileNamesString,
         keys: keys
       }
-      keys.map((key)=>{
+      keys.forEach((key)=>{
         if (data[fileName][key]["type"] === "optionsMulti") {
           formState.[key] = [];
         } else {
@@ -65,7 +65,7 @@ class PipelineForm extends React.Component {
       // since the selected values are multiValue]
       let values = "";
       if (Array.isArray(data[key])) {
-        data[key].map((x) => {
+        data[key].forEach((x) => {
           values += x.value + " "
         });
       } else {
@@ -82,13 +82,13 @@ class PipelineForm extends React.Component {
   };
 
   validatInput = (e, key) => {
-    let value = e.target.value
+    // let value = e.target.value
     debugger;
   }
 
   optionsMulti = (key) => {
     let options = []
-    this.state.data[this.state.fileName][key]["values"].map((option)=>{
+    this.state.data[this.state.fileName][key]["values"].forEach((option)=>{
       options.push({label: option, value: option})
     })
     return options
