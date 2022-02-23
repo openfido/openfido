@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import axios from "axios";
 
+
 import { requestStartPipelineRun } from 'services';
 import {
   uploadInputFile,
@@ -149,7 +150,7 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
+const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl,piplineUrl}) => {
   // get config from github
   // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
   const [data, setData] = useState({})
@@ -222,7 +223,13 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
   return (
     <Modal
       visible
-      footer={null}
+      footer={[
+        <StyledButton
+        key="link"
+        href={piplineUrl}
+      >
+        Pipline Describtion
+      </StyledButton>]}
       onOk={handleOk}
       onCancel={onCloseStartRunPopup}
       closeIcon={<CloseOutlined color="darkText" />}
@@ -293,6 +300,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  piplineUrl: PropTypes.string.isRequired,
   configUrl: PropTypes.string.isRequired,
 };
 
