@@ -1,14 +1,11 @@
 import React from "react";
-import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import {
-  StyledModal,
   StyledButton,
-  StyledText,
 } from 'styles/app';
-import {
-  uploadInputFile,
-} from 'actions/pipelines';
+// import {
+//   uploadInputFile,
+// } from 'actions/pipelines';
 import MultiSelect from "react-multi-select-component";
 
 const PipelineFormStyled = styled.div`

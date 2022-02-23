@@ -154,11 +154,11 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl,piplin
   // get config from github
   // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
   const [data, setData] = useState({})
-  useEffect( () => {
-      axios.get(configUrl).then((response) => {
-        setData(response.data)
-      })
-   }, []);
+  useEffect(() => {
+    axios.get(configUrl).then((response) => {
+      setData(response.data);
+    });
+  }, [data]);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 

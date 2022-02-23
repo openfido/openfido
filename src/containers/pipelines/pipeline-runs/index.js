@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import axios from "axios";
+// import axios from "axios";
 
 import {
   PIPELINE_STATES,
@@ -13,7 +13,7 @@ import {
   getPipelineRuns,
   getPipelineRun,
   getPipelines,
-  getPipelineConfigData,
+  // getPipelineConfigData,
 } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
@@ -103,15 +103,15 @@ const PipelineRuns = () => {
   const [showStartRunPopup, setStartRunPopup] = useState(false);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
-  let configUrl = null
-  let piplineUrl = null
+  let configUrl = null;
+  let piplineUrl = null;
   if (pipelines !== null) {
-    pipelines.map((pipeline)=>{
+    pipelines.map((pipeline) => {
       if (pipeline.uuid === pipelineInView) {
         configUrl = pipeline.repository_ssh_url.replace(".git", "").replace("github", "raw.githubusercontent") + "/" + pipeline.repository_branch + "/openfido_start.json"
-        piplineUrl = pipeline.repository_ssh_url
+        piplineUrl = pipeline.repository_ssh_url;
       }
-    })
+    });
   }
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
