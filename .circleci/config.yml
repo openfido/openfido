@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Build
           command: |
-            npm run build
+            CI=false npm run build
       - run:
           name: Move Build to tmb
           command: |
@@ -24,7 +24,7 @@ jobs:
             mv -v build/* /tmp/workspace/build
       - persist_to_workspace:
           root: /tmp/workspace
-          paths:
+          
             - build
 
   deploy:
