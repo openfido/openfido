@@ -150,7 +150,7 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl,piplineUrl}) => {
+const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl }) => {
   // get config from github
   // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
   const [data, setData] = useState({})
@@ -158,7 +158,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl,piplin
     axios.get(configUrl).then((response) => {
       setData(response.data);
     });
-  }, [data]);
+  }, [configUrl]);
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
