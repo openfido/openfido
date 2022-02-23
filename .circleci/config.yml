@@ -5,11 +5,12 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/base:stable
+       - image: cimg/node:16.13.1
     steps:
       - checkout
-      - node/install:
-          node-version: 16.14.0
+      # look for existing cache and restore if found
+      - restore_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Install Dependencies
           command: npm install
