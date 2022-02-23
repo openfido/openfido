@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: 16.14.0
+          node-version: 16.13.1
       - run:
           name: Install Dependencies
           command: npm install
@@ -24,7 +24,7 @@ jobs:
             mv -v build/* /tmp/workspace/build
       - persist_to_workspace:
           root: /tmp/workspace
-          
+          paths:
             - build
 
   deploy:
