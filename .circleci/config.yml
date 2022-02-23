@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Build
           command: |
-            CI=false npm run build
+            npm run build
       - run:
           name: Move Build to tmb
           command: |
