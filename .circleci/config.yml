@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: latest
+          node-version: 16.14.0
       - run:
           name: Install Dependencies
           command: npm install
