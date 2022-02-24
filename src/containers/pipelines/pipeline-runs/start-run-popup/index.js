@@ -219,17 +219,24 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, pipli
     await dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, data));
   };
 
+  const handleOpenPiplineClick = () => {
+    window.open(piplineUrl);
+  };
+
 
   return (
     <Modal
       visible
       footer={[
         <StyledButton
-        key="link"
-        href={piplineUrl}
-      >
+          type="text"
+          size="middle"
+          textcolor="lightBlue"
+          onClick={handleOpenPiplineClick}
+        >
         Pipline Describtion
-      </StyledButton>]}
+        </StyledButton>
+      ]}
       onOk={handleOk}
       onCancel={onCloseStartRunPopup}
       closeIcon={<CloseOutlined color="darkText" />}
