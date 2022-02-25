@@ -64,6 +64,9 @@ jobs:
       - name: Staging Apply 
         id: staging-apply
         if: steps.staging-plan.outcome == 'success'
+        with:
+          db_user: ${{ secrets.TF_VAR_DB_USER }}
+          db_password: ${{ secrets.TF_VAR_DB_PASSWORD }}
         run: |
           cd deploy/
           # pass variable into terraform 
