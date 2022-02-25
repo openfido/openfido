@@ -3,21 +3,26 @@ name: Super-Linter
 
 on: 
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - features/**
+      - dependabot/**
   pull_request:
-    branches: [ master ]
+    branches: 
+      - master
   workflow_dispatch:
 
 jobs:
-  super-lint:
-    name: Test Lint and Validatet
+  docker:
+    name: Build and Push
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Test and Lint
-        run: echo "Test and Lint"
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d --build
 
       - name: Validate Terraform
         id: validate
