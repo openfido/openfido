@@ -7,6 +7,7 @@ on:
   pull_request:
     branches: [ master ]
   workflow_dispatch:
+
 jobs:
   super-lint:
     name: Test Lint and Validatet
@@ -19,10 +20,14 @@ jobs:
         run: echo "Test and Lint"
 
       - name: Validate Terraform
+        id: validate
         run: echo "Validate Terraform"
 
       - name: Build and Push
+        if: steps.validate.outcome == 'success'
+        id: build
         run: echo "Build and Push docker image"
 
       - name: Staging Plan 
-        run: ehco "Run Terraform Plan for Staging"
+        if: steps.build.outcome == 'success'
+        run: echo "Run Terraform Plan for Staging"
