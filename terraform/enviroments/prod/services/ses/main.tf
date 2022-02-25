@@ -18,7 +18,7 @@ terraform {
 // Tag all resources
 locals {
   env  = var.environment
-  tags = merge(map("Environment", local.env), var.aws_tags)
+  tags = merge(tomap({ Environment = local.env}), var.aws_tags)
 }
 
 module "ses-forwarding" {
