@@ -5,6 +5,8 @@ on:
   push:
     branches: 
       - master
+      - features/**
+      - dependabot/**
   pull_request:
     branches: 
       - master
