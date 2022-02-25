@@ -18,13 +18,10 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     container:
-      image: hashicorp/terraform:0.12.21
+      image: hashicorp/terraform:1.1.6
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      # - name: Start containers
-      #   run: docker-compose -f "deploy/docker-compose.yml" up -d --build
 
       - name: Validate Terraform
         id: validate
