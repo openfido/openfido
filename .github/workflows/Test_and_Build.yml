@@ -28,10 +28,11 @@ jobs:
 
       - name: Validate Terraform
         id: validate
-        run: cd deploy/
-        run: terraform init -backend=false
-        run: terraform validate
-        run: terraform fmt -check
+        run:  |
+          cd deploy/
+          terraform init -backend=false
+          terraform validate
+          terraform fmt -check
 
 
       - name: Build and Push
