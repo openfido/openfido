@@ -2,9 +2,11 @@
 name: Super-Linter
 
 on: 
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
-
+  workflow_dispatch:
 jobs:
   super-lint:
     name: Test Lint and Validatet
