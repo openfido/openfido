@@ -8,7 +8,7 @@ on:
         default: 'staging-destroy'
 jobs:
   docker:
-    name: Build and Push
+    name: Terraform Staging Destroy
     timeout-minutes: 10
     runs-on: ubuntu-latest
     container:
