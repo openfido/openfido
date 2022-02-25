@@ -1,0 +1,29 @@
+name: Terraform Staging Destroy
+on: 
+  workflow_dispatch:
+     inputs:
+      job:
+        description: 'Destroy Terraform Staging.'
+        required: true
+        default: 'staging-destroy'
+jobs:
+  docker:
+    name: Build and Push
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:1.1.6
+        
+    - name: Staging Destroy
+        id: staging-destroy
+        if: ${{ github.event.inputs.job == 'staging-destroy'}}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+        run: |
+          cd deploy/
+          terraform init
+          terraform workspace select staging 
+          terraform destroy -auto-approve
