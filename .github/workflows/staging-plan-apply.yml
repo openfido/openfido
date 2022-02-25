@@ -1,5 +1,5 @@
 
-name: Test and Build 
+name: Terraform Staging Plan Apply
 
 on: 
   push:
@@ -72,11 +72,3 @@ jobs:
           terraform workspace select staging 
           terraform apply -auto-approve
 
-      - name: Staging Destroy
-        id: staging-destroy
-        if: ${{ github.event.inputs.job == 'staging-destroy'}}
-        run: |
-          cd deploy/
-          terraform init
-          terraform workspace select staging 
-          terraform destroy -auto-approve

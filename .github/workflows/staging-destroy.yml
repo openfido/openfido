@@ -19,7 +19,6 @@ jobs:
           aws-region: us-east-1
 
       - name: Staging Destroy 
-        if: steps.staging-apply.outcome == 'success'
         run: |
           cd deploy/
           terraform init
