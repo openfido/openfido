@@ -8,8 +8,8 @@ resource "aws_s3_bucket" "website" {
     # error_document = "index.html"
   }
 
-  tags = merge(map(
-  "Name", local.s3_website
+  tags = merge(tomap(
+  {Name = local.s3_website}
   ), local.tags)
 }
 
@@ -37,7 +37,7 @@ resource "aws_s3_bucket" "blob" {
     max_age_seconds = 3000
   }
 
-  tags = merge(map(
-    "Name", local.s3_blob
+  tags = merge(tomap(
+    {Name =  local.s3_blob}
   ), local.tags)
 }
