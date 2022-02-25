@@ -16,8 +16,7 @@ on:
         description: 'Destroy Terraform Staging.'
         required: true
         default: 'staging-destroy'
-jobs:
-
+        
 jobs:
   docker:
     name: Build and Push
