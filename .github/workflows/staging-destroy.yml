@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: hashicorp/terraform:1.1.6
-        
-    - name: Staging Destroy
+    steps:
+      - name: Staging Destroy
         id: staging-destroy
         if: ${{ github.event.inputs.job == 'staging-destroy'}}
         uses: aws-actions/configure-aws-credentials@v1
