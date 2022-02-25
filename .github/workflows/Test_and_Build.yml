@@ -1,5 +1,5 @@
 
-name: Super-Linter
+name: Test and Build 
 
 on: 
   push:
@@ -17,6 +17,8 @@ jobs:
     name: Build and Push
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:0.12.21
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,7 +27,6 @@ jobs:
         run: docker-compose -f "deploy/docker-compose.yml" up -d --build
 
       - name: Validate Terraform
-        container:  hashicorp/terraform:0.12.21
         id: validate
         run: cd deploy/
         run: terraform init -backend=false
