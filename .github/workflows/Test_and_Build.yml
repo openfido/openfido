@@ -46,4 +46,10 @@ jobs:
 
       - name: Staging Plan 
         if: steps.build.outcome == 'success'
-        run: echo "Run Terraform Plan for Staging"
+        run: |
+          cd deploy/
+          # pass variable into terraform 
+          export TF_VAR_ecr_image_api=$ECR_REPO_BASE_URL
+          terraform init
+          terraform workspace select staging || terraform workspace new staging
+          terraform plan
