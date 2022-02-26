@@ -53,7 +53,6 @@ jobs:
           export TF_VAR_db_password=${{ secrets.TF_VAR_DB_PASSWORD }}
           terraform init
           terraform workspace select staging || terraform workspace new staging
-          terraform force-unlock -force 24731867-fda8-5df6-b1c2-55b7ec5744c7
           terraform plan
       
       - name: Staging Apply 
