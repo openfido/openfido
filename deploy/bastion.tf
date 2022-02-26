@@ -41,7 +41,13 @@ resource "aws_instance" "bastion" {
 
 
   user_data = file("./templates/bastion/user-data.sh")
+  # iam role 
   iam_instance_profile = aws_iam_instance_profile.bastion.name
+
+  subnet_id = aws_subnet.public_a.id
+
+  key_name = var.bastion_key_name
+
 
   tags = merge(
     local.common_tags,
