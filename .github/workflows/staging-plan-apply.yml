@@ -53,7 +53,7 @@ jobs:
           export TF_VAR_db_password=${{ secrets.TF_VAR_DB_PASSWORD }}
           terraform init
           terraform workspace select staging || terraform workspace new staging
-          terraform plan -lock=false
+          terraform plan
       
       - name: Staging Apply 
         id: staging-apply
@@ -66,5 +66,5 @@ jobs:
           export TF_VAR_db_password=${{ secrets.TF_VAR_DB_PASSWORD }}
           terraform init
           terraform workspace select staging 
-          terraform apply -lock=false -auto-approve
+          terraform apply -auto-approve
 
