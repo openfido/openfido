@@ -10,6 +10,8 @@ import {
   StyledButton, StyledText, StyledInput, StyledTextArea,
 } from 'styles/app';
 
+import PipelineDropdown from '../pipeline-dropdown';
+
 const AddPipelineForm = styled.form`
   max-width: 432px;
   h3 {
@@ -51,6 +53,10 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
         });
     }
   }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading]);
+
+  const updateFromDropdown = (selectedPipeline) => {
+    // pass into dropdown to send data back and fill
+  };
 
   const validateField = (fieldName, fieldValue) => {
     let result;
@@ -128,6 +134,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
   return (
     <AddPipelineForm onSubmit={onAddPipelineClicked}>
       <StyledH3 color="black">Add a pipeline</StyledH3>
+      <PipelineDropdown />
       <Space direction="vertical" size={24}>
         <label htmlFor="name">
           <StyledText

@@ -50,4 +50,4 @@ export default {
     version: '',
     appToken: apiToken,
   },
-}
+};
