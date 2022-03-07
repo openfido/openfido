@@ -1,6 +1,6 @@
 html {
   box-sizing: border-box;
-  background-color: #f7f7f7;
+  background-color: #3BA889;
 }
 *, *:before, *:after {
   box-sizing: inherit;
@@ -26,8 +26,10 @@ a {
 .ant-modal-mask {
     background-color: rgba(196, 196, 196, 0.75);
 }
+/* css for the pipeline add form */
 form {
     width: 100%;
+    background-color: #3BA889;
 }
 input {
     outline: none;
