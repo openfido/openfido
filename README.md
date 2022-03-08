@@ -2,6 +2,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## OpenFIDO Environments
 
+## Getting Started
+
+### `npm install`
+
+For the first-time setup, make sure to run ```npm install``` to build the repo's dependencies.
+
+### Create the .env file
+ 
+To protect sensitive information, the .env file is NOT provided for you. Rename the example.env.txt file to .env and fill in the appropriate variables for your use case.
+
+Follow the step-by-step instructions in the (https://github.com/slacgismo/openfido-app-service) repository to get the REACT_APP_API_TOKEN, and follow the step-by-step instructions at (https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app) to create a personal github Oauth app. Use your app's secret for the DEV_GAPP_SECRET.
+
 ## Available Scripts
 
 In the project directory, you can run:

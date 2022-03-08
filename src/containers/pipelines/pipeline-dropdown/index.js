@@ -71,7 +71,7 @@ const PipelineDropdown = (updateFromDropdown) => {
           aria-label="This is a test"
           to={ROUTE_LOGOUT}
         >
-          Log Out
+          This is a Test of the Emergency Dropdown System...
         </Link>
       </AppDropdownMenuItem>
     </AppDropdownMenu>
@@ -81,7 +81,7 @@ const PipelineDropdown = (updateFromDropdown) => {
     <AppDropdown overlay={menu} trigger="click">
       <div aria-label="App dropdown">
         <StyledText color="darkText">
-          OpenFIDO
+          Import from Github
         </StyledText>
         <DownOutlined color="gray20" />
       </div>
