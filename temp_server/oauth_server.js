@@ -7,6 +7,8 @@ const gitApi = require('../src/util/api-github');
 const app = express();
 const port = 3005;
 
+app.use(express.json());
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // update to match the domain you will make the request from
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -61,9 +63,11 @@ app.get('/autogenPipelines', async (req, res) => {
 });
 
 // data from selected pipeline to pre-fill pipeline form
-app.get('/pipelineManifest', async (req, res) => {
-  const data = await gitApi.getPotentialPipelines();
-  console.log('hmmmmm1', data);
+app.post('/pipelineManifest', async (req, res) => {
+  const { url } = req.body;
+  console.log('LOOK AT ME', url);
+  const data = await gitApi.getManifest(url);
+  // console.log('hmmmmm1', data);
   res.send(data);
 });
 

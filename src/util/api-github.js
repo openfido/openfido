@@ -13,14 +13,28 @@ const GHUB_TOKEN_STAGING = process.env.GHUB_API_SECRET || 'UPDATE ENV';
 const GHUB_TOKEN_PRODUCTION = process.env.GHUB_API_SECRET || 'UPDATE ENV';
 
 const GHUB_CLIENT_ID = process.env.GHUB_CLIENT_ID || 'UPDATE ENV';
-const queryString = `https://api.github.com/search/repositories?q=${encodeURIComponent('org:openfido pipeline settings in:readme')}`;
+
+// api scrape within openfido for all pipeline repositories
+const potentialPipelines = `https://api.github.com/search/repositories?q=${encodeURIComponent('org:openfido pipeline settings in:readme')}`;
 
 const gitApi = {
 
-  getPipelinesWithManifest: async () => {
-    const response = await axios.get(queryString, { timeout: 1500 });
+  getPotentialPipelines: async () => {
+    const response = await axios.get(potentialPipelines, { timeout: 1500 });
     console.log(response.data);
     return response.data;
+  },
+
+  // accept header application/vnd.github.VERSION.raw is REQUIRED to decrypt file contents
+  getManifest: async (url) => {
+    const temp = `${url}/contents/manifest.json`;
+    const response = await axios.get(temp, {
+      headers: {
+        accept: 'application/vnd.github.VERSION.raw',
+      },
+    });
+    console.log(response.data);
+    return response.data.content;
   },
 
 };
