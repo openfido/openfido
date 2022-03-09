@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { Space } from 'antd';
+import axios from 'axios';
 
 import { requestCreatePipeline } from 'services';
 import {

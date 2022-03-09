@@ -6,6 +6,14 @@ const path = require('path');
 const app = express();
 const port = 3005;
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // update to match the domain you will make the request from
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+let gtoken;
+
 app.get('/', (req, res) => {
   res.send('This page isn\'t for humans!');
 });
@@ -16,7 +24,7 @@ app.get('/auth', (req, res) => {
   );
 });
 
-app.get('/oauth-callback', ({ query: { code } }, res) => {
+app.get('/pipelines/Oauth2', ({ query: { code } }, res) => {
   const body = {
     client_id: process.env.GHUB_CLIENT_ID,
     client_secret: process.env.DEV_GAPP_SECRET,
@@ -30,9 +38,17 @@ app.get('/oauth-callback', ({ query: { code } }, res) => {
       // eslint-disable-next-line no-console
       console.log('My token:', token);
 
-      res.redirect(`/?token=${token}`);
+      gtoken = token;
+
+      res.redirect('http://localhost:3000/pipelines');
     })
     .catch((err) => res.status(500).json({ err: err.message }));
+});
+
+app.get('/gtoken', (req, res) => {
+  res.send(
+    `${gtoken}`,
+  );
 });
 
 app.listen(port, () => {

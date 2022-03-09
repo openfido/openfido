@@ -1,3 +1,5 @@
+// This file is meant to consolidate all utility function calls required to interact with the Github API
+
 const axios = require('axios');
 const oauth = require('axios-oauth-client');
 
@@ -12,14 +14,29 @@ const GHUB_TOKEN_PRODUCTION = process.env.GHUB_API_SECRET || 'UPDATE ENV';
 
 const GHUB_CLIENT_ID = process.env.GHUB_CLIENT_ID || 'UPDATE ENV';
 
-const getAuthorizationCode = oauth.client(axios.create(), {
-  url: 'https://github.com/login/oauth/authorize?',
-  type: 'user_agent',
-  client_id: GHUB_CLIENT_ID,
-  client_secret: GHUB_TOKEN_DEVELOPMENT,
-  redirect_uri: 'https://localhost:3000/pipelines/Oauth2',
-  code: '...'
-});
+const gitApi = {
+
+    getAuthorizationCode: oauth.client(axios.create(), {
+        url: 'https://github.com/login/oauth/authorize?',
+        type: 'user_agent',
+        client_id: GHUB_CLIENT_ID,
+        client_secret: GHUB_TOKEN_DEVELOPMENT,
+        redirect_uri: 'https://localhost:3000/pipelines/Oauth2',
+        code: '...'
+      }),
+
+      auth: await getAuthorizationCode(), // => { "access_token": "...", "expires_in": 900, ... }
+
+      getMostFollowedUsers: async() => {
+        const noOfFollowers = 35000;
+        const perPage = 10;
+        //ref: https://docs.GitHub.com/en/GitHub/searching-for-information-on-GitHub/searching-on-GitHub/searching-users
+        const response = await GitHubClient.get(`search/users?q=followers:>${noOfFollowers}&per_page=${perPage}`, {timeout: 1500});
+        return response.data.items;
+      },
+
+}
+
 
 const auth = await getAuthorizationCode(); // => { "access_token": "...", "expires_in": 900, ... }
 
@@ -32,13 +49,6 @@ const GitHubClient = axios.create({
     }
   });
   
-  async function getMostFollowedUsers() {
-    const noOfFollowers = 35000;
-    const perPage = 10;
-    //ref: https://docs.GitHub.com/en/GitHub/searching-for-information-on-GitHub/searching-on-GitHub/searching-users
-    const response = await GitHubClient.get(`search/users?q=followers:>${noOfFollowers}&per_page=${perPage}`, {timeout: 1500});
-    return response.data.items;
-  }
   
   async function getCounts(username) {
     const response = await GitHubClient.get(`users/${username}`);
@@ -65,3 +75,5 @@ const GitHubClient = axios.create({
       console.log(`Error calling GitHub API: ${error.message}`, error);
     }
   })();
+
+  module.exports = gitApi; 

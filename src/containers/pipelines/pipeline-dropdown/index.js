@@ -15,6 +15,7 @@ import { Dropdown, Menu } from 'antd';
 import colors from 'styles/colors';
 
 import { ROUTE_LOGOUT } from 'config/routes';
+import axios from 'axios';
 
 const AppDropdown = styled(Dropdown)`
   user-select: none;
@@ -64,6 +65,42 @@ const AppDropdownMenuItem = styled(Menu.Item)`
 
 const PipelineDropdown = (updateFromDropdown) => {
   // magic happens here
+
+  const [gtoken, setToken] = useState(false);
+
+  const [fields, setFields] = useState({
+    name: '',
+    description: '',
+    docker_image_url: '',
+    repository_ssh_url: '',
+    repository_branch: '',
+    repository_script: 'openfido.sh',
+  });
+
+  useEffect(() => {
+    console.log('UE');
+    axios.get('http://localhost:3005/gtoken')
+      .then((response) => {
+        console.log(response);
+        if (response.data !== 'undefined') {
+          setToken(response);
+        }
+      }, (error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const buttonAuth = () => {
+    //  href="http://localhost:3005/auth"
+    console.log('clicked');
+    axios.get('http://localhost:3005/gtoken')
+      .then((response) => {
+        console.log(response);
+      }, (error) => {
+        console.log(error);
+      });
+  };
+
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
@@ -77,16 +114,28 @@ const PipelineDropdown = (updateFromDropdown) => {
     </AppDropdownMenu>
   );
 
+  if (!!gtoken) {
+    console.log('hmm', gtoken);
+    return (
+      <AppDropdown overlay={menu} trigger="click">
+        <div aria-label="App dropdown">
+          <StyledText color="darkText">
+            Import from Github
+          </StyledText>
+          <DownOutlined color="gray20" />
+        </div>
+      </AppDropdown>
+    );
+  }
   return (
-    <AppDropdown overlay={menu} trigger="click">
-      <div aria-label="App dropdown">
-        <StyledText color="darkText">
-          Import from Github
-        </StyledText>
-        <DownOutlined color="gray20" />
-      </div>
-    </AppDropdown>
+    <a className="btn" href="http://localhost:3005/auth">Enable pre-select from GITHUB</a>
   );
 };
+
+/*
+        <button type="button" onClick={buttonAuth()}>
+          Enable pre-select from GITHUB
+        </button>
+        */
 
 export default PipelineDropdown;
