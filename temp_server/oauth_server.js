@@ -65,9 +65,8 @@ app.get('/autogenPipelines', async (req, res) => {
 // data from selected pipeline to pre-fill pipeline form
 app.post('/pipelineManifest', async (req, res) => {
   const { url } = req.body;
-  console.log('LOOK AT ME', url);
   const data = await gitApi.getManifest(url);
-  // console.log('hmmmmm1', data);
+  console.log('hmmmmm1', data);
   res.send(data);
 });
 

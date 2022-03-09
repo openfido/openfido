@@ -34,7 +34,7 @@ const gitApi = {
       },
     });
     console.log(response.data);
-    return response.data.content;
+    return response.data;
   },
 
 };
