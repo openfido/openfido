@@ -2,6 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
+const gitApi = require('src/util/api-github');
 
 const app = express();
 const port = 3005;
@@ -46,6 +47,12 @@ app.get('/pipelines/Oauth2', ({ query: { code } }, res) => {
 });
 
 app.get('/gtoken', (req, res) => {
+  res.send(
+    `${gtoken}`,
+  );
+});
+
+app.get('/autogenPipelines', (req, res) => {
   res.send(
     `${gtoken}`,
   );
