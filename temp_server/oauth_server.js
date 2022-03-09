@@ -2,7 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
-const gitApi = require('src/util/api-github');
+const gitApi = require('../src/util/api-github');
 
 const app = express();
 const port = 3005;
@@ -46,16 +46,25 @@ app.get('/pipelines/Oauth2', ({ query: { code } }, res) => {
     .catch((err) => res.status(500).json({ err: err.message }));
 });
 
+// current functional internal method to retrieve token and grant Oauth search priviledges, **needs security improvement**
 app.get('/gtoken', (req, res) => {
   res.send(
     `${gtoken}`,
   );
 });
 
-app.get('/autogenPipelines', (req, res) => {
-  res.send(
-    `${gtoken}`,
-  );
+// list for dropdown of all repositories that can generate a pipeline
+app.get('/autogenPipelines', async (req, res) => {
+  const data = await gitApi.getPotentialPipelines();
+  console.log('hmmmmm1', data);
+  res.send(data);
+});
+
+// data from selected pipeline to pre-fill pipeline form
+app.get('/pipelineManifest', async (req, res) => {
+  const data = await gitApi.getPotentialPipelines();
+  console.log('hmmmmm1', data);
+  res.send(data);
 });
 
 app.listen(port, () => {

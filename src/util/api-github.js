@@ -13,11 +13,12 @@ const GHUB_TOKEN_STAGING = process.env.GHUB_API_SECRET || 'UPDATE ENV';
 const GHUB_TOKEN_PRODUCTION = process.env.GHUB_API_SECRET || 'UPDATE ENV';
 
 const GHUB_CLIENT_ID = process.env.GHUB_CLIENT_ID || 'UPDATE ENV';
+const queryString = `https://api.github.com/search/repositories?q=${encodeURIComponent('org:openfido pipeline settings in:readme')}`;
 
 const gitApi = {
 
   getPipelinesWithManifest: async () => {
-    const response = await axios.get('https://api.github.com//search/repositories?q=filename:manifest.json&org:openfido', { timeout: 1500 });
+    const response = await axios.get(queryString, { timeout: 1500 });
     console.log(response.data);
     return response.data;
   },
