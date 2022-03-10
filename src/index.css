@@ -40,6 +40,9 @@ input {
     font-size: 12px;
     line-height: 14px;
 }
+option:hover {
+    background-color: yellow;
+  }
 
 /* react-date-range theme */
 .rdrCalendarWrapper{

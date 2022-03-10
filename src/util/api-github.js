@@ -1,7 +1,6 @@
 // This file is meant to consolidate all utility function calls required to interact with the Github API
 
 const axios = require('axios');
-const oauth = require('axios-oauth-client');
 
 /// // END OF IMPORTS /////
 
@@ -21,7 +20,6 @@ const gitApi = {
 
   getPotentialPipelines: async () => {
     const response = await axios.get(potentialPipelines, { timeout: 1500 });
-    console.log(response.data);
     return response.data;
   },
 
@@ -33,7 +31,6 @@ const gitApi = {
         accept: 'application/vnd.github.VERSION.raw',
       },
     });
-    console.log(response.data);
     return response.data;
   },
 

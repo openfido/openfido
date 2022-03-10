@@ -1,7 +1,6 @@
 require('dotenv').config();
 const axios = require('axios');
 const express = require('express');
-const path = require('path');
 const gitApi = require('../src/util/api-github');
 
 const app = express();
@@ -38,9 +37,6 @@ app.get('/pipelines/Oauth2', ({ query: { code } }, res) => {
     .post('https://github.com/login/oauth/access_token', body, opts)
     .then((_res) => _res.data.access_token)
     .then((token) => {
-      // eslint-disable-next-line no-console
-      console.log('My token:', token);
-
       gtoken = token;
 
       res.redirect('http://localhost:3000/pipelines');
@@ -55,18 +51,24 @@ app.get('/gtoken', (req, res) => {
   );
 });
 
-// list for dropdown of all repositories that can generate a pipeline
+// list for dropdown of all repositories that can generate a pipeline, cleaned of excess data
 app.get('/autogenPipelines', async (req, res) => {
-  const data = await gitApi.getPotentialPipelines();
-  console.log('hmmmmm1', data);
-  res.send(data);
+  let data = await gitApi.getPotentialPipelines();
+  data = data.items;
+  const cleanData = data.map((repo) => {
+    const reducedData = {};
+    reducedData.full_name = repo.full_name;
+    reducedData.url = repo.url;
+    reducedData.id = repo.id;
+    return reducedData;
+  });
+  res.send(cleanData);
 });
 
-// data from selected pipeline to pre-fill pipeline form
+// data from selected pipeline to pre-fill pipeline form, expecting an obj with the url property
 app.post('/pipelineManifest', async (req, res) => {
   const { url } = req.body;
   const data = await gitApi.getManifest(url);
-  console.log('hmmmmm1', data);
   res.send(data);
 });
 

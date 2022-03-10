@@ -55,8 +55,28 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
     }
   }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading]);
 
-  const updateFromDropdown = (selectedPipeline) => {
+  const updateFromDropdown = (e) => {
     // pass into dropdown to send data back and fill
+    const url = {
+      url: e.target.dataset.url,
+      name: e.target.dataset.fullname,
+    };
+
+    console.log(url);
+    axios.post('http://localhost:3005/pipelineManifest', url)
+      .then((response) => {
+        console.log(response);
+        setFields({
+          name: url.name,
+          description: response.data.description,
+          docker_image_url: response.data.docker,
+          repository_ssh_url: response.data.git,
+          repository_branch: response.data.branch,
+          repository_script: response.data.script,
+        });
+      }, (error) => {
+        console.log(error);
+      });
   };
 
   const validateField = (fieldName, fieldValue) => {
@@ -135,7 +155,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
   return (
     <AddPipelineForm onSubmit={onAddPipelineClicked}>
       <StyledH3 color="black">Add a pipeline</StyledH3>
-      <PipelineDropdown />
+      <PipelineDropdown updateFromDropdown={updateFromDropdown} />
       <Space direction="vertical" size={24}>
         <label htmlFor="name">
           <StyledText

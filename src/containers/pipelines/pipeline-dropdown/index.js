@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import DownOutlined from 'icons/DownOutlined';
 import {
-  StyledLayout,
-  StyledSider,
-  StyledContent,
   StyledText,
 } from 'styles/app';
 import { Dropdown, Menu } from 'antd';
 import colors from 'styles/colors';
 
-import { ROUTE_LOGOUT } from 'config/routes';
 import axios from 'axios';
+import PipelineSelector from './pipeline-selector';
 
 const AppDropdown = styled(Dropdown)`
   user-select: none;
@@ -65,23 +59,21 @@ const AppDropdownMenuItem = styled(Menu.Item)`
 
 const PipelineDropdown = (updateFromDropdown) => {
   // magic happens here
-
+  console.log('pd', updateFromDropdown);
   const [gtoken, setToken] = useState(false);
 
-  const [fields, setFields] = useState({
-    name: '',
-    description: '',
-    docker_image_url: '',
-    repository_ssh_url: '',
-    repository_branch: '',
-    repository_script: 'openfido.sh',
-  });
+  const [pipelines, setPipelines] = useState([
+    {
+      full_name: '',
+      url: '',
+      id: '',
+    },
+  ]);
 
   useEffect(() => {
     console.log('UE');
     axios.get('http://localhost:3005/gtoken')
       .then((response) => {
-        console.log(response);
         if (response.data !== 'undefined') {
           setToken(response);
         }
@@ -90,31 +82,29 @@ const PipelineDropdown = (updateFromDropdown) => {
       });
   }, []);
 
-  const buttonAuth = () => {
-    //  href="http://localhost:3005/auth"
-    console.log('clicked');
-    axios.get('http://localhost:3005/gtoken')
+  useEffect(() => {
+    console.log('UEP');
+    axios.get('http://localhost:3005/autogenPipelines')
       .then((response) => {
         console.log(response);
+        if (response.data !== 'undefined') {
+          setPipelines(response.data);
+        }
       }, (error) => {
         console.log(error);
       });
-  };
+  }, []);
 
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
-        <Link
-          aria-label="This is a test"
-          to={ROUTE_LOGOUT}
-        >
-          This is a Test of the Emergency Dropdown System...
-        </Link>
+        {pipelines.map((pipe) => <PipelineSelector pipeline={pipe} updateFromDropdown={updateFromDropdown} />)}
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );
 
-  if (!!gtoken) {
+  /*
+  if (gtoken) {
     console.log('hmm', gtoken);
     return (
       <AppDropdown overlay={menu} trigger="click">
@@ -129,6 +119,18 @@ const PipelineDropdown = (updateFromDropdown) => {
   }
   return (
     <a className="btn" href="http://localhost:3005/auth">Enable pre-select from GITHUB</a>
+  );
+  */
+
+  return (
+    <AppDropdown overlay={menu} trigger="click">
+      <div aria-label="App dropdown">
+        <StyledText color="darkText">
+          Import from Github
+        </StyledText>
+        <DownOutlined color="gray20" />
+      </div>
+    </AppDropdown>
   );
 };
 
