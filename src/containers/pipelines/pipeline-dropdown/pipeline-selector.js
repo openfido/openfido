@@ -1,8 +1,8 @@
 import React from 'react';
 
-const PipelineSelector = ({ pipeline, updateFromDropdown }) => {
+const PipelineSelector = (props) => {
 // assign required values to each element for click handler
-  console.log(pipeline, updateFromDropdown.updateFromDropdown);
+  const { pipeline, updateFromDropdown } = props;
   return (
     <option
       id={pipeline.id}

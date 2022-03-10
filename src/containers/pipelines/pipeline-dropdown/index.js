@@ -58,8 +58,6 @@ const AppDropdownMenuItem = styled(Menu.Item)`
 `;
 
 const PipelineDropdown = (updateFromDropdown) => {
-  // magic happens here
-  console.log('pd', updateFromDropdown);
   const [gtoken, setToken] = useState(false);
 
   const [pipelines, setPipelines] = useState([
@@ -70,8 +68,9 @@ const PipelineDropdown = (updateFromDropdown) => {
     },
   ]);
 
+  // To be used in Oauth
+
   useEffect(() => {
-    console.log('UE');
     axios.get('http://localhost:3005/gtoken')
       .then((response) => {
         if (response.data !== 'undefined') {
@@ -83,10 +82,8 @@ const PipelineDropdown = (updateFromDropdown) => {
   }, []);
 
   useEffect(() => {
-    console.log('UEP');
     axios.get('http://localhost:3005/autogenPipelines')
       .then((response) => {
-        console.log(response);
         if (response.data !== 'undefined') {
           setPipelines(response.data);
         }
@@ -98,7 +95,7 @@ const PipelineDropdown = (updateFromDropdown) => {
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
-        {pipelines.map((pipe) => <PipelineSelector pipeline={pipe} updateFromDropdown={updateFromDropdown} />)}
+        {pipelines.map((pipe) => <PipelineSelector pipeline={pipe} key={pipe.id} updateFromDropdown={updateFromDropdown} />)}
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );
