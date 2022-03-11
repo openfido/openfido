@@ -51,27 +51,6 @@ app.get('/gtoken', (req, res) => {
   );
 });
 
-// list for dropdown of all repositories that can generate a pipeline, cleaned of excess data
-app.get('/autogenPipelines', async (req, res) => {
-  let data = await gitApi.getPotentialPipelines();
-  data = data.items;
-  const cleanData = data.map((repo) => {
-    const reducedData = {};
-    reducedData.full_name = repo.full_name;
-    reducedData.url = repo.url;
-    reducedData.id = repo.id;
-    return reducedData;
-  });
-  res.send(cleanData);
-});
-
-// data from selected pipeline to pre-fill pipeline form, expecting an obj with the url property
-app.post('/pipelineManifest', async (req, res) => {
-  const { url } = req.body;
-  const data = await gitApi.getManifest(url);
-  res.send(data);
-});
-
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

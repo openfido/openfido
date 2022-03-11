@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import axios from "axios";
-
+import axios from 'axios';
 
 import { requestStartPipelineRun } from 'services';
 import {
@@ -150,10 +149,12 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl }) => {
+const StartRunPopup = ({
+  handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl,
+}) => {
   // get config from github
   // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
-  const [data, setData] = useState({})
+  const [data, setData] = useState({});
   useEffect(() => {
     axios.get(configUrl).then((response) => {
       setData(response.data);
@@ -223,7 +224,6 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, pipli
     window.open(piplineUrl);
   };
 
-
   return (
     <Modal
       visible
@@ -234,8 +234,8 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, pipli
           textcolor="lightBlue"
           onClick={handleOpenPiplineClick}
         >
-        Pipline Describtion
-        </StyledButton>
+          Pipline Description
+        </StyledButton>,
       ]}
       onOk={handleOk}
       onCancel={onCloseStartRunPopup}
@@ -249,8 +249,7 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl, pipli
         <PipelineForm
           data={data}
           onInputFormSubmit={(e, arrayBuffer, fileName) => handleInputFormSubmit(e, arrayBuffer, fileName)}
-        >
-        </PipelineForm>
+        />
         <UploadSection>
           <UploadBox
             onDragOver={onUploadBoxDragOverOrEnter}

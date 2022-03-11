@@ -11,6 +11,7 @@ import {
   StyledButton, StyledText, StyledInput, StyledTextArea,
 } from 'styles/app';
 
+import gitApi from 'util/api-github';
 import PipelineDropdown from '../pipeline-dropdown';
 
 const AddPipelineForm = styled.form`
@@ -63,16 +64,16 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
     };
 
     console.log(url);
-    axios.post('http://localhost:3005/pipelineManifest', url)
+    gitApi.getManifest(url.url)
       .then((response) => {
         console.log(response);
         setFields({
           name: url.name,
-          description: response.data.description,
-          docker_image_url: response.data.docker,
-          repository_ssh_url: response.data.git,
-          repository_branch: response.data.branch,
-          repository_script: response.data.script,
+          description: response.description,
+          docker_image_url: response.docker,
+          repository_ssh_url: response.git,
+          repository_branch: response.branch,
+          repository_script: response.script,
         });
       }, (error) => {
         console.log(error);

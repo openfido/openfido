@@ -8,7 +8,7 @@ import {
 import { Dropdown, Menu } from 'antd';
 import colors from 'styles/colors';
 
-import axios from 'axios';
+import gitApi from 'util/api-github';
 import PipelineSelector from './pipeline-selector';
 
 const AppDropdown = styled(Dropdown)`
@@ -69,7 +69,7 @@ const PipelineDropdown = (updateFromDropdown) => {
   ]);
 
   // To be used in Oauth
-
+  /*
   useEffect(() => {
     axios.get('http://localhost:3005/gtoken')
       .then((response) => {
@@ -80,12 +80,12 @@ const PipelineDropdown = (updateFromDropdown) => {
         console.log(error);
       });
   }, []);
-
+*/
   useEffect(() => {
-    axios.get('http://localhost:3005/autogenPipelines')
+    gitApi.getPotentialPipelines()
       .then((response) => {
-        if (response.data !== 'undefined') {
-          setPipelines(response.data);
+        if (response.items !== 'undefined') {
+          setPipelines(response.items);
         }
       }, (error) => {
         console.log(error);
