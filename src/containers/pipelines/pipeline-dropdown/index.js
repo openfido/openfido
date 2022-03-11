@@ -58,8 +58,6 @@ const AppDropdownMenuItem = styled(Menu.Item)`
 `;
 
 const PipelineDropdown = (updateFromDropdown) => {
-  const [gtoken, setToken] = useState(false);
-
   const [pipelines, setPipelines] = useState([
     {
       full_name: '',
@@ -82,7 +80,13 @@ const PipelineDropdown = (updateFromDropdown) => {
   const menu = (
     <AppDropdownMenu>
       <AppDropdownMenuItem>
-        {pipelines.map((pipe) => <PipelineSelector pipeline={pipe} key={pipe.id} updateFromDropdown={updateFromDropdown} />)}
+        {pipelines.map((pipe) => (
+          <PipelineSelector
+            pipeline={pipe}
+            key={pipe.id}
+            updateFromDropdown={updateFromDropdown}
+          />
+        ))}
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );
@@ -99,41 +103,4 @@ const PipelineDropdown = (updateFromDropdown) => {
   );
 };
 
-/*
-        <button type="button" onClick={buttonAuth()}>
-          Enable pre-select from GITHUB
-        </button>
-        */
-
 export default PipelineDropdown;
-
-// To be used in Oauth
-/*
-  useEffect(() => {
-    axios.get('http://localhost:3005/gtoken')
-      .then((response) => {
-        if (response.data !== 'undefined') {
-          setToken(response);
-        }
-      }, (error) => {
-        console.log(error);
-      });
-  }, []);
-
-  if (gtoken) {
-    console.log('hmm', gtoken);
-    return (
-      <AppDropdown overlay={menu} trigger="click">
-        <div aria-label="App dropdown">
-          <StyledText color="darkText">
-            Import from Github
-          </StyledText>
-          <DownOutlined color="gray20" />
-        </div>
-      </AppDropdown>
-    );
-  }
-  return (
-    <a className="btn" href="http://localhost:3005/auth">Enable pre-select from GITHUB</a>
-  );
-  */
