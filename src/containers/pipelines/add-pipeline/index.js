@@ -10,6 +10,9 @@ import {
   StyledButton, StyledText, StyledInput, StyledTextArea,
 } from 'styles/app';
 
+import gitApi from 'util/api-github';
+import PipelineDropdown from '../pipeline-dropdown';
+
 const AddPipelineForm = styled.form`
   max-width: 432px;
   h3 {
@@ -51,6 +54,28 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
         });
     }
   }, [formSubmitted, errors, currentOrg, fields, handleSuccess, loading]);
+
+  const updateFromDropdown = (e) => {
+    // pass into dropdown to send data back and fill
+    const url = {
+      url: e.target.dataset.url,
+      name: e.target.dataset.fullname,
+    };
+
+    gitApi.getManifest(url.url)
+      .then((response) => {
+        setFields({
+          name: url.name,
+          description: response.description,
+          docker_image_url: response.docker,
+          repository_ssh_url: response.git,
+          repository_branch: response.branch,
+          repository_script: response.script,
+        });
+      }, (error) => {
+        console.log(error);
+      });
+  };
 
   const validateField = (fieldName, fieldValue) => {
     let result;
@@ -128,6 +153,7 @@ const AddPipeline = ({ handleSuccess, handleCancel }) => {
   return (
     <AddPipelineForm onSubmit={onAddPipelineClicked}>
       <StyledH3 color="black">Add a pipeline</StyledH3>
+      <PipelineDropdown updateFromDropdown={updateFromDropdown} />
       <Space direction="vertical" size={24}>
         <label htmlFor="name">
           <StyledText

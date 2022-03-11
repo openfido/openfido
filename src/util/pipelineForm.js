@@ -42,9 +42,9 @@ class PipelineForm extends React.Component {
       }
       keys.forEach((key)=>{
         if (data[fileName][key]["type"] === "optionsMulti") {
-          formState.[key] = [];
+          formState[key] = [];
         } else {
-          formState.[key] = null;
+          formState[key] = null;
         }
       })
       this.setState(formState)
