@@ -68,24 +68,11 @@ const PipelineDropdown = (updateFromDropdown) => {
     },
   ]);
 
-  // To be used in Oauth
-  /*
-  useEffect(() => {
-    axios.get('http://localhost:3005/gtoken')
-      .then((response) => {
-        if (response.data !== 'undefined') {
-          setToken(response);
-        }
-      }, (error) => {
-        console.log(error);
-      });
-  }, []);
-*/
   useEffect(() => {
     gitApi.getPotentialPipelines()
       .then((response) => {
-        if (response.items !== 'undefined') {
-          setPipelines(response.items);
+        if (response !== 'undefined') {
+          setPipelines(response);
         }
       }, (error) => {
         console.log(error);
@@ -99,25 +86,6 @@ const PipelineDropdown = (updateFromDropdown) => {
       </AppDropdownMenuItem>
     </AppDropdownMenu>
   );
-
-  /*
-  if (gtoken) {
-    console.log('hmm', gtoken);
-    return (
-      <AppDropdown overlay={menu} trigger="click">
-        <div aria-label="App dropdown">
-          <StyledText color="darkText">
-            Import from Github
-          </StyledText>
-          <DownOutlined color="gray20" />
-        </div>
-      </AppDropdown>
-    );
-  }
-  return (
-    <a className="btn" href="http://localhost:3005/auth">Enable pre-select from GITHUB</a>
-  );
-  */
 
   return (
     <AppDropdown overlay={menu} trigger="click">
@@ -138,3 +106,34 @@ const PipelineDropdown = (updateFromDropdown) => {
         */
 
 export default PipelineDropdown;
+
+// To be used in Oauth
+/*
+  useEffect(() => {
+    axios.get('http://localhost:3005/gtoken')
+      .then((response) => {
+        if (response.data !== 'undefined') {
+          setToken(response);
+        }
+      }, (error) => {
+        console.log(error);
+      });
+  }, []);
+
+  if (gtoken) {
+    console.log('hmm', gtoken);
+    return (
+      <AppDropdown overlay={menu} trigger="click">
+        <div aria-label="App dropdown">
+          <StyledText color="darkText">
+            Import from Github
+          </StyledText>
+          <DownOutlined color="gray20" />
+        </div>
+      </AppDropdown>
+    );
+  }
+  return (
+    <a className="btn" href="http://localhost:3005/auth">Enable pre-select from GITHUB</a>
+  );
+  */
