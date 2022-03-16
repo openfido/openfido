@@ -1,6 +1,6 @@
 module "ecs" {
-  source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.1.1"
-
+  # source = "git@github.com:PresencePG/presence-devops-module-ecs.git?ref=2.1.1"
+  source = "git::https://github.com/slacgismo/openfido-deploy-modules.git?ref=vendor/presencepg-ecs-2.1.1"
   client         = var.client
   environment    = local.env
   tags           = local.tags

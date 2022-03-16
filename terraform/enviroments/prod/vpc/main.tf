@@ -18,8 +18,8 @@ locals {
 // Create VPC
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 2"
-
+  # version = "~> 2"
+  version = "2.77.0"
   name = "${var.client}-${local.env}"
   cidr = "10.12.0.0/16"
 
