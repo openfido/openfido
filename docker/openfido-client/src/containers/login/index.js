@@ -66,7 +66,7 @@ const Login = () => {
       <StyledH1>
         Welcome to
         <br />
-        OpenFIDO
+        OpenFIDO !!
       </StyledH1>
       <FormWrapper>
         <StyledForm onSubmit={onLoginClicked}>

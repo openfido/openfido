@@ -391,6 +391,10 @@ export const StyledIcon = styled(Icon)`
   right: 0;
 `;
 
+export const StyledQmark = styled(Icon)`
+  position: relative;
+`;
+
 export const StyledMenu = styled(Menu)`
   padding: 8px 10px;
   border: 1px solid ${colors.lightGray};

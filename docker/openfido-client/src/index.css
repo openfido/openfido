@@ -1,3 +1,4 @@
+/* css for the user settings forms */
 html {
   box-sizing: border-box;
   background-color: #f7f7f7;
@@ -26,6 +27,7 @@ a {
 .ant-modal-mask {
     background-color: rgba(196, 196, 196, 0.75);
 }
+/* css for the pipeline add form */
 form {
     width: 100%;
 }
@@ -38,6 +40,9 @@ input {
     font-size: 12px;
     line-height: 14px;
 }
+option:hover {
+    background-color: yellow;
+  }
 
 /* react-date-range theme */
 .rdrCalendarWrapper{

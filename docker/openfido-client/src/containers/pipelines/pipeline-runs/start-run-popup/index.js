@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import axios from "axios";
 
 import { requestStartPipelineRun } from 'services';
 import {
@@ -18,7 +17,9 @@ import {
   StyledText,
 } from 'styles/app';
 import colors from 'styles/colors';
-import PipelineForm from 'util/pipelineForm';
+import gitApi from 'util/api-github';
+import PipelineForm from '../pipeline-form/pipelineForm';
+import PipelineFormJson from '../pipeline-form/pipelineFormJson';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -149,20 +150,35 @@ export const Artifact = styled.div`
   }
 `;
 
-const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
-  // get config from github
-  // console.log( useSelector((state) => state.pipelines.currentOpenfidoStartConfig) )
-  const [data, setData] = useState({})
-  useEffect( () => {
-      axios.get(configUrl).then((response) => {
-        setData(response.data)
-      })
-   }, []);
+const StartRunPopup = ({
+  handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl,
+}) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
 
   const inputFiles = useSelector((state) => state.pipelines.inputFiles);
   const [uploadBoxDragged, setUploadBoxDragged] = useState(false);
+
+  const [manifest, setManifest] = useState(null);
+  const [manual, setManual] = useState([]);
+
+  useEffect(() => {
+    // uses the passed-in URL to grab the manifest
+    // Object.keys(response.manual) to build array
+    // Use .map((key) => {}) of result to build multiple forms
+    // Pass in the correct response.manual[key] value to build correct form type
+    gitApi.getManifest(configUrl)
+      .then((response) => {
+        if (response.manual === undefined) {
+          console.log('Missing manual property from the manifest');
+        } else {
+          setManifest(response);
+          setManual(Object.keys(response.manual));
+        }
+      }, (error) => {
+        console.log(error);
+      });
+  }, [configUrl]);
 
   const onInputsChangedOrDropped = (e) => {
     e.preventDefault();
@@ -213,16 +229,32 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
     dispatch(clearInputFiles());
   };
 
-  const handleInputFormSubmit = async (e, data, fileName) => {
-    e.preventDefault();
-    await dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, data));
+  const handleInputFormSubmit = async (data, fileName) => {
+    const fileReader = new window.FileReader();
+    fileReader.onload = () => {
+      dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, fileReader.result));
+    };
+
+    fileReader.readAsArrayBuffer(data);
   };
 
+  const handleOpenPiplineClick = () => {
+    window.open(piplineUrl);
+  };
 
   return (
     <Modal
       visible
-      footer={null}
+      footer={[
+        <StyledButton
+          type="text"
+          size="middle"
+          textcolor="lightBlue"
+          onClick={handleOpenPiplineClick}
+        >
+          Pipline Description
+        </StyledButton>,
+      ]}
       onOk={handleOk}
       onCancel={onCloseStartRunPopup}
       closeIcon={<CloseOutlined color="darkText" />}
@@ -232,11 +264,33 @@ const StartRunPopup = ({ handleOk, handleCancel, pipeline_uuid, configUrl}) => {
       title="Start a run"
     >
       <StyledForm onSubmit={onStartRunClicked}>
-        <PipelineForm
-          data={data}
-          onInputFormSubmit={(e, arrayBuffer, fileName) => handleInputFormSubmit(e, arrayBuffer, fileName)}
-        >
-        </PipelineForm>
+        {
+          manual.map((item) => {
+            // Don't attempt a render if there is nothing to render yet
+            if (manual.length === 0) {
+              return <div />;
+            }
+            // separated json form from csv/rc form to allow for more complicated, targeted logic
+            if (manifest.manual[item] === 'json') {
+              return (
+                <PipelineFormJson
+                  config={manifest[item]}
+                  key={item}
+                  formType={[item, manifest.manual[item]]}
+                  onInputFormSubmit={(arrayBuffer, fileName) => handleInputFormSubmit(arrayBuffer, fileName)}
+                />
+              );
+            }
+            return (
+              <PipelineForm
+                config={manifest[item]}
+                key={item}
+                formType={[item, manifest.manual[item]]}
+                onInputFormSubmit={(arrayBuffer, fileName) => handleInputFormSubmit(arrayBuffer, fileName)}
+              />
+            );
+          })
+        }
         <UploadSection>
           <UploadBox
             onDragOver={onUploadBoxDragOverOrEnter}
@@ -293,6 +347,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  piplineUrl: PropTypes.string.isRequired,
   configUrl: PropTypes.string.isRequired,
 };
 

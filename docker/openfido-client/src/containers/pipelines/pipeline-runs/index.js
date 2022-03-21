@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import axios from "axios";
+// import axios from "axios";
 
 import {
   PIPELINE_STATES,
@@ -13,7 +13,7 @@ import {
   getPipelineRuns,
   getPipelineRun,
   getPipelines,
-  getPipelineConfigData,
+  // getPipelineConfigData,
 } from 'actions/pipelines';
 import { StyledGrid, StyledText, StyledTitle } from 'styles/app';
 import colors from 'styles/colors';
@@ -103,13 +103,16 @@ const PipelineRuns = () => {
   const [showStartRunPopup, setStartRunPopup] = useState(false);
 
   const pipelines = useSelector((state) => state.pipelines.pipelines);
-  let configUrl = null
+  let configUrl = null;
+  let piplineUrl = null;
   if (pipelines !== null) {
-    pipelines.map((pipeline)=>{
+    pipelines.forEach((pipeline) => {
       if (pipeline.uuid === pipelineInView) {
-        configUrl = pipeline.repository_ssh_url.replace(".git", "").replace("github", "raw.githubusercontent") + "/" + pipeline.repository_branch + "/openfido_start.json"
+        // configUrl generates the API url for github to retrieve the manifest.json file
+        configUrl = pipeline.repository_ssh_url.replace('.git', '').replace('github.com/', 'api.github.com/repos/');
+        piplineUrl = pipeline.repository_ssh_url;
       }
-    })
+    });
   }
   const pipelineRuns = useSelector((state) => state.pipelines.pipelineRuns[pipelineInView]);
   const getPipelineRunsInProgress = useSelector((state) => state.pipelines.messages.getPipelineRunsInProgress);
@@ -126,7 +129,6 @@ const PipelineRuns = () => {
       && pipelineRunSelected.states.length
       && pipelineRunSelected.states[pipelineRunSelected.states.length - 1].state
   );
-  // dispatch(getPipelineConfigData(configUrl));
 
   useEffect(() => {
     if (!pipelines) {
@@ -228,7 +230,8 @@ const PipelineRuns = () => {
           handleOk={closeStartRunPopup}
           handleCancel={closeStartRunPopup}
           pipeline_uuid={pipelineInView}
-          configUrl = {configUrl}
+          configUrl={configUrl}
+          piplineUrl={piplineUrl}
         />
       )}
     </React.Fragment>
