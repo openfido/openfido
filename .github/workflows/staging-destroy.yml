@@ -1,0 +1,52 @@
+name: Terraform Staging Destroy
+on: 
+  workflow_dispatch:
+
+jobs:
+  docker:
+    name: Terraform Staging Destroy
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    container:
+      image: hashicorp/terraform:1.1.6
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Configure AWS Credentials
+        id: config-aws
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Staging Plan 
+        id: staging-plan
+        if: steps.config-aws.outcome == 'success'
+        run: |
+          cd deploy/
+          # pass variable into terraform 
+          export TF_VAR_ecr_image_api=$ECR_REPO_BASE_URL
+          terraform init
+          terraform workspace select staging || terraform workspace new staging
+          terraform plan
+      
+      - name: Staging Apply 
+        id: staging-apply
+        if: steps.staging-plan.outcome == 'success'
+        run: |
+          cd deploy/
+          # pass variable into terraform 
+          export TF_VAR_ecr_image_api=$ECR_REPO_BASE_URL
+          terraform init
+          terraform workspace select staging 
+          terraform apply -auto-approve
+
+      - name: Staging Destroy 
+        if: steps.staging-apply.outcome == 'success'
+        run: |
+          cd deploy/
+          terraform init
+          terraform workspace select staging 
+          terraform destroy -auto-approve

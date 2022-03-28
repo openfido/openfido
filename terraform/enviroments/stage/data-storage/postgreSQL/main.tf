@@ -12,11 +12,12 @@ terraform {
 // Tag all resources
 locals {
   env  = var.environment
-  tags = merge(map("Environment", local.env), var.aws_tags)
+  tags = merge(tomap({Environment = local.env}), var.aws_tags)
 }
 
 module "rds" {
-  source = "git@github.com:PresencePG/presence-devops-module-rds.git?ref=0.1.3"
+  # source = "git@github.com:PresencePG/presence-devops-module-rds.git?ref=0.1.3"
+  source = "git@github.com:slacgismo/openfido-deploy-modules.git?ref=vendor/presencepg-rds-0.1.3"
 
   environment       = local.env
   client            = var.client
