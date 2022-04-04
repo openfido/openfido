@@ -23,3 +23,8 @@ Pipeline developers should consult the [pipeline developer documents](http://hel
 ### Docker
 
 Developer can setup the docker environment by consulting the [developer setup guide](http://help.openfido.org/_page.html?owner=slacgismo&project=openfido&branch=master&folder=/Getting%20Started&doc=/Getting%20Started/Developer%20Setup.md).
+
+## Related Repositories
+
+* [OpenFIDO Platform](https://github.com/slacgismo?q=openfido&type=all&language=&sort=)
+* [OpenFIDO Products](https://source.openfido.org/)
