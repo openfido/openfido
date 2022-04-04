@@ -14,7 +14,7 @@ To run this image directly, use the following command:
       -p 127.0.0.1:5003:5003 \
       -p 127.0.0.1:9000:9000 \
       -p 127.0.0.1:3000:3000 \
-      openfido/openfido
+      openfido/cli
 
 The system will take a few minutes to bring up the underlying services and seed
 the initial system databases.
@@ -32,12 +32,12 @@ To build the image yourself, issue the following command:
 
     # Build the docker image, using the SSH private key you use for github
     # access (to access other openslac private repositories)
-    docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido/openfido .
+    docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" -t openfido/cli .
 
 
 Once you've logged into the docker hub account you can push your built images:
 
-    docker push openfido/openfido
+    docker push openfido/cli:latest
 
 Development
 -----------
