@@ -395,6 +395,10 @@ export const StyledQmark = styled(Icon)`
   position: relative;
 `;
 
+export const StyledUploadBox = styled(Icon)`
+  position: relative;
+`;
+
 export const StyledMenu = styled(Menu)`
   padding: 8px 10px;
   border: 1px solid ${colors.lightGray};

@@ -19,7 +19,6 @@ import {
 import colors from 'styles/colors';
 import gitApi from 'util/api-github';
 import PipelineForm from '../pipeline-form/pipelineForm';
-import PipelineFormJson from '../pipeline-form/pipelineFormJson';
 
 const Modal = styled(StyledModal)`
   h2 {
@@ -151,7 +150,7 @@ export const Artifact = styled.div`
 `;
 
 const StartRunPopup = ({
-  handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl,
+  handleOk, handleCancel, pipeline_uuid, configUrl, piplineUrl, pipelineBranch,
 }) => {
   const currentOrg = useSelector((state) => state.user.currentOrg);
   const dispatch = useDispatch();
@@ -161,13 +160,13 @@ const StartRunPopup = ({
 
   const [manifest, setManifest] = useState(null);
   const [manual, setManual] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [uploadedCsv, setUploadedCsv] = useState([]);
 
   useEffect(() => {
     // uses the passed-in URL to grab the manifest
-    // Object.keys(response.manual) to build array
-    // Use .map((key) => {}) of result to build multiple forms
-    // Pass in the correct response.manual[key] value to build correct form type
-    gitApi.getManifest(configUrl)
+    // Object.keys(response.manual) to determine which forms to build
+    gitApi.getManifest(configUrl, pipelineBranch)
       .then((response) => {
         if (response.manual === undefined) {
           console.log('Missing manual property from the manifest');
@@ -178,15 +177,42 @@ const StartRunPopup = ({
       }, (error) => {
         console.log(error);
       });
-  }, [configUrl]);
+  }, [configUrl, pipelineBranch]);
 
+  // When file(s) selected from browse, or dropped on the box, disable start run until
+  // files are done uploading to the pipeline
   const onInputsChangedOrDropped = (e) => {
     e.preventDefault();
+    let uploadCounter = 0;
 
-    Array.from(e.target.files || e.dataTransfer.files).forEach((file) => {
+    Array.from(e.target.files || e.dataTransfer.files).forEach((file, index, array) => {
       const fileReader = new window.FileReader();
+      // added loadend event to enable autofill matching form fields with uploaded config
+      fileReader.addEventListener('loadend', (event) => {
+        if (file.name === 'config.csv') {
+          const buf = event.target.result;
+          let view = String.fromCharCode.apply(null, new Int8Array(buf)).split('\n');
+          view = view.map((item) => {
+            const temp = [];
+            const splitter = item.split(',');
+            temp.push(splitter.shift());
+            temp.push(splitter.join(',').replace('\r', ''));
+            return temp;
+          });
+          setUploadedCsv(view);
+        }
+      });
+      fileReader.addEventListener('loadstart', () => {
+        setIsLoading(true);
+      });
       fileReader.onload = () => {
-        dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result));
+        dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result))
+          .then(() => {
+            uploadCounter += 1;
+            if (uploadCounter === array.length) {
+              setIsLoading(false);
+            }
+          });
       };
 
       fileReader.readAsArrayBuffer(file);
@@ -224,18 +250,48 @@ const StartRunPopup = ({
     dispatch(removeInputFile(index));
   };
 
+  // clears input files on closing the modal to prevent cross contamination
   const onCloseStartRunPopup = () => {
     handleCancel();
     dispatch(clearInputFiles());
   };
 
+  // passed into the form generators to upload the processed form data into the pipeline
   const handleInputFormSubmit = async (data, fileName) => {
     const fileReader = new window.FileReader();
+    fileReader.addEventListener('loadstart', () => {
+      setIsLoading(true);
+    });
+    fileReader.addEventListener('loadend', () => {
+      setIsLoading(false);
+    });
     fileReader.onload = () => {
       dispatch(uploadInputFile(currentOrg, pipeline_uuid, fileName, fileReader.result));
     };
 
     fileReader.readAsArrayBuffer(data);
+  };
+
+  const handleFormFieldUpload = (e) => {
+    e.preventDefault();
+    let file;
+
+    if (e.target.files) {
+      [file] = e.target.files;
+    } else if (e.dataTransfer.files) {
+      [file] = e.dataTransfer.files;
+    }
+
+    const fileReader = new window.FileReader();
+    fileReader.addEventListener('loadstart', () => {
+      setIsLoading(true);
+    });
+    fileReader.onload = () => {
+      dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result))
+        .then(() => setIsLoading(false));
+    };
+
+    fileReader.readAsArrayBuffer(file);
   };
 
   const handleOpenPiplineClick = () => {
@@ -252,7 +308,7 @@ const StartRunPopup = ({
           textcolor="lightBlue"
           onClick={handleOpenPiplineClick}
         >
-          Pipline Description
+          Help
         </StyledButton>,
       ]}
       onOk={handleOk}
@@ -270,23 +326,14 @@ const StartRunPopup = ({
             if (manual.length === 0) {
               return <div />;
             }
-            // separated json form from csv/rc form to allow for more complicated, targeted logic
-            if (manifest.manual[item] === 'json') {
-              return (
-                <PipelineFormJson
-                  config={manifest[item]}
-                  key={item}
-                  formType={[item, manifest.manual[item]]}
-                  onInputFormSubmit={(arrayBuffer, fileName) => handleInputFormSubmit(arrayBuffer, fileName)}
-                />
-              );
-            }
             return (
               <PipelineForm
                 config={manifest[item]}
                 key={item}
                 formType={[item, manifest.manual[item]]}
                 onInputFormSubmit={(arrayBuffer, fileName) => handleInputFormSubmit(arrayBuffer, fileName)}
+                handleFormFieldUpload={handleFormFieldUpload}
+                uploadedCsv={uploadedCsv}
               />
             );
           })
@@ -299,7 +346,6 @@ const StartRunPopup = ({
             onDrop={onInputsChangedOrDropped}
             className={uploadBoxDragged ? 'dragged' : ''}
           >
-            <input type="file" id="inputs" onChange={onInputsChangedOrDropped} multiple />
             <CloudOutlined />
             <div>
               <StyledText size="large" color="darkText">
@@ -310,7 +356,8 @@ const StartRunPopup = ({
                   size="middle"
                   textcolor="lightBlue"
                 >
-                  <label htmlFor="inputs">
+                  <label>
+                    <input type="file" onChange={onInputsChangedOrDropped} multiple />
                     <strong>browse</strong>
                   </label>
                 </StyledButton>
@@ -330,6 +377,7 @@ const StartRunPopup = ({
           </div>
         </ArtifactsSection>
         <StyledButton
+          disabled={isLoading}
           aria-label="Start Run button"
           size="middle"
           color="blue"
@@ -347,6 +395,7 @@ StartRunPopup.propTypes = {
   handleOk: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   pipeline_uuid: PropTypes.string.isRequired,
+  pipelineBranch: PropTypes.string.isRequired,
   piplineUrl: PropTypes.string.isRequired,
   configUrl: PropTypes.string.isRequired,
 };

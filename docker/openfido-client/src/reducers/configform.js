@@ -11,6 +11,15 @@ const formReducer = (state, action) => {
         },
       };
     }
+    case 'HANDLE VALIDATION': {
+      return {
+        ...state,
+        [action.field]: {
+          ...state[action.field],
+          isValidated: action.payload,
+        },
+      };
+    }
     case 'HANDLE INITIAL UPDATE': {
       return {
         ...action.payload,

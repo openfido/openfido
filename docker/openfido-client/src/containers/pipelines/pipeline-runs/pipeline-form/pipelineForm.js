@@ -1,9 +1,8 @@
 import React, {
-  useState, useEffect, useReducer, useRef,
+  useState, useEffect, useReducer,
 } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { CSVLink } from 'react-csv';
 import {
   StyledButton,
 } from 'styles/app';
@@ -21,17 +20,16 @@ const PipelineFormStyled = styled.form`
 
 const DEFAULT_STATE = {};
 
-const PipelineForm = ({ config, formType, onInputFormSubmit }) => {
+const PipelineForm = ({
+  config, formType, onInputFormSubmit, handleFormFieldUpload, uploadedCsv,
+}) => {
   const [fType, setFormType] = useState(undefined);
   const [fName, setFormName] = useState(undefined);
+
   // used to prepare the form for conversion
   const [formBuilder, setFormBuilder] = useState([]);
   const [isHidden, setIsHidden] = useState(false);
-  const [toCsv, dispatch] = useReducer(formReducer, DEFAULT_STATE);
-
-  // used for when submitted
-  const [convertedCsv, setConvertedCsv] = useState([]);
-  const csvLink = useRef();
+  const [toFile, dispatch] = useReducer(formReducer, DEFAULT_STATE);
 
   useEffect(() => {
     const [fname, type] = formType;
@@ -40,7 +38,8 @@ const PipelineForm = ({ config, formType, onInputFormSubmit }) => {
   }, [formType]);
 
   // generates the provided fieldnames into an array
-  // prepares form for csv conversion and creates trackable state
+  // prepares form for file conversion and creates trackable state
+  // if an item is provided with no details, generates generic field
   useEffect(() => {
     if (config === undefined) {
       setFormBuilder([]);
@@ -51,11 +50,21 @@ const PipelineForm = ({ config, formType, onInputFormSubmit }) => {
         if (cleanConfig[item].default === undefined) {
           cleanConfig[item].default = '';
         }
-        if (cleanConfig[item].descrition === undefined) {
+        if (cleanConfig[item].description === undefined) {
           cleanConfig[item].description = '';
         }
         if (cleanConfig[item].input_type === undefined) {
           cleanConfig[item].input_type = 'str';
+        }
+        if (cleanConfig[item].choices === undefined) {
+          cleanConfig[item].choices = '';
+        }
+        if (cleanConfig[item].input_type.includes('required')) {
+          cleanConfig[item].required = true;
+          cleanConfig[item].isValidated = true;
+        } else {
+          cleanConfig[item].required = false;
+          cleanConfig[item].isValidated = true;
         }
         cleanConfig[item].value = cleanConfig[item].default;
         return item;
@@ -68,88 +77,161 @@ const PipelineForm = ({ config, formType, onInputFormSubmit }) => {
     }
   }, [config]);
 
+  useEffect(() => {
+    const csvData = uploadedCsv;
+    csvData.map((item) => {
+      if ((item.length > 0) && (config[item[0]] !== undefined)) {
+        dispatch({
+          type: 'HANDLE INPUT TEXT',
+          field: item[0],
+          payload: item[1],
+        });
+      }
+      return item;
+    });
+  }, [uploadedCsv, config]);
+
   const clickHide = () => {
     // magic button to hide/unhide form
     setIsHidden(!isHidden);
   };
 
+  // handy state update for majority of form needs
   const handleChange = (e) => {
+    let update = e.target.value;
+    if (config[e.target.id].input_type === 'boolean') {
+      update = `${e.target.checked}`;
+    }
+    if ((config[e.target.id].input_type === 'upload') || (config[e.target.id].input_type === 'upload required')) {
+      if (e.target.files) {
+        const [file] = e.target.files;
+        update = file.name;
+        handleFormFieldUpload(e);
+      } else if (e.dataTransfer) {
+        const [file] = e.dataTransfer.files;
+        update = file.name;
+        handleFormFieldUpload(e);
+      }
+    }
     dispatch({
       type: 'HANDLE INPUT TEXT',
       field: e.target.id,
-      payload: e.target.value,
+      payload: update,
     });
   };
 
-  // const formValidator = (configMapable) => {
-  //   // do magic;
-  //   let passing = true;
-  //   for (let i = 0; i < configMapable.length; i += 1) {
-  //     console.log(toCsv[configMapable[i]]);
-  //     if (toCsv[configMapable[i]].input_type.contains('required')) {
-  //       if (toCsv[configMapable[i]].value.length === 0) {
-  //         alert(`Please enter a value in the ${configMapable[i]} field`);
-  //         passing = false;
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   return passing;
-  // }; if (formValidator(configMapable))
+  // converts the data selected into a proper csv-string before updating state
+  // can be modified to make arrays for json version
+  const handleChangeSelect = (data, id) => {
+    let input = '';
+    for (let i = 0; i < data.length; i += 1) {
+      if (i === 0) {
+        input = data[i].value;
+      } else {
+        input += `, ${data[i].value}`;
+      }
+    }
+    dispatch({
+      type: 'HANDLE INPUT TEXT',
+      field: id,
+      payload: input,
+    });
+  };
 
-  const handleRc = (configMapable) => {
+  const formValidator = (configMapable) => {
+    // do magic;
+    let passing = true;
+    for (let i = 0; i < configMapable.length; i += 1) {
+      if (toFile[configMapable[i]].required) {
+        if (toFile[configMapable[i]].value.length === 0) {
+          dispatch({
+            type: 'HANDLE VALIDATION',
+            field: configMapable[i],
+            payload: false,
+          });
+          passing = false;
+        } else if (toFile[configMapable[i]].isValidated === false) {
+          dispatch({
+            type: 'HANDLE VALIDATION',
+            field: configMapable[i],
+            payload: true,
+          });
+          passing = true;
+        }
+      }
+    }
+    return passing;
+  };
+
+  // combined csv and rc generation due to similarities and for easier/cleaner maintenance
+  const handleUpload = (configMapable, datatype) => {
     const temp = [];
     configMapable.map((item) => {
-      if (toCsv[item].input_type === 'title') {
+      if (toFile[item].input_type === 'title') {
         return item;
       }
-      temp.push([
-        toCsv[item].value,
-      ]);
+      if (fType === 'rc') {
+        temp.push([
+          toFile[item].value,
+        ]);
+      }
+      if (fType === 'csv') {
+        temp.push([
+          item, toFile[item].value,
+        ]);
+      }
       return item;
     });
-    const fileContent = `data:text/plain;charset=utf-8,${
-      temp.map((e) => e.join(',')).join('\n')}`;
+    const fileContent = temp.map((e) => e.join(',')).join('\n');
     const file = new Blob([fileContent], { // eslint-disable-line
-      type: 'text/plain',
+      type: datatype,
     });
     onInputFormSubmit(file, `${fName}.${fType}`);
-    const encodedUri = encodeURI(fileContent);
-    const link = document.createElement('a'); // eslint-disable-line
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `${fName}.${fType}`);
-    document.body.appendChild(link); // eslint-disable-line
-    link.click(); // This will download the data file named "my_data.rc".
   };
 
-  const handleCsv = (configMapable) => {
-    const temp = [];
+  // Json has unique complications, therefore gets its own handler.
+  const convertToJson = (configMapable) => {
+    const temp = {};
     configMapable.map((item) => {
-      if (toCsv[item].input_type === 'title') {
+      if (toFile[item].input_type === 'title') {
         return item;
       }
-      temp.push([
-        item, toCsv[item].value,
-      ]);
+      if (toFile[item].input_type === 'arr') {
+        temp[item] = toFile[item].value.split(',');
+        return item;
+      }
+      if (toFile[item].input_type === 'boolean') {
+        if (toFile[item].value === 'true') {
+          temp[item] = true;
+          return item;
+        }
+        temp[item] = false;
+        return item;
+      }
+      temp[item] = toFile[item].value;
       return item;
     });
-    setConvertedCsv(temp);
-    const csvContent = `data:text/csv;charset=utf-8,${
-      temp.map((e) => e.join(',')).join('\n')}`;
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); // eslint-disable-line
-    onInputFormSubmit(blob, `${fName}.${fType}`);
-    csvLink.current.link.click();
+    const fileContent = JSON.stringify(temp);
+    const file = new Blob([fileContent], { // eslint-disable-line
+      type: 'application/json',
+    });
+    onInputFormSubmit(file, `${fName}.${fType}`);
   };
 
+  // adjusts applicable parameters based on the received form
   const handleSubmit = async () => {
-    // convert toCsv into csv format, downloads copy of csv file and automatically attaches form
     const configMapable = Object.keys(config);
-    if (configMapable === undefined) {
+    if (formValidator(configMapable)) {
+      if (configMapable === undefined) {
       alert('There was an error with the configuration file'); // eslint-disable-line
-    } else if (fType === 'csv') {
-      handleCsv(configMapable);
-    } else if (fType === 'rc') {
-      handleRc(configMapable);
+      } else if (fType === 'csv') {
+        handleUpload(configMapable, 'text/csv');
+      } else if (fType === 'rc') {
+        handleUpload(configMapable, 'text/plain');
+      } else if (fType === 'json') {
+        convertToJson(configMapable);
+      }
+      clickHide();
     }
   };
 
@@ -175,42 +257,38 @@ const PipelineForm = ({ config, formType, onInputFormSubmit }) => {
         </StyledButton>
         <div style={isHidden ? {} : { display: 'none' }}>
           {formBuilder.map((item) => {
-            const field = config[item];
+            const field = toFile[item];
             let fieldName;
-            if (config[item].prompt === undefined) {
+            let fieldId = '';
+            if (toFile[item].prompt === undefined) {
               fieldName = item;
             } else {
-              fieldName = config[item].prompt;
+              fieldName = toFile[item].prompt;
+            }
+            if (typeof (item) === 'string') {
+              fieldId = item;
             }
             return (
               <FormBuilder
                 key={item}
                 type={fType}
                 field={field}
+                fieldId={fieldId}
                 fieldName={fieldName}
-                value={toCsv[item]}
+                value={toFile[item]}
                 handleChange={handleChange}
+                handleChangeSelect={handleChangeSelect}
+                handleFormFieldUpload={handleFormFieldUpload}
               />
             );
           })}
           <StyledButton type="submit" onClick={() => handleSubmit()}>Submit form</StyledButton>
-          <CSVLink
-            data={convertedCsv}
-            filename={`${fName}.${fType}`}
-            className="hidden"
-            ref={csvLink}
-            target="_blank"
-          />
         </div>
       </PipelineFormStyled>
     );
   }
   return (
-    <div>
-      The system could not detect a manifest.json file with a &quot;config&quot; property.
-      <br />
-      Please create the required file in the pipeline&apos;s repository or proceed with manual upload.
-    </div>
+    <div />
   );
 };
 
@@ -219,7 +297,9 @@ PipelineForm.propTypes = {
     root: PropTypes.string,
   }).isRequired,
   onInputFormSubmit: PropTypes.func.isRequired,
+  handleFormFieldUpload: PropTypes.func.isRequired,
   formType: PropTypes.arrayOf(PropTypes.string).isRequired,
+  uploadedCsv: PropTypes.arrayOf(PropTypes.array).isRequired,
 };
 
 export default PipelineForm;

@@ -10,7 +10,7 @@ class OrganizationPipeline(CommonColumnsMixin, db.Model):
 
     organization_uuid = db.Column(db.String(32), nullable=False, server_default="")
     pipeline_uuid = db.Column(db.String(32), nullable=False, server_default="")
-    is_deleted = db.Column(db.Boolean(), default=False, nullable=False)
+    is_deleted = db.Column(db.Boolean(), default=False, nullable=False, server_default="false")
 
     organization_pipeline_runs = db.relationship(
         "OrganizationPipelineRun", backref="organization_pipeline", lazy="immediate"

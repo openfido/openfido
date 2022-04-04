@@ -6,6 +6,7 @@ import {
   StyledText,
 } from 'styles/app';
 import { Dropdown, Menu } from 'antd';
+
 import colors from 'styles/colors';
 
 import gitApi from 'util/api-github';
@@ -40,12 +41,16 @@ const AppDropdownMenu = styled(Menu)`
   min-width: 87px;
   right: 16px;
   right: 1rem;
+  margin-bottom: 70px;
+  margin-left: 15px;
+  height: auto;
 `;
 
 const AppDropdownMenuItem = styled(Menu.Item)`
   padding: 10px;
   padding: 0.625rem;
-  text-align: center;
+  text-align: left;
+  height: auto;
   a {
     color: ${colors.lightBlue};
     font-weight: 500;

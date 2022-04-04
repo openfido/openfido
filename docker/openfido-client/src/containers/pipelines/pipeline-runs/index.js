@@ -105,12 +105,14 @@ const PipelineRuns = () => {
   const pipelines = useSelector((state) => state.pipelines.pipelines);
   let configUrl = null;
   let piplineUrl = null;
+  let pipelineBranch = null;
   if (pipelines !== null) {
     pipelines.forEach((pipeline) => {
       if (pipeline.uuid === pipelineInView) {
         // configUrl generates the API url for github to retrieve the manifest.json file
         configUrl = pipeline.repository_ssh_url.replace('.git', '').replace('github.com/', 'api.github.com/repos/');
         piplineUrl = pipeline.repository_ssh_url;
+        pipelineBranch = pipeline.repository_branch;
       }
     });
   }
@@ -232,6 +234,7 @@ const PipelineRuns = () => {
           pipeline_uuid={pipelineInView}
           configUrl={configUrl}
           piplineUrl={piplineUrl}
+          pipelineBranch={pipelineBranch}
         />
       )}
     </React.Fragment>
