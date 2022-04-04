@@ -7,8 +7,8 @@ resource "aws_s3_bucket" "website" {
     redirect_all_requests_to = "https://github.com/slacgismo/openfido"
   }
 
-  tags = merge(map(
-    "Name", var.domain
+  tags = merge(tomap(
+    { Name = var.domain }
   ), local.tags)
 }
 
@@ -21,7 +21,7 @@ resource "aws_s3_bucket" "www_website" {
     redirect_all_requests_to = "https://github.com/slacgismo/openfido"
   }
 
-  tags = merge(map(
-  "Name", "www.${var.domain}"
+  tags = merge(tomap(
+    { Name = "www.${var.domain}" }
   ), local.tags)
 }
