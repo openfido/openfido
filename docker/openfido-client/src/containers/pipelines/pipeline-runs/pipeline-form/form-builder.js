@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Dropdown, Menu } from 'antd';
@@ -56,6 +56,12 @@ const AppDropdownMenuItem = styled(Menu.Item)`
   }
 `;
 
+const UploadZone = styled.div`
+  &.dragged {
+    background-color: ${colors.lightBlue};
+  }
+`;
+
 const FormLabel = styled.label`
   min-width: 15rem;
 `;
@@ -66,11 +72,18 @@ const FormSelect = styled.select`
 
 const FormInput = styled.input`
   min-width: 10rem;
+  &.dragged {
+    background-color: #e0ffff;
+  }
+  &.overMax {
+    background-color: #f0e68c;
+  }
 `;
 
 const FormBuilder = ({
-  field, fieldName, fieldId, handleChange, value, type, handleChangeSelect,
+  field, fieldName, fieldId, handleChange, value, type, handleChangeSelect, handleDrop,
 }) => {
+  const [uploadZoneDragged, setUploadZoneDragged] = useState(false);
   // simple dropdown tooltip
   const menu = (
     <AppDropdownMenu>
@@ -143,6 +156,15 @@ const FormBuilder = ({
       fieldType = 'text';
   }
 
+  const onUploadZoneDragOverOrEnter = (e) => {
+    e.preventDefault();
+    if (!uploadZoneDragged) setUploadZoneDragged(true);
+  };
+
+  const onUploadZoneDragLeave = () => {
+    if (uploadZoneDragged) setUploadZoneDragged(false);
+  };
+
   // looking at merging multi select and select for cleaner/consistent implementation and styling
   if (isMultiSelect) {
     const options = [];
@@ -210,43 +232,54 @@ const FormBuilder = ({
   }
 
   if (isUpload) {
+    const overMax = field.isOverMax ? 'overMax' : '';
     return (
       <>
-        <FormLabel style={{
-          minWidth: '10rem',
-          color: field.isValidated ? 'black' : 'pink',
-        }}
+        <UploadZone
+          onDragOver={onUploadZoneDragOverOrEnter}
+          onDragEnter={onUploadZoneDragOverOrEnter}
+          onDragLeave={onUploadZoneDragLeave}
+          onDrop={(e) => {
+            onUploadZoneDragLeave();
+            return handleDrop(e, fieldId, field.space_delimited, field.upload_max);
+          }}
         >
-          {fieldName}
-        </FormLabel>
-        <StyledButton
-          type="text"
-          size="middle"
-          textcolor="lightBlue"
-          style={{ minWidth: '5rem' }}
-        >
-          <label htmlFor={fieldId}>
-            <UploadBox />
-          </label>
-        </StyledButton>
-        <FormInput
-          type={fieldType}
-          id={fieldId}
-          name={fieldName}
-          onChange={(e) => handleChange(e)}
-        />
-        <FormInput
-          type="text"
-          id={fieldId}
-          name={fieldName}
-          value={value.value}
-          defaultChecked={boolDefault}
-          onChange={(e) => handleChange(e)}
-        />
-        <AppDropdown overlay={menu} trigger="click">
-          <QmarkOutlined />
-        </AppDropdown>
-        <br />
+          <FormLabel style={{
+            minWidth: '10rem',
+            color: field.isValidated ? 'black' : 'pink',
+          }}
+          >
+            {fieldName}
+          </FormLabel>
+          <StyledButton
+            type="text"
+            size="middle"
+            textcolor="lightBlue"
+            style={{ minWidth: '5rem' }}
+          >
+            <label htmlFor={fieldId}>
+              <UploadBox />
+            </label>
+          </StyledButton>
+          <FormInput
+            type={fieldType}
+            id={fieldId}
+            name={fieldName}
+            onChange={(e) => handleDrop(e, fieldId, field.space_delimited, field.upload_max)}
+          />
+          <FormInput
+            type="text"
+            id={fieldId}
+            name={fieldName}
+            value={value.value}
+            defaultChecked={boolDefault}
+            onChange={(e) => handleChange(e)}
+            className={uploadZoneDragged ? 'dragged' : overMax}
+          />
+          <AppDropdown overlay={menu} trigger="click">
+            <QmarkOutlined />
+          </AppDropdown>
+        </UploadZone>
       </>
     );
   }
@@ -310,11 +343,15 @@ FormBuilder.propTypes = {
     description: PropTypes.string.isRequired,
     choices: PropTypes.string.isRequired,
     isValidated: PropTypes.bool.isRequired,
+    space_delimited: PropTypes.bool.isRequired,
+    isOverMax: PropTypes.bool.isRequired,
+    upload_max: PropTypes.number.isRequired,
   }).isRequired,
   fieldName: PropTypes.string.isRequired,
   fieldId: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
   handleChangeSelect: PropTypes.func.isRequired,
+  handleDrop: PropTypes.func.isRequired,
   value: PropTypes.shape({
     value: PropTypes.oneOfType([
       PropTypes.string,

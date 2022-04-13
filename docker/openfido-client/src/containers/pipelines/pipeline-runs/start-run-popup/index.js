@@ -272,26 +272,44 @@ const StartRunPopup = ({
     fileReader.readAsArrayBuffer(data);
   };
 
-  const handleFormFieldUpload = (e) => {
+  const handleFormFieldUpload = (e, max) => {
     e.preventDefault();
-    let file;
+    let uploadCounter = 0;
 
-    if (e.target.files) {
-      [file] = e.target.files;
-    } else if (e.dataTransfer.files) {
-      [file] = e.dataTransfer.files;
-    }
+    const files = Array.from(e.target.files || e.dataTransfer.files).slice(0, max);
 
-    const fileReader = new window.FileReader();
-    fileReader.addEventListener('loadstart', () => {
-      setIsLoading(true);
+    files.forEach((file, index, array) => {
+      const fileReader = new window.FileReader();
+      // added loadend event to enable autofill matching form fields with uploaded config
+      fileReader.addEventListener('loadend', (event) => {
+        if (file.name === 'config.csv') {
+          const buf = event.target.result;
+          let view = String.fromCharCode.apply(null, new Int8Array(buf)).split('\n');
+          view = view.map((item) => {
+            const temp = [];
+            const splitter = item.split(',');
+            temp.push(splitter.shift());
+            temp.push(splitter.join(',').replace('\r', ''));
+            return temp;
+          });
+          setUploadedCsv(view);
+        }
+      });
+      fileReader.addEventListener('loadstart', () => {
+        setIsLoading(true);
+      });
+      fileReader.onload = () => {
+        dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result))
+          .then(() => {
+            uploadCounter += 1;
+            if (uploadCounter === array.length) {
+              setIsLoading(false);
+            }
+          });
+      };
+
+      fileReader.readAsArrayBuffer(file);
     });
-    fileReader.onload = () => {
-      dispatch(uploadInputFile(currentOrg, pipeline_uuid, file.name, fileReader.result))
-        .then(() => setIsLoading(false));
-    };
-
-    fileReader.readAsArrayBuffer(file);
   };
 
   const handleOpenPiplineClick = () => {
@@ -334,6 +352,7 @@ const StartRunPopup = ({
                 onInputFormSubmit={(arrayBuffer, fileName) => handleInputFormSubmit(arrayBuffer, fileName)}
                 handleFormFieldUpload={handleFormFieldUpload}
                 uploadedCsv={uploadedCsv}
+                onInputsChangedOrDropped={onInputsChangedOrDropped}
               />
             );
           })

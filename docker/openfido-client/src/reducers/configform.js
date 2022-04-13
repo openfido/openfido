@@ -20,6 +20,15 @@ const formReducer = (state, action) => {
         },
       };
     }
+    case 'DROPPED OVER MAXIMUM ALLOWED': {
+      return {
+        ...state,
+        [action.field]: {
+          ...state[action.field],
+          isOverMax: action.payload,
+        },
+      };
+    }
     case 'HANDLE INITIAL UPDATE': {
       return {
         ...action.payload,

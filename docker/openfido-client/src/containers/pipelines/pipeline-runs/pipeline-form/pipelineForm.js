@@ -21,7 +21,7 @@ const PipelineFormStyled = styled.form`
 const DEFAULT_STATE = {};
 
 const PipelineForm = ({
-  config, formType, onInputFormSubmit, handleFormFieldUpload, uploadedCsv,
+  config, formType, onInputFormSubmit, handleFormFieldUpload, uploadedCsv, onInputsChangedOrDropped,
 }) => {
   const [fType, setFormType] = useState(undefined);
   const [fName, setFormName] = useState(undefined);
@@ -59,6 +59,12 @@ const PipelineForm = ({
         if (cleanConfig[item].choices === undefined) {
           cleanConfig[item].choices = '';
         }
+        if (cleanConfig[item].space_delimited !== true) {
+          cleanConfig[item].space_delimited = false;
+        }
+        if (cleanConfig[item].upload_max === undefined) {
+          cleanConfig[item].upload_max = 0;
+        }
         if (cleanConfig[item].input_type.includes('required')) {
           cleanConfig[item].required = true;
           cleanConfig[item].isValidated = true;
@@ -67,6 +73,7 @@ const PipelineForm = ({
           cleanConfig[item].isValidated = true;
         }
         cleanConfig[item].value = cleanConfig[item].default;
+        cleanConfig[item].isOverMax = false;
         return item;
       });
       dispatch({
@@ -102,17 +109,6 @@ const PipelineForm = ({
     if (config[e.target.id].input_type === 'boolean') {
       update = `${e.target.checked}`;
     }
-    if ((config[e.target.id].input_type === 'upload') || (config[e.target.id].input_type === 'upload required')) {
-      if (e.target.files) {
-        const [file] = e.target.files;
-        update = file.name;
-        handleFormFieldUpload(e);
-      } else if (e.dataTransfer) {
-        const [file] = e.dataTransfer.files;
-        update = file.name;
-        handleFormFieldUpload(e);
-      }
-    }
     dispatch({
       type: 'HANDLE INPUT TEXT',
       field: e.target.id,
@@ -135,6 +131,54 @@ const PipelineForm = ({
       type: 'HANDLE INPUT TEXT',
       field: id,
       payload: input,
+    });
+  };
+
+  const handleDrop = (e, id, space, max) => {
+    let update = '';
+    const files = Array.from(e.target.files || e.dataTransfer.files);
+    if (max) {
+      if (files.length > max) {
+        dispatch({
+          type: 'DROPPED OVER MAXIMUM ALLOWED',
+          field: id,
+          payload: true,
+        });
+      } else {
+        dispatch({
+          type: 'DROPPED OVER MAXIMUM ALLOWED',
+          field: id,
+          payload: false,
+        });
+      }
+      if (max === 1) {
+        update = files[0].name;
+      } else {
+        for (let i = 0; i < max; i += 1) {
+          if (i === (max - 1)) {
+            update += files[i].name;
+          } else if (space) {
+            update += `${files[i].name} `;
+          } else {
+            update += `${files[i].name}, `;
+          }
+        }
+      }
+      handleFormFieldUpload(e, max);
+    } else {
+      onInputsChangedOrDropped(e);
+      for (let i = 0; i < files.length; i += 1) {
+        if (space) {
+          update += `${files[i].name} `;
+        } else {
+          update += `${files[i].name}, `;
+        }
+      }
+    }
+    dispatch({
+      type: 'HANDLE INPUT TEXT',
+      field: id,
+      payload: update,
     });
   };
 
@@ -279,6 +323,7 @@ const PipelineForm = ({
                 handleChange={handleChange}
                 handleChangeSelect={handleChangeSelect}
                 handleFormFieldUpload={handleFormFieldUpload}
+                handleDrop={handleDrop}
               />
             );
           })}
@@ -298,6 +343,7 @@ PipelineForm.propTypes = {
   }).isRequired,
   onInputFormSubmit: PropTypes.func.isRequired,
   handleFormFieldUpload: PropTypes.func.isRequired,
+  onInputsChangedOrDropped: PropTypes.func.isRequired,
   formType: PropTypes.arrayOf(PropTypes.string).isRequired,
   uploadedCsv: PropTypes.arrayOf(PropTypes.array).isRequired,
 };

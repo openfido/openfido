@@ -1,5 +1,47 @@
 version: '3'
 services:
+
+
+  # minio:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #   volumes:
+  #     - datastore:/data
+  #   environment:
+  #     - "MINIO_ACCESS_KEY=minio_access_key"
+  #     - "MINIO_SECRET_KEY=minio123"
+  #   command: server /data
+  # blobstorage:
+  #   image: minio/mc
+  #   depends_on:
+  #     - minio
+  #   entrypoint: >
+  #     /bin/sh -c "
+  #     /usr/bin/mc alias set myminio http://minio:9000 minio_access_key minio123;
+  #     /usr/bin/mc mb myminio/workflow-data;
+  #     /usr/bin/mc policy set public myminio/workflow-data;
+  #     exit 0;
+  #     "
+  # blobstorage:
+  #   image: minio/minio
+  #   restart: "unless-stopped"
+  #   volumes:
+  #       - datastore:/data
+  #   environment:
+  #       MINIO_ROOT_USER: minio_access_key
+  #       MINIO_ROOT_PASSWORD: minio123
+  #   # Allow all incoming hosts to access the server by using 0.0.0.0
+  #   command: server --address 0.0.0.0:9000 --console-address ":9001" /data
+  #   ports:
+  #       # Bind explicitly to 127.0.0.1
+  #       - "127.0.0.1:9000:9000"
+  #       - "9001:9001"
+  #   healthcheck:
+  #       test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/live"]
+  #       interval: 30s
+  #       timeout: 20s
+  #       retries: 3
   blobstorage:
     image: minio/minio
     command: server /data
@@ -9,10 +51,49 @@ services:
     volumes:
       - ./uploads:/data:delegated
     ports:
-      - "9000:9000"
+      - "10000:9000"
+
+  # blobstorage:
+  #   image: minio/minio
+  #   command: server /data
+  #   environment:
+  #     MINIO_ACCESS_KEY: minio_access_key
+  #     MINIO_SECRET_KEY: minio123
+  #   volumes:
+  #     - ./uploads:/data:delegated
+  #   ports:
+  #     - "9000:9000"
+  # minio:
+  #   image: minio/minio
+  #   ports:
+  #     - "9000:9000"
+  #   volumes:
+  #     - ./test/.minio/data:/export
+  #     - ./test/.minio/config:/root/.minio
+  #   environment:
+  #     - "MINIO_ACCESS_KEY=minio_access_key"
+  #     - "MINIO_SECRET_KEY=minio123"
+
+  # blobstorage:
+  #   image: garland/aws-cli-docker
+  #   links:
+  #     - minio
+  #   command: >
+  #     /bin/sh -c "
+  #       while ! wget -q -S http://minio:9000/minio/login; do sleep 1; done;
+  #       aws configure set default.s3.signature_version s3v4;
+  #       aws configure set default.region us-east-1;
+  #       aws s3api create-bucket \
+  #         --bucket workflow-data \
+  #         --endpoint-url=http://minio:9000;
+  #       exit 0;
+  #     "
+  #   environment:
+  #     - "AWS_ACCESS_KEY_ID=minio_access_key"
+  #     - "AWS_SECRET_ACCESS_KEY=minio123"
   workflow-queue:
     build:
-      context: ../openfido-workflow-service/
+      context: openfido-workflow-service/
       dockerfile: Dockerfile.rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: rabbit-user
@@ -27,7 +108,7 @@ services:
       - workflow_data:/var/lib/postgresql/data
 
   workflow-service:
-    build: ../openfido-workflow-service/
+    build: openfido-workflow-service/
     environment:
       PGDATABASE: workflowservice
       PGUSER: postgres
@@ -39,11 +120,13 @@ services:
       CELERY_BROKER_URL: amqp://rabbit-user:rabbit-password@workflow-queue/api-queue
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
+      S3_BUCKET: workflow-data
       S3_ENDPOINT_URL: http://blobstorage:9000
+      # S3_ENDPOINT_URL: http://minio:9000
       PYTHONPATH: /opt/utils
     volumes:
-      - ../openfido-workflow-service:/opt/app:delegated
-      - ../openfido-utils:/opt/utils:delegated
+      - ./openfido-workflow-service:/opt/app:delegated
+      - ./openfido-utils:/opt/utils:delegated
     ports:
       - "6001:5000"
     depends_on:
@@ -52,7 +135,7 @@ services:
       - blobstorage
   workflow-worker:
     build:
-      context: ../openfido-workflow-service
+      context: openfido-workflow-service
       dockerfile: Dockerfile.worker
     command: celery -A app.worker worker -l DEBUG
     environment:
@@ -61,7 +144,7 @@ services:
     env_file:
       - .worker-env
     volumes:
-      - ../openfido-workflow-service:/opt/app:delegated
+      - ./openfido-workflow-service:/opt/app:delegated
       - /var/run/docker.sock:/var/run/docker.sock
       # The 'docker in docker' nature of this local configuration means that
       # bind mounts happen on the 'host docker' not the first docker container.
@@ -79,11 +162,10 @@ services:
       POSTGRES_PASSWORD: dev-password
     volumes:
       - auth_data:/var/lib/postgresql/data
+
   auth-service:
-    build: ../openfido-auth-service
+    build: openfido-auth-service
     command: flask run -h 0.0.0.0
-    env_file:
-      - ../openfido-auth-service/.env
     environment:
       PGDATABASE: accountservices
       PGUSER: postgres
@@ -96,10 +178,11 @@ services:
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
       S3_ENDPOINT_URL: http://blobstorage:9000
+      # S3_ENDPOINT_URL: http://minio:9000
       PYTHONPATH: /opt/utils
     volumes:
-      - ../openfido-auth-service:/opt/app:delegated
-      - ../openfido-utils:/opt/utils:delegated
+      - ./openfido-auth-service:/opt/app:delegated
+      - ./openfido-utils:/opt/utils:delegated
     ports:
       - "6002:5000"
     depends_on:
@@ -112,8 +195,9 @@ services:
       POSTGRES_PASSWORD: dev-password
     volumes:
       - app_data:/var/lib/postgresql/data
+
   app-service:
-    build: .
+    build: openfido-app-service
     environment:
       PGDATABASE: appservice
       PGUSER: postgres
@@ -124,13 +208,17 @@ services:
       SQLALCHEMY_DATABASE_URI: postgresql://postgres:dev-password@app-db/appservice
       S3_ACCESS_KEY_ID: minio_access_key
       S3_SECRET_ACCESS_KEY: minio123
+      S3_BUCKET: app-data
       S3_ENDPOINT_URL: http://blobstorage:9000
+      # S3_ENDPOINT_URL: http://minio:9000
       AUTH_HOSTNAME: http://auth-service:5000
       WORKFLOW_HOSTNAME: http://workflow-service:5000
       PYTHONPATH: /opt/utils
+    env_file:
+      - .workflow-env
     volumes:
-      - .:/opt/app:delegated
-      - ../openfido-utils:/opt/utils:delegated
+      - ./openfido-app-service:/opt/app:delegated
+      - ./openfido-utils:/opt/utils:delegated
     ports:
       - "6003:5000"
     depends_on:
@@ -138,10 +226,9 @@ services:
       - auth-service
       - blobstorage
       - workflow-service
-
   react-client:
     stdin_open: true
-    build: ../openfido-client
+    build: openfido-client
     environment:
       HOST: 0.0.0.0
     volumes:
@@ -151,6 +238,7 @@ services:
     depends_on:
       - auth-service
       - app-service
+
 volumes:
   app_data:
   auth_data:
