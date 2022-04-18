@@ -18,6 +18,8 @@ import colors from 'styles/colors';
 
 const PipelineItemGrid = styled(StyledGrid)`
   text-align: left;
+  box-shadow: 10px 5px 5px black;
+  border: 1px solid;
   .ant-btn {
     height: 32px;
     height: 2rem;

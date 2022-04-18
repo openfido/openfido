@@ -153,6 +153,16 @@ const PipelineForm = ({
       }
       if (max === 1) {
         update = files[0].name;
+      } else if (files.length < max) {
+        for (let i = 0; i < files.length; i += 1) {
+          if (i === (files.length - 1)) {
+            update += files[i].name;
+          } else if (space) {
+            update += `${files[i].name} `;
+          } else {
+            update += `${files[i].name}, `;
+          }
+        }
       } else {
         for (let i = 0; i < max; i += 1) {
           if (i === (max - 1)) {

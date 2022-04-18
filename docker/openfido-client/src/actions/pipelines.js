@@ -82,6 +82,7 @@ export const getPipelineRun = (organization_uuid, pipeline_uuid, pipeline_run_uu
     });
 };
 
+// Adds current pipeline run's console output to the console field in state
 export const getPipelineRunConsoleOutput = (organization_uuid, pipeline_uuid, pipeilne_run_uuid, poll) => async (dispatch) => {
   if (!poll) await dispatch({ type: GET_PIPELINE_RUN_CONSOLE_OUTPUT_IN_PROGRESS });
   requestPipelineRunConsoleOutput(organization_uuid, pipeline_uuid, pipeilne_run_uuid)

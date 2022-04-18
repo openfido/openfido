@@ -42,7 +42,8 @@ const AppDropdown = styled(Dropdown)`
 
 const AppDropdownMenu = styled(Menu)`
   filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.05));
-  box-shadow: none;
+  border: 1px solid;
+  box-shadow: 2px 1px 1px black;
   border-radius: 3px;
   padding: 0;
   min-width: 87px;

@@ -58,6 +58,8 @@ const StyledConsoleOutput = styled.div`
 `;
 
 const ConsoleOutputTypes = styled.div`
+  display: flex;
+  flex-direction: row;
   padding-top: 16px;
   padding-top: 1rem;
   text-align: left;
@@ -67,6 +69,18 @@ const ConsoleOutputContent = styled.div`
   padding: 20px 28px;
   padding: 1.25rem 1.75rem;
   text-align: left;
+`;
+
+const ButtonContainer = styled.div`
+display: flex;
+box-shadow: 10px 5px 5px black;
+border: 1px solid;
+margin: 15px;
+max-width: 40%;
+min-width: 40%;
+text-align: left;
+justify-content: center;
+align-items: center;
 `;
 
 const ConsoleOutput = () => {
@@ -97,11 +111,20 @@ const ConsoleOutput = () => {
     }
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, currentPipelineRunUuid, currentPipelineRun, dispatch]);
 
+  // Refreshes console output after the time set in interval
   useEffect(() => {
     const interval = pipelineRunSelectedUuid && !getConsoleOutputInProgress && setInterval(() => {
       dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
     }, POLL_CONSOLE_OUTPUT_INTERVAL);
     return () => clearInterval(interval);
+  }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch]);
+
+  // run once version of above useEffect to quickly refresh console data when switching between runs
+  useEffect(() => {
+    const updateOnce = pipelineRunSelectedUuid && !getConsoleOutputInProgress && setTimeout(() => {
+      dispatch(getPipelineRunConsoleOutput(currentOrg, pipelineInView, pipelineRunSelectedUuid, true));
+    }, 500);
+    return () => clearTimeout(updateOnce);
   }, [currentOrg, pipelineInView, pipelineRunSelectedUuid, getConsoleOutputInProgress, dispatch]);
 
   useEffect(() => {
@@ -138,24 +161,32 @@ const ConsoleOutput = () => {
         </header>
         <section>
           <ConsoleOutputTypes>
-            <StyledButton
-              type="text"
-              size="large"
-              width={108}
-              onClick={() => setOutputType(STDOUT)}
-              textcolor={outputType === STDOUT ? 'lightBlue' : 'gray'}
-            >
-              stdout
-            </StyledButton>
-            <StyledButton
-              type="text"
-              size="large"
-              width={108}
-              onClick={() => setOutputType(STDERR)}
-              textcolor={outputType === STDERR ? 'lightBlue' : 'gray'}
-            >
-              stderr
-            </StyledButton>
+            <ButtonContainer style={{ borderColor: outputType === STDOUT ? 'lightBlue' : 'black' }}>
+              <StyledButton
+                type="text"
+                size="large"
+                width={108}
+                onClick={() => setOutputType(STDOUT)}
+                textcolor={outputType === STDOUT ? 'lightBlue' : 'gray'}
+              >
+                STANDARD OUTPUT
+                <br />
+                (stdout)
+              </StyledButton>
+            </ButtonContainer>
+            <ButtonContainer style={{ borderColor: outputType === STDERR ? 'lightBlue' : 'black' }}>
+              <StyledButton
+                type="text"
+                size="large"
+                width={108}
+                onClick={() => setOutputType(STDERR)}
+                textcolor={outputType === STDERR ? 'lightBlue' : 'gray'}
+              >
+                STANDARD ERROR
+                <br />
+                (stderr)
+              </StyledButton>
+            </ButtonContainer>
           </ConsoleOutputTypes>
           {(getConsoleOutputError || (consoleOutput && !consoleOutput[outputType])) && (
             <Spin indicator={<LoadingFilled spin />} />

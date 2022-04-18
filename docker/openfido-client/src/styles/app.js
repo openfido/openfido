@@ -296,6 +296,8 @@ export const StyledInput = styled(Input)`
   width: auto;
   min-width: 280px;
   padding: 12px;
+  box-shadow: 10px 5px 5px black;
+  border: 1px solid;
   background-color: ${colors.lightBg};
   &, &:hover:focus {
     color: ${colors.gray};
@@ -326,7 +328,6 @@ export const StyledInput = styled(Input)`
   `)}
   ${(shape === 'round' ? (`
   background-color: ${colors.white};
-  border: 1px solid ${colors.lightGray};
   font-size: 16px;
   line-height: 19px;
   height: 42px;
@@ -350,7 +351,6 @@ export const StyledInput = styled(Input)`
   &::placeholder {
     color: ${colors.darkText};
   }
-  border: 0;
   &:hover, &:focus {
     box-shadow: none;
   }
@@ -359,13 +359,17 @@ export const StyledInput = styled(Input)`
 `;
 
 export const StyledTextArea = styled(Input.TextArea)`
-  border: 0;
+box-shadow: 10px 5px 5px black;
+border: 1px solid;
   &:focus {
     box-shadow: none;
   }
   color: ${colors.gray};
   &:hover {
     color: ${colors.blue};
+  }
+  &:hover, &:focus {
+    box-shadow: none;
   }
   font-size: 18px;
   line-height: 21px;
