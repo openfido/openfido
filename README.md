@@ -20,7 +20,7 @@ Users should consult the [online documentation](http://help.openfido.org/).
 
 Pipeline developers should consult the [pipeline developer documents](http://help.openfido.org/_page.html?owner=slacgismo&project=openfido&branch=master&folder=/Pipeline%20Developer&doc=/Pipeline%20Developer/How%20to%20create%20an%20OpenFIDO%20Pipeline.md)
 
-If you are looking for a specific pipeline, you can also refer to our [Quick Links][https://github.com/openfido/openfido/wiki](https://github.com/openfido/openfido/wiki/Quick-Links) to see if it included in our list of official pipelines confirmed to work on the openfido platform.
+If you are looking for a specific pipeline, you can also refer to our [Quick Links](https://github.com/openfido/openfido/wiki/Quick-Links) to see if it included in our list of official pipelines confirmed to work on the openfido platform.
 
 ### Docker
 
