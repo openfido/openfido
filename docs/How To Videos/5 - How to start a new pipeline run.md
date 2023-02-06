@@ -1,6 +1,6 @@
 # How to start a pipeline run
 
-[Watch Video](http://help.openfido.org/assets/create_pipeline.mp4)
+[Watch Video](http://help.openfido.org/assets/start_pipeline.mp4)
 
 After you’ve created a new pipeline, you can start a new run of your pipeline.
 
