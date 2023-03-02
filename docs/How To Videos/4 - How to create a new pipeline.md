@@ -1,6 +1,6 @@
 # How to create a new pipeline
 
-[Watch Video](http://help.openfido.org/assets/create_pipeline.mp4)
+[video:hSJxM3FpF5o]
 
 Create your first pipeline. click on "Get Started".
 

@@ -1,6 +1,6 @@
 # How to apply a visualization to a pipeline artifact
 
-[Watch Video](http://help.openfido.org/assets/data_visualization.mp4)
+[video:2cYt2unItAo]
 
 In this video, we've just successfully run a GRIP recovery simulation.
 

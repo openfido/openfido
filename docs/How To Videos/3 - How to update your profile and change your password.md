@@ -1,6 +1,6 @@
 # How to update your profile and change your password
 
-[Watch Video](http://help.openfido.org/assets/update_profile.mp4)
+[video:WLyI6nimr40]
 
 Any user can update their own profile and change their account password.
 
