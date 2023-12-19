@@ -5,7 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.1",
     "@fast-csv/parse": "^4.3.1",
-    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "antd": "^4.3.3",
@@ -40,7 +40,7 @@
     "react-redux": "^7.2.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.0",
     "recharts": "^1.8.5",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
